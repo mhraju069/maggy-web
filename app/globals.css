@@ -1,0 +1,184 @@
+@import "tailwindcss";
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+  --brand-ink: #1d1a17;
+  --brand-muted: #8b7355;
+  --brand-sand: #f3e8dc;
+  --brand-cream: #fbf6ef;
+  --brand-shadow: rgba(21, 17, 12, 0.12);
+  --font-display: "Cambria", "Georgia", serif;
+  --font-body: "Cambria", "Georgia", serif;
+  --text-kicker-size: 11px;
+  --text-kicker-letter: 3.3px;
+  --text-hero-size: 44px;
+  --text-hero-line: 1.15;
+  --text-subtitle-size: 15px;
+  --text-subtitle-line: 1.6;
+
+  /* Section title tokens */
+  --color-section-title: #6b5945;
+  --text-section-title-size: 56px;
+  --text-section-title-lh: 84px;
+  --text-section-title-ls: 1.12px;
+
+  /* Relax section tokens */
+  --color-relax-bg: #f5f1ed;
+  --color-relax-body: #9d8b7a;
+  --text-relax-title-size: 48px;
+  --text-relax-title-lh: 64px;
+  --text-relax-title-ls: 0.96px;
+  --text-relax-body-lh: 1.9;
+
+  /* Service card tokens */
+  --color-service-title: #6b5945;
+  --color-service-desc: #9d8b7a;
+  --color-service-link: #8b7355;
+  --font-playfair: "Playfair Display", Georgia, serif;
+  --text-service-title-size: 24px;
+  --text-service-title-lh: 36px;
+  --text-service-title-ls: 0.48px;
+  --text-service-desc-size: 16px;
+  --text-service-desc-lh: 1.71;
+  --text-service-link-size: 11px;
+  --text-service-link-lh: 16px;
+  --text-service-link-ls: 1.65px;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-body);
+}
+
+@layer components {
+  .text-kicker {
+    color: var(--brand-muted);
+    font-family: var(--font-body);
+    font-size: var(--text-kicker-size);
+    font-weight: 400;
+    line-height: 16px;
+    letter-spacing: var(--text-kicker-letter);
+    text-transform: uppercase;
+  }
+
+  .section-title {
+    color: #6b5945;
+    font-family: var(--font-playfair);
+    font-size: 56px;
+    font-weight: 400;
+    line-height: 84px;
+    letter-spacing: 1.12px;
+    text-align: center;
+  }
+
+  .text-hero {
+    color: #6b5945;
+    font-family: var(--font-playfair);
+    font-size: 72px;
+    font-weight: 400;
+    line-height: 78px;
+    letter-spacing: 1.44px;
+  }
+
+  .text-subtitle {
+    color: var(--brand-muted);
+    font-size: var(--text-subtitle-size);
+    line-height: var(--text-subtitle-line);
+  }
+  .font-cambria {
+    font-family: "Cambria", "Georgia", serif;
+  }
+  .font-displayPlayFair {
+    font-family: "Playfair Display", serif;
+  }
+
+  /* Service card classes */
+  /* Relax section classes */
+  .relax-title {
+    color: #6b5945;
+    font-family: var(--font-playfair);
+    font-size: 48px;
+    font-weight: 400;
+    line-height: 64px;
+    letter-spacing: 0.96px;
+  }
+
+  .relax-body {
+    color: #9d8b7a;
+    font-family: var(--font-body);
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 30.4px;
+  }
+
+  .service-card-title {
+    color: #6b5945;
+    font-family: var(--font-playfair);
+    font-size: 24px;
+    font-weight: 400;
+    line-height: 36px;
+    letter-spacing: 0.48px;
+  }
+
+  .service-card-desc {
+    color: var(--color-service-desc);
+    font-family: var(--font-body);
+    font-size: var(--text-service-desc-size);
+    font-weight: 400;
+    line-height: var(--text-service-desc-lh);
+  }
+
+  /* Activities carousel classes */
+  .activity-title {
+    color: #6b5945;
+    font-family: var(--font-playfair);
+    font-size: 48px;
+    font-weight: 400;
+    line-height: 64px;
+    letter-spacing: 0.96px;
+  }
+
+  .activity-subtitle {
+    color: #6b5945;
+    font-family: var(--font-body);
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 24px;
+  }
+
+  .activity-body {
+    color: #9d8b7a;
+    font-family: var(--font-body);
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 32px;
+  }
+
+  .service-card-link {
+    color: var(--color-service-link);
+    font-family: var(--font-body);
+    font-size: var(--text-service-link-size);
+    font-weight: 400;
+    line-height: var(--text-service-link-lh);
+    letter-spacing: var(--text-service-link-ls);
+    text-transform: uppercase;
+    text-decoration: underline;
+    text-underline-offset: auto;
+  }
+}
