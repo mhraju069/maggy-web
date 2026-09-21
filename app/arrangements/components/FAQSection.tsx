@@ -6,7 +6,7 @@ import { useState } from "react";
 
 const FAQSection = () => {
   const { t } = useLanguage();
-  const s = t.arrangementsPage.faq;
+  const s = (t.arrangementsPage as any)?.faq || { items: [] };
   const [openIndex, setOpenIndex] = useState<number | null>(1);
 
   return (
@@ -33,7 +33,7 @@ const FAQSection = () => {
 
         {/* Accordion — each item is its own card */}
         <div className="flex flex-col" style={{ gap: 8 }}>
-          {s.items.map((item, i) => {
+          {s.items.map((item: any, i: number) => {
             const isOpen = openIndex === i;
             return (
               <div

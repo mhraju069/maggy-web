@@ -1,11 +1,10 @@
 "use client";
+
 import CTASection from "@/components/shared/CTASection";
 import Footer from "@/components/shared/Footer";
 import PageHero from "@/components/shared/PageHero";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
-import ArrangementsGrid from "./components/ArrangementsGrid";
 import CreateYourOwn from "./components/CreateYourOwn";
-import FAQSection from "./components/FAQSection";
 
 const ArrangementsPage = () => {
   const { t } = useLanguage();
@@ -14,38 +13,37 @@ const ArrangementsPage = () => {
     <div className="min-h-screen bg-white">
       <PageHero
         backgroundImage="/images/arrangements/hero/arrangementshero.png"
-        title={t.arrangementsPage?.hero?.title || "Curated Experiences"}
+        title={t.arrangementsPage?.hero?.title || "Arrangements"}
         subtitle={
           t.arrangementsPage?.hero?.subtitle ||
-          "Thoughtfully designed journeys for deep transformation."
+          "Celebrate special occasions"
         }
       />
 
+      {/* Intro Section */}
       <section className="py-16 md:py-20 bg-[#FCF2E9]">
         <div className="container mx-auto px-6">
-          <div className="max-w-200 mx-auto text-center">
+          <div className="max-w-3xl mx-auto text-center">
             <p
-              className="text-[#475569] text-lg md:text-xl leading-relaxed"
-              style={{ fontFamily: "Cambria, Georgia, serif" }}
+              className="text-[#475569] text-xl md:text-2xl font-serif leading-relaxed"
             >
-              {t.arrangementsPage?.intro?.text ||
-                "Each arrangement is a carefully curated experience that combines our signature offerings into transformative wellness journeys designed for your unique needs."}
+              {t.arrangementsPage?.intro?.text}
             </p>
           </div>
         </div>
       </section>
 
-      <ArrangementsGrid />
+      {/* Create Your Own Section */}
       <CreateYourOwn />
-      <FAQSection />
 
+      {/* CTA Section */}
       <CTASection
-        title={t.arrangementsPage?.cta?.title || "Begin Your Journey"}
+        title={t.arrangementsPage?.createYourOwn?.title || "Create Your Own"}
         subtitle={
-          t.arrangementsPage?.cta?.subtitle ||
-          "Reserve your curated wellness experience today."
+          t.arrangementsPage?.createYourOwn?.description ||
+          "We'll work with you to design a bespoke arrangement."
         }
-        buttonText={t.arrangementsPage?.cta?.button || "Book Arrangement"}
+        buttonText={t.navbar?.contact || "Contact Us"}
         buttonLink="/contact"
         backgroundColor="#8B7355"
         textColor="#FFFFFF"

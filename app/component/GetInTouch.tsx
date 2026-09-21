@@ -1,4 +1,5 @@
 "use client";
+
 import DecorativeUnderline from "@/components/shared/DecorativeUnderline";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 import Image from "next/image";
@@ -31,7 +32,7 @@ const GetInTouch = () => {
         {/* Right: text */}
         <div className="flex flex-col gap-8 w-full lg:max-w-[605px] text-center lg:text-left">
           {/* Title */}
-          <div className="flex flex-col gap-3">
+          <div className="flex flex-col gap-3 items-center lg:items-start">
             <h2
               style={{
                 color: "#0F172A",
@@ -49,8 +50,8 @@ const GetInTouch = () => {
 
           {/* Contact items */}
           <div className="flex flex-col gap-6">
-            {t.getInTouch.contacts.map((item) => (
-              <div key={item.label} className="flex flex-col gap-0">
+            {t.getInTouch.contacts.map((item, idx) => (
+              <div key={idx} className="flex flex-col gap-1">
                 <p
                   style={{
                     color: "#0F172A",
@@ -66,9 +67,10 @@ const GetInTouch = () => {
                   style={{
                     color: "#475569",
                     fontFamily: "Cambria, Georgia, serif",
-                    fontSize: "20px",
+                    fontSize: "18px",
                     fontWeight: 400,
-                    lineHeight: "30px",
+                    lineHeight: "28px",
+                    whiteSpace: "pre-line",
                   }}
                 >
                   {item.value}

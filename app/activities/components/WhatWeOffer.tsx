@@ -13,7 +13,10 @@ const icons = [
 
 const WhatWeOffer = () => {
   const { t } = useLanguage();
-  const s = t.activitiesPage.whatWeOffer;
+  const s = (t.activitiesPage as any)?.whatWeOffer || {
+    subtitle: "Explore our experiences",
+    offerings: [],
+  };
 
   return (
     <section className="min-h-screen flex flex-col justify-center" style={{ background: "#FFFFFF", padding: "96px 128px" }}>
@@ -66,7 +69,7 @@ const WhatWeOffer = () => {
           margin: "0 auto",
         }}
       >
-        {s.offerings.map((item, i) => (
+        {s.offerings.map((item: any, i: number) => (
           <div
             key={i}
             style={{

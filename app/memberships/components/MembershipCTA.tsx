@@ -6,7 +6,13 @@ import Link from "next/link";
 
 const MembershipCTA = () => {
   const { t } = useLanguage();
-  const s = t.membershipsPage.cta;
+  const m = (t.membershipsPage as any)?.chooseMembership;
+  const oldS = (t.membershipsPage as any)?.cta;
+  const s = {
+    title: m?.title || oldS?.title || "Choose the Membership That Suits You",
+    subtitle: m?.subtitle || oldS?.subtitle || "",
+    button: m?.button || oldS?.button || "Apply for a membership",
+  };
 
   return (
     <section className="py-24" style={{ background: "#E8DFD5" }}>

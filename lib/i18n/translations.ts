@@ -4,70 +4,89 @@ export const translations = {
   en: {
     navbar: {
       home: "Home",
-      philosophy: "Philosophy",
+      philosophy: "About us",
+      restaurant: "Restaurant",
+      menu: "Menu",
+      events: "Events",
       wellness: "Wellness",
       arrangements: "Arrangements",
-      memberships: "Memberships",
       activities: "Activities",
+      memberships: "Memberships",
       contact: "Contact",
       login: "Log In",
       bookNow: "Book Now",
     },
     header: {
-      kicker: "A Different Approach to Health and Wellness",
-      title: ["Heaven is place", "on earth. Lunch.", "Relax. Celebrate."],
+      kicker: "Where heavenly food, relaxation and special moments come together.",
+      title: ["Heaven is a place", "on earth. Lunch.", "Relax. Celebrate."],
       subtitle:
-        "Where wellness, dining, and meaningful moments come together in perfect harmony.",
+        "Enjoy our cosy restaurant, relaxing sauna and beautiful event spaces for every occasion.",
+      bookNow: "Book now",
     },
     service: {
-      kicker: "Discover Our",
+      kicker: "Our Services",
       title: "Our Services",
       learnMore: "LEARN MORE",
       items: [
         {
           title: "The Lunchroom",
           description:
-            "Seasonal, refined dining in a calm and elegant setting where you can truly savor each moment.",
+            "Enjoy, fresh food, great coffee, and a welcoming atmosphere. A place to relax, connect, and enjoy life's simple pleasures.",
         },
         {
-          title: "Saunas & Wellness",
+          title: "Sauna",
           description:
-            "A sanctuary of warmth and stillness, designed for deep relaxation and inner balance.",
+            "Escape the rush of a daily life and enjoy a moment of pure relaxation in our peaceful wellness environment.",
         },
         {
-          title: "Multifunctional Space",
+          title: "Events & Activities",
           description:
-            "A serene space for gatherings, movement, and meaningful moments in thoughtful design.",
+            "From private celebrations and business gatherings to mindfulness sessions and workshops. A versatile space designed to connect, inspire and create memorable moments.",
         },
       ],
     },
     relax: {
-      kicker: "Helping you make better",
+      kicker: "Relax. Enjoy.",
       title: "Relax. Enjoy.",
       body1:
-        "This is where your brand story comes to life. What makes your approach unique? Why should future clients choose to join your wellness journey?",
+        "A place where life slows down and moments matter.",
       body2:
-        "A warm, stylish environment where you can relax, enjoy and connect",
+        "At heaven on Earth, every visit is an invitation to enjoy. Start your day with a wholesome breakfast, have a fresh lunch, enjoy a coffee or a ice-cream on our sunny terrace, relax in our wellness facilities, or gather with friends, family and colleagues to celebrate life special moments.",
       body3:
-        "From healthy lunches and artisanal ice cream to luxurious wellness and inspiring gatherings, here you step out of the crowds and recharge, inside and out.",
+        "Whether you're seeking relaxation, connection, or simply a beautiful place to spend your time, you'll find it here.",
     },
     activities: {
       kicker: "Activities",
       items: [
         {
-          title: "Breathwork",
-          subtitle: "Mindful sessions and curated wellness",
-          body: "During our breathing sessions, we take you on a journey to relaxation and deepening. With conscious breathing, you release tension, you get out of your head and back into your body. A gentle but powerful experience that gives room for peace, clarity and new energy.",
+          title: "Weddings",
+          subtitle: "Cherished memories made",
+          body: "From intimate ceremonies, to elegant receptions & dinners to a big celebration party. Heaven on Earth offers a warm and beautiful atmosphere where cherished memories are made and every detail is thoughtfully considered.",
         },
         {
-          title: "Sound Healing",
-          subtitle: "Vibrational therapy for deep rest",
-          body: "Immerse yourself in the resonant tones of sound bowls and gentle instruments. Each session guides you into a meditative state where the body finds its natural rhythm and the mind releases its grip.",
+          title: "Babyshowers & Gender Reveals",
+          subtitle: "A beautiful place to start new beginnings.",
+          body: "Gather with family and friends in a charming setting and make a baby shower or gender reveal a moment to remember.",
         },
         {
-          title: "Guided Meditation",
-          subtitle: "Stillness woven into your daily life",
-          body: "Our guided meditation sessions offer a gentle entry into mindfulness. Whether you are new to the practice or looking to deepen your awareness, each session leaves you feeling grounded and renewed.",
+          title: "Bachelor & Bachelorette Parties",
+          subtitle: "Celebrate before the big day in style.",
+          body: "Whether you're planning a relaxed gathering, a high beer, wine, cocktail, a wellness experience, or an workshop for a unforgettable day with friends, Heaven on Earth offers the perfect setting to celebrate this special occasion together.",
+        },
+        {
+          title: "Corporate Events & Meetings",
+          subtitle: "Bring your team together in a unique setting.",
+          body: "From productive meetings and inspiring team building workshops to company celebrations and networking events, Heaven on Earth provides the perfect atmosphere to connect, collaborate and create lasting impressions.",
+        },
+        {
+          title: "Mindfulness & Workshops",
+          subtitle: "Cultivate calm, balance, and connection",
+          body: "From meditation and breathwork to coaching and inspiring workshops. A place to slow down, release stress, and let go of built-up tension. Discover different ways to cultivate more calm, balance, and meaningful connection in everyday life.",
+        },
+        {
+          title: "Salt Room & Halotherapy",
+          subtitle: "Deep relaxation and natural well-being",
+          body: "Step into a calming salt room designed for deep relaxation and natural well-being. Halotherapy uses microscopic salt particles released into the air, creating a soothing environment that supports comfortable breathing and skin wellness while helping you slow down, unwind and recharge.",
         },
       ],
     },
@@ -76,137 +95,130 @@ export const translations = {
       contacts: [
         {
           label: "Address",
-          value: "123 Anywhene St. Any City, State, Country 12345",
+          value: "Slotweg 1, 1934CM in Egmond aan den Hoef.",
         },
-        { label: "Openingshours", value: "www.heavenlymomments.nl" },
-        { label: "Phone number", value: "+316 16017000" },
+        { label: "Opening hours Lunchroom", value: "Wed - Sun: 09:00 – 16:00 (Mon, Tue Closed)" },
+        { label: "Opening hours Wellness & Events", value: "Mon-Thu, Sun: 06:00 – 00:00 | Fri-Sat: 06:00 – 02:00" },
+        { label: "Phone number", value: "072 – 3030548" },
       ],
     },
     wellnessJourney: {
       title: "Begin Your Wellness Journey",
       subtitle:
         "Reconnect with your inner balance in a space where time slows down and clarity begins.",
-      bookNow: "Book Now",
+      bookNow: "Book here for all our services",
+      welcomeText: "We look forward to welcoming you in Heaven.",
     },
     philosophyPage: {
       hero: {
-        title: "Our Philosophy",
-        subtitle:
-          "Wellness is not a destination, but a practice of returning to yourself.",
+        title: "About us",
+        subtitle: "",
+      },
+      aboutUs: {
+        title: "",
+        text: "At Heaven on Earth, we believe life becomes more beautiful when we slow down and truly enjoy the moment. Our philosophy is centered around connection: with yourself, with others and with the world around you. Whether you visit us for a nourishing lunch, a relaxing wellness experience, an inspiring workshop or a special celebration, we want you to feel completely welcome. Surrounded by the beautiful nature, dunes and coastline of heavenly Egmond, Heaven on Earth is a place to unwind, recharge and create meaningful memories. Everything we offer is created with care, warmth and attention, from the food we serve to the atmosphere you experience. A place where life slows down and moments matter.",
       },
       whatWeBelieve: {
         title: "What We Believe",
-        body1:
-          "In a world that moves too fast, we create spaces that invite you to slow down. Our philosophy is simple: true transformation happens when you give yourself permission to pause.",
-        body2:
-          "We believe wellness is not about perfection, but about presence. It's about honoring your body, quieting your mind, and nurturing your spirit.",
+        body: "We believe that life is not only about what you do, but more importantly, about how you feel. It is about consciously making time for yourself and for one another. About enjoying good food, meaningful conversations, relaxation and special moments. We believe in genuine hospitality, true connection and creating an environment where everyone feels welcome and free to be themselves. Heaven on Earth is more than just a venue. It is a place to come together, unwind, celebrate life and create memories that will stay with you forever.",
       },
-      approach: {
-        title: "Our Approach to Wellness",
-        subtitle: "Four simple steps to your moment of tranquility",
+      heart: {
+        title: "The Heart of Heaven on Earth",
+        subtitle: "Three values at the heart of everything we do.",
         items: [
           {
-            title: "Intentional Care",
-            body: "Every detail is designed with your well-being in mind, from the temperature of our spaces to the quality of our materials.",
+            title: "Slow Down",
+            body: "We create a warm and welcoming place where you can step away from everyday life, relax and truly enjoy the moment.",
           },
           {
-            title: "Natural Harmony",
-            body: "We honor the wisdom of nature, incorporating organic materials and sustainable practices into everything we do.",
+            title: "Come Together",
+            body: "Whether you join us for lunch, a celebration, an activity or a moment of relaxation, Heaven on Earth is a place for genuine connection.",
           },
           {
-            title: "Community Connection",
-            body: "While we celebrate solitude, we also recognize the power of shared experiences in deepening our wellness journey.",
+            title: "Celebrate Life",
+            body: "We believe that both the big milestones and the small everyday moments deserve to be celebrated and remembered.",
           },
         ],
       },
-      sustainability: {
-        kicker: "Membership",
-        title: "Sustainability & Care",
-        body1:
-          "Our commitment to wellness extends beyond our guests to the planet itself. We source responsibly, minimize waste, and operate with deep respect for the environment.",
-        body2:
-          "From our energy-efficient saunas to our organic, locally-sourced ingredients, every choice reflects our dedication to sustainable luxury.",
+      experience: {
+        title: "The Heaven on Earth Experience",
+        subtitle: "Everything Comes Together",
+        body: "Heaven on Earth is a place where food, relaxation, celebration and connection come together under one roof. Enjoy a delicious breakfast or lunch, take time for yourself, join an inspiring activity or celebrate one of life's special moments with the people you love. Whatever brings you to us, we want you to leave feeling happy, recharged and inspired with a beautiful memory to take home.",
       },
       quote: {
-        text: "Wellness is the art of listening to what your body, mind, and soul truly need—and having the courage to honor it.",
-        author: "Our Founding Principle",
+        text: "“The present moment is filled with joy and happiness. If you are attentive, you will see it.”",
+        author: "Thich Nhat Hanh",
       },
       experienceCTA: {
-        title: "Experience Our Philosophy",
-        subtitle:
-          "Let us guide you on a journey of transformation and renewal.",
-        button: "Explore Wellness",
+        title: "Experience Heaven on Earth",
+        subtitle: "Discover a place created for good food, meaningful connection, relaxation and unforgettable moments.",
+        button: "Explore Heaven on Earth",
       },
     },
     footer: {
-      tagline:
-        "A luxury wellness destination where peace, balance and meaningful experiences come together.",
-      quickLinks: {
-        title: "Quick Links",
-        links: [
-          { label: "Home", href: "/" },
-          { label: "Private Saunas", href: "/wellness" },
-          { label: "Arrangements", href: "/arrangements" },
-          { label: "Membership", href: "/memberships" },
-          { label: "Contact", href: "/contact" },
-        ],
-      },
-      connect: {
-        title: "Connect",
-        links: [
-          { label: "Event Space", href: "/eventspace" },
-          { label: "Lunchroom", href: "/lunchroom" },
-          { label: "Activities", href: "/activities" },
-          { label: "Contact", href: "/contact" },
-          { label: "Book Now", href: "/contact" },
-        ],
-      },
+      tagline: "",
       contact: {
-        title: "Contact",
-        address: "123 Anywhene St. Any City, State, Country 12345",
-        country: "The Netherlands",
-        phone: "+316 16017000",
-        website: "www.heavenlymoments.nl",
+        title: "Get in touch",
+        address: "Slotweg 1, 1934CM in Egmond aan den Hoef.",
+        phone: "072 – 3030548",
       },
-      openingHours: {
-        title: "Opening Hours",
+      lunchroomHours: {
+        title: "Opening hours Lunchroom",
         hours: [
-          { day: "Monday - Friday", time: "9AM - 9PM" },
-          { day: "Saturday", time: "10AM - 8PM" },
-          { day: "Sunday", time: "10AM - 6PM" },
+          { day: "Monday & Tuesday", time: "Closed" },
+          { day: "Wednesday - Sunday", time: "09:00 – 16:00" },
         ],
       },
-      copyright: "© 2026 heaven All rights reserved.",
+      wellnessHours: {
+        title: "Opening hours Wellness en Events",
+        hours: [
+          { day: "Monday - Thursday & Sunday", time: "06:00 – 00:00" },
+          { day: "Friday & Saturday", time: "06:00 – 02:00" },
+        ],
+      },
+      copyright: "© 2026 Heaven on Earth. All rights reserved.",
     },
     wellnessPage: {
       hero: {
         title: "Sauna & Wellness",
-        subtitle:
-          "Ancient wisdom meets modern comfort in our heat therapy sanctuaries.",
+        subtitle: "Relax. Recharge. Enjoy.",
       },
       intro: {
-        text: "Our saunas are more than heated rooms—they are spaces of transformation where heat, breath, and stillness work together to release what no longer serves you.",
+        text: "Step into our wellness spaces and leave the everyday rush behind. Enjoy the warmth of the sauna, unwind in the jacuzzi and take some well-deserved time for yourself.",
       },
-      saunaOfferings: {
-        title: "Sauna & Wellness",
-        subtitle: "Choose between private exclusivity or shared serenity",
+      spaces: {
+        title: "Three Spaces, Your Way to Relax",
+        subtitle: "Discover three unique spaces designed for relaxation, connection and natural well-being.",
+        items: [
+          {
+            title: "Private Sauna",
+            body: "A luxurious 40 m² private space for 2–8 guests, complete with a sauna, steam room, jacuzzi and exclusive extras.",
+          },
+          {
+            title: "Shared Sauna",
+            body: "A welcoming 40 m² sauna experience with swimwear, available to book in convenient time slots.",
+          },
+          {
+            title: "Salt Room",
+            body: "A calming, separately bookable halotherapy experience supporting natural breathing, skin health and deep relaxation.",
+          },
+        ],
       },
       whatsIncluded: {
-        title: "What's Included",
-        subtitle: "Here are some features included",
+        title: "What’s Included",
+        subtitle: "Everything you need to relax and recharge.",
         features: [
-          "Temperature-controlled environments",
-          "Luxurious robes & towels",
-          "Traditional heat therapy rituals",
-          "Premium aromatherapy essences",
-          "Private or shared experiences",
-          "Flexible session durations",
+          "Finnish sauna",
+          "Steam room",
+          "Jacuzzi",
+          "Cold plunge",
+          "Private or shared wellness",
+          "Free scrubsalt",
         ],
       },
       cta: {
-        title: "Experience Our Philosophy",
-        subtitle:
-          "Book your sauna experience and begin your wellness journey today.",
+        title: "Ready to Relax?",
+        subtitle: "Choose your wellness experience and enjoy a moment just for you.",
         button: "Book Sauna",
       },
     },
@@ -387,56 +399,18 @@ export const translations = {
     },
     arrangementsPage: {
       hero: {
-        title: "Curated Experiences",
-        subtitle: "Thoughtfully designed journeys for deep transformation.",
+        title: "Arrangements",
+        subtitle: "Celebrate special occasions",
       },
       intro: {
-        text: "Each arrangement is a carefully curated experience that combines our signature offerings into transformative wellness journeys designed for your unique needs.",
-      },
-      grid: {
-        bookButton: "Book Arrangement",
+        text: "Celebrate your birthday, baby shower, bachelor or bachelorette party, or any other special occasion with us.",
       },
       createYourOwn: {
         title: "Create Your Own",
-        body: "Don't see exactly what you're looking for? We'll work with you to design a bespoke wellness arrangement that perfectly matches your intentions and desires.",
+        description:
+          "Don't see exactly what you're looking for? We'll work with you to design a bespoke arrangement that perfectly matches your intentions and desires.",
+        body: "Don't see exactly what you're looking for? We'll work with you to design a bespoke arrangement that perfectly matches your intentions and desires.",
         button: "Contact Us",
-      },
-      faq: {
-        title: "Frequently Asked",
-        subtitle:
-          "We've answered the most common ones to help you feel confident before getting your quote.",
-        items: [
-          {
-            question: "What exactly is an arrangement?",
-            answer:
-              "An arrangement is a curated wellness package that combines multiple services — such as sauna, massage, yoga, and dining — into one seamless experience designed around your intentions.",
-          },
-          {
-            question: "What is the purpose of an arrangement?",
-            answer:
-              "Arrangements are designed to give you a complete day of well-being. Rather than booking services separately, everything is thoughtfully bundled so you can focus entirely on relaxation and transformation.",
-          },
-          {
-            question: "What does prepayment refer to?",
-            answer:
-              "Prepayment means we ask you to pay in full at the time of booking to secure your arrangement. Some arrangements offer partial payment options — you pay a deposit and settle the rest on arrival.",
-          },
-          {
-            question: "Could you tell me what 'Pay on the spot' means?",
-            answer:
-              "'Pay on the spot' arrangements can be booked without any upfront payment. You simply arrive and pay on the day of your experience.",
-          },
-          {
-            question: "Can you explain what a group arrangement includes?",
-            answer:
-              "Group arrangements include private sauna access for up to 18 persons, a guided wellness activity, premium catering, and a dedicated host to ensure your event runs smoothly from start to finish.",
-          },
-        ],
-      },
-      cta: {
-        title: "Begin Your Journey",
-        subtitle: "Reserve your curated wellness experience today.",
-        button: "Book Arrangement",
       },
     },
     membershipsPage: {
@@ -499,91 +473,26 @@ export const translations = {
     },
     activitiesPage: {
       hero: {
-        title: "Wellness in Motion",
-        subtitle: "Deepen your practice through guided experiences.",
+        title: "Activities",
+        subtitle: "Join our monthly or weekly activities",
       },
       intro: {
-        text: "Our activities are designed to complement your wellness journey, offering structured practices that cultivate presence, strength, and inner peace.",
+        text: "Join our monthly or weekly activities",
       },
-      weeklySchedule: {
-        title: "This Week's Schedule",
-        activities: [
-          {
-            name: "Morning Flow Yoga",
-            time: "8:00 AM - 9:00 AM",
-            capacity: "12 people",
-            location: "Movement Studio",
-            duration: "60 minutes",
-            price: "\u20ac40",
-          },
-          {
-            name: "Transformational Breathwork",
-            time: "8:00 AM - 9:00 AM",
-            capacity: "12 people",
-            location: "Movement Studio",
-            duration: "60 minutes",
-            price: "\u20ac40",
-          },
-          {
-            name: "Guided Meditation",
-            time: "8:00 AM - 9:00 AM",
-            capacity: "12 people",
-            location: "Movement Studio",
-            duration: "60 minutes",
-            price: "\u20ac40",
-          },
-          {
-            name: "Restorative Yoga",
-            time: "8:00 AM - 9:00 AM",
-            capacity: "12 people",
-            location: "Movement Studio",
-            duration: "60 minutes",
-            price: "\u20ac40",
-          },
-          {
-            name: "Sound Healing Circle",
-            time: "8:00 AM - 9:00 AM",
-            capacity: "12 people",
-            location: "Movement Studio",
-            duration: "60 minutes",
-            price: "\u20ac40",
-          },
-          {
-            name: "Mindfulness Workshop",
-            time: "8:00 AM - 9:00 AM",
-            capacity: "12 people",
-            location: "Movement Studio",
-            duration: "60 minutes",
-            price: "\u20ac40",
-          },
-        ],
+      partner: {
+        title: "Become a Partner of Heaven on Earth",
+        description:
+          "Would you like to organise your own workshops, ceremonies, retreats or other events at our venue? We would love to collaborate with inspiring professionals who want to share their work in a unique setting. Contact us to explore the possibilities.",
       },
-      whatWeOffer: {
-        title: "What We Offer",
-        subtitle: "Four simple steps to your moment of tranquility",
-        offerings: [
-          {
-            title: "Movement",
-            description: "Yoga, stretching, and mindful movement practices",
-          },
-          {
-            title: "Breathwork",
-            description: "Guided breathing techniques for energy and calm",
-          },
-          {
-            title: "Meditation",
-            description: "Stillness practices for mental clarity",
-          },
-          {
-            title: "Workshops",
-            description: "Educational sessions on wellness topics",
-          },
-        ],
+      contactCTA: {
+        title: "Contact Us",
+        description:
+          "We’re happy to answer your questions and help you explore the possibilities.",
       },
       privateSessions: {
-        title: "Private Sessions Available",
-        body: "For a more personalized experience, book private or semi-private sessions with our expert facilitators. We\u2019ll tailor the practice to your specific needs and intentions.",
-        button: "Inquire About Private Sessions",
+        title: "Become a Partner of Heaven on Earth",
+        body: "Would you like to organise your own workshops, ceremonies, retreats or other events at our venue? We would love to collaborate with inspiring professionals who want to share their work in a unique setting. Contact us to explore the possibilities.",
+        button: "Contact Us",
       },
     },
     contactPage: {
@@ -597,210 +506,222 @@ export const translations = {
   nl: {
     navbar: {
       home: "Home",
-      philosophy: "Filosofie",
+      philosophy: "Over ons",
+      restaurant: "Restaurant",
+      menu: "Menukaart",
+      events: "Events",
       wellness: "Wellness",
       arrangements: "Arrangementen",
-      memberships: "Lidmaatschap",
       activities: "Activiteiten",
+      memberships: "Lidmaatschappen",
       contact: "Contact",
       login: "Inloggen",
-      bookNow: "Boek Nu",
+      bookNow: "Reserveer hier",
     },
     header: {
-      kicker: "Een andere benadering van gezondheid en welzijn",
-      title: ["De hemel is een plek", "op aarde. Lunch.", "Ontspan. Vier."],
+      kicker: "Waar lekker eten, ontspanning en bijzondere momenten samenkomen.",
+      title: ["Heaven is a place", "on earth. Lunch.", "Relax. Celebrate."],
       subtitle:
-        "Waar wellness, dineren en betekenisvolle momenten samenkomen in perfecte harmonie.",
+        "Geniet van ons sfeervolle hemelse restaurant, de ontspanning in onze sauna en onze unieke locatie voor elke gelegenheid.",
+      bookNow: "Reserveer hier",
     },
     service: {
-      kicker: "Ontdek Onze",
-      title: "Onze Diensten",
+      kicker: "Onze diensten",
+      title: "Onze diensten",
       learnMore: "MEER WETEN",
       items: [
         {
           title: "De Lunchroom",
           description:
-            "Seizoensgebonden, verfijnd dineren in een rustige en elegante omgeving waar u elk moment kunt savoureren.",
+            "Geniet van verse gerechten, goede koffie en een ontspannen sfeer. Een plek om even tot rust te komen, bij te praten en te genieten van het moment.",
         },
         {
-          title: "Sauna's & Wellness",
+          title: "Sauna",
           description:
-            "Een toevluchtsoord van warmte en stilte, ontworpen voor diepe ontspanning en innerlijk evenwicht.",
+            "Kom tot rust, laad op en geniet van een moment voor jezelf en in onze sfeervolle wellness omgeving.",
         },
         {
-          title: "Multifunctionele Ruimte",
+          title: "Events & Activiteiten",
           description:
-            "Een serene ruimte voor bijeenkomsten, beweging en betekenisvolle momenten in een doordacht ontwerp.",
+            "Van privé feestgelegenheden en bedrijfsbijeenkomsten tot mindfulness sessies en workshops. Een veelzijdige plek om samen te komen, genieten een mooie momenten te creëren.",
         },
       ],
     },
     relax: {
-      kicker: "Wij helpen u het beter te maken",
-      title: "Ontspan. Geniet.",
+      kicker: "Relax. Enjoy.",
+      title: "Relax. Enjoy.",
       body1:
-        "Dit is waar uw merkverhaal tot leven komt. Wat maakt uw aanpak uniek? Waarom zouden toekomstige klanten kiezen voor uw wellnesstraject?",
+        "Een plek om even te vertragen en in het moment te zijn.",
       body2:
-        "Een warme, stijlvolle omgeving waar u kunt ontspannen, genieten en verbinden.",
+        "Bij Heaven on Earth is elk bezoek een uitnodiging om te genieten van het leven. Begin de dag met een lekker ontbijt, een verse lunch of verwen je zelf met een ambachtelijk ijsje op ons zonnige terras. Kom tot rust in onze welness faciliteiten of kom samen met vrienden, familie en collega’s om de bijzondere momenten van het leven te vieren.",
       body3:
-        "Van gezonde lunches en ambachtelijk ijs tot luxueuze wellness en inspirerende bijeenkomsten — hier stapt u uit de drukte en laadt u op, van binnen en buiten.",
+        "Of je nu op zoek bent naar ontspanning, verbinding of gewoon een mooie plek om je tijd door te brengen, hier ben je op de juiste plek.",
     },
     activities: {
       kicker: "Activiteiten",
       items: [
         {
-          title: "Ademwerk",
-          subtitle: "Bewuste sessies en samengestelde wellness",
-          body: "Tijdens onze ademsessies nemen wij u mee op een reis naar ontspanning en verdieping. Met bewust ademen laat u spanning los, stapt u uit uw hoofd en keert u terug in uw lichaam.",
+          title: "Bruiloften",
+          subtitle: "Warm en sfeervol",
+          body: "Van intieme ceremonies tot sfeervolle recepties en diners. Of een onvergetelijke feestavond. Heaven on Earth bied een warme en prachtige ruimte waar bijzondere herinneringen ontstaan en elk detail met liefde en aandacht wordt verzorgd.",
         },
         {
-          title: "Klankgenezing",
-          subtitle: "Vibrationele therapie voor diepe rust",
-          body: "Dompel uzelf onder in de resonante tonen van klankschalen en zachte instrumenten. Elke sessie begeleidt u naar een meditatieve toestand waar het lichaam zijn natuurlijke ritme vindt.",
+          title: "Babyshowers & Gender Reveals",
+          subtitle: "Een prachtige plek om nieuw leven te vieren.",
+          body: "Kom samen met familie en vrienden in een warme sfeervolle omgeving en maak van een babyshower of gender reveal een onvergetelijk moment.",
         },
         {
-          title: "Geleide Meditatie",
-          subtitle: "Stilte verweven in uw dagelijkse leven",
-          body: "Onze geleide meditatiesessies bieden een zachte inleiding tot mindfulness. Of u nu nieuw bent in de praktijk of uw bewustzijn wilt verdiepen, elke sessie laat u gegrond en vernieuwd voelen.",
+          title: "Vrijgezellenfeesten",
+          subtitle: "Vier het voor de grote dag in stijl.",
+          body: "Of je nu kiest voor een ontspannen wellness ervaring, een gezellige high beer, wine of cocktail of leuke workshop voor een onvergetelijke dag met je vriend(inn)en. Heaven on Earth biedt de perfecte setting om samen onvergetelijke herinneringen te maken.",
+        },
+        {
+          title: "Bedrijfsfeesten & Vergaderingen",
+          subtitle: "Breng je team samen in een unieke omgeving.",
+          body: "Van vergaderen en teambuilding workshops tot bedrijfsuitjes en feesten: Heaven on Earth biedt een professionele en sfeervolle omgeving waar verbinding, samenwerking en inspiratie centraal staan.",
+        },
+        {
+          title: "Mindfulness & Workshops",
+          subtitle: "Vertragen, stress loslaten en ontladen",
+          body: "Van meditatie en ademwerk tot coaching en inspirerende workshops. Een plek om te vertragen, stress los te laten en spanning te ontladen. Ontdek verschillende manieren om meer rust, balans en verbinding te ervaren en burn-outklachten te helpen voorkomen.",
+        },
+        {
+          title: "Zoutkamer & Halotherapie",
+          subtitle: "Ondersteuning voor luchtwegen en huid",
+          body: "Kom tot rust in onze sfeervolle zoutkamer en ervaar halotherapie in een ontspannen omgeving. Microscopisch kleine zoutdeeltjes worden door de ruimte verspreid en ondersteunen de luchtwegen en huid, terwijl je volledig kunt ontspannen, vertragen en weer opladen.",
         },
       ],
     },
     getInTouch: {
-      title: "Neem contact op",
+      title: "Neem contact met ons op",
       contacts: [
         {
           label: "Adres",
-          value: "123 Anywhene St. Any City, State, Country 12345",
+          value: "Slotweg 1, 1934 CM Egmond aan den Hoef",
         },
-        { label: "Openingstijden", value: "www.heavenlymomments.nl" },
-        { label: "Telefoonnummer", value: "+316 16017000" },
+        { label: "Openingstijden lunchroom", value: "Wo - Zo: 09:00–16:00 uur (Ma & Di gesloten)" },
+        { label: "Openingstijden Wellness & Events", value: "Ma-Do & Zo: 06:00 – 00:00 | Vr-Za: 06:00 – 02:00" },
+        { label: "Telefoonnummer", value: "072 - 303 05 48" },
       ],
     },
     wellnessJourney: {
       title: "Begin uw wellnessreis",
       subtitle:
         "Herverbind u met uw innerlijke balans op een plek waar de tijd vertraagt en helderheid begint.",
-      bookNow: "Boek Nu",
+      bookNow: "Reserveer hier voor al onze diensten",
+      welcomeText: "We kijken er naar uit u te verwelkomen in Heaven.",
     },
     philosophyPage: {
       hero: {
         title: "Onze Filosofie",
-        subtitle:
-          "Wellness is geen bestemming, maar een praktijk van terugkeren naar jezelf.",
+        subtitle: "Over ons",
+      },
+      aboutUs: {
+        title: "Over ons",
+        text: "Bij Heaven on Earth geloven we dat geluk vaak te vinden is in de kleine momenten: samen genieten, écht contact maken en even ontsnappen aan de drukte van alledag. Daarom creëren we een plek waar alles samenkomt: heerlijk eten, ontspanning, wellness, bijzondere vieringen en momenten van verbinding. Een plek waar je niets hoeft, maar simpelweg mag zijn, genieten en nieuwe herinneringen kunt maken. Omringd door de prachtige natuur, duinen en stranden van het hemelse Egmond nodigt Heaven on Earth je uit om te vertragen, op te laden en bewust te genieten van het leven. A place where life slows down and moments matter.",
       },
       whatWeBelieve: {
-        title: "Waar Wij In Geloven",
-        body1:
-          "In een wereld die te snel beweegt, creëren we ruimtes die u uitnodigen om te vertragen. Onze filosofie is eenvoudig: echte transformatie gebeurt wanneer u uzelf toestemming geeft om te pauzeren.",
-        body2:
-          "Wij geloven dat wellness niet draait om perfectie, maar om aanwezigheid. Het gaat om het eren van uw lichaam, het tot rust brengen van uw geest en het voeden van uw spirit.",
+        title: "Waar wij in geloven",
+        body: "Wij geloven dat het leven niet alleen draait om wat je doet, maar vooral om hoe je je voelt. Om tijd maken voor jezelf én voor elkaar. Om bewust genieten van goed eten, fijne gesprekken, ontspanning en bijzondere momenten. Wij geloven in oprechte gastvrijheid, verbinding en een omgeving waarin iedereen zich welkom en vrij voelt. Heaven on Earth is meer dan alleen een locatie. Het is een plek om samen te komen, tot rust te komen, het leven te vieren en herinneringen te creëren die je bijblijven.",
       },
-      approach: {
-        title: "Onze Benadering van Wellness",
-        subtitle: "Vier eenvoudige stappen naar uw moment van rust",
+      heart: {
+        title: "Wat Heaven on Earth bijzonder maakt",
+        subtitle: "De hemelse vibe die wij willen creëren",
         items: [
           {
-            title: "Intentionele Zorg",
-            body: "Elk detail is ontworpen met uw welzijn in gedachten, van de temperatuur van onze ruimtes tot de kwaliteit van onze materialen.",
+            title: "Vertraag",
+            body: "Wij creëren een warme en gastvrije plek waar je even kunt ontsnappen aan de drukte van alledag, tot rust kunt komen en bewust van het moment kunt genieten.",
           },
           {
-            title: "Natuurlijke Harmonie",
-            body: "Wij eren de wijsheid van de natuur en integreren biologische materialen en duurzame praktijken in alles wat we doen.",
+            title: "Kom samen",
+            body: "Of je nu bij ons komt voor een lunch, een feest, een activiteit of een moment van ontspanning: Heaven on Earth is een plek voor oprechte verbinding.",
           },
           {
-            title: "Gemeenschapsverbinding",
-            body: "Hoewel we eenzaamheid vieren, erkennen we ook de kracht van gedeelde ervaringen bij het verdiepen van onze wellnessreis.",
+            title: "Vier het leven",
+            body: "Wij geloven dat zowel de grote mijlpalen als de kleine, alledaagse momenten het verdienen om gevierd en herinnerd te worden.",
           },
         ],
       },
-      sustainability: {
-        kicker: "Lidmaatschap",
-        title: "Duurzaamheid & Zorg",
-        body1:
-          "Onze toewijding aan wellness reikt verder dan onze gasten tot aan de planeet zelf. Wij kopen verantwoord in, minimaliseren afval en opereren met diep respect voor het milieu.",
-        body2:
-          "Van onze energiezuinige sauna's tot onze biologische, lokaal geproduceerde ingrediënten — elke keuze weerspiegelt onze toewijding aan duurzame luxe.",
+      experience: {
+        title: "De Heaven on Earth-beleving",
+        subtitle: "Hier komt alles samen",
+        body: "Heaven on Earth is een plek waar lekker eten, ontspanning, feest en verbinding samenkomen onder één dak. Geniet van een heerlijk ontbijt of een fijne lunch, neem bewust tijd voor jezelf, doe mee aan een inspirerende activiteit of vier een bijzonder moment met de mensen van wie je houdt. Wat je ook bij ons brengt, wij willen dat je met een fijn, opgeladen en geïnspireerd gevoel weer naar huis gaat én met een mooie herinnering om mee te nemen.",
       },
       quote: {
-        text: "Wellness is de kunst van luisteren naar wat je lichaam, geest en ziel echt nodig hebben—en de moed hebben om het te eren.",
-        author: "Ons Grondprincipe",
+        text: "“The present moment is filled with joy and happiness. If you are attentive, you will see it.”",
+        author: "Thich Nhat Hanh",
       },
       experienceCTA: {
-        title: "Ervaar Onze Filosofie",
-        subtitle:
-          "Laat ons u begeleiden op een reis van transformatie en vernieuwing.",
-        button: "Ontdek Wellness",
+        title: "Ervaar Heaven on Earth",
+        subtitle: "Ontdek een plek voor lekker eten, verbinding, ontspanning en onvergetelijke momenten.",
+        button: "Ontdek Heaven on Earth",
       },
     },
     footer: {
-      tagline:
-        "Een luxe wellnessbestemming waar vrede, balans en betekenisvolle ervaringen samenkomen.",
-      quickLinks: {
-        title: "Snelle Links",
-        links: [
-          { label: "Home", href: "/" },
-          { label: "Privé Sauna's", href: "/wellness" },
-          { label: "Arrangementen", href: "/arrangements" },
-          { label: "Lidmaatschap", href: "/memberships" },
-          { label: "Contact", href: "/contact" },
-        ],
-      },
-      connect: {
-        title: "Verbinden",
-        links: [
-          { label: "Evenementenruimte", href: "/contact" },
-          { label: "Lunchroom", href: "/" },
-          { label: "Activiteiten", href: "/activities" },
-          { label: "Contact", href: "/contact" },
-          { label: "Boek Nu", href: "/contact" },
-        ],
-      },
+      tagline: "",
       contact: {
-        title: "Contact",
-        address: "123 Anywhene St. Any City, State, Country 12345",
-        country: "Nederland",
-        phone: "+316 16017000",
-        website: "www.heavenlymoments.nl",
+        title: "Neem contact met ons op",
+        address: "Slotweg 1, 1934 CM Egmond aan den Hoef",
+        phone: "072 - 303 05 48",
       },
-      openingHours: {
-        title: "Openingstijden",
+      lunchroomHours: {
+        title: "Openingstijden lunchroom",
         hours: [
-          { day: "Maandag - Vrijdag", time: "9:00 - 21:00" },
-          { day: "Zaterdag", time: "10:00 - 20:00" },
-          { day: "Zondag", time: "10:00 - 18:00" },
+          { day: "Maandag & Dinsdag", time: "Gesloten" },
+          { day: "Woensdag - Zondag", time: "09:00 – 16:00 uur" },
         ],
       },
-      copyright: "© 2026 heaven Alle rechten voorbehouden.",
+      wellnessHours: {
+        title: "Openingstijden Wellness en Events",
+        hours: [
+          { day: "Maandag - Donderdag & Zondag", time: "06:00 – 00:00" },
+          { day: "Vrijdag & Zaterdag", time: "06:00 – 02:00" },
+        ],
+      },
+      copyright: "© 2026 Heaven on Earth. Alle rechten voorbehouden.",
     },
     wellnessPage: {
       hero: {
-        title: "Sauna & Wellness",
-        subtitle:
-          "Oude wijsheid ontmoet modern comfort in onze warmte therapie heiligdommen.",
+        title: "Sauna's",
+        subtitle: "Ontspan. Laad op. Geniet.",
       },
       intro: {
-        text: "Onze sauna's zijn meer dan verwarmde ruimtes—het zijn plekken van transformatie waar warmte, ademhaling en stilte samenwerken om los te laten wat u niet langer dient.",
+        text: "Stap binnen in onze sauna en laat de drukte van alledag achter je. Geniet van de warmte van de sauna, kom tot rust in de jacuzzi en neem een welverdiend moment voor jezelf.",
       },
-      saunaOfferings: {
-        title: "Sauna & Wellness",
-        subtitle: "Kies tussen privé exclusiviteit of gedeelde sereniteit",
+      spaces: {
+        title: "Drie ruimtes, jouw manier van ontspannen.",
+        subtitle: "Ontdek drie unieke ruimtes die zijn ontworpen voor ontspanning, verbinding en gezondheid.",
+        items: [
+          {
+            title: "Privésauna",
+            body: "Een luxe privéruimte van 40 m² voor 2 tot 8 personen, compleet met sauna, stoombad, jacuzzi, massagestoel en exclusieve extra’s.",
+          },
+          {
+            title: "Gedeelde sauna",
+            body: "Een sfeervolle wellnessruimte van 40 m² waar badkleding verplicht is en die je eenvoudig per tijdslot kunt reserveren.",
+          },
+          {
+            title: "Zoutkamer",
+            body: "Een rustgevende halotherapieruimte die apart te boeken is en de natuurlijke ademhaling, huidgezondheid en diepe ontspanning ondersteunt.",
+          },
+        ],
       },
       whatsIncluded: {
-        title: "Wat is inbegrepen",
-        subtitle: "Hier zijn enkele inbegrepen functies",
+        title: "Wat is inbegrepen?",
+        subtitle: "Alles wat je nodig hebt om volledig te ontspannen en weer op te laden:",
         features: [
-          "Temperatuurgeregelde omgevingen",
-          "Luxe badjassen & handdoeken",
-          "Traditionele warmtetherapie rituelen",
-          "Premium aromatherapie essenties",
-          "Privé of gedeelde ervaringen",
-          "Flexibele sessieduur",
+          "Finse sauna",
+          "Stoombad",
+          "Jacuzzi",
+          "Koud dompelbad",
+          "Privé- of gedeelde sauna",
+          "Scrubzout",
         ],
       },
       cta: {
-        title: "Ervaar onze filosofie",
-        subtitle:
-          "Boek uw sauna-ervaring en begin vandaag nog met uw wellnessreis.",
-        button: "Boek Sauna",
+        title: "Klaar om te ontspannen?",
+        subtitle: "Laat de drukte even achter je en geniet van een heerlijk moment van ontspanning.",
+        button: "Reserveer Sauna",
       },
     },
     lunchroomPage: {
@@ -1187,7 +1108,7 @@ export const translations = {
     },
     contactPage: {
       hero: {
-        title: "Laten We Verbinden",
+        title: "Neem contact op",
         subtitle: "Wij staan klaar om uw vragen te beantwoorden en u te begeleiden op uw reis.",
       },
     },
@@ -1195,216 +1116,223 @@ export const translations = {
 
   de: {
     navbar: {
-      home: "Startseite",
-      philosophy: "Philosophie",
+      home: "Home",
+      philosophy: "Über uns",
+      restaurant: "Restaurant",
+      menu: "Speisekarte",
+      events: "Events",
       wellness: "Wellness",
       arrangements: "Arrangements",
-      memberships: "Mitgliedschaften",
       activities: "Aktivitäten",
+      memberships: "Mitgliedschaften",
       contact: "Kontakt",
       login: "Anmelden",
-      bookNow: "Jetzt Buchen",
+      bookNow: "Jetzt buchen",
     },
     header: {
-      kicker: "Ein anderer Ansatz für Gesundheit und Wohlbefinden",
-      title: [
-        "Der Himmel ist ein Ort",
-        "auf Erden. Mittagessen.",
-        "Entspannen. Feiern.",
-      ],
+      kicker: "Wo himmlischer Genuss, Entspannung und besondere Momente zusammenkommen.",
+      title: ["Heaven is a place", "on earth. Lunch.", "Relax. Celebrate."],
       subtitle:
-        "Wo Wellness, Gastronomie und bedeutungsvolle Momente in perfekter Harmonie zusammenkommen.",
+        "Genießen Sie unser gemütliches Restaurant, unsere entspannende Sauna und unsere wunderschöne Location für jeden Anlass.",
+      bookNow: "Jetzt buchen",
     },
     service: {
-      kicker: "Entdecken Sie",
-      title: "Unsere Leistungen",
+      kicker: "Unsere Angebote",
+      title: "Unsere Angebote",
       learnMore: "MEHR ERFAHREN",
       items: [
         {
-          title: "Das Mittagsrestaurant",
+          title: "Unser Café & Bistro",
           description:
-            "Saisonale, verfeinerte Küche in einem ruhigen und eleganten Ambiente, in dem Sie jeden Moment genießen können.",
+            "Genießen Sie frische Gerichte, guten Kaffee und eine einladende Atmosphäre. Ein Ort, um zur Ruhe zu kommen, sich auszutauschen und die kleinen Freuden des Lebens zu genießen.",
         },
         {
-          title: "Saunen & Wellness",
+          title: "Sauna",
           description:
-            "Ein Ort der Wärme und Stille, der für tiefe Entspannung und innere Balance gestaltet wurde.",
+            "Entfliehen Sie dem Trubel des Alltags und genießen Sie einen Moment vollkommener Entspannung in unserer stimmungsvollen Wellnesswelt.",
         },
         {
-          title: "Multifunktionaler Raum",
+          title: "Events & Aktivitäten",
           description:
-            "Ein ruhiger Raum für Veranstaltungen, Bewegung und bedeutungsvolle Momente in durchdachtem Design.",
+            "Von privaten Feiern und geschäftlichen Zusammenkünften bis hin zu Achtsamkeitssessions und Workshops: ein vielseitiger Ort, der Menschen verbindet, inspiriert und unvergessliche Momente entstehen lässt.",
         },
       ],
     },
     relax: {
-      kicker: "Wir helfen Ihnen, es besser zu machen",
-      title: "Entspannen. Genießen.",
+      kicker: "Relax. Enjoy.",
+      title: "Relax. Enjoy.",
       body1:
-        "Hier kommt Ihre Markengeschichte zum Leben. Was macht Ihren Ansatz einzigartig? Warum sollten zukünftige Kunden Ihrer Wellness-Reise beitreten?",
+        "Ein Ort, an dem das Leben langsamer wird und die besonderen Momente zählen.",
       body2:
-        "Eine warme, stilvolle Umgebung, in der Sie entspannen, genießen und in Kontakt treten können.",
+        "Bei Heaven on Earth ist jeder Besuch eine Einladung, das Leben zu genießen. Beginnen Sie den Tag mit einem köstlichen Frühstück oder einem frischen Lunch, genießen Sie einen Kaffee oder ein handwerklich hergestelltes Eis auf unserer sonnigen Terrasse, entspannen Sie in unserem Wellnessbereich oder feiern Sie gemeinsam mit Freunden, Familie und Kollegen die besonderen Momente des Lebens.",
       body3:
-        "Von gesunden Mittagessen und handgefertigtem Eis bis hin zu luxuriösem Wellness und inspirierenden Veranstaltungen — hier treten Sie aus dem Trubel heraus und tanken Kraft.",
+        "Ob Sie Entspannung, Verbundenheit oder einfach einen wunderschönen Ort zum Verweilen suchen – hier sind Sie genau richtig.",
     },
     activities: {
       kicker: "Aktivitäten",
       items: [
         {
-          title: "Atemarbeit",
-          subtitle: "Achtsame Sitzungen und kuratiertes Wellness",
-          body: "Während unserer Atemsitzungen nehmen wir Sie mit auf eine Reise der Entspannung und Vertiefung. Mit bewusstem Atmen lösen Sie Spannungen, treten aus Ihrem Kopf heraus und kehren in Ihren Körper zurück.",
+          title: "Hochzeiten",
+          subtitle: "Warme und wunderschöne Atmosphäre",
+          body: "Von intimen Zeremonien über stilvolle Empfänge und Dinner bis hin zu einer unvergesslichen Hochzeitsfeier: Heaven on Earth bietet eine warme und wunderschöne Atmosphäre, in der besondere Erinnerungen entstehen und jedes Detail mit Liebe und Sorgfalt gestaltet wird.",
         },
         {
-          title: "Klangheiling",
-          subtitle: "Vibrationelle Therapie für tiefe Ruhe",
-          body: "Tauchen Sie ein in die resonanten Töne von Klangschalen und sanften Instrumenten. Jede Sitzung führt Sie in einen meditativen Zustand, in dem der Körper seinen natürlichen Rhythmus findet.",
+          title: "Babyshowers & Gender Reveals",
+          subtitle: "Ein wunderschöner Ort, um neues Leben zu feiern.",
+          body: "Kommen Sie mit Familie und Freunden in einem warmen, stimmungsvollen Ambiente zusammen und machen Sie Ihre Babyshower oder Gender-Reveal-Party zu einem unvergesslichen Moment.",
         },
         {
-          title: "Geführte Meditation",
-          subtitle: "Stille verwoben in Ihren Alltag",
-          body: "Unsere geführten Meditationssitzungen bieten einen sanften Einstieg in die Achtsamkeit. Egal, ob Sie neu in der Praxis sind oder Ihr Bewusstsein vertiefen möchten — jede Sitzung lässt Sie geerdet und erneuert fühlen.",
+          title: "Junggesellen- & Junggesellinnenabschiede",
+          subtitle: "Feiern Sie stilvoll vor dem großen Tag.",
+          body: "Ob Sie sich für ein entspanntes Wellnesserlebnis, ein geselliges High Beer, High Wine, einen Cocktail-Nachmittag oder einen inspirierenden Workshop entscheiden: Heaven on Earth bietet den perfekten Rahmen für einen unvergesslichen Tag mit Ihren Freundinnen und Freunden.",
+        },
+        {
+          title: "Firmenfeiern & Meetings",
+          subtitle: "Bringen Sie Ihr Team in einer einzigartigen Umgebung zusammen.",
+          body: "Von produktiven Meetings und inspirierenden Teambuilding-Workshops bis hin zu Betriebsausflügen und Firmenfeiern: Heaven on Earth bietet eine professionelle und stimmungsvolle Umgebung, in der Verbindung, Zusammenarbeit und Inspiration im Mittelpunkt stehen.",
+        },
+        {
+          title: "Achtsamkeit & Workshops",
+          subtitle: "Mehr Ruhe, Balance und echte Verbundenheit",
+          body: "Von Meditation und Atemübungen bis hin zu Coaching und inspirierenden Workshops. Ein Ort, um langsamer zu werden, Stress loszulassen und angestaute Anspannung abzubauen. Entdecken Sie verschiedene Wege zu mehr Ruhe, Balance und echter Verbundenheit im Alltag und beugen Sie Erschöpfungs- und Burn-out-Beschwerden vor.",
+        },
+        {
+          title: "Salzraum & Halotherapie",
+          subtitle: "Entlastung für Atemwege und Haut",
+          body: "Kommen Sie in unserem stimmungsvollen Salzraum zur Ruhe und erleben Sie Halotherapie in einer entspannten Umgebung. Mikroskopisch kleine Salzpartikel werden in der Raumluft verteilt und unterstützen die Atemwege und die Haut, während Sie vollkommen abschalten, entschleunigen und neue Energie tanken können.",
         },
       ],
     },
     getInTouch: {
-      title: "Kontakt aufnehmen",
+      title: "Kontakt",
       contacts: [
         {
           label: "Adresse",
-          value: "123 Anywhene St. Any City, State, Country 12345",
+          value: "Slotweg 1, 1934 CM Egmond aan den Hoef, Niederlande",
         },
-        { label: "Öffnungszeiten", value: "www.heavenlymomments.nl" },
-        { label: "Telefonnummer", value: "+316 16017000" },
+        { label: "Öffnungszeiten Café & Bistro", value: "Mi - So: 09:00–16:00 Uhr (Mo & Di geschlossen)" },
+        { label: "Öffnungszeiten Wellness & Events", value: "Mo-Do & Zo: 06:00 – 00:00 | Fr-Sa: 06:00 – 02:00" },
+        { label: "Telefonnummer", value: "+31 (0)72 303 05 48" },
       ],
     },
     wellnessJourney: {
       title: "Beginnen Sie Ihre Wellness-Reise",
       subtitle:
         "Verbinden Sie sich wieder mit Ihrer inneren Balance an einem Ort, an dem die Zeit verlangsamt und Klarheit beginnt.",
-      bookNow: "Jetzt Buchen",
+      bookNow: "Entdecken und buchen Sie hier unsere Angebote.",
+      welcomeText: "Wir freuen uns darauf, Sie im Heaven on Earth willkommen zu heißen.",
     },
     philosophyPage: {
       hero: {
         title: "Unsere Philosophie",
-        subtitle:
-          "Wellness ist kein Ziel, sondern eine Praxis der Rückkehr zu sich selbst.",
+        subtitle: "Über uns",
+      },
+      aboutUs: {
+        title: "Über uns",
+        text: "Bei Heaven on Earth glauben wir, dass das Glück oft in den kleinen Momenten zu finden ist: gemeinsam genießen, echte Verbindungen schaffen und dem hektischen Alltag für eine Weile entfliehen. Deshalb schaffen wir einen Ort, an dem alles zusammenkommt: köstliches Essen, Entspannung, Wellness, besondere Feiern und Momente der Verbundenheit. Einen Ort, an dem du nichts musst, sondern einfach sein, genießen und neue Erinnerungen schaffen darfst. Umgeben von der wunderschönen Natur, den Dünen und Stränden des himmlischen Egmond lädt Heaven on Earth dich dazu ein, zur Ruhe zu kommen, neue Energie zu tanken und das Leben ganz bewusst zu genießen. Ein Ort, an dem das Leben langsamer wird und die Momente zählen.",
       },
       whatWeBelieve: {
-        title: "Woran Wir Glauben",
-        body1:
-          "In einer Welt, die zu schnell ist, schaffen wir Orte, die Sie einladen, langsamer zu werden. Unsere Philosophie ist einfach: Wahre Transformation geschieht, wenn Sie sich erlauben, innezuhalten.",
-        body2:
-          "Wir glauben, dass Wellness nicht Perfektion bedeutet, sondern Präsenz. Es geht darum, Ihren Körper zu ehren, Ihren Geist zu beruhigen und Ihre Seele zu stärken.",
+        title: "Woran wir glauben",
+        body: "Wir glauben, dass es im Leben nicht nur darum geht, was du tust, sondern vor allem darum, wie du dich fühlst. Es geht darum, sich bewusst Zeit für sich selbst und füreinander zu nehmen. Gutes Essen, schöne Gespräche, Entspannung und besondere Momente bewusst zu genießen. Wir glauben an aufrichtige Gastwirtschaft, echte Verbundenheit und eine Umgebung, in der sich jeder willkommen und frei fühlt. Heaven on Earth ist mehr als nur ein Veranstaltungsort. Es ist ein Ort, um zusammenzukommen, zur Ruhe zu kommen, das Leben zu feiern und Erinnerungen zu schaffen, die bleiben.",
       },
-      approach: {
-        title: "Unser Ansatz für Wellness",
-        subtitle: "Vier einfache Schritte zu Ihrem Moment der Ruhe",
+      heart: {
+        title: "Was Heaven on Earth so besonders macht",
+        subtitle: "Die himmlische Atmosphäre, die wir schaffen möchten",
         items: [
           {
-            title: "Intentionale Pflege",
-            body: "Jedes Detail ist mit Ihrem Wohlbefinden im Sinn gestaltet, von der Temperatur unserer Räume bis zur Qualität unserer Materialien.",
+            title: "Entschleunige",
+            body: "Wir schaffen einen warmen und einladenden Ort, an dem du dem hektischen Alltag für eine Weile entfliehen, zur Ruhe kommen und den Moment ganz bewusst genießen kannst.",
           },
           {
-            title: "Natürliche Harmonie",
-            body: "Wir ehren die Weisheit der Natur und integrieren biologische Materialien und nachhaltige Praktiken in alles, was wir tun.",
+            title: "Kommt zusammen",
+            body: "Ob du zu uns kommst, um zu Mittag zu essen, zu feiern, an einer Aktivität teilzunehmen oder dich zu entspannen: Heaven on Earth ist ein Ort für echte Verbundenheit.",
           },
           {
-            title: "Gemeinschaftsverbindung",
-            body: "Während wir Einsamkeit feiern, erkennen wir auch die Kraft gemeinsamer Erfahrungen zur Vertiefung unserer Wellness-Reise.",
+            title: "Feiere das Leben",
+            body: "Wir glauben, dass sowohl die großen Meilensteine als auch die kleinen alltäglichen Momente es verdienen, gefeiert und in Erinnerung behalten zu werden.",
           },
         ],
       },
-      sustainability: {
-        kicker: "Mitgliedschaft",
-        title: "Nachhaltigkeit & Pflege",
-        body1:
-          "Unser Engagement für Wellness erstreckt sich über unsere Gäste hinaus auf den Planeten selbst. Wir beziehen verantwortungsvoll, minimieren Abfall und arbeiten mit tiefem Respekt für die Umwelt.",
-        body2:
-          "Von unseren energieeffizienten Saunen bis zu unseren biologischen, lokal bezogenen Zutaten spiegelt jede Wahl unsere Hingabe an nachhaltigen Luxus wider.",
+      experience: {
+        title: "Das Heaven on Earth Erlebnis",
+        subtitle: "Hier kommt alles zusammen",
+        body: "Heaven on Earth ist ein Ort, an dem köstliches Essen, Entspannung, Feiern und Verbundenheit unter einem Dach zusammenkommen. Genieße ein köstliches Frühstück oder ein schönes Mittagessen, nimm dir bewusst Zeit für dich, mach bei einer inspirierenden Aktivität mit oder feiere einen besonderen Moment mit den Menschen, die du liebst. Was auch immer dich zu uns führt: Wir möchten, dass du glücklich, erholt und inspiriert nach Hause gehst – und eine schöne Erinnerung mitnimmst.",
       },
       quote: {
-        text: "Wellness ist die Kunst, auf das zu hören, was Ihr Körper, Geist und Seele wirklich brauchen—und den Mut zu haben, es zu ehren.",
-        author: "Unser Grundprinzip",
+        text: "“The present moment is filled with joy and happiness. If you are attentive, you will see it.”",
+        author: "Thich Nhat Hanh",
       },
       experienceCTA: {
-        title: "Erleben Sie Unsere Philosophie",
-        subtitle:
-          "Lassen Sie uns Sie auf eine Reise der Transformation und Erneuerung führen.",
-        button: "Wellness Erkunden",
+        title: "Erlebe Heaven on Earth",
+        subtitle: "Entdecke einen Ort für köstliches Essen, Verbundenheit, Entspannung und unvergessliche Momente.",
+        button: "Entdecke Heaven on Earth",
       },
     },
     footer: {
-      tagline:
-        "Ein luxuriöses Wellnessziel, wo Frieden, Balance und bedeutungsvolle Erfahrungen zusammenkommen.",
-      quickLinks: {
-        title: "Schnelllinks",
-        links: [
-          { label: "Home", href: "/" },
-          { label: "Private Saunen", href: "/wellness" },
-          { label: "Arrangements", href: "/arrangements" },
-          { label: "Mitgliedschaft", href: "/memberships" },
-          { label: "Kontakt", href: "/contact" },
-        ],
-      },
-      connect: {
-        title: "Verbinden",
-        links: [
-          { label: "Veranstaltungsraum", href: "/contact" },
-          { label: "Lunchroom", href: "/" },
-          { label: "Aktivitäten", href: "/activities" },
-          { label: "Kontakt", href: "/contact" },
-          { label: "Jetzt Buchen", href: "/contact" },
-        ],
-      },
+      tagline: "",
       contact: {
         title: "Kontakt",
-        address: "123 Anywhene St. Any City, State, Country 12345",
-        country: "Die Niederlande",
-        phone: "+316 16017000",
-        website: "www.heavenlymoments.nl",
+        address: "Slotweg 1, 1934 CM Egmond aan den Hoef, Niederlande",
+        phone: "+31 (0)72 303 05 48",
       },
-      openingHours: {
-        title: "Öffnungszeiten",
+      lunchroomHours: {
+        title: "Öffnungszeiten Café & Bistro",
         hours: [
-          { day: "Montag - Freitag", time: "9:00 - 21:00" },
-          { day: "Samstag", time: "10:00 - 20:00" },
-          { day: "Sonntag", time: "10:00 - 18:00" },
+          { day: "Montag & Dienstag", time: "geschlossen" },
+          { day: "Mittwoch - Sonntag", time: "09:00 – 16:00 Uhr" },
         ],
       },
-      copyright: "© 2026 heaven Alle Rechte vorbehalten.",
+      wellnessHours: {
+        title: "Öffnungszeiten Wellness & Events",
+        hours: [
+          { day: "Montag - Donnerstag & Sonntag", time: "06:00 – 00:00 Uhr" },
+          { day: "Freitag & Samstag", time: "06:00 – 02:00 Uhr" },
+        ],
+      },
+      copyright: "© 2026 Heaven on Earth. Alle Rechte vorbehalten.",
     },
     wellnessPage: {
       hero: {
-        title: "Sauna & Wellness",
-        subtitle:
-          "Alte Weisheit trifft auf modernen Komfort in unseren Wärmetherapie-Heiligtümern.",
+        title: "Saunen",
+        subtitle: "Entspannen. Auftanken. Genießen.",
       },
       intro: {
-        text: "Unsere Saunen sind mehr als beheizte Räume—sie sind Orte der Transformation, wo Wärme, Atmung und Stille zusammenarbeiten, um loszulassen, was Ihnen nicht länger dient.",
+        text: "Betritt unsere Sauna und lass die Hektik des Alltags hinter dir. Genieße die Wärme der Sauna, entspanne im Whirlpool und gönn dir eine wohlverdiente Auszeit.",
       },
-      saunaOfferings: {
-        title: "Sauna & Wellness",
-        subtitle:
-          "Wählen Sie zwischen privater Exklusivität oder geteilter Gelassenheit",
+      spaces: {
+        title: "Drei Räume, deine Art zu entspannen.",
+        subtitle: "Entdecke drei einzigartige Räume, die für Entspannung, Verbundenheit und Wohlbefinden gestaltet wurden.",
+        items: [
+          {
+            title: "Private Sauna",
+            body: "Ein luxuriöser privater Bereich von 40 m² für 2 bis 8 Personen, ausgestattet mit Sauna, Dampfbad, Whirlpool, Massagesessel und exklusiven Extras.",
+          },
+          {
+            title: "Gemeinschaftssauna",
+            body: "Ein stimmungsvoller Wellnessbereich von 40 m², in dem Badekleidung vorgeschrieben ist und den du bequem für ein Zeitfenster reservieren kannst.",
+          },
+          {
+            title: "Salzraum",
+            body: "Ein beruhigender Halotherapieraum, der separat gebucht werden kann und die natürliche Atmung, die Hautgesundheit und tiefe Entspannung unterstützt.",
+          },
+        ],
       },
       whatsIncluded: {
-        title: "Was ist enthalten",
-        subtitle: "Hier sind einige enthaltene Funktionen",
+        title: "Was ist inbegriffen?",
+        subtitle: "Alles, was du brauchst, um vollständig zu entspannen und neue Energie zu tanken:",
         features: [
-          "Temperaturkontrollierte Umgebungen",
-          "Luxuriöse Bademäntel & Handtücher",
-          "Traditionelle Wärmetherapie-Rituale",
-          "Premium-Aromatherapie-Essenzen",
-          "Private oder gemeinsame Erlebnisse",
-          "Flexibel Sitzungsdauer",
+          "Finnische Sauna",
+          "Dampfbad",
+          "Whirlpool",
+          "Kaltes Tauchbecken",
+          "Private oder gemeinschaftlich genutzte Sauna",
+          "Peelingsalz",
         ],
       },
       cta: {
-        title: "Erleben Sie unsere Philosophie",
-        subtitle:
-          "Buchen Sie Ihr Sauna-Erlebnis und beginnen Sie noch heute Ihre Wellness-Reise.",
-        button: "Sauna buchen",
+        title: "Bereit zum Entspannen?",
+        subtitle: "Lass die Hektik für einen Moment hinter dir und genieße eine wunderbare Auszeit.",
+        button: "Sauna reservieren",
       },
     },
     lunchroomPage: {

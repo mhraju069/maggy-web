@@ -132,7 +132,7 @@ import ArrangementCard from "@/components/shared/ArrangementCard";
 
 const ArrangementsGrid = () => {
   const { t } = useLanguage();
-  const bookLabel = t.arrangementsPage?.grid?.bookButton || "Book Arrangement";
+  const bookLabel = (t.arrangementsPage as any)?.grid?.bookButton || "Book Arrangement";
 
   return (
     <section className="py-16 md:py-24 bg-white">

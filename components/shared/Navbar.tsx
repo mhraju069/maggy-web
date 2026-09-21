@@ -10,11 +10,13 @@ import { useState } from "react";
 
 const navHrefs = [
   "/",
-  "/philosophy",
+  "/about",
+  "/lunchroom",
+  "/menu",
   "/wellness",
   "/arrangements",
-  "/memberships",
   "/activities",
+  "/memberships",
   "/contact",
 ];
 const languageOptions: { label: string; value: Language }[] = [
@@ -29,18 +31,17 @@ const Navbar = () => {
   const [isLanguageOpen, setIsLanguageOpen] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-  const navLinks = navHrefs.map((href, i) => ({
-    href,
-    name: [
-      t.navbar.home,
-      t.navbar.philosophy,
-      t.navbar.wellness,
-      t.navbar.arrangements,
-      t.navbar.memberships,
-      t.navbar.activities,
-      t.navbar.contact,
-    ][i],
-  }));
+  const navLinks = [
+    { href: "/", name: t.navbar.home },
+    { href: "/about", name: t.navbar.philosophy },
+    { href: "/lunchroom", name: t.navbar.restaurant },
+    { href: "/menu", name: t.navbar.menu },
+    { href: "/wellness", name: t.navbar.wellness },
+    { href: "/arrangements", name: t.navbar.arrangements },
+    { href: "/activities", name: t.navbar.activities },
+    { href: "/memberships", name: t.navbar.memberships },
+    { href: "/contact", name: t.navbar.contact },
+  ];
 
   const activeLanguageLabel =
     languageOptions.find((o) => o.value === language)?.label ?? "EN";

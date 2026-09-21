@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 
 const publicPaths = [
   "/",
+  "/about",
   "/philosophy",
   "/wellness",
   "/arrangements",

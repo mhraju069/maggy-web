@@ -1,46 +1,47 @@
 "use client";
+
+import CTASection from "@/components/shared/CTASection";
 import Footer from "@/components/shared/Footer";
 import PageHero from "@/components/shared/PageHero";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 import PrivateSessions from "./components/PrivateSessions";
-import WeeklySchedule from "./components/WeeklySchedule";
-import WhatWeOffer from "./components/WhatWeOffer";
 
 const ActivitiesPage = () => {
   const { t } = useLanguage();
+  const act = t.activitiesPage;
 
   return (
     <div className="min-h-screen bg-white">
       <PageHero
         backgroundImage="/images/activities/hero/activitieshero.png"
-        title={t.activitiesPage.hero.title}
-        subtitle={t.activitiesPage.hero.subtitle}
+        title={act?.hero?.title || "Activities"}
+        subtitle={act?.hero?.subtitle || "Join our monthly or weekly activities"}
       />
 
       {/* Intro Section */}
-      <section
-        className="flex items-center justify-center"
-        style={{ background: "#FCF2E9", padding: "96px 128px" }}
-      >
-        <p
-          style={{
-            fontFamily: "Cambria, Georgia, serif",
-            fontSize: 24,
-            lineHeight: 1.6,
-            color: "#475569",
-            textAlign: "center",
-            maxWidth: 860,
-          }}
-        >
-          {t.activitiesPage.intro.text}
-        </p>
+      <section className="py-16 md:py-20 bg-[#FCF2E9]">
+        <div className="container mx-auto px-6 max-w-3xl text-center">
+          <p className="text-[#475569] text-xl md:text-2xl font-serif leading-relaxed">
+            {act?.intro?.text || "Join our monthly or weekly activities"}
+          </p>
+        </div>
       </section>
 
-      <WeeklySchedule />
-
-      <WhatWeOffer />
-
+      {/* Become a Partner Section */}
       <PrivateSessions />
+
+      {/* Contact Us CTA Section */}
+      <CTASection
+        title={act?.contactCTA?.title || "Contact Us"}
+        subtitle={
+          act?.contactCTA?.description ||
+          "We’re happy to answer your questions and help you explore the possibilities."
+        }
+        buttonText={t.navbar?.contact || "Contact Us"}
+        buttonLink="/contact"
+        backgroundColor="#8B7355"
+        textColor="#FFFFFF"
+      />
 
       <Footer />
     </div>

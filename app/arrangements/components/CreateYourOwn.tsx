@@ -28,8 +28,9 @@ const CreateYourOwn = () => {
             className="text-[#475569] text-lg leading-relaxed"
             style={{ fontFamily: "Cambria, Georgia, serif" }}
           >
-            {s?.body ||
-              "Don't see exactly what you're looking for? We'll work with you to design a bespoke wellness arrangement that perfectly matches your intentions and desires."}
+            {s?.description ||
+              s?.body ||
+              "Don't see exactly what you're looking for? We'll work with you to design a bespoke arrangement that perfectly matches your intentions and desires."}
           </p>
 
           <Link

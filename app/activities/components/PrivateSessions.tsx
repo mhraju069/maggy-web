@@ -1,11 +1,20 @@
 "use client";
+
 import DecorativeUnderline from "@/components/shared/DecorativeUnderline";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 import Link from "next/link";
 
 const PrivateSessions = () => {
   const { t } = useLanguage();
-  const s = t.activitiesPage.privateSessions;
+  const partner = t.activitiesPage?.partner;
+  const s = t.activitiesPage?.privateSessions;
+
+  const title = partner?.title || s?.title || "Become a Partner of Heaven on Earth";
+  const body =
+    partner?.description ||
+    s?.body ||
+    "Would you like to organise your own workshops, ceremonies, retreats or other events at our venue? We would love to collaborate with inspiring professionals who want to share their work in a unique setting. Contact us to explore the possibilities.";
+  const buttonText = t.navbar?.contact || s?.button || "Contact Us";
 
   return (
     <section className="py-24" style={{ background: "#E8DFD5" }}>
@@ -13,15 +22,13 @@ const PrivateSessions = () => {
         <div className="max-w-2xl mx-auto text-center flex flex-col items-center gap-6">
           <div>
             <h2
+              className="text-3xl md:text-5xl font-bold text-[#0F172A]"
               style={{
                 fontFamily: "var(--font-playfair)",
-                fontSize: 48,
-                fontWeight: 700,
-                color: "#0F172A",
                 lineHeight: "140%",
               }}
             >
-              {s.title}
+              {title}
             </h2>
             <div className="flex justify-center w-full">
               <DecorativeUnderline />
@@ -37,7 +44,7 @@ const PrivateSessions = () => {
               textAlign: "center",
             }}
           >
-            {s.body}
+            {body}
           </p>
 
           <Link
@@ -57,7 +64,7 @@ const PrivateSessions = () => {
                 fontWeight: 700,
               }}
             >
-              {s.button}
+              {buttonText}
             </span>
             <svg
               width="20"

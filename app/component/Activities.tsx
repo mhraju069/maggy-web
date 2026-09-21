@@ -17,7 +17,7 @@ const Activities = () => {
   const slides = t.activities.items.map((item, i) => ({
     ...item,
     kicker: t.activities.kicker,
-    image: slideImages[i],
+    image: slideImages[i % slideImages.length],
   }));
 
   const prev = () => setCurrent((c) => (c - 1 + slides.length) % slides.length);
@@ -44,7 +44,7 @@ const Activities = () => {
         {/* Left: fixed-size image */}
         <div className="relative w-full lg:flex-shrink-0 lg:w-[720px] h-[280px] sm:h-[400px] lg:h-[600px]">
           <Image
-            key={slide.image}
+            key={slide.title}
             src={slide.image}
             alt={slide.title}
             fill

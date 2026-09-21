@@ -2,7 +2,6 @@
 
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 import Image from "next/image";
-import Link from "next/link";
 
 export default function Footer() {
   const { t } = useLanguage();
@@ -11,10 +10,10 @@ export default function Footer() {
     <footer className="bg-[#0F172A] text-white">
       <div className="container mx-auto px-6 py-12 lg:py-16">
         {/* Main Footer Content */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8 lg:gap-16">
-          {/* Logo and Description Section */}
-          <div className="lg:col-span-1 flex flex-col">
-            <div className="relative h-[54px] w-[54px] overflow-hidden rounded-[41px] mb-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 lg:gap-12 items-start">
+          {/* Logo and Bigger Social Media Icons */}
+          <div className="flex flex-col items-start">
+            <div className="relative h-[84px] w-[84px] overflow-hidden rounded-[41px] mb-6">
               <Image
                 src="/images/logo.png"
                 alt="Heaven Logo"
@@ -22,30 +21,20 @@ export default function Footer() {
                 className="object-cover"
               />
             </div>
-            <p
-              style={{
-                fontSize: "clamp(14px, 1.5vw, 16px)",
-                fontFamily: "var(--font-geist-sans), sans-serif",
-                lineHeight: "1.6",
-                color: "rgba(255, 255, 255, 0.60)",
-                marginBottom: "1.5rem",
-              }}
-            >
-              {t.footer.tagline}
-            </p>
-            {/* Social Media Icons */}
-            <div className="flex gap-4">
+
+            {/* Enlarged Facebook & Instagram Logos */}
+            <div className="flex gap-6 mt-5">
               <a
                 href="https://facebook.com"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-10 h-10 bg-[#1E293B] rounded-full flex items-center justify-center hover:bg-[#334155] transition-colors"
+                className="w-11 h-11 bg-[#1E293B] rounded-full flex items-center justify-center hover:bg-[#9B7C56] transition-all transform hover:scale-110 shadow-lg"
                 aria-label="Facebook"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  width="16"
-                  height="16"
+                  width="22"
+                  height="22"
                   viewBox="0 0 16 16"
                   fill="none"
                 >
@@ -59,13 +48,13 @@ export default function Footer() {
                 href="https://instagram.com"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-10 h-10 bg-[#1E293B] rounded-full flex items-center justify-center hover:bg-[#334155] transition-colors"
+                className="w-11 h-11 bg-[#1E293B] rounded-full flex items-center justify-center hover:bg-[#9B7C56] transition-all transform hover:scale-110 shadow-lg"
                 aria-label="Instagram"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  width="16"
-                  height="16"
+                  width="22"
+                  height="22"
                   viewBox="0 0 16 16"
                   fill="none"
                 >
@@ -75,6 +64,7 @@ export default function Footer() {
                       fill="white"
                     />
                   </g>
+
                   <defs>
                     <clipPath id="clip0_8389_6241">
                       <rect width="16" height="16" fill="white" />
@@ -86,13 +76,13 @@ export default function Footer() {
                 href="https://twitter.com"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-10 h-10 bg-[#1E293B] rounded-full flex items-center justify-center hover:bg-[#334155] transition-colors"
+                className="w-11 h-11 bg-[#1E293B] rounded-full flex items-center justify-center hover:bg-[#9B7C56] transition-all transform hover:scale-110 shadow-lg"
                 aria-label="Twitter"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  width="14"
-                  height="11"
+                  width="22"
+                  height="22"
                   viewBox="0 0 14 11"
                   fill="none"
                 >
@@ -105,176 +95,93 @@ export default function Footer() {
             </div>
           </div>
 
-          {/* Quick Links */}
+          {/* Contact Details Column */}
           <div>
             <h3
               style={{
-                fontSize: "clamp(14px, 1.5vw, 16px)",
+                fontSize: "clamp(16px, 1.5vw, 18px)",
                 fontFamily: "var(--font-geist-sans), Cambria",
                 fontWeight: "700",
                 lineHeight: "130%",
-                marginBottom: "1.5rem",
-              }}
-            >
-              {t.footer.quickLinks.title}
-            </h3>
-            <ul className="space-y-3">
-              {t.footer.quickLinks.links.map((link: any, index: number) => (
-                <li key={index}>
-                  <Link
-                    href={link.href}
-                    style={{
-                      fontSize: "clamp(14px, 1.5vw, 16px)",
-                      fontFamily: "var(--font-geist-sans), Cambria",
-                      fontWeight: "400",
-                      lineHeight: "130%",
-                      color: "rgba(255, 255, 255, 0.60)",
-                    }}
-                    className="hover:text-white transition-colors"
-                  >
-                    {link.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Connect */}
-          <div>
-            <h3
-              style={{
-                fontSize: "clamp(14px, 1.5vw, 16px)",
-                fontFamily: "var(--font-geist-sans), Cambria",
-                fontWeight: "700",
-                lineHeight: "130%",
-                marginBottom: "1.5rem",
-              }}
-            >
-              {t.footer.connect.title}
-            </h3>
-            <ul className="space-y-3">
-              {t.footer.connect.links.map((link: any, index: number) => (
-                <li key={index}>
-                  <Link
-                    href={link.href}
-                    style={{
-                      fontSize: "clamp(14px, 1.5vw, 16px)",
-                      fontFamily: "var(--font-geist-sans), Cambria",
-                      fontWeight: "400",
-                      lineHeight: "130%",
-                      color: "rgba(255, 255, 255, 0.60)",
-                    }}
-                    className="hover:text-white transition-colors"
-                  >
-                    {link.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Contact */}
-          <div>
-            <h3
-              style={{
-                fontSize: "clamp(14px, 1.5vw, 16px)",
-                fontFamily: "var(--font-geist-sans), Cambria",
-                fontWeight: "700",
-                lineHeight: "130%",
-                marginBottom: "1.5rem",
+                marginBottom: "1.2rem",
+                color: "#9B7C56",
               }}
             >
               {t.footer.contact.title}
             </h3>
-            <ul className="space-y-3">
-              <li
+            <div className="space-y-3">
+              <p
                 style={{
-                  fontSize: "clamp(14px, 1.5vw, 16px)",
+                  fontSize: "15px",
                   fontFamily: "var(--font-geist-sans), Cambria",
-                  fontWeight: "400",
-                  lineHeight: "130%",
-                  color: "rgba(255, 255, 255, 0.60)",
+                  lineHeight: "1.5",
+                  color: "rgba(255, 255, 255, 0.80)",
                 }}
               >
                 {t.footer.contact.address}
-              </li>
-              <li
-                style={{
-                  fontSize: "clamp(14px, 1.5vw, 16px)",
-                  fontFamily: "var(--font-geist-sans), Cambria",
-                  fontWeight: "400",
-                  lineHeight: "130%",
-                  color: "rgba(255, 255, 255, 0.60)",
-                }}
-              >
-                {t.footer.contact.country}
-              </li>
-              <li>
+              </p>
+              <p className="mt-2">
                 <a
                   href={`tel:${t.footer.contact.phone}`}
                   style={{
-                    fontSize: "clamp(14px, 1.5vw, 16px)",
+                    fontSize: "16px",
                     fontFamily: "var(--font-geist-sans), Cambria",
-                    fontWeight: "400",
-                    lineHeight: "130%",
-                    color: "rgba(255, 255, 255, 0.60)",
+                    fontWeight: "600",
+                    color: "#E2E8F0",
                   }}
-                  className="hover:text-white transition-colors"
+                  className="hover:text-[#9B7C56] transition-colors inline-block"
                 >
                   {t.footer.contact.phone}
                 </a>
-              </li>
-              <li>
-                <a
-                  href={`https://${t.footer.contact.website}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  style={{
-                    fontSize: "clamp(14px, 1.5vw, 16px)",
-                    fontFamily: "var(--font-geist-sans), Cambria",
-                    fontWeight: "400",
-                    lineHeight: "130%",
-                    color: "rgba(255, 255, 255, 0.60)",
-                  }}
-                  className="hover:text-white transition-colors"
-                >
-                  {t.footer.contact.website}
-                </a>
-              </li>
-            </ul>
+              </p>
+            </div>
           </div>
 
-          {/* Opening Hours */}
-          <div>
-            <h3
-              style={{
-                fontSize: "clamp(14px, 1.5vw, 16px)",
-                fontFamily: "var(--font-geist-sans), Cambria",
-                fontWeight: "700",
-                lineHeight: "130%",
-                marginBottom: "1.5rem",
-              }}
-            >
-              {t.footer.openingHours.title}
-            </h3>
-            <ul className="space-y-3">
-              {t.footer.openingHours.hours.map((hour: any, index: number) => (
-                <li
-                  key={index}
-                  className="flex justify-between"
-                  style={{
-                    fontSize: "clamp(14px, 1.5vw, 16px)",
-                    fontFamily: "var(--font-geist-sans), Cambria",
-                    fontWeight: "400",
-                    lineHeight: "130%",
-                    color: "rgba(255, 255, 255, 0.60)",
-                  }}
-                >
-                  <span>{hour.day}</span>
-                  <span>{hour.time}</span>
-                </li>
-              ))}
-            </ul>
+          {/* Opening Hours Column */}
+          <div className="space-y-6">
+            <div>
+              <h3
+                style={{
+                  fontSize: "15px",
+                  fontFamily: "var(--font-geist-sans), Cambria",
+                  fontWeight: "700",
+                  marginBottom: "0.5rem",
+                  color: "#9B7C56",
+                }}
+              >
+                {t.footer.lunchroomHours.title}
+              </h3>
+              <ul className="space-y-1 text-sm text-white/80">
+                {t.footer.lunchroomHours.hours.map((hour: any, index: number) => (
+                  <li key={index} className="flex justify-between gap-4">
+                    <span>{hour.day}:</span>
+                    <span className="font-medium text-white">{hour.time}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <div>
+              <h3
+                style={{
+                  fontSize: "15px",
+                  fontFamily: "var(--font-geist-sans), Cambria",
+                  fontWeight: "700",
+                  marginBottom: "0.5rem",
+                  color: "#9B7C56",
+                }}
+              >
+                {t.footer.wellnessHours.title}
+              </h3>
+              <ul className="space-y-1 text-sm text-white/80">
+                {t.footer.wellnessHours.hours.map((hour: any, index: number) => (
+                  <li key={index} className="flex justify-between gap-4">
+                    <span>{hour.day}:</span>
+                    <span className="font-medium text-white">{hour.time}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
           </div>
         </div>
 
@@ -282,7 +189,7 @@ export default function Footer() {
         <div className="mt-12 pt-8 border-t border-white/10">
           <p
             style={{
-              fontSize: "clamp(14px, 1.5vw, 16px)",
+              fontSize: "14px",
               fontFamily: "var(--font-geist-sans), Cambria",
               fontWeight: "400",
               textAlign: "center",

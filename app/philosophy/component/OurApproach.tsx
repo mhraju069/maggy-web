@@ -5,7 +5,11 @@ import { LuHeart, LuLeaf, LuUsers } from "react-icons/lu";
 
 const OurApproach = () => {
   const { t } = useLanguage();
-  const approach = t.philosophyPage.approach;
+  const approach = (t.philosophyPage as any)?.approach || {
+    title: "",
+    subtitle: "",
+    items: [{ title: "", body: "" }, { title: "", body: "" }, { title: "", body: "" }],
+  };
 
   return (
     <section className="w-full min-h-screen bg-white py-20 lg:py-24 flex items-center">

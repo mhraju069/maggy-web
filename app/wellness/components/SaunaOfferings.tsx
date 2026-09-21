@@ -1,114 +1,74 @@
 "use client";
 
 import DecorativeUnderline from "@/components/shared/DecorativeUnderline";
-import SaunaCard from "@/components/shared/SaunaCard";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
+import Image from "next/image";
 import Link from "next/link";
-
-// Dummy data for sauna offerings
-const saunaData = [
-  {
-    id: 1,
-    title: "Private Sauna",
-    description:
-      "Your own exclusive sanctuary for ultimate privacy and relaxation.",
-    image: "/images/wellness/bookings/private-sauna.png",
-    rating: 4.9,
-    capacity: "Up to 6 persons",
-    duration: "2-hour sessions",
-    paymentType: "Prepayment required",
-    price: 210,
-    bookingLink: "/booking?type=private",
-  },
-  {
-    id: 2,
-    title: "Shared Sauna",
-    description: "Join our wellness experience in a peaceful, shared space.",
-    image: "/images/wellness/bookings/shared-sauna.png",
-    rating: 4.9,
-    capacity: "Limited capacity",
-    duration: "Flexible sessions",
-    paymentType: "Pay upon arrival",
-    price: 140,
-    bookingLink: "/booking?type=shared",
-  },
-];
 
 export default function SaunaOfferings() {
   const { t } = useLanguage();
+  const spaces = t.wellnessPage?.spaces;
+
+  const images = [
+    "/images/wellness/bookings/private-sauna.png",
+    "/images/wellness/bookings/shared-sauna.png",
+    "/images/home/saltroom.png",
+  ];
 
   return (
     <section className="py-16 md:py-24 bg-white">
       <div className="container mx-auto px-6">
-        {/* Header with View All Button */}
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-12">
-          <div>
-            {/* Title with Decorative Underline */}
-            <h2
-              style={{ fontFamily: "var(--font-playfair)" }}
-              className="text-[clamp(32px,4vw,48px)] font-bold text-[#0F172A] mb-2"
-            >
-              {t.wellnessPage?.saunaOfferings?.title || "Sauna & Wellness"}
-            </h2>
-            {/* Decorative Underline */}
-            <DecorativeUnderline />
-            {/* Subtitle */}
-            <p
-              className="text-[#475569] text-lg md:text-xl max-w-[600px] mt-6"
-              style={{ fontFamily: "Cambria, Georgia, serif" }}
-            >
-              {t.wellnessPage?.saunaOfferings?.subtitle ||
-                "Choose between private exclusivity or shared serenity"}
-            </p>
-          </div>
-
-          {/* View All Button */}
-          <Link
-            href="/suites"
-            className="mt-6 md:mt-0 inline-flex items-center gap-3 px-6 py-3 border border-[#CFB9A3] text-[#0F172A] font-semibold rounded-sm hover:bg-[#CFB9A3] hover:bg-opacity-10 transition-colors"
+        {/* Header */}
+        <div className="mb-14 flex flex-col items-center text-center">
+          <h2
             style={{ fontFamily: "var(--font-playfair)" }}
+            className="text-[clamp(32px,4vw,48px)] font-bold text-[#0F172A] mb-2"
           >
-            View All Suites
-            <svg
-              width="20"
-              height="20"
-              viewBox="0 0 24 24"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M5 12H19"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-              <path
-                d="M12 5L19 12L12 19"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-          </Link>
+            {spaces?.title || "Three Spaces, Your Way to Relax"}
+          </h2>
+          <DecorativeUnderline />
+          <p
+            className="text-[#475569] text-lg md:text-xl max-w-[700px] mt-6 font-serif"
+          >
+            {spaces?.subtitle ||
+              "Discover three unique spaces designed for relaxation, connection and natural well-being."}
+          </p>
         </div>
 
-        {/* Sauna Cards Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {saunaData.map((sauna) => (
-            <SaunaCard
-              key={sauna.id}
-              title={sauna.title}
-              description={sauna.description}
-              image={sauna.image}
-              rating={sauna.rating}
-              capacity={sauna.capacity}
-              duration={sauna.duration}
-              paymentType={sauna.paymentType}
-              price={sauna.price}
-              bookingLink={sauna.bookingLink}
-            />
+        {/* 3 Spaces Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+          {spaces?.items?.map((item: any, idx: number) => (
+            <div
+              key={idx}
+              className="flex flex-col bg-[#FCF2E9] rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-all group"
+            >
+              <div className="relative h-64 w-full overflow-hidden">
+                <Image
+                  src={images[idx % images.length]}
+                  alt={item.title}
+                  fill
+                  className="object-cover group-hover:scale-105 transition-transform duration-500"
+                />
+              </div>
+              <div className="p-6 flex flex-col flex-grow justify-between text-center">
+                <div>
+                  <h3 className="text-2xl font-bold font-serif text-[#0F172A] mb-3">
+                    {item.title}
+                  </h3>
+                  <p className="text-base font-serif text-[#475569] leading-relaxed">
+                    {item.body}
+                  </p>
+                </div>
+                <div className="mt-6">
+                  <Link
+                    href="/booking"
+                    className="inline-flex items-center justify-center px-6 py-3 bg-[#8B7355] text-white font-serif font-bold rounded-lg hover:bg-[#725e44] transition-colors"
+                  >
+                    {t.wellnessPage?.cta?.button || "Book Sauna"}
+                  </Link>
+                </div>
+              </div>
+            </div>
           ))}
         </div>
       </div>

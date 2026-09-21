@@ -6,7 +6,14 @@ import Image from "next/image";
 
 const MoreThanAccess = () => {
   const { t } = useLanguage();
-  const s = t.membershipsPage.moreThanAccess;
+  const m = (t.membershipsPage as any)?.moreThanRelaxation;
+  const oldS = (t.membershipsPage as any)?.moreThanAccess;
+  const s = {
+    kicker: "Membership",
+    title: m?.title || oldS?.title || "More Than Just Relaxation",
+    body1: m?.body1 || oldS?.body1 || "",
+    body2: m?.body2 || oldS?.body2 || "",
+  };
 
   return (
     <section

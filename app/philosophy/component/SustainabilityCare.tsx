@@ -5,7 +5,12 @@ import Image from "next/image";
 
 const SustainabilityCare = () => {
   const { t } = useLanguage();
-  const sustainability = t.philosophyPage.sustainability;
+  const sustainability = (t.philosophyPage as any)?.sustainability || {
+    kicker: "",
+    title: "",
+    body1: "",
+    body2: "",
+  };
 
   return (
     <section className="w-full min-h-screen flex items-center bg-[#F5F1ED]">
