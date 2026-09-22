@@ -16,21 +16,10 @@ const PhilosophyPage = () => {
     <div className="min-h-screen bg-white">
       <PageHero
         backgroundImage="/images/philosophy/philosophyimage1.png"
-        title={p.hero.title}
-        subtitle={p.hero.subtitle}
+        title={p.hero.title || p.aboutUs?.title || "Over ons"}
+        subtitle={p.aboutUs?.text || ""}
+        maxWidth="850px"
       />
-
-      {/* About Us Intro Section */}
-      <section className="w-full bg-[#FCF2E9] py-16 lg:py-24">
-        <div className="container mx-auto px-6 max-w-4xl text-center">
-          <h2 className="text-3xl lg:text-5xl font-bold font-serif text-[#0F172A] mb-8">
-            {p.aboutUs?.title || "About us"}
-          </h2>
-          <p className="text-lg lg:text-xl font-serif text-[#475569] leading-relaxed">
-            {p.aboutUs?.text}
-          </p>
-        </div>
-      </section>
 
       {/* What We Believe */}
       <WhatWeBelieve />

@@ -103,10 +103,9 @@ export const translations = {
       ],
     },
     wellnessJourney: {
-      title: "Begin Your Wellness Journey",
-      subtitle:
-        "Reconnect with your inner balance in a space where time slows down and clarity begins.",
-      bookNow: "Book here for all our services",
+      title: "Book here for all our services",
+      subtitle: "We look forward to welcoming you in Heaven.",
+      bookNow: "Reserve",
       welcomeText: "We look forward to welcoming you in Heaven.",
     },
     philosophyPage: {
@@ -115,7 +114,7 @@ export const translations = {
         subtitle: "",
       },
       aboutUs: {
-        title: "",
+        title: "About us",
         text: "At Heaven on Earth, we believe life becomes more beautiful when we slow down and truly enjoy the moment. Our philosophy is centered around connection: with yourself, with others and with the world around you. Whether you visit us for a nourishing lunch, a relaxing wellness experience, an inspiring workshop or a special celebration, we want you to feel completely welcome. Surrounded by the beautiful nature, dunes and coastline of heavenly Egmond, Heaven on Earth is a place to unwind, recharge and create meaningful memories. Everything we offer is created with care, warmth and attention, from the food we serve to the atmosphere you experience. A place where life slows down and moments matter.",
       },
       whatWeBelieve: {
@@ -605,16 +604,15 @@ export const translations = {
       ],
     },
     wellnessJourney: {
-      title: "Begin uw wellnessreis",
-      subtitle:
-        "Herverbind u met uw innerlijke balans op een plek waar de tijd vertraagt en helderheid begint.",
-      bookNow: "Reserveer hier voor al onze diensten",
+      title: "Reserveer hier voor al onze diensten",
+      subtitle: "We kijken er naar uit u te verwelkomen in Heaven.",
+      bookNow: "Reserveer",
       welcomeText: "We kijken er naar uit u te verwelkomen in Heaven.",
     },
     philosophyPage: {
       hero: {
-        title: "Onze Filosofie",
-        subtitle: "Over ons",
+        title: "Over ons",
+        subtitle: "",
       },
       aboutUs: {
         title: "Over ons",
@@ -1216,16 +1214,15 @@ export const translations = {
       ],
     },
     wellnessJourney: {
-      title: "Beginnen Sie Ihre Wellness-Reise",
-      subtitle:
-        "Verbinden Sie sich wieder mit Ihrer inneren Balance an einem Ort, an dem die Zeit verlangsamt und Klarheit beginnt.",
-      bookNow: "Entdecken und buchen Sie hier unsere Angebote.",
-      welcomeText: "Wir freuen uns darauf, Sie im Heaven on Earth willkommen zu heißen.",
+      title: "Buchen Sie hier für alle unsere Dienste",
+      subtitle: "Wir freuen uns darauf, Sie im Heaven zu begrüßen.",
+      bookNow: "Reservieren",
+      welcomeText: "Wir freuen uns darauf, Sie im Heaven zu begrüßen.",
     },
     philosophyPage: {
       hero: {
-        title: "Unsere Philosophie",
-        subtitle: "Über uns",
+        title: "Über uns",
+        subtitle: "",
       },
       aboutUs: {
         title: "Über uns",

@@ -43,7 +43,7 @@ const WellnessJourney = () => {
           {t.wellnessJourney.subtitle}
         </p>
         <div className="mt-2">
-          <BookNow href="/booking" />
+          <BookNow href="/booking" label={t.wellnessJourney.bookNow} />
         </div>
       </div>
     </section>

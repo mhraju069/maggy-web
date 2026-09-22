@@ -6,6 +6,7 @@ interface PageHeroProps {
   title: string;
   subtitle: string;
   overlayOpacity?: number; // 0 to 1, default 0.55
+  maxWidth?: string;
 }
 
 export default function PageHero({
@@ -13,10 +14,11 @@ export default function PageHero({
   title,
   subtitle,
   overlayOpacity = 0.55,
+  maxWidth = "850px",
 }: PageHeroProps) {
   return (
     <section
-      className="relative w-full min-h-screen flex flex-col"
+      className="relative w-full min-h-screen flex flex-col py-12"
       style={{
         backgroundImage: `url('${backgroundImage}')`,
         backgroundSize: "cover",
@@ -37,7 +39,7 @@ export default function PageHero({
       </div>
 
       {/* Centered hero text */}
-      <div className="relative z-10 flex-1 flex flex-col items-center justify-center text-center px-6 gap-6">
+      <div className="relative z-10 flex-1 flex flex-col items-center justify-center text-center px-6 py-12 gap-6">
         <h1
           style={{
             color: "#FFFFFF",
@@ -50,18 +52,20 @@ export default function PageHero({
         >
           {title}
         </h1>
-        <p
-          style={{
-            color: "rgba(255,255,255,0.90)",
-            fontFamily: "Cambria, Georgia, serif",
-            fontSize: "clamp(16px, 2vw, 24px)",
-            fontWeight: 400,
-            lineHeight: "150%",
-            maxWidth: "640px",
-          }}
-        >
-          {subtitle}
-        </p>
+        {subtitle && (
+          <p
+            style={{
+              color: "rgba(255,255,255,0.92)",
+              fontFamily: "Cambria, Georgia, serif",
+              fontSize: "clamp(16px, 1.8vw, 22px)",
+              fontWeight: 400,
+              lineHeight: "160%",
+              maxWidth: maxWidth,
+            }}
+          >
+            {subtitle}
+          </p>
+        )}
       </div>
     </section>
   );
