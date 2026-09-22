@@ -224,10 +224,11 @@ export const translations = {
     lunchroomPage: {
       hero: {
         title: "Lunchroom",
-        subtitle: "Relax, nourish, recharge.",
+        subtitle:
+          "Step inside. Take your time. Enjoy.\nFresh dishes, good coffee, and a place where you don't have to be anywhere else for a while",
       },
       intro: {
-        text: "Our lunchroom is more than a place to eat—it's a bright, welcoming space where good food meets good energy. Enjoy fresh, wholesome meals, sweet treats, and Instagram-worthy moments.",
+        text: "Our menu is a mix of familiar favorites and surprising flavors. Think colorful bowls, generously topped toast, pancakes, fresh smoothies, and dishes to share.\n\nWe choose fresh ingredients, beautiful presentation, and dishes that simply make you happy. Healthy where possible, delicious always.",
       },
       whatsIncluded: {
         title: "What We Offer",
@@ -725,10 +726,11 @@ export const translations = {
     lunchroomPage: {
       hero: {
         title: "Lunchroom",
-        subtitle: "Ontspan, voed, laad op.",
+        subtitle:
+          "Kom binnen. Neem de tijd. Geniet.\nVerse gerechten, goede koffie en een plek waar je even nergens anders hoeft te zijn",
       },
       intro: {
-        text: "Onze lunchroom is meer dan een plek om te eten—het is een lichte, gastvrije ruimte waar goed eten goede energie ontmoet. Geniet van verse, gezonde maaltijden, zoete lekkernijen en Instagram-waardige momenten.",
+        text: "Onze kaart is een mix van vertrouwde favorieten en verrassende smaken. Denk aan kleurrijke bowls, rijk belegde toast, pancakes, verse smoothies en gerechten om samen te delen.\n\nWe kiezen voor verse ingrediënten, mooie presentatie en gerechten waar je simpelweg blij van wordt. Gezond waar het kan, lekker altijd.",
       },
       whatsIncluded: {
         title: "Wat we aanbieden",
@@ -1335,10 +1337,11 @@ export const translations = {
     lunchroomPage: {
       hero: {
         title: "Lunchroom",
-        subtitle: "Entspannen, nähren, aufladen.",
+        subtitle:
+          "Komm herein. Nimm dir Zeit. Genieße.\nFrische Gerichte, guter Kaffee und ein Ort, an dem du für eine Weile nirgendwo anders sein musst",
       },
       intro: {
-        text: "Unser Lunchroom ist mehr als ein Ort zum Essen—es ist ein heller, einladender Raum, wo gutes Essen auf gute Energie trifft. Genießen Sie frische, gesunde Mahlzeiten, süße Leckereien und Instagram-würdige Momente.",
+        text: "Unsere Speisekarte ist eine Mischung aus vertrauten Favoriten und überraschenden Geschmacksrichtungen. Denken Sie an farbenfrohe Bowls, reich belegte Toasts, Pfannkuchen, frische Smoothies und Gerichte zum Teilen.\n\nWir setzen auf frische Zutaten, eine schöne Präsentation und Gerichte, die einfach glücklich machen. Gesund, wo es geht, lecker immer.",
       },
       whatsIncluded: {
         title: "Was wir anbieten",

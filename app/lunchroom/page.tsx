@@ -76,7 +76,8 @@ const LunchroomPage = () => {
         backgroundImage="/images/lunchroom/hero/lunchroomhero.png"
         title={t.lunchroomPage?.hero?.title || "Lunchroom"}
         subtitle={
-          t.lunchroomPage?.hero?.subtitle || "Relax, nourish, recharge."
+          t.lunchroomPage?.hero?.subtitle ||
+          "Step inside. Take your time. Enjoy.\nFresh dishes, good coffee, and a place where you don't have to be anywhere else for a while"
         }
       />
 
@@ -85,11 +86,11 @@ const LunchroomPage = () => {
         <div className="container mx-auto px-6">
           <div className="max-w-[800px] mx-auto text-center">
             <p
-              className="text-[#475569] text-lg md:text-xl leading-relaxed"
+              className="text-[#475569] text-lg md:text-xl leading-relaxed whitespace-pre-line"
               style={{ fontFamily: "Cambria, Georgia, serif" }}
             >
               {t.lunchroomPage?.intro?.text ||
-                "Our lunchroom is more than a place to eat—it's a bright, welcoming space where good food meets good energy. Enjoy fresh, wholesome meals, sweet treats, and Instagram-worthy moments."}
+                "Our menu is a mix of familiar favorites and surprising flavors. Think colorful bowls, generously topped toast, pancakes, fresh smoothies, and dishes to share.\n\nWe choose fresh ingredients, beautiful presentation, and dishes that simply make you happy. Healthy where possible, delicious always."}
             </p>
           </div>
         </div>

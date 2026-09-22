@@ -68,11 +68,11 @@ export default function MenuSection() {
 
             {/* Description */}
             <p
-              className="text-[#6B5D54] text-lg md:text-xl mb-8 leading-relaxed"
+              className="text-[#6B5D54] text-lg md:text-xl mb-8 leading-relaxed whitespace-pre-line"
               style={{ fontFamily: "Cambria, Georgia, serif" }}
             >
               {t.lunchroomPage?.menuSection?.description ||
-                "Every dish is prepared with care, using seasonal ingredients and recipes that nourish both body and spirit."}
+                "Our menu is a mix of familiar favorites and surprising flavors. Think colorful bowls, generously topped toast, pancakes, fresh smoothies, and dishes to share.\n\nWe choose fresh ingredients, beautiful presentation, and dishes that simply make you happy. Healthy where possible, delicious always."}
             </p>
 
             {/* Menu Items */}

@@ -54,6 +54,7 @@ export default function PageHero({
         </h1>
         {subtitle && (
           <p
+            className="whitespace-pre-line"
             style={{
               color: "rgba(255,255,255,0.92)",
               fontFamily: "Cambria, Georgia, serif",
