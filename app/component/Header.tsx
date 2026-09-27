@@ -19,7 +19,7 @@ const Header = () => {
             {t.header.subtitle}
           </h6>
           <div className="flex justify-center lg:justify-start">
-            <BookNow href="/booking" className="mt-10" />
+            <BookNow href="/booking" className="mt-10" label={t.header.bookNow} />
           </div>
         </div>
         <div className="right w-full lg:max-h-[690px] lg:w-auto">

@@ -19,8 +19,8 @@ const HeartOfHeaven = () => {
       <div className="container mx-auto px-6">
         {/* Header */}
         <div className="mb-14 flex flex-col items-center gap-3 text-center">
-          <div className="flex flex-col items-center gap-2">
-            <h2 className="text-3xl lg:text-5xl font-bold font-serif text-[#0F172A]">
+          <div className="flex flex-col items-center gap-2 w-full">
+            <h2 className="text-2xl sm:text-3xl lg:text-5xl font-bold font-serif text-[#0F172A] break-words max-w-full">
               {heart?.title}
             </h2>
             <DecorativeUnderline />

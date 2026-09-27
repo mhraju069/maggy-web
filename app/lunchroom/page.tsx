@@ -126,8 +126,8 @@ const LunchroomPage = () => {
           t.lunchroomPage?.cta?.subtitle ||
           "Drop by during your next visit\u2014no reservation needed."
         }
-        buttonText={t.lunchroomPage?.cta?.button || "Get in Touch"}
-        buttonLink="/contact"
+        buttonText={t.lunchroomPage?.cta?.button || "Reserveer"}
+        buttonLink="/booking/lunchroom"
         backgroundColor="#8B7355"
         textColor="#FFFFFF"
       />

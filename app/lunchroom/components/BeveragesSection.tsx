@@ -73,7 +73,7 @@ export default function BeveragesSection() {
             </p>
 
             {/* Beverage Items List */}
-            <ul className="space-y-3">
+            <ul className="space-y-3 mb-6">
               {beverageItems.map((item, index) => (
                 <li key={index} className="flex items-start gap-3">
                   <span className="text-[#8B7355] mt-1.5 text-xl">•</span>
@@ -86,6 +86,16 @@ export default function BeveragesSection() {
                 </li>
               ))}
             </ul>
+
+            {/* Tagline */}
+            {(t.lunchroomPage?.beveragesSection as any)?.tagline && (
+              <p
+                className="text-[#8B7355] text-lg md:text-xl font-bold font-serif italic mt-6"
+                style={{ fontFamily: "Cambria, Georgia, serif" }}
+              >
+                {(t.lunchroomPage?.beveragesSection as any)?.tagline}
+              </p>
+            )}
           </div>
         </div>
       </div>

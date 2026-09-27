@@ -13,8 +13,8 @@ const MembershipsPage = () => {
     <div className="min-h-screen bg-white">
       <PageHero
         backgroundImage="/images/memberships/hero/membershipshero.png"
-        title={t.membershipsPage.hero.title}
-        subtitle={t.membershipsPage.hero.subtitle}
+        title={t.membershipsPage?.hero?.title || "Sauna & Salt Room Membership"}
+        subtitle={t.membershipsPage?.hero?.subtitle}
       />
       <MembershipCards />
       <MoreThanAccess />

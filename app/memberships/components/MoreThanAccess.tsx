@@ -9,46 +9,27 @@ const MoreThanAccess = () => {
   const m = (t.membershipsPage as any)?.moreThanRelaxation;
   const oldS = (t.membershipsPage as any)?.moreThanAccess;
   const s = {
-    kicker: "Membership",
+    kicker: m?.kicker || oldS?.kicker || "Membership",
     title: m?.title || oldS?.title || "More Than Just Relaxation",
     body1: m?.body1 || oldS?.body1 || "",
     body2: m?.body2 || oldS?.body2 || "",
   };
 
   return (
-    <section
-      style={{ background: "#FFFFFF", padding: "96px 128px" }}
-      className="min-h-screen flex items-center"
-    >
-      <div
-        className="container mx-auto flex items-center"
-        style={{ gap: 46, padding: 0 }}
-      >
+    <section className="min-h-screen flex items-center bg-white py-16 lg:py-24 px-6 md:px-12 lg:px-16 xl:px-24">
+      <div className="container mx-auto flex flex-col lg:flex-row items-center gap-10 lg:gap-14">
         {/* Image */}
-        <div
-          style={{
-            flex: "0 0 auto",
-            position: "relative",
-            width: 799,
-            height: 640,
-          }}
-        >
+        <div className="relative w-full lg:w-1/2 h-[320px] sm:h-[420px] lg:h-[540px] shrink-0 rounded-[32px] sm:rounded-[42px] overflow-hidden">
           <Image
             src="/images/memberships/morethanless/morethanless.png"
             alt="More Than Access"
             fill
-            style={{
-              objectFit: "cover",
-              borderRadius: "42.667px",
-            }}
+            className="object-cover"
           />
         </div>
 
         {/* Text */}
-        <div
-          className="flex flex-col"
-          style={{ flex: 1, gap: 24, minWidth: 0 }}
-        >
+        <div className="flex flex-col gap-6 flex-1 min-w-0">
           {/* Kicker */}
           <p
             style={{

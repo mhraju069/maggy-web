@@ -10,9 +10,9 @@ export default function SaunaOfferings() {
   const spaces = t.wellnessPage?.spaces;
 
   const images = [
-    "/images/wellness/bookings/private-sauna.png",
-    "/images/wellness/bookings/shared-sauna.png",
-    "/images/home/saltroom.png",
+    "/images/wellness/bookings/private-sauna-v2.png",
+    "/images/wellness/bookings/shared-sauna-v2.png",
+    "/images/wellness/bookings/saltroom-v2.png",
   ];
 
   return (
@@ -64,7 +64,7 @@ export default function SaunaOfferings() {
                     href="/booking"
                     className="inline-flex items-center justify-center px-6 py-3 bg-[#8B7355] text-white font-serif font-bold rounded-lg hover:bg-[#725e44] transition-colors"
                   >
-                    {t.wellnessPage?.cta?.button || "Book Sauna"}
+                    {t.wellnessPage?.cta?.button || "Reserve"}
                   </Link>
                 </div>
               </div>

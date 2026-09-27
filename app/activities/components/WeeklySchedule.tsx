@@ -63,21 +63,12 @@ import ActivityCard from "@/components/shared/ActivityCard";
 
 const WeeklySchedule = () => {
   return (
-    <section
-      style={{
-        background: "#FFFFFF",
-        padding: "96px 128px",
-      }}
-    >
+    <section className="bg-white py-16 lg:py-24 px-6 md:px-12 lg:px-16 xl:px-24">
       {/* Title */}
       <h2
+        className="text-3xl sm:text-4xl lg:text-5xl font-bold text-[#0F172A] text-center mb-12 sm:mb-14"
         style={{
           fontFamily: "var(--font-playfair)",
-          fontSize: 48,
-          fontWeight: 700,
-          color: "#0F172A",
-          textAlign: "center",
-          marginBottom: 56,
           lineHeight: "140%",
         }}
       >
@@ -85,13 +76,7 @@ const WeeklySchedule = () => {
       </h2>
 
       {/* 3×2 Grid */}
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(3, 1fr)",
-          gap: 32,
-        }}
-      >
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8 max-w-6xl mx-auto w-full">
         {activities.map((activity, i) => (
           <ActivityCard key={i} activity={activity} />
         ))}

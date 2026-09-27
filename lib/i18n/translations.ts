@@ -14,14 +14,14 @@ export const translations = {
       memberships: "Memberships",
       contact: "Contact",
       login: "Log In",
-      bookNow: "Book Now",
+      bookNow: "Reserve Now",
     },
     header: {
       kicker: "Where heavenly food, relaxation and special moments come together.",
       title: ["Heaven is a place", "on earth. Lunch.", "Relax. Celebrate."],
       subtitle:
         "Enjoy our cosy restaurant, relaxing sauna and beautiful event spaces for every occasion.",
-      bookNow: "Book now",
+      bookNow: "Reserve now",
     },
     service: {
       kicker: "Our Services",
@@ -218,7 +218,7 @@ export const translations = {
       cta: {
         title: "Ready to Relax?",
         subtitle: "Choose your wellness experience and enjoy a moment just for you.",
-        button: "Book Sauna",
+        button: "Reserve",
       },
     },
     lunchroomPage: {
@@ -246,78 +246,84 @@ export const translations = {
       cta: {
         title: "Visit the Lunchroom",
         subtitle: "Drop by during your next visit\u2014no reservation needed.",
-        button: "Get in Touch",
+        button: "Reserve",
       },
       menuSection: {
         badge: "Menu",
-        title: "Fresh & Wholesome",
+        title: "Fresh, Colorful & Prepared with Love",
         description:
-          "Every dish is prepared with care, using seasonal ingredients and recipes that nourish both body and spirit.",
+          "At Heaven on Earth, it's all about enjoyment. Our dishes are carefully prepared with fresh ingredients, beautiful flavors, and a surprising twist. From a light lunch to something you can truly sit down for.",
         menuItems: [
           {
-            title: "Fresh Salads",
-            description: "Seasonal greens, grains, and wholesome toppings",
+            title: "Salads & Bowls",
+            description: "Colorful, fresh, and packed with flavorful toppings.",
           },
           {
-            title: "Artisan Sandwiches",
-            description: "Made with locally-sourced bread and ingredients",
+            title: "Bread & Brunch",
+            description:
+              "From richly topped breads to our brunch favorites.",
           },
           {
-            title: "Warm Bowls",
-            description: "Nourishing soups and grain bowls",
+            title: "Warm Dishes",
+            description: "Comforting, flavorful, and fresh from our kitchen.",
           },
           {
-            title: "Sweet Treats",
-            description: "Homemade pastries and desserts",
+            title: "Sweet Moments",
+            description:
+              "Pancakes, French toast, and other sweet treats.",
           },
         ],
-        requestMenu: "Request full menu",
+        requestMenu: "View full menu",
       },
       beveragesSection: {
         badge: "Drinks",
         title: "Smoothies & Beverages",
         description:
-          "Revitalize with fresh smoothies, specialty coffees, herbal teas, and cold-pressed juices.",
-        subtitle: "Each drink is crafted to energize, hydrate, and refresh.",
+          "From colorful smoothies and freshly squeezed juices to good coffee and specialty tea. For a fresh start to your day, a moment for yourself, or simply because it's delicious.",
+        subtitle: "On our menu you'll find among others:",
         menuItems: [
-          "Fresh fruit smoothies",
+          "Fresh smoothies",
+          "Freshly squeezed juices",
           "Specialty coffee & tea",
-          "Cold-pressed juices",
-          "Herbal infusions",
+          "Homemade & refreshing drinks",
         ],
+        tagline: "Take a sip, slow down & enjoy.",
       },
       iceCreamSection: {
         badge: "Sweet",
-        title: "Artisan Ice Cream",
+        title: "Italian Gelato & Soft Serve",
         description:
-          "Handcrafted ice cream in rotating seasonal flavors. Made with natural ingredients, no artificial colors or preservatives.",
-        subtitle: "Treat yourself to a moment of pure joy.",
+          "Ice cream is a summer essential. Enjoy delicious Italian gelato and creamy soft-serve at Heaven on Earth—perfect for a sunny day, dessert, or a sweet treat.",
+        subtitle:
+          "From classic favorites to rotating flavors, there is always something to enjoy.",
         menuItems: [
-          "Seasonal flavors",
-          "Vegan options available",
-          "Made fresh daily",
+          "Italian gelato in various flavors",
+          "Creamy soft-serve ice cream",
+          "Cups & cones",
+          "Rotating specials and toppings",
         ],
       },
       moreToDiscover: {
         title: "More to Discover",
         subtitle:
-          "The lunchroom offers a few extra touches to make your visit memorable.",
+          "Heaven on Earth is more than a place to eat. Discover the small extras that make your visit just that little bit more special.",
         cards: [
           {
-            title: "Souvenir Shop",
+            title: "Heaven Shop",
             description:
-              "A curated selection of wellness products, local crafts, and small keepsakes to take a piece of your experience home.",
+              "Take a piece of Heaven on Earth home with you. Discover a carefully selected collection of beautiful products, local items, and small gifts for yourself or someone else.",
           },
           {
-            title: "Photo Booth",
+            title: "Capture the Moment",
             description:
-              "Capture your visit with our stylish photo booth. Perfect for Instagram moments and memories with friends.",
+              "Capture your Heaven on Earth moment in our photo spot. A beautiful place for spontaneous photos, special moments, and memories together.",
           },
         ],
-        connectionTitle: "A Space for Connection",
+        connectionTitle: "A Place to Celebrate Life",
         connectionBody1:
-          "Whether you're catching up with friends, enjoying a quiet moment alone, or refueling after a sauna session, the lunchroom welcomes you.",
-        connectionBody2: "Bright, warm, and filled with good vibes.",
+          "Whether you're catching up with friends, enjoying a heavenly lunch, unwinding after a sauna session, or simply craving something delicious, you're always welcome.",
+        connectionBody2:
+          "Good food, fine conversations, and beautiful moments together.",
       },
     },
     eventspacePage: {
@@ -400,10 +406,12 @@ export const translations = {
     arrangementsPage: {
       hero: {
         title: "Arrangements",
-        subtitle: "Celebrate special occasions",
+        subtitle:
+          "Celebrate your birthday, baby shower, bachelor or bachelorette party, or any other special occasion with us.",
       },
       intro: {
-        text: "Celebrate your birthday, baby shower, bachelor or bachelorette party, or any other special occasion with us.",
+        text:
+          "Celebrate your birthday, baby shower, bachelor or bachelorette party, or any other special occasion with us.",
       },
       createYourOwn: {
         title: "Create Your Own",
@@ -415,7 +423,7 @@ export const translations = {
     },
     membershipsPage: {
       hero: {
-        title: "For Those Who Return",
+        title: "Sauna & Salt Room Membership",
         subtitle:
           "Thoughtfully designed memberships for guests who value consistency, care, and calm.",
       },
@@ -457,18 +465,33 @@ export const translations = {
           },
         ],
       },
-      moreThanAccess: {
-        kicker: "Dining Experience",
-        title: "More Than Access",
+      moreThanRelaxation: {
+        kicker: "Membership",
+        title: "More Than Just Relaxation",
         body1:
-          "A membership at Serene is an invitation to make wellness a practice, not an event. It\u2019s for those who understand that true transformation unfolds through consistency.",
+          "A membership for our sauna and salt room is an invitation to make rest and recovery a regular part of your life, not only when you feel you need it, but as a recurring moment dedicated to yourself.",
         body2:
-          "When you join, you become part of a community that values presence, intention, and the art of slowing down.",
+          "Enjoy the warmth of the sauna, the calming atmosphere of the salt room and the opportunity to consciously slow down more often. This way, self-care becomes more than an occasional treat, it becomes a valuable ritual.",
+      },
+      moreThanAccess: {
+        kicker: "Membership",
+        title: "More Than Just Relaxation",
+        body1:
+          "A membership for our sauna and salt room is an invitation to make rest and recovery a regular part of your life, not only when you feel you need it, but as a recurring moment dedicated to yourself.",
+        body2:
+          "Enjoy the warmth of the sauna, the calming atmosphere of the salt room and the opportunity to consciously slow down more often. This way, self-care becomes more than an occasional treat, it becomes a valuable ritual.",
+      },
+      chooseMembership: {
+        title: "Choose the Membership That Suits You",
+        subtitle:
+          "Visit our sauna and salt room as often as you need and enjoy the benefits of membership.",
+        button: "Apply for a membership",
       },
       cta: {
-        title: "Begin a More Intentional Wellness Journey",
-        subtitle: "Join those who have chosen to make peace a practice.",
-        button: "Apply for Membership",
+        title: "Choose the Membership That Suits You",
+        subtitle:
+          "Visit our sauna and salt room as often as you need and enjoy the benefits of membership.",
+        button: "Apply for a membership",
       },
     },
     activitiesPage: {
@@ -491,14 +514,16 @@ export const translations = {
       },
       privateSessions: {
         title: "Become a Partner of Heaven on Earth",
-        body: "Would you like to organise your own workshops, ceremonies, retreats or other events at our venue? We would love to collaborate with inspiring professionals who want to share their work in a unique setting. Contact us to explore the possibilities.",
+        body:
+          "Would you like to organise your own workshops, ceremonies, retreats or other events at our venue? We would love to collaborate with inspiring professionals who want to share their work in a unique setting. Contact us to explore the possibilities.",
         button: "Contact Us",
       },
     },
     contactPage: {
       hero: {
-        title: "Let's Connect",
-        subtitle: "We\u2019re here to answer your questions and guide your journey.",
+        title: "Contact Us",
+        subtitle:
+          "We’re happy to answer your questions and help you explore the possibilities.",
       },
     },
   },
@@ -607,7 +632,7 @@ export const translations = {
     wellnessJourney: {
       title: "Reserveer hier voor al onze diensten",
       subtitle: "We kijken er naar uit u te verwelkomen in Heaven.",
-      bookNow: "Reserveer",
+      bookNow: "Reserveer hier",
       welcomeText: "We kijken er naar uit u te verwelkomen in Heaven.",
     },
     philosophyPage: {
@@ -720,7 +745,7 @@ export const translations = {
       cta: {
         title: "Klaar om te ontspannen?",
         subtitle: "Laat de drukte even achter je en geniet van een heerlijk moment van ontspanning.",
-        button: "Reserveer Sauna",
+        button: "Reserveer hier",
       },
     },
     lunchroomPage: {
@@ -748,80 +773,85 @@ export const translations = {
         title: "Bezoek de Lunchroom",
         subtitle:
           "Loop gerust binnen tijdens uw volgende bezoek\u2014geen reservering nodig.",
-        button: "Neem contact op",
+        button: "Reserveer",
       },
       menuSection: {
         badge: "Menu",
-        title: "Vers & Gezond",
+        title: "Vers, kleurrijk & met liefde bereid",
         description:
-          "Elk gerecht wordt met zorg bereid, met seizoensgebonden ingrediënten en recepten die zowel lichaam als geest voeden.",
+          "Bij Heaven on Earth draait het om genieten. Onze gerechten worden met zorg bereid met verse ingrediënten, mooie smaken en een verrassende twist. Van een lichte lunch tot iets waar je écht even voor gaat zitten.",
         menuItems: [
           {
-            title: "Verse Salades",
-            description: "Seizoensgroenten, granen en gezonde toppings",
-          },
-          {
-            title: "Ambachtelijke Sandwiches",
+            title: "Salades & Bowls",
             description:
-              "Gemaakt met lokaal geproduceerd brood en ingrediënten",
+              "Kleurrijk, vers en rijkgevuld met smaakvolle toppings.",
           },
           {
-            title: "Warme Bowls",
-            description: "Voedzame soepen en graan bowls",
+            title: "Brood & Brunch",
+            description:
+              "Van rijk belegde broodgerechten tot onze brunchfavorieten.",
           },
           {
-            title: "Zoete Lekkernijen",
-            description: "Huisgemaakte gebakjes en desserts",
+            title: "Warme Gerechten",
+            description: "Comforting, smaakvol en vers uit onze keuken.",
+          },
+          {
+            title: "Sweet Moments",
+            description:
+              "Pancakes, French toast en andere zoete verwenmomenten.",
           },
         ],
-        requestMenu: "Vraag het volledige menu aan",
+        requestMenu: "Bekijk het volledige menu",
       },
       beveragesSection: {
         badge: "Drankjes",
         title: "Smoothies & Dranken",
         description:
-          "Revitaliseer met verse smoothies, speciale koffies, kruidenthee en koudgeperste sappen.",
-        subtitle:
-          "Elk drankje is gemaakt om energie te geven, te hydrateren en te verfrissen.",
+          "Van kleurrijke smoothies en versgeperste sappen tot goede koffie en bijzondere thee. Voor een frisse start van je dag, een moment voor jezelf of gewoon omdat het lekker is.",
+        subtitle: "Op onze kaart vind je onder andere:",
         menuItems: [
-          "Verse fruitsmoothies",
-          "Speciale koffie & thee",
-          "Koudgeperste sappen",
-          "Kruiden infusies",
+          "Verse smoothies",
+          "Versgeperste sappen",
+          "Speciality coffee & thee",
+          "Huisgemaakte en verfrissende drankjes",
         ],
+        tagline: "Take a sip, slow down & enjoy.",
       },
       iceCreamSection: {
         badge: "Zoet",
-        title: "Ambachtelijk Ijs",
+        title: "Italiaans IJs & Softijs",
         description:
-          "Handgemaakt ijs in wisselende seizoenssmaken. Gemaakt met natuurlijke ingrediënten, zonder kunstmatige kleurstoffen of conserveringsmiddelen.",
-        subtitle: "Verwenner jezelf met een moment van pure vreugde.",
+          "In de zomer hoort ijs erbij. Geniet bij Heaven on Earth van heerlijk Italiaans schepijs en romig softijs, perfect voor een zonnige dag, als dessert of gewoon tussendoor.",
+        subtitle:
+          "Van klassieke favorieten tot wisselende smaken: er is altijd iets om van te genieten.",
         menuItems: [
-          "Seizoenssmaken",
-          "Veganistische opties beschikbaar",
-          "Dagelijks vers gemaakt",
+          "Italiaans schepijs in verschillende smaken",
+          "Romig softijs",
+          "Bekers & hoorntjes",
+          "Wisselende specials en toppings",
         ],
       },
       moreToDiscover: {
         title: "Meer te Ontdekken",
         subtitle:
-          "De lunchroom biedt een paar extra details om uw bezoek onvergetelijk te maken.",
+          "Heaven on Earth is meer dan een plek om te eten. Ontdek de kleine extra’s die jouw bezoek nét wat bijzonderder maken.",
         cards: [
           {
-            title: "Souvenir Winkel",
+            title: "Heaven Shop",
             description:
-              "Een curated selectie van wellnessproducten, lokale ambachten en kleine souvenirs om een stukje van uw ervaring mee naar huis te nemen.",
+              "Neem een stukje Heaven on Earth mee naar huis. Ontdek een zorgvuldig geselecteerde collectie van mooie producten, lokale items en kleine cadeaus voor jezelf of iemand anders.",
           },
           {
-            title: "Fotohokje",
+            title: "Capture the Moment",
             description:
-              "Leg uw bezoek vast in onze stijlvolle fotohokje. Perfect voor Instagram-momenten en herinneringen met vrienden.",
+              "Leg jouw Heaven on Earth-moment vast in onze fotospot. Een mooie plek voor spontane foto’s, bijzondere momenten en herinneringen samen.",
           },
         ],
-        connectionTitle: "Een Plek voor Verbinding",
+        connectionTitle: "Een plek om het leven te vieren",
         connectionBody1:
-          "Of u nu bijpraat met vrienden, geniet van een rustig moment alleen of oplaadt na een saunasessie, de lunchroom verwelkomt u.",
-        connectionBody2: "Licht, warm en vol goede energie.",
+          "Of je nu bijpraat met vrienden, geniet van een hemelse lunch, even bijkomt na een saunasessie of gewoon zin hebt in iets lekkers, bij ons ben je altijd welkom.",
+        connectionBody2:
+          "Goed eten, fijne gesprekken en mooie momenten samen.",
       },
     },
     eventspacePage: {
@@ -904,11 +934,13 @@ export const translations = {
     },
     arrangementsPage: {
       hero: {
-        title: "Samengestelde Ervaringen",
-        subtitle: "Doordacht ontworpen reizen voor diepe transformatie.",
+        title: "Arrangementen",
+        subtitle:
+          "Vier je verjaardag, babyshower, vrijgezellenfeest of een andere bijzondere gelegenheid bij ons.",
       },
       intro: {
-        text: "Elk arrangement is een zorgvuldig samengestelde ervaring die onze kenmerkende aanbiedingen combineert tot transformatieve wellnessreizen, ontworpen voor uw unieke behoeften.",
+        text:
+          "Vier je verjaardag, babyshower, vrijgezellenfeest of een andere bijzondere gelegenheid bij ons.",
       },
       grid: {
         bookButton: "Arrangement Boeken",
@@ -959,7 +991,7 @@ export const translations = {
     },
     membershipsPage: {
       hero: {
-        title: "Voor Wie Terugkeert",
+        title: "Sauna & Zoutkamer Lidmaatschap",
         subtitle:
           "Doordacht ontworpen lidmaatschappen voor gasten die waarde hechten aan consistentie, zorg en rust.",
       },
@@ -1001,115 +1033,65 @@ export const translations = {
           },
         ],
       },
-      moreThanAccess: {
-        kicker: "Eetervaring",
-        title: "Meer Dan Toegang",
+      moreThanRelaxation: {
+        kicker: "Lidmaatschap",
+        title: "Meer dan alleen ontspanning",
         body1:
-          "Een lidmaatschap bij Serene is een uitnodiging om wellness een praktijk te maken, geen evenement. Het is voor degenen die begrijpen dat ware transformatie zich ontvouwt door consistentie.",
+          "Een lidmaatschap voor onze sauna en zoutkamer is een uitnodiging om rust en herstel een vast onderdeel van je leven te maken. Niet alleen wanneer je eraan toe bent, maar juist als regelmatig moment voor jezelf.",
         body2:
-          "Wanneer u lid wordt, maakt u deel uit van een gemeenschap die aanwezigheid, intentie en de kunst van het vertragen waardeert.",
+          "Geniet vaker van de warmte van de sauna, de rustgevende sfeer van de zoutkamer en de ruimte om bewust te vertragen. Zo wordt selfcare geen uitzondering, maar een waardevol ritueel.",
+      },
+      moreThanAccess: {
+        kicker: "Lidmaatschap",
+        title: "Meer dan alleen ontspanning",
+        body1:
+          "Een lidmaatschap voor onze sauna en zoutkamer is een uitnodiging om rust en herstel een vast onderdeel van je leven te maken. Niet alleen wanneer je eraan toe bent, maar juist als regelmatig moment voor jezelf.",
+        body2:
+          "Geniet vaker van de warmte van de sauna, de rustgevende sfeer van de zoutkamer en de ruimte om bewust te vertragen. Zo wordt selfcare geen uitzondering, maar een waardevol ritueel.",
+      },
+      chooseMembership: {
+        title: "Kies het lidmaatschap dat bij jou past",
+        subtitle:
+          "Bezoek onze sauna en zoutkamer zo vaak als jij nodig hebt en profiteer van de voordelen van een lidmaatschap.",
+        button: "Meld je aan om lid te worden",
       },
       cta: {
-        title: "Begin een Bewustere Wellness Reis",
+        title: "Kies het lidmaatschap dat bij jou past",
         subtitle:
-          "Sluit u aan bij degenen die ervoor hebben gekozen om vrede een praktijk te maken.",
-        button: "Aanmelden voor Lidmaatschap",
+          "Bezoek onze sauna en zoutkamer zo vaak als jij nodig hebt en profiteer van de voordelen van een lidmaatschap.",
+        button: "Meld je aan om lid te worden",
       },
     },
     activitiesPage: {
       hero: {
-        title: "Wellness in Beweging",
-        subtitle: "Verdiep uw praktijk door begeleide ervaringen.",
+        title: "Activiteiten",
+        subtitle: "Doe mee met onze wekelijkse of maandelijkse activiteiten.",
       },
       intro: {
-        text: "Onze activiteiten zijn ontworpen om uw wellnesreis aan te vullen en bieden gestructureerde oefeningen die aanwezigheid, kracht en innerlijke vrede cultiveren.",
+        text: "Doe mee met onze wekelijkse of maandelijkse activiteiten.",
       },
-      weeklySchedule: {
-        title: "Het Schema van Deze Week",
-        activities: [
-          {
-            name: "Ochtend Flow Yoga",
-            time: "8:00 - 9:00",
-            capacity: "12 personen",
-            location: "Bewegingsstudio",
-            duration: "60 minuten",
-            price: "\u20ac40",
-          },
-          {
-            name: "Transformationele Ademhaling",
-            time: "8:00 - 9:00",
-            capacity: "12 personen",
-            location: "Bewegingsstudio",
-            duration: "60 minuten",
-            price: "\u20ac40",
-          },
-          {
-            name: "Begeleide Meditatie",
-            time: "8:00 - 9:00",
-            capacity: "12 personen",
-            location: "Bewegingsstudio",
-            duration: "60 minuten",
-            price: "\u20ac40",
-          },
-          {
-            name: "Herstellende Yoga",
-            time: "8:00 - 9:00",
-            capacity: "12 personen",
-            location: "Bewegingsstudio",
-            duration: "60 minuten",
-            price: "\u20ac40",
-          },
-          {
-            name: "Klankheling Cirkel",
-            time: "8:00 - 9:00",
-            capacity: "12 personen",
-            location: "Bewegingsstudio",
-            duration: "60 minuten",
-            price: "\u20ac40",
-          },
-          {
-            name: "Mindfulness Workshop",
-            time: "8:00 - 9:00",
-            capacity: "12 personen",
-            location: "Bewegingsstudio",
-            duration: "60 minuten",
-            price: "\u20ac40",
-          },
-        ],
+      partner: {
+        title: "Word partner van Heaven on Earth",
+        description:
+          "Wil jij jouw eigen workshops, ceremonies, retraites of andere evenementen bij ons organiseren? We werken graag samen met inspirerende professionals die hun aanbod willen delen op een bijzondere locatie. Neem contact met ons op om de mogelijkheden te bespreken.",
       },
-      whatWeOffer: {
-        title: "Wat Wij Bieden",
-        subtitle: "Vier eenvoudige stappen naar uw moment van rust",
-        offerings: [
-          {
-            title: "Beweging",
-            description: "Yoga, stretching en bewuste bewegingsoefeningen",
-          },
-          {
-            title: "Ademwerk",
-            description:
-              "Begeleide ademhalingstechnieken voor energie en kalmte",
-          },
-          {
-            title: "Meditatie",
-            description: "Stilte-oefeningen voor mentale helderheid",
-          },
-          {
-            title: "Workshops",
-            description: "Educatieve sessies over wellnessonderwerpen",
-          },
-        ],
+      contactCTA: {
+        title: "Neem Contact Op",
+        description:
+          "Wij beantwoorden graag uw vragen en helpen u de mogelijkheden te verkennen.",
       },
       privateSessions: {
-        title: "Priv\u00e9sessies Beschikbaar",
-        body: "Voor een meer persoonlijke ervaring, boek priv\u00e9- of semi-priv\u00e9sessies met onze deskundige begeleiders. Wij stemmen de oefening af op uw specifieke behoeften en intenties.",
-        button: "Informeer Over Priv\u00e9sessies",
+        title: "Word partner van Heaven on Earth",
+        body:
+          "Wil jij jouw eigen workshops, ceremonies, retraites of andere evenementen bij ons organiseren? We werken graag samen met inspirerende professionals die hun aanbod willen delen op een bijzondere locatie. Neem contact met ons op om de mogelijkheden te bespreken.",
+        button: "Neem Contact Op",
       },
     },
     contactPage: {
       hero: {
-        title: "Neem contact op",
-        subtitle: "Wij staan klaar om uw vragen te beantwoorden en u te begeleiden op uw reis.",
+        title: "Neem contact met ons op",
+        subtitle:
+          "We beantwoorden graag je vragen en denken met je mee over de mogelijkheden.",
       },
     },
   },
@@ -1331,7 +1313,7 @@ export const translations = {
       cta: {
         title: "Bereit zum Entspannen?",
         subtitle: "Lass die Hektik für einen Moment hinter dir und genieße eine wunderbare Auszeit.",
-        button: "Sauna reservieren",
+        button: "Reservieren",
       },
     },
     lunchroomPage: {
@@ -1360,79 +1342,84 @@ export const translations = {
         title: "Besuchen Sie den Lunchroom",
         subtitle:
           "Kommen Sie einfach vorbei bei Ihrem n\u00e4chsten Besuch\u2014keine Reservierung n\u00f6tig.",
-        button: "Kontakt aufnehmen",
+        button: "Reservieren",
       },
       menuSection: {
         badge: "Menü",
-        title: "Frisch & Gesund",
+        title: "Frisch, bunt & mit Liebe zubereitet",
         description:
-          "Jedes Gericht wird mit Sorgfalt zubereitet, mit saisonalen Zutaten und Rezepten, die Körper und Geist nähren.",
+          "Bei Heaven on Earth dreht sich alles ums Genießen. Unsere Gerichte werden mit Sorgfalt aus frischen Zutaten, wunderbaren Aromen und einer überraschenden Note zubereitet. Vom leichten Mittagessen bis zu Speisen zum echten Verweilen.",
         menuItems: [
           {
-            title: "Frische Salate",
-            description: "Saisonales Grün, Körner und gesunde Toppings",
+            title: "Salate & Bowls",
+            description: "Farbenfroh, frisch und reich an schmackhaften Toppings.",
           },
           {
-            title: "Handwerkliche Sandwiches",
-            description: "Hergestellt mit lokal bezogenem Brot und Zutaten",
+            title: "Brot & Brunch",
+            description:
+              "Von reich belegten Brotgerichten bis zu unseren Brunch-Favoriten.",
           },
           {
-            title: "Warme Bowls",
-            description: "Nahrhafte Suppen und Körner-Bowls",
+            title: "Warme Gerichte",
+            description: "Wohltuend, geschmackvoll und frisch aus unserer Küche.",
           },
           {
-            title: "Süße Leckereien",
-            description: "Hausgemachte Gebäck und Desserts",
+            title: "Sweet Moments",
+            description:
+              "Pancakes, French Toast und andere süße Genussmomente.",
           },
         ],
-        requestMenu: "Vollständiges Menü anfordern",
+        requestMenu: "Vollständiges Menü ansehen",
       },
       beveragesSection: {
         badge: "Getränke",
         title: "Smoothies & Getränke",
         description:
-          "Revitalisieren Sie sich mit frischen Smoothies, Spezialkaffees, Kräutertees und kaltgepressten Säften.",
-        subtitle:
-          "Jedes Getränk wird hergestellt, um zu energetisieren, zu hydratisieren und zu erfrischen.",
+          "Von farbenfrohen Smoothies und frisch gepressten Säften bis hin zu gutem Kaffee und besonderen Tees. Für einen frischen Start in den Tag, einen Moment für sich selbst oder einfach, weil es lecker ist.",
+        subtitle: "Auf unserer Karte findest du unter anderem:",
         menuItems: [
-          "Frische Frucht-Smoothies",
+          "Frische Smoothies",
+          "Frisch gepresste Säfte",
           "Spezialitätenkaffee & Tee",
-          "Kaltgepresste Säfte",
-          "Kräuteraufgüsse",
+          "Hausgemachte und erfrischende Getränke",
         ],
+        tagline: "Take a sip, slow down & enjoy.",
       },
       iceCreamSection: {
         badge: "Süß",
-        title: "Handwerkliches Eis",
+        title: "Italienisches Eis & Softeis",
         description:
-          "Handgefertigtes Eis in wechselnden Saisonsorten. Hergestellt mit natürlichen Zutaten, ohne künstliche Farb- oder Konservierungsstoffe.",
-        subtitle: "Gönnen Sie sich einen Moment reiner Freude.",
+          "Im Sommer gehört Eis einfach dazu. Genießen Sie bei Heaven on Earth köstliches italienisches Kugeleis und cremiges Softeis—perfekt für einen sonnigen Tag, als Dessert oder einfach zwischendurch.",
+        subtitle:
+          "Von klassischen Favoriten bis hin zu wechselnden Sorten: Es gibt immer etwas zu genießen.",
         menuItems: [
-          "Saisonsorten",
-          "Vegane Optionen verfügbar",
-          "Täglich frisch zubereitet",
+          "Italienisches Kugeleis in verschiedenen Sorten",
+          "Cremiges Softeis",
+          "Becher & Hörnchen",
+          "Wechselnde Specials und Toppings",
         ],
       },
       moreToDiscover: {
         title: "Mehr zu Entdecken",
         subtitle:
-          "Die Lunchroom bietet einige besondere Details, die Ihren Besuch unvergesslich machen.",
+          "Heaven on Earth ist mehr als nur ein Ort zum Essen. Entdecken Sie die kleinen Extras, die Ihren Besuch zu etwas ganz Besonderem machen.",
         cards: [
           {
-            title: "Souvenir-Shop",
+            title: "Heaven Shop",
             description:
-              "Eine ausgewählte Kollektion von Wellnessprodukten, lokalen Kunstwerken und kleinen Souvenirs, um ein Stück Ihres Erlebnisses mit nach Hause zu nehmen.",
+              "Nehmen Sie ein Stück Heaven on Earth mit nach Hause. Entdecken Sie eine sorgfältig ausgewählte Kollektion schöner Produkte, lokaler Artikel und kleiner Geschenke für sich selbst oder jemand anderen.",
           },
           {
-            title: "Fotobox",
+            title: "Capture the Moment",
             description:
-              "Halten Sie Ihren Besuch in unserer stilvollen Fotobox fest. Perfekt für Instagram-Momente und Erinnerungen mit Freunden.",
+              "Halten Sie Ihren Heaven on Earth-Moment an unserem Fotospot fest. Ein schöner Ort für spontane Fotos, besondere Momente und gemeinsame Erinnerungen.",
           },
         ],
-        connectionTitle: "Ein Ort der Begegnung",
+        connectionTitle: "Ein Ort, um das Leben zu feiern",
         connectionBody1:
-          "Ob Sie sich mit Freunden austauschen, einen ruhigen Moment alleine genießen oder sich nach einer Saunasession erholen – die Lunchroom heißt Sie willkommen.",
-        connectionBody2: "Hell, warm und voller guter Energie.",
+          "Ob Sie sich mit Freunden unterhalten, ein himmlisches Mittagessen genießen, sich nach einem Saunagang erholen oder einfach Lust auf etwas Leckeres haben – bei uns sind Sie immer willkommen.",
+        connectionBody2:
+          "Gutes Essen, feine Gespräche und schöne gemeinsame Momente.",
       },
     },
     eventspacePage: {
@@ -1515,11 +1502,13 @@ export const translations = {
     },
     arrangementsPage: {
       hero: {
-        title: "Kuratierte Erlebnisse",
-        subtitle: "Durchdacht gestaltete Reisen f\u00fcr tiefe Transformation.",
+        title: "Arrangements",
+        subtitle:
+          "Feiern Sie Ihren Geburtstag, Ihre Babyparty, Ihren Junggesellen- oder Junggesellinnenabschied oder jeden anderen besonderen Anlass mit uns.",
       },
       intro: {
-        text: "Jedes Arrangement ist ein sorgfältig zusammengestelltes Erlebnis, das unsere Kernangebote zu transformativen Wellness-Reisen verbindet, die auf Ihre einzigartigen Bedürfnisse zugeschnitten sind.",
+        text:
+          "Feiern Sie Ihren Geburtstag, Ihre Babyparty, Ihren Junggesellen- oder Junggesellinnenabschied oder jeden anderen besonderen Anlass mit uns.",
       },
       grid: {
         bookButton: "Arrangement Buchen",
@@ -1572,7 +1561,7 @@ export const translations = {
     },
     membershipsPage: {
       hero: {
-        title: "Für Die, Die Zurückkehren",
+        title: "Sauna- und Salzraum-Mitgliedschaft",
         subtitle:
           "Durchdacht gestaltete Mitgliedschaften für Gäste, die Kontinuität, Fürsorge und Ruhe schätzen.",
       },
@@ -1614,115 +1603,65 @@ export const translations = {
           },
         ],
       },
-      moreThanAccess: {
-        kicker: "Kulinarisches Erlebnis",
-        title: "Mehr Als Zugang",
+      moreThanRelaxation: {
+        kicker: "Mitgliedschaft",
+        title: "Mehr als nur Entspannung",
         body1:
-          "Eine Mitgliedschaft bei Serene ist eine Einladung, Wellness zur Praxis zu machen, nicht zum Ereignis. Sie ist für diejenigen, die verstehen, dass wahre Transformation sich durch Konsequenz entfaltet.",
+          "Eine Mitgliedschaft für unsere Sauna und unseren Salzraum ist eine Einladung, Ruhe und Erholung zu einem festen Bestandteil deines Lebens zu machen. Nicht nur dann, wenn du das Gefühl hast, sie zu brauchen, sondern als regelmäßigen Moment ganz für dich.",
         body2:
-          "Wenn Sie beitreten, werden Sie Teil einer Gemeinschaft, die Präsenz, Intention und die Kunst des Verlangsamens schätzt.",
+          "Genieße häufiger die Wärme der Sauna, die beruhigende Atmosphäre des Salzraums und die Möglichkeit, bewusst zu entschleunigen. So bleibt Selbstfürsorge keine Ausnahme, sondern wird zu einem wertvollen Ritual.",
+      },
+      moreThanAccess: {
+        kicker: "Mitgliedschaft",
+        title: "Mehr als nur Entspannung",
+        body1:
+          "Eine Mitgliedschaft für unsere Sauna und unseren Salzraum ist eine Einladung, Ruhe und Erholung zu einem festen Bestandteil deines Lebens zu machen. Nicht nur dann, wenn du das Gefühl hast, sie zu brauchen, sondern als regelmäßigen Moment ganz für dich.",
+        body2:
+          "Genieße häufiger die Wärme der Sauna, die beruhigende Atmosphäre des Salzraums und die Möglichkeit, bewusst zu entschleunigen. So bleibt Selbstfürsorge keine Ausnahme, sondern wird zu einem wertvollen Ritual.",
+      },
+      chooseMembership: {
+        title: "Wähle die Mitgliedschaft, die zu dir passt",
+        subtitle:
+          "Besuche unsere Sauna und unseren Salzraum so oft, wie du es brauchst, und profitiere von den Vorteilen einer Mitgliedschaft.",
+        button: "Jetzt Mitglied werden",
       },
       cta: {
-        title: "Beginnen Sie Eine Bewusstere Wellness-Reise",
+        title: "Wähle die Mitgliedschaft, die zu dir passt",
         subtitle:
-          "Schließen Sie sich denen an, die sich entschieden haben, Frieden zur Praxis zu machen.",
-        button: "Für Mitgliedschaft Bewerben",
+          "Besuche unsere Sauna und unseren Salzraum so oft, wie du es brauchst, und profitiere von den Vorteilen einer Mitgliedschaft.",
+        button: "Jetzt Mitglied werden",
       },
     },
     activitiesPage: {
       hero: {
-        title: "Wellness in Bewegung",
-        subtitle: "Vertiefen Sie Ihre Praxis durch geführte Erfahrungen.",
+        title: "Aktivitäten",
+        subtitle: "Nimm an unseren wöchentlichen oder monatlichen Aktivitäten teil.",
       },
       intro: {
-        text: "Unsere Aktivitäten sind darauf ausgelegt, Ihre Wellness-Reise zu ergänzen und strukturierte Praktiken anzubieten, die Präsenz, Stärke und inneren Frieden kultivieren.",
+        text: "Nimm an unseren wöchentlichen oder monatlichen Aktivitäten teil.",
       },
-      weeklySchedule: {
-        title: "Der Plan Dieser Woche",
-        activities: [
-          {
-            name: "Morgen Flow Yoga",
-            time: "8:00 - 9:00 Uhr",
-            capacity: "12 Personen",
-            location: "Bewegungsstudio",
-            duration: "60 Minuten",
-            price: "\u20ac40",
-          },
-          {
-            name: "Transformatives Atemwork",
-            time: "8:00 - 9:00 Uhr",
-            capacity: "12 Personen",
-            location: "Bewegungsstudio",
-            duration: "60 Minuten",
-            price: "\u20ac40",
-          },
-          {
-            name: "Geführte Meditation",
-            time: "8:00 - 9:00 Uhr",
-            capacity: "12 Personen",
-            location: "Bewegungsstudio",
-            duration: "60 Minuten",
-            price: "\u20ac40",
-          },
-          {
-            name: "Restauratives Yoga",
-            time: "8:00 - 9:00 Uhr",
-            capacity: "12 Personen",
-            location: "Bewegungsstudio",
-            duration: "60 Minuten",
-            price: "\u20ac40",
-          },
-          {
-            name: "Klangheils-Kreis",
-            time: "8:00 - 9:00 Uhr",
-            capacity: "12 Personen",
-            location: "Bewegungsstudio",
-            duration: "60 Minuten",
-            price: "\u20ac40",
-          },
-          {
-            name: "Achtsamkeits-Workshop",
-            time: "8:00 - 9:00 Uhr",
-            capacity: "12 Personen",
-            location: "Bewegungsstudio",
-            duration: "60 Minuten",
-            price: "\u20ac40",
-          },
-        ],
+      partner: {
+        title: "Werde Partner von Heaven on Earth",
+        description:
+          "Möchtest du deine eigenen Workshops, Zeremonien, Retreats oder andere Veranstaltungen bei uns organisieren? Wir arbeiten gerne mit inspirierenden Fachleuten zusammen, die ihr Angebot an einem besonderen Ort teilen möchten. Nimm Kontakt mit uns auf, um die Möglichkeiten zu besprechen.",
       },
-      whatWeOffer: {
-        title: "Was Wir Anbieten",
-        subtitle: "Vier einfache Schritte zu Ihrem Moment der Ruhe",
-        offerings: [
-          {
-            title: "Bewegung",
-            description: "Yoga, Dehnen und achtsame Bewegungspraktiken",
-          },
-          {
-            title: "Atemarbeit",
-            description:
-              "Gef\u00fchrte Atemtechniken f\u00fcr Energie und Ruhe",
-          },
-          {
-            title: "Meditation",
-            description: "Stille-Praktiken f\u00fcr mentale Klarheit",
-          },
-          {
-            title: "Workshops",
-            description: "Bildungssitzungen zu Wellness-Themen",
-          },
-        ],
+      contactCTA: {
+        title: "Kontakt Aufnehmen",
+        description:
+          "Wir beantworten gerne Ihre Fragen und helfen Ihnen, die Möglichkeiten zu erkunden.",
       },
       privateSessions: {
-        title: "Private Sitzungen Verf\u00fcgbar",
-        body: "F\u00fcr ein pers\u00f6nlicheres Erlebnis buchen Sie private oder halbprivate Sitzungen mit unseren erfahrenen Begleitern. Wir passen die Praxis an Ihre spezifischen Bed\u00fcrfnisse und Absichten an.",
-        button: "Nach Privatsitzungen Anfragen",
+        title: "Werde Partner von Heaven on Earth",
+        body:
+          "Möchtest du deine eigenen Workshops, Zeremonien, Retreats oder andere Veranstaltungen bei uns organisieren? Wir arbeiten gerne mit inspirierenden Fachleuten zusammen, die ihr Angebot an einem besonderen Ort teilen möchten. Nimm Kontakt mit uns auf, um die Möglichkeiten zu besprechen.",
+        button: "Kontakt Aufnehmen",
       },
     },
     contactPage: {
       hero: {
-        title: "Lassen Sie Uns Verbinden",
-        subtitle: "Wir sind hier, um Ihre Fragen zu beantworten und Sie auf Ihrer Reise zu begleiten.",
+        title: "Nimm Kontakt mit uns auf",
+        subtitle:
+          "Wir beantworten gerne deine Fragen und denken gemeinsam mit dir über die Möglichkeiten nach.",
       },
     },
   },

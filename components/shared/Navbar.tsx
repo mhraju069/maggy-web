@@ -122,12 +122,12 @@ const Navbar = () => {
           </div>
         </div>
 
-        <div className="hidden items-center gap-2 lg:flex">
+        <div className="hidden items-center gap-1 xl:gap-2 lg:flex shrink-0">
           {navLinks.map((link) => (
             <Link
               key={link.href}
               href={link.href}
-              className={`rounded-md px-4 py-3 text-[16px] font-medium font-serif transition-colors ${
+              className={`rounded-md px-2 xl:px-3.5 py-2.5 text-[15px] xl:text-[16px] font-medium font-serif whitespace-nowrap transition-colors ${
                 pathname === link.href
                   ? "bg-[#F5D8BB] text-[#0F172A]"
                   : "text-[#2D2D2D] hover:text-[#CA7521]"
@@ -138,10 +138,10 @@ const Navbar = () => {
           ))}
         </div>
 
-        <div className="hidden items-center gap-4 lg:flex">
+        <div className="hidden items-center gap-2 xl:gap-4 lg:flex shrink-0">
           <Link
             href="/login"
-            className="flex items-center gap-3 rounded-md border border-[#CFB9A3] bg-transparent px-8 py-4 text-[16px] font-bold font-serif text-[#0F172A] transition-all hover:border-[#C4AD96] hover:text-[#0F172A] active:scale-95"
+            className="flex items-center gap-2.5 rounded-md border border-[#CFB9A3] bg-transparent px-5 xl:px-7 py-3.5 text-[15px] xl:text-[16px] font-bold font-serif text-[#0F172A] whitespace-nowrap shrink-0 transition-all hover:border-[#C4AD96] hover:text-[#0F172A] active:scale-95"
           >
             {t.navbar.login}
             <svg
@@ -160,7 +160,7 @@ const Navbar = () => {
               />
             </svg>
           </Link>
-          <BookNow href="/booking" />
+          <BookNow href="/booking" label={t.navbar.bookNow} />
         </div>
 
         <button
@@ -240,7 +240,7 @@ const Navbar = () => {
                   />
                 </svg>
               </Link>
-              <BookNow href="/booking" className="w-full justify-center" />
+              <BookNow href="/booking" className="w-full justify-center" label={t.navbar.bookNow} />
             </div>
           </div>
         </div>

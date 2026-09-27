@@ -11,8 +11,11 @@ const ContactPage = () => {
     <div className="min-h-screen bg-white">
       <PageHero
         backgroundImage="/images/contact/hero/contacthero.png"
-        title={t.contactPage.hero.title}
-        subtitle={t.contactPage.hero.subtitle}
+        title={t.contactPage?.hero?.title || "Contact Us"}
+        subtitle={
+          t.contactPage?.hero?.subtitle ||
+          "We’re happy to answer your questions and help you explore the possibilities."
+        }
       />
       <GetInTouchSection />
       <Footer />

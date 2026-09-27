@@ -13,18 +13,18 @@ export default function MoreToDiscover() {
         <LuShoppingBag className="w-7 h-7 text-[#8B7355]" strokeWidth={1.5} />
       ),
       title:
-        t.lunchroomPage?.moreToDiscover?.cards?.[0]?.title || "Souvenir Shop",
+        t.lunchroomPage?.moreToDiscover?.cards?.[0]?.title || "Heaven Shop",
       description:
         t.lunchroomPage?.moreToDiscover?.cards?.[0]?.description ||
-        "A curated selection of wellness products, local crafts, and small keepsakes to take a piece of your experience home.",
+        "Neem een stukje Heaven on Earth mee naar huis. Ontdek een zorgvuldig geselecteerde collectie van mooie producten, lokale items en kleine cadeaus voor jezelf of iemand anders.",
     },
     {
       icon: <LuCamera className="w-7 h-7 text-[#8B7355]" strokeWidth={1.5} />,
       title:
-        t.lunchroomPage?.moreToDiscover?.cards?.[1]?.title || "Photo Booth",
+        t.lunchroomPage?.moreToDiscover?.cards?.[1]?.title || "Capture the Moment",
       description:
         t.lunchroomPage?.moreToDiscover?.cards?.[1]?.description ||
-        "Capture your visit with our stylish photo booth. Perfect for Instagram moments and memories with friends.",
+        "Leg jouw Heaven on Earth-moment vast in onze fotospot. Een mooie plek voor spontane foto’s, bijzondere momenten en herinneringen samen.",
     },
   ];
 
@@ -37,14 +37,14 @@ export default function MoreToDiscover() {
             style={{ fontFamily: "var(--font-playfair)" }}
             className="text-[clamp(36px,4vw,48px)] font-bold text-[#0F172A] mb-4"
           >
-            {t.lunchroomPage?.moreToDiscover?.title || "More to Discover"}
+            {t.lunchroomPage?.moreToDiscover?.title || "Meer te Ontdekken"}
           </h2>
           <p
             className="text-[#6B5D54] text-lg md:text-xl max-w-2xl mx-auto leading-relaxed"
             style={{ fontFamily: "Cambria, Georgia, serif" }}
           >
             {t.lunchroomPage?.moreToDiscover?.subtitle ||
-              "The lunchroom offers a few extra touches to make your visit memorable."}
+              "Heaven on Earth is meer dan een plek om te eten. Ontdek de kleine extra’s die jouw bezoek nét wat bijzonderder maken."}
           </p>
         </div>
 
@@ -83,21 +83,21 @@ export default function MoreToDiscover() {
               className="text-[clamp(32px,4vw,48px)] font-bold text-[#0F172A] mb-6"
             >
               {t.lunchroomPage?.moreToDiscover?.connectionTitle ||
-                "A Space for Connection"}
+                "Een plek om het leven te vieren"}
             </h2>
             <p
               className="text-[#6B5D54] text-lg md:text-xl leading-relaxed mb-4"
               style={{ fontFamily: "Cambria, Georgia, serif" }}
             >
               {t.lunchroomPage?.moreToDiscover?.connectionBody1 ||
-                "Whether you're catching up with friends, enjoying a quiet moment alone, or refueling after a sauna session, the lunchroom welcomes you."}
+                "Of je nu bijpraat met vrienden, geniet van een hemelse lunch, even bijkomt na een saunasessie of gewoon zin hebt in iets lekkers, bij ons ben je altijd welkom."}
             </p>
             <p
               className="text-[#6B5D54] text-lg md:text-xl leading-relaxed"
               style={{ fontFamily: "Cambria, Georgia, serif" }}
             >
               {t.lunchroomPage?.moreToDiscover?.connectionBody2 ||
-                "Bright, warm, and filled with good vibes."}
+                "Goed eten, fijne gesprekken en mooie momenten samen."}
             </p>
           </div>
 

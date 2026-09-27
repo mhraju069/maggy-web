@@ -8,17 +8,16 @@ const GetInTouch = () => {
   const { t } = useLanguage();
   return (
     <section
-      className="w-full min-h-screen flex items-center overflow-hidden"
+      className="w-full min-h-screen flex items-center"
       style={{ background: "#f5f1ed" }}
     >
-      <div className="container mx-auto px-6 flex flex-col lg:flex-row items-center gap-12 lg:gap-20 py-16 lg:py-24">
-        {/* Left: image with blob clip-path */}
+      <div className="container mx-auto px-6 max-w-6xl flex flex-col lg:flex-row items-center justify-center gap-12 lg:gap-20 py-16 lg:py-24">
+        {/* Left: blob image */}
         <div
-          className="relative w-full lg:flex-shrink-0 lg:w-[480px] h-[340px] sm:h-[440px] lg:h-[580px]"
+          className="relative w-full max-w-[480px] lg:flex-shrink-0 lg:w-[480px] h-[340px] sm:h-[440px] lg:h-[580px] mx-auto lg:mx-0"
           style={{
             clipPath:
-              "path('M240,0 C340,0 420,70 420,180 C420,290 360,370 300,460 C240,550 120,590 50,540 C-20,490 0,360 0,240 C0,120 20,50 80,20 C130,0 180,0 240,0 Z')",
-            overflow: "hidden",
+              "path('M270,0 C370,0 450,70 450,180 C450,290 390,370 330,460 C270,550 150,590 80,540 C10,490 30,360 30,240 C30,120 50,50 110,20 C160,0 210,0 270,0 Z')",
           }}
         >
           <Image
@@ -30,7 +29,7 @@ const GetInTouch = () => {
         </div>
 
         {/* Right: text */}
-        <div className="flex flex-col gap-8 w-full lg:max-w-[605px] text-center lg:text-left">
+        <div className="flex flex-col gap-8 w-full lg:max-w-[605px] text-center lg:text-left lg:pl-6">
           {/* Title */}
           <div className="flex flex-col gap-3 items-center lg:items-start">
             <h2

@@ -19,19 +19,19 @@ const ActivitiesPage = () => {
       />
 
       {/* Intro Section */}
-      <section className="py-16 md:py-20 bg-[#FCF2E9]">
+      {/*<section className="py-16 md:py-20 bg-[#FCF2E9]">
         <div className="container mx-auto px-6 max-w-3xl text-center">
           <p className="text-[#475569] text-xl md:text-2xl font-serif leading-relaxed">
             {act?.intro?.text || "Join our monthly or weekly activities"}
           </p>
         </div>
-      </section>
+      </section> */}
 
       {/* Become a Partner Section */}
       <PrivateSessions />
 
       {/* Contact Us CTA Section */}
-      <CTASection
+      {/*<CTASection
         title={act?.contactCTA?.title || "Contact Us"}
         subtitle={
           act?.contactCTA?.description ||
@@ -41,7 +41,7 @@ const ActivitiesPage = () => {
         buttonLink="/contact"
         backgroundColor="#8B7355"
         textColor="#FFFFFF"
-      />
+      />*/}
 
       <Footer />
     </div>

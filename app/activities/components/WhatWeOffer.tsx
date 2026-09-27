@@ -19,24 +19,13 @@ const WhatWeOffer = () => {
   };
 
   return (
-    <section className="min-h-screen flex flex-col justify-center" style={{ background: "#FFFFFF", padding: "96px 128px" }}>
+    <section className="min-h-screen flex flex-col justify-center bg-white py-16 lg:py-24 px-6 md:px-12 lg:px-16 xl:px-24">
       {/* Header */}
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          gap: 8,
-          marginBottom: 64,
-        }}
-      >
+      <div className="flex flex-col items-center gap-2 mb-12 sm:mb-16">
         <h2
+          className="text-3xl sm:text-4xl lg:text-5xl font-bold text-[#0F172A] text-center"
           style={{
             fontFamily: "var(--font-playfair)",
-            fontSize: 48,
-            fontWeight: 700,
-            color: "#0F172A",
-            textAlign: "center",
             lineHeight: "140%",
             margin: 0,
           }}
@@ -60,15 +49,7 @@ const WhatWeOffer = () => {
       </div>
 
       {/* 4-column grid */}
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(4, 1fr)",
-          gap: 40,
-          maxWidth: 960,
-          margin: "0 auto",
-        }}
-      >
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 max-w-6xl mx-auto w-full">
         {s.offerings.map((item: any, i: number) => (
           <div
             key={i}

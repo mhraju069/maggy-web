@@ -38,7 +38,7 @@ const MembershipCTA = () => {
           </p>
 
           <Link
-            href="/contact"
+            href="#packages"
             className="flex items-center gap-3 transition-opacity hover:opacity-80"
             style={{
               padding: "16px 32px",

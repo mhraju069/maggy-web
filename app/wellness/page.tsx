@@ -59,7 +59,7 @@ const WellnessPage = () => {
   return (
     <div>
       <PageHero
-        backgroundImage="/images/wellness/hero/wellnesshero.png"
+        backgroundImage="/images/wellness/hero/wellnesshero-v2.png"
         title={t.wellnessPage.hero.title}
         subtitle={t.wellnessPage.hero.subtitle}
       />
@@ -104,7 +104,7 @@ const WellnessPage = () => {
           t.wellnessPage?.cta?.subtitle ||
           "Book your sauna experience and begin your wellness journey today."
         }
-        buttonText={t.wellnessPage?.cta?.button || "Book Sauna"}
+        buttonText={t.wellnessPage?.cta?.button || "Reserve"}
         buttonLink="/booking"
         backgroundColor="#8B7355"
       />

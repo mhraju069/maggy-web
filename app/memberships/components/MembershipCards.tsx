@@ -46,15 +46,12 @@ const MembershipCards = () => {
 
   return (
     <section
-      className="min-h-screen flex items-center"
-      style={{ background: "#FCF2E9", padding: "96px 0" }}
+      id="packages"
+      className="min-h-screen flex items-center scroll-mt-20 py-16 lg:py-24 bg-[#FCF2E9]"
     >
-      <div
-        className="container mx-auto flex flex-col items-center"
-        style={{ gap: 68, padding: "0 128px" }}
-      >
+      <div className="container mx-auto flex flex-col items-center gap-12 lg:gap-16 px-4 sm:px-6 md:px-12 lg:px-16 xl:px-24">
         {/* Cards row */}
-        <div className="flex w-full" style={{ gap: 32, alignItems: "stretch" }}>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8 w-full items-stretch">
           {plans.map((plan) => {
             const isDark = plan.variant === "infinite";
             const isFilled = plan.variant === "ethereal" || isDark;
@@ -62,15 +59,9 @@ const MembershipCards = () => {
             return (
               <div
                 key={plan.variant}
-                className="flex flex-col"
+                className="flex flex-col justify-between items-start w-full min-h-[500px] p-6 sm:p-8 lg:p-10 rounded-2xl"
                 style={{
-                  flex: "1 0 0",
-                  minHeight: 544,
-                  padding: "46px 24px",
-                  borderRadius: 0,
                   background: isDark ? "#081228" : "#FFFFFF",
-                  justifyContent: "space-between",
-                  alignItems: "flex-start",
                   border: isDark
                     ? "1px solid rgba(212,196,176,0.2)"
                     : undefined,

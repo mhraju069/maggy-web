@@ -17,12 +17,12 @@ const PrivateSessions = () => {
   const buttonText = t.navbar?.contact || s?.button || "Contact Us";
 
   return (
-    <section className="py-24" style={{ background: "#E8DFD5" }}>
-      <div className="container mx-auto px-6">
+    <section className="py-16 sm:py-20 lg:py-24 pb-20 sm:pb-24 lg:pb-28 bg-[#E8DFD5]">
+      <div className="container mx-auto px-4 sm:px-6">
         <div className="max-w-2xl mx-auto text-center flex flex-col items-center gap-6">
-          <div>
+          <div className="w-full flex flex-col items-center">
             <h2
-              className="text-3xl md:text-5xl font-bold text-[#0F172A]"
+              className="text-2xl sm:text-3xl md:text-5xl font-bold text-[#0F172A] break-words max-w-full"
               style={{
                 fontFamily: "var(--font-playfair)",
                 lineHeight: "140%",
@@ -30,7 +30,7 @@ const PrivateSessions = () => {
             >
               {title}
             </h2>
-            <div className="flex justify-center w-full">
+            <div className="flex justify-center w-full mt-2">
               <DecorativeUnderline />
             </div>
           </div>
