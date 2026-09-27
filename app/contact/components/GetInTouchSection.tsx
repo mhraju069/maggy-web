@@ -146,7 +146,7 @@ export default function GetInTouchSection() {
           {/* Background image */}
           <div className="absolute inset-0">
             <Image
-              src="/images/contact/touch/touch.png"
+              src="/images/contact/touch/touch.jpg"
               alt="Get in touch background"
               fill
               className="object-cover object-center"

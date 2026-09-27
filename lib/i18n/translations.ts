@@ -7,7 +7,7 @@ export const translations = {
       philosophy: "About us",
       restaurant: "Restaurant",
       menu: "Menu",
-      events: "Events",
+      events: "Event Space",
       wellness: "Wellness",
       arrangements: "Arrangements",
       activities: "Activities",
@@ -328,78 +328,78 @@ export const translations = {
     },
     eventspacePage: {
       hero: {
-        title: "Multifunctional Space",
-        subtitle: "A calm setting for life\u2019s meaningful moments.",
+        title: "Event Space (150 m²)",
+        subtitle: "A 150 m² versatile venue for life's meaningful moments.",
       },
       intro: {
-        text: "Our multifunctional space combines flexibility with atmosphere. Whether hosting a seminar, celebrating a wedding, or gathering for a corporate retreat, this space adapts to honor your vision.",
+        text: "We offer a 150 m² atmospheric, flexible space for rent for celebrations, weddings, business meetings, and coaching sessions. Our multifunctional venue combines natural light, peaceful acoustics, and premium amenities tailored to your vision.",
       },
       seminarsSection: {
-        badge: "Learning",
-        title: "Seminars & Workshops",
+        badge: "Coaching & Workshops",
+        title: "Coaching, Seminars & Workshops",
         description:
-          "A space designed for focused learning and creative collaboration. Natural light, calm acoustics, and flexible seating create the ideal environment for workshops and seminars.",
-        subtitle: "",
+          "Our 150 m² space is designed for focused coaching, seminars, and creative collaboration. Abundant natural daylight, calm acoustics, and flexible layouts create the ideal setting.",
+        subtitle: "Inspire your group in a tranquil, distraction-free environment.",
         items: [
-          "Flexible seating arrangements",
-          "High-quality audio/visual setup",
-          "Natural light and calming atmosphere",
-          "Catering options available",
+          "Flexible seating & workshop setups",
+          "High-quality audio/visual equipment",
+          "Peaceful atmosphere & natural daylight",
+          "Full catering, coffee & tea packages",
         ],
       },
       weddingsSection: {
         badge: "Celebration",
         title: "Weddings & Celebrations",
         description:
-          "Celebrate life\u2019s most precious moments in a setting that feels both intimate and expansive. The space offers the perfect blend of elegance and warmth.",
+          "Celebrate life's most precious moments in a 150 m² setting that feels both intimate and grand. Perfect for weddings, receptions, anniversaries, and private parties.",
         subtitle:
-          "From casual ceremonies to joyful receptions, we create an atmosphere that honors your unique story.",
+          "From informal ceremonies to joyous receptions, we craft an ambiance that honors your unique story.",
         items: [
-          "Elegant, neutral d\u00e9cor",
-          "Indoor/outdoor access",
-          "Full catering coordination",
-          "Wellness packages for guests",
+          "150 m² elegant & neutral decor",
+          "Indoor and outdoor venue access",
+          "Complete catering coordination",
+          "Guest wellness integration options",
         ],
       },
       corporateSection: {
         badge: "Corporate",
-        title: "Corporate & Private Events",
+        title: "Business Meetings & Corporate Events",
         description:
-          "Host team retreats, strategy sessions, or private gatherings in a space that inspires clarity and connection.",
+          "Host business meetings, executive retreats, or strategy workshops in a 150 m² venue designed for clarity, focus, and team connection.",
         subtitle:
-          "Combine professional focus with wellness amenities for a truly transformative experience.",
+          "Combine professional focus with healthy dining and optional wellness amenities.",
         items: [
-          "Private, distraction-free environment",
-          "Technology-ready infrastructure",
-          "Wellness add-ons (sauna, yoga)",
-          "On-site catering coordination",
+          "Spacious 150 m² multifunctional hall",
+          "High-speed Wi-Fi & AV infrastructure",
+          "On-site lunchroom & catering coordination",
+          "Custom event packages on request",
         ],
       },
       spaceSuitable: {
-        title: "What Makes This Space Suitable",
-        subtitle: "Four simple steps to your moment of tranquility",
+        title: "What Makes This 150 m² Space Unique",
+        subtitle: "Designed to adapt effortlessly to your needs",
         features: [
           {
-            title: "Flexible Layout",
+            title: "150 m² Flexible Layout",
             description:
-              "Adaptable configurations to suit any event type, from intimate gatherings to large celebrations.",
+              "Adaptable floorplan to suit any event type, from 1-on-1 coaching to large celebrations.",
           },
           {
-            title: "Calm Surroundings",
+            title: "Serene & Natural Atmosphere",
             description:
-              "Natural materials, thoughtful acoustics, and our signature wellness atmosphere.",
+              "Thoughtful acoustics, natural materials, and abundant daylight for a relaxed experience.",
           },
           {
-            title: "Wellness Connection",
+            title: "Holistic Wellness Integration",
             description:
-              "Integrate sauna sessions, yoga, or spa services to create a truly holistic event.",
+              "Combine your event with sauna sessions, healthy dining, or spa services for a unique event.",
           },
         ],
       },
       cta: {
-        title: "Request Information",
+        title: "Rent Our 150 m² Event Space",
         subtitle:
-          "Share your vision with us. We\u2019ll help create an experience that feels uniquely yours.",
+          "Share your vision with us. We'll help create an event that feels uniquely yours.",
         button: "Get In Touch",
       },
     },
@@ -534,7 +534,7 @@ export const translations = {
       philosophy: "Over ons",
       restaurant: "Restaurant",
       menu: "Menukaart",
-      events: "Events",
+      events: "Event Space",
       wellness: "Wellness",
       arrangements: "Arrangementen",
       activities: "Activiteiten",
@@ -856,79 +856,78 @@ export const translations = {
     },
     eventspacePage: {
       hero: {
-        title: "Multifunctionele Ruimte",
-        subtitle:
-          "Een rustige omgeving voor de betekenisvolle momenten in uw leven.",
+        title: "Event Space (150 m²)",
+        subtitle: "Een multifunctionele 150 m² ruimte voor bijzondere momenten.",
       },
       intro: {
-        text: "Onze multifunctionele ruimte combineert flexibiliteit met sfeer. Of u nu een seminar organiseert, een bruiloft viert of samenkomt voor een bedrijfsretraite \u2013 deze ruimte past zich aan uw visie aan.",
+        text: "Wij bieden 150 m² aan sfeervolle, flexibele ruimte te huur voor feesten, bruiloften, zakelijke bijeenkomsten en coaching- of workshopsessies. Onze multifunctionele zaal combineert natuurlijk daglicht, rustige akoestiek en uitstekende voorzieningen op maat van jouw visie.",
       },
       seminarsSection: {
-        badge: "Leren",
-        title: "Seminars & Workshops",
+        badge: "Coaching & Workshops",
+        title: "Coaching, Seminars & Workshops",
         description:
-          "Een ruimte ontworpen voor gefocust leren en creatieve samenwerking. Natuurlijk licht, rustige akoestiek en flexibele zitopstellingen cre\u00ebren de ideale omgeving voor workshops en seminars.",
-        subtitle: "",
+          "Onze 150 m² ruimte is ontworpen voor gefocust leren, coaching en creatieve samenwerking. Natuurlijk daglicht, rustige akoestiek en flexibele opstellingen creëren de ideale omgeving.",
+        subtitle: "Inspireer jouw groep in een rustige, afleidingsvrije omgeving.",
         items: [
-          "Flexibele zitopstellingen",
-          "Hoogwaardige audio/visuele installatie",
-          "Natuurlijk licht en rustgevende sfeer",
-          "Catering-opties beschikbaar",
+          "Flexibele zit- en workshopopstellingen",
+          "Hoogwaardige geluids- en presentatieapparatuur",
+          "Natuurlijk daglicht en rustgevende sfeer",
+          "Catering, koffie & thee arrangements beschikbaar",
         ],
       },
       weddingsSection: {
         badge: "Feest",
         title: "Bruiloften & Feesten",
         description:
-          "Vier de mooiste momenten van het leven in een omgeving die zowel intiem als ruim aanvoelt. De ruimte biedt de perfecte balans tussen elegantie en warmte.",
+          "Vier de mooiste momenten van het leven in een ruimtelijke 150 m² omgeving die zowel intiem als sfeervol aanvoelt. Perfect voor feesten, jubilea, recepties en bruiloften.",
         subtitle:
-          "Van informele ceremonies tot vrolijke recepties \u2013 wij cre\u00ebren een sfeer die uw unieke verhaal eert.",
+          "Van informele ceremonies tot vrolijke recepties – wij creëren een sfeer die uw unieke verhaal eert.",
         items: [
-          "Elegant, neutraal interieur",
-          "Toegang binnen en buiten",
-          "Volledige catering-co\u00f6rdinatie",
+          "150 m² sfeervol & neutraal interieur",
+          "Toegang tot binnen- en buitenruimtes",
+          "Volledige catering-coördinatie",
           "Wellnesspakketten voor gasten",
         ],
       },
       corporateSection: {
         badge: "Zakelijk",
-        title: "Zakelijke & Priv\u00e9-evenementen",
+        title: "Zakelijke Bijeenkomsten & Meetings",
         description:
-          "Organiseer teamretraites, strategiesessies of priv\u00e9bijeenkomsten in een ruimte die helderheid en verbinding inspireert.",
+          "Organiseer zakelijke meetings, teamretraites of strategiesessies in een inspirerende omgeving van 150 m² waar helderheid en verbinding centraal staan.",
         subtitle:
-          "Combineer professionele focus met wellnessfaciliteiten voor een werkelijk transformatieve ervaring.",
+          "Combineer professionele focus met gezonde catering en optionele wellnessfaciliteiten.",
         items: [
-          "Priv\u00e9, afleidingsvrije omgeving",
-          "Technologisch uitgeruste infrastructuur",
-          "Wellness-toevoegingen (sauna, yoga)",
-          "Catering-co\u00f6rdinatie ter plaatse",
+          "Ruime 150 m² multifunctionele zaal",
+          "Snelle Wi-Fi & AV ondersteuning",
+          "Combineerbaar met lunchroom & wellness",
+          "Maatwerk arrangementen op aanvraag",
         ],
       },
       spaceSuitable: {
-        title: "Wat deze ruimte bijzonder maakt",
-        subtitle: "Vier eenvoudige stappen naar uw moment van rust",
+        title: "Wat onze 150 m² ruimte uniek maakt",
+        subtitle: "Ontworpen om zich moeiteloos aan te passen aan jouw wensen",
         features: [
           {
-            title: "Flexibele indeling",
+            title: "150 m² Flexibele Indeling",
             description:
-              "Aanpasbare configuraties voor elk type evenement, van kleine bijeenkomsten tot grote vieringen.",
+              "Aanpasbare zaalopstelling voor elk type evenement, van 1-op-1 coaching tot grote feesten.",
           },
           {
-            title: "Rustgevende omgeving",
+            title: "Rustgevende & Natuurlijke Sfeer",
             description:
-              "Natuurlijke materialen, doordachte akoestiek en onze kenmerkende wellnesssfeer.",
+              "Doordachte akoestiek, natuurlijke materialen en veel daglicht voor een ontspannen ervaring.",
           },
           {
-            title: "Wellness-verbinding",
+            title: "Wellness & Catering Integratie",
             description:
-              "Integreer saunasessies, yoga of spa-diensten voor een werkelijk holistisch evenement.",
+              "Combineer je evenement met saunasessies, gezonde catering of spa-diensten voor een bijzonder moment.",
           },
         ],
       },
       cta: {
-        title: "Informatie aanvragen",
+        title: "Huur Onze 150 m² Event Space",
         subtitle:
-          "Deel uw visie met ons. Wij helpen u een ervaring te cre\u00ebren die uniek voor u is.",
+          "Deel jouw visie met ons. Wij helpen je een evenement te creëren dat uniek en onvergetelijk is.",
         button: "Neem contact op",
       },
     },
@@ -1102,7 +1101,7 @@ export const translations = {
       philosophy: "Über uns",
       restaurant: "Restaurant",
       menu: "Speisekarte",
-      events: "Events",
+      events: "Event Space",
       wellness: "Wellness",
       arrangements: "Arrangements",
       activities: "Aktivitäten",
