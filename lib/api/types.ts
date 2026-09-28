@@ -29,9 +29,67 @@ export interface PaginatedResponse<T> {
 export interface ApiErrorResponse {
   message?: string;
   detail?: string;
-  errors?: Record<string, string[] | string>;
-  status?: number;
+  log?: string;
+  error?: string;
+  errors?: Record<string, string[] | string> | string[];
+  status?: number | boolean;
   [key: string]: unknown;
+}
+
+function capitalize(str: string): string {
+  if (!str) return "";
+  return str.charAt(0).toUpperCase() + str.slice(1).replace(/_/g, " ");
+}
+
+export function parseApiErrorMessage(data: unknown): string {
+  if (!data) return "An unexpected API error occurred.";
+
+  if (typeof data === "string") return data;
+
+  if (typeof data === "object") {
+    const obj = data as Record<string, unknown>;
+
+    // 1. Explicit message keys
+    if (typeof obj.message === "string" && obj.message.trim()) return obj.message;
+    if (typeof obj.detail === "string" && obj.detail.trim()) return obj.detail;
+    if (typeof obj.log === "string" && obj.log.trim()) return obj.log;
+    if (typeof obj.error === "string" && obj.error.trim()) return obj.error;
+
+    // 2. Handling obj.errors
+    if (obj.errors) {
+      if (typeof obj.errors === "string" && obj.errors.trim()) return obj.errors;
+      if (Array.isArray(obj.errors) && obj.errors.length > 0) {
+        return obj.errors.map((e) => (typeof e === "string" ? e : JSON.stringify(e))).join(" ");
+      }
+      if (typeof obj.errors === "object") {
+        return parseApiErrorMessage(obj.errors);
+      }
+    }
+
+    // 3. Handling DRF field errors dictionary e.g. {"password": ["Ensure this field has at least 6 characters."]}
+    const messages: string[] = [];
+
+    for (const [key, value] of Object.entries(obj)) {
+      if (key === "status" || key === "code" || key === "status_code") continue;
+
+      if (typeof value === "string" && value.trim()) {
+        const prefix = key !== "non_field_errors" && key !== "detail" ? `${capitalize(key)}: ` : "";
+        messages.push(`${prefix}${value}`);
+      } else if (Array.isArray(value) && value.length > 0) {
+        const fieldMsgs = value.map((item) => (typeof item === "string" ? item : JSON.stringify(item))).join(", ");
+        const prefix = key !== "non_field_errors" && key !== "detail" ? `${capitalize(key)}: ` : "";
+        messages.push(`${prefix}${fieldMsgs}`);
+      } else if (typeof value === "object" && value !== null) {
+        messages.push(parseApiErrorMessage(value));
+      }
+    }
+
+    if (messages.length > 0) {
+      return messages.join(" | ");
+    }
+  }
+
+  return "An unexpected API error occurred.";
 }
 
 export class ApiError extends Error {
@@ -39,8 +97,7 @@ export class ApiError extends Error {
   data: ApiErrorResponse;
 
   constructor(status: number, data: ApiErrorResponse) {
-    const message =
-      data.message || data.detail || (typeof data.errors === "string" ? data.errors : "An unexpected API error occurred.");
+    const message = parseApiErrorMessage(data);
     super(message);
     this.name = "ApiError";
     this.status = status;

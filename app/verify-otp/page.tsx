@@ -2,12 +2,12 @@
 
 import Footer from "@/components/shared/Footer";
 import Navbar from "@/components/shared/Navbar";
-import { authService } from "@/lib/api";
+import { authService, parseApiErrorMessage } from "@/lib/api";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
-import { FiArrowRight, FiShieldCheck } from "react-icons/fi";
+import { FiArrowRight, FiShield } from "react-icons/fi";
 import { HiOutlineMail } from "react-icons/hi";
 
 function VerifyOtpContent() {
@@ -44,16 +44,16 @@ function VerifyOtpContent() {
       });
 
       if (response.status === false) {
-        setError(response.log || "OTP verification failed. Please check your code.");
+        setError(parseApiErrorMessage(response) || "OTP verification failed. Please check your code.");
       } else if (response.access) {
         const targetRoute = response.user?.role === "admin" ? "/admin" : "/dashboard";
         router.push(targetRoute);
       } else {
-        setError(response.log || "Verification completed. Please log in.");
+        setError(parseApiErrorMessage(response) || "Verification completed. Please log in.");
         setTimeout(() => router.push("/login"), 1500);
       }
     } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : "Invalid or expired OTP code.";
+      const msg = parseApiErrorMessage((err as { data?: unknown })?.data || err);
       setError(msg);
     } finally {
       setLoading(false);
@@ -88,7 +88,7 @@ function VerifyOtpContent() {
       <div className="flex flex-col justify-center p-8 md:p-16 lg:px-24 bg-white">
         <div className="mb-10">
           <div className="w-12 h-12 rounded-full bg-[#F4EFEA] flex items-center justify-center text-[#8B7355] mb-4">
-            <FiShieldCheck className="w-6 h-6" />
+            <FiShield className="w-6 h-6" />
           </div>
           <h1 className="text-3xl lg:text-4xl font-displayPlayFair font-bold text-[#1d1a17] mb-3">
             Verify Email OTP
@@ -127,7 +127,7 @@ function VerifyOtpContent() {
             </label>
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-[#9d8b7a]">
-                <FiShieldCheck className="w-5 h-5" />
+                <FiShield className="w-5 h-5" />
               </div>
               <input
                 id="otp_code"

@@ -2,7 +2,7 @@
 
 import Footer from "@/components/shared/Footer";
 import Navbar from "@/components/shared/Navbar";
-import { authService } from "@/lib/api";
+import { authService, parseApiErrorMessage } from "@/lib/api";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -42,10 +42,10 @@ export default function SignupPage() {
         // Redirect to OTP verification page with email parameter
         router.push(`/verify-otp?email=${encodeURIComponent(userEmail)}`);
       } else {
-        setError(response.log || "Registration failed.");
+        setError(parseApiErrorMessage(response) || "Registration failed.");
       }
     } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : "Registration failed. Please try again.";
+      const msg = parseApiErrorMessage((err as { data?: unknown })?.data || err);
       setError(msg);
     } finally {
       setLoading(false);
