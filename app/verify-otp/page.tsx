@@ -18,6 +18,7 @@ function VerifyOtpContent() {
   const [otpCode, setOtpCode] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   useEffect(() => {
     const emailParam = searchParams.get("email");
@@ -29,6 +30,7 @@ function VerifyOtpContent() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
+    setSuccessMessage(null);
 
     if (!email.trim() || !otpCode.trim()) {
       setError("Please enter both email and OTP code.");
@@ -45,12 +47,12 @@ function VerifyOtpContent() {
 
       if (response.status === false) {
         setError(parseApiErrorMessage(response) || "OTP verification failed. Please check your code.");
-      } else if (response.access) {
-        const targetRoute = response.user?.role === "admin" ? "/admin" : "/dashboard";
-        router.push(targetRoute);
       } else {
-        setError(parseApiErrorMessage(response) || "Verification completed. Please log in.");
-        setTimeout(() => router.push("/login"), 1500);
+        const msg = response.log || "OTP verified successfully. Please log in to continue.";
+        setSuccessMessage(msg);
+        setTimeout(() => {
+          router.push("/login");
+        }, 1500);
       }
     } catch (err: unknown) {
       const msg = parseApiErrorMessage((err as { data?: unknown })?.data || err);
@@ -140,6 +142,13 @@ function VerifyOtpContent() {
               />
             </div>
           </div>
+
+          {/* Success Alert */}
+          {successMessage && (
+            <div className="p-3 bg-green-50 border border-green-200 text-green-700 text-xs rounded-sm">
+              {successMessage}
+            </div>
+          )}
 
           {/* Error Alert */}
           {error && (

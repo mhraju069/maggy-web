@@ -32,8 +32,11 @@ export const authService = {
     const refresh = response.refresh || response.tokens?.refresh;
     const role = response.user?.role || "user";
 
-    if (token) {
+    if (response.status !== false && token) {
       setAuthToken(token, refresh, role);
+      if (typeof window !== "undefined" && response.user) {
+        localStorage.setItem("user_info", JSON.stringify(response.user));
+      }
     }
 
     return response;

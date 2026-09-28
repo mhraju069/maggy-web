@@ -127,7 +127,9 @@ export interface TokenPair {
 }
 
 export interface AuthResponse {
-  user: User;
+  status?: boolean;
+  log?: string;
+  user?: User;
   token?: string;
   access?: string;
   refresh?: string;

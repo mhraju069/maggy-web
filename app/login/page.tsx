@@ -2,6 +2,7 @@
 
 import Footer from "@/components/shared/Footer";
 import Navbar from "@/components/shared/Navbar";
+import { authService, parseApiErrorMessage } from "@/lib/api";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -9,39 +10,60 @@ import { useState } from "react";
 import { HiOutlineLockClosed, HiOutlineMail } from "react-icons/hi";
 import { IoEyeOutline } from "react-icons/io5";
 
-// Hardcoded credentials
-const USERS = [
-  { username: "user",  password: "123", role: "user",  redirect: "/dashboard" },
-  { username: "admin", password: "123", role: "admin", redirect: "/admin" },
-];
-
 export default function LoginPage() {
   const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
-  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const [isInactive, setIsInactive] = useState(false);
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError("");
-    setLoading(true);
+    setError(null);
+    setIsInactive(false);
 
-    const match = USERS.find(
-      (u) => u.username === username.trim() && u.password === password
-    );
-
-    if (!match) {
-      setError("Invalid username or password.");
-      setLoading(false);
+    if (!email.trim() || !password) {
+      setError("Please enter both email and password.");
       return;
     }
 
-    // Set role cookie (read by middleware to protect routes)
-    document.cookie = `role=${match.role}; path=/; SameSite=Lax`;
+    setLoading(true);
 
-    router.push(match.redirect);
+    try {
+      const response = await authService.login({
+        email: email.trim(),
+        password: password,
+      });
+
+      if (response.status === false) {
+        const logMsg = response.log || "Invalid email or password.";
+        setError(logMsg);
+        if (logMsg.toLowerCase().includes("inactive") || logMsg.toLowerCase().includes("otp")) {
+          setIsInactive(true);
+          setTimeout(() => {
+            router.push(`/verify-otp?email=${encodeURIComponent(email.trim())}`);
+          }, 1500);
+        }
+      } else if (response.access || response.token || response.status === true) {
+        const targetRoute = response.user?.role === "admin" ? "/admin" : "/dashboard";
+        router.push(targetRoute);
+      } else {
+        setError(response.log || "Login failed. Please check your credentials.");
+      }
+    } catch (err: unknown) {
+      const msg = parseApiErrorMessage((err as { data?: unknown })?.data || err);
+      setError(msg);
+      if (msg.toLowerCase().includes("inactive") || msg.toLowerCase().includes("otp")) {
+        setIsInactive(true);
+        setTimeout(() => {
+          router.push(`/verify-otp?email=${encodeURIComponent(email.trim())}`);
+        }, 1500);
+      }
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -50,7 +72,6 @@ export default function LoginPage() {
       <div className="h-[88px]" />
 
       <main className="flex-grow flex min-h-screen">
-
         {/* LEFT — image fills full height, text centered */}
         <div className="hidden md:block w-1/2 relative">
           <Image
@@ -76,7 +97,6 @@ export default function LoginPage() {
         {/* RIGHT — login form */}
         <div className="w-full md:w-1/2 flex flex-col justify-center items-center gap-6 px-8 py-4 bg-white self-stretch">
           <div className="w-full max-w-[500px]">
-
             <div className="mb-6">
               <h1 className="font-displayPlayFair text-[32px] font-bold text-[#1d1a17] mb-2 leading-tight">
                 Member Access
@@ -87,26 +107,26 @@ export default function LoginPage() {
             </div>
 
             <form className="flex flex-col gap-3" onSubmit={handleSubmit}>
-
-              {/* Username */}
+              {/* Email */}
               <div className="flex flex-col gap-1.5">
                 <label
-                  htmlFor="username"
+                  htmlFor="email"
                   className="text-[11px] font-medium text-[#1d1a17] uppercase tracking-wide"
                   style={{ fontFamily: "Cambria, serif" }}
                 >
-                  Username
+                  Email Address
                 </label>
                 <div className="relative">
                   <span className="absolute inset-y-0 left-3 flex items-center text-[#94A3B8] pointer-events-none">
                     <HiOutlineMail className="w-4 h-4" />
                   </span>
                   <input
-                    id="username"
-                    type="text"
-                    placeholder="user or admin"
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value)}
+                    id="email"
+                    type="email"
+                    required
+                    placeholder="user@example.com"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
                     className="w-full pl-9 pr-3 py-2.5 border border-[#E2E8F0] rounded-sm text-sm text-[#1d1a17] placeholder:text-[#94A3B8] focus:outline-none focus:border-[#8b7355] transition-colors"
                     style={{ fontFamily: "Cambria, serif" }}
                   />
@@ -129,6 +149,7 @@ export default function LoginPage() {
                   <input
                     id="password"
                     type={showPassword ? "text" : "password"}
+                    required
                     placeholder="••••••••"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
@@ -145,9 +166,19 @@ export default function LoginPage() {
                 </div>
               </div>
 
-              {/* Error message */}
+              {/* Error message alert */}
               {error && (
-                <p className="text-red-500 text-xs mt-1">{error}</p>
+                <div className="p-3 bg-red-50 border border-red-200 rounded-sm flex flex-col gap-2 mt-1">
+                  <p className="text-red-700 text-xs">{error}</p>
+                  {isInactive && (
+                    <Link
+                      href={`/verify-otp?email=${encodeURIComponent(email.trim())}`}
+                      className="inline-block text-xs font-semibold text-[#8b7355] hover:underline"
+                    >
+                      → Verify OTP Now
+                    </Link>
+                  )}
+                </div>
               )}
 
               {/* Submit */}
@@ -182,7 +213,6 @@ export default function LoginPage() {
                 </Link>
               </p>
             </form>
-
           </div>
         </div>
       </main>
@@ -191,3 +221,4 @@ export default function LoginPage() {
     </div>
   );
 }
+
