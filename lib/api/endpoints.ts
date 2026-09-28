@@ -4,14 +4,15 @@
 
 export const ENDPOINTS = {
   AUTH: {
-    LOGIN: "/accounts/login/",
-    REGISTER: "/accounts/register/",
-    LOGOUT: "/accounts/logout/",
-    REFRESH: "/accounts/token/refresh/",
-    PROFILE: "/accounts/profile/",
-    CHANGE_PASSWORD: "/accounts/password/change/",
-    FORGOT_PASSWORD: "/accounts/password/forgot/",
-    RESET_PASSWORD: "/accounts/password/reset/",
+    REGISTER: "/auth/register/",
+    LOGIN: "/auth/login/",
+    LOGOUT: "/auth/logout/",
+    VERIFY_OTP: "/auth/otp-verify/",
+    REFRESH: "/auth/token/refresh/",
+    PROFILE: "/auth/profile/",
+    CHANGE_PASSWORD: "/auth/password/change/",
+    FORGOT_PASSWORD: "/auth/password/forgot/",
+    RESET_PASSWORD: "/auth/password/reset/",
   },
   USERS: {
     LIST: "/users/",

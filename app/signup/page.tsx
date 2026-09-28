@@ -2,6 +2,7 @@
 
 import Footer from "@/components/shared/Footer";
 import Navbar from "@/components/shared/Navbar";
+import { authService } from "@/lib/api";
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
@@ -10,6 +11,45 @@ import { HiOutlineEye, HiOutlineLockClosed, HiOutlineMail, HiOutlineUser } from 
 
 export default function SignupPage() {
   const [showPassword, setShowPassword] = useState(false);
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [successLog, setSuccessLog] = useState<string | null>(null);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+    setSuccessLog(null);
+
+    if (!name.trim() || !email.trim() || !password) {
+      setError("Please fill in all fields.");
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const response = await authService.register({
+        name: name.trim(),
+        email: email.trim(),
+        password,
+      });
+
+      if (response.status || response.log) {
+        setSuccessLog(response.log || "Registration successful!");
+        setName("");
+        setEmail("");
+        setPassword("");
+      }
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Registration failed. Please try again.";
+      setError(msg);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="bg-white min-h-screen flex flex-col font-cambria">
@@ -18,7 +58,7 @@ export default function SignupPage() {
       <main className="flex-grow flex items-center justify-center py-16 px-4 md:px-6">
         <div className="max-w-[1240px] w-full grid grid-cols-1 md:grid-cols-2 bg-white overflow-hidden">
 
-          {/* Left Side: Image with Text Overlay (Matches Login Design) */}
+          {/* Left Side: Image with Text Overlay */}
           <div className="relative h-[450px] md:h-[650px] flex flex-col justify-center p-12 lg:p-16 text-white">
             <Image
               src="/images/login/login.png"
@@ -40,7 +80,7 @@ export default function SignupPage() {
             </div>
           </div>
 
-          {/* Right Side: Signup Form (Same Style as Login) */}
+          {/* Right Side: Signup Form */}
           <div className="flex flex-col justify-center p-8 md:p-16 lg:px-24 bg-white">
             <div className="mb-10">
               <h1 className="text-3xl lg:text-4xl font-displayPlayFair font-bold text-[#1d1a17] mb-3">
@@ -51,7 +91,7 @@ export default function SignupPage() {
               </p>
             </div>
 
-            <form className="space-y-5" onSubmit={(e) => e.preventDefault()}>
+            <form className="space-y-5" onSubmit={handleSubmit}>
               {/* Full Name */}
               <div className="space-y-2">
                 <label className="text-[13px] text-[#1d1a17] font-medium" htmlFor="name">
@@ -64,6 +104,9 @@ export default function SignupPage() {
                   <input
                     id="name"
                     type="text"
+                    required
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
                     placeholder="Enter your name"
                     className="w-full pl-10 pr-4 py-3 border border-[#E2E8F0] rounded-sm focus:outline-none focus:border-[#8b7355] text-sm text-[#1d1a17] placeholder:text-[#9d8b7a]/50"
                   />
@@ -82,6 +125,9 @@ export default function SignupPage() {
                   <input
                     id="email"
                     type="email"
+                    required
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
                     placeholder="you@example.com"
                     className="w-full pl-10 pr-4 py-3 border border-[#E2E8F0] rounded-sm focus:outline-none focus:border-[#8b7355] text-sm text-[#1d1a17] placeholder:text-[#9d8b7a]/50"
                   />
@@ -100,6 +146,9 @@ export default function SignupPage() {
                   <input
                     id="password"
                     type={showPassword ? "text" : "password"}
+                    required
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
                     placeholder="********"
                     className="w-full pl-10 pr-12 py-3 border border-[#E2E8F0] rounded-sm focus:outline-none focus:border-[#8b7355] text-sm text-[#1d1a17]"
                   />
@@ -113,14 +162,29 @@ export default function SignupPage() {
                 </div>
               </div>
 
+              {/* Success Alert */}
+              {successLog && (
+                <div className="p-3 bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs rounded-sm">
+                  {successLog}
+                </div>
+              )}
+
+              {/* Error Alert */}
+              {error && (
+                <div className="p-3 bg-red-50 border border-red-200 text-red-700 text-xs rounded-sm">
+                  {error}
+                </div>
+              )}
+
               {/* Signup Button */}
               <div className="pt-4">
                 <button
                   type="submit"
-                  className="w-full flex items-center justify-center space-x-2 py-4 bg-[#D1BC9D] hover:bg-[#8B7355] text-white font-bold rounded-sm transition-colors uppercase tracking-widest text-sm"
+                  disabled={loading}
+                  className="w-full flex items-center justify-center space-x-2 py-4 bg-[#D1BC9D] hover:bg-[#8B7355] disabled:opacity-60 text-white font-bold rounded-sm transition-colors uppercase tracking-widest text-sm"
                 >
-                  <span>Sign Up</span>
-                  <FiArrowRight className="w-4 h-4" />
+                  <span>{loading ? "Registering..." : "Sign Up"}</span>
+                  {!loading && <FiArrowRight className="w-4 h-4" />}
                 </button>
               </div>
 

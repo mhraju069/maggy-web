@@ -50,14 +50,16 @@ export class ApiError extends Error {
 
 // User & Auth Types
 export interface User {
-  id: string | number;
-  username: string;
+  id: number | string;
   email: string;
-  first_name?: string;
-  last_name?: string;
+  uid?: string | null;
+  name?: string;
+  username?: string;
+  bio?: string | null;
+  image?: string | null;
+  phone?: string | null;
+  language?: string;
   role?: "user" | "admin" | string;
-  phone?: string;
-  avatar?: string;
   created_at?: string;
   updated_at?: string;
 }
@@ -77,18 +79,21 @@ export interface AuthResponse {
 }
 
 export interface LoginCredentials {
-  username?: string;
   email?: string;
+  username?: string;
   password?: string;
 }
 
 export interface RegisterCredentials {
-  username: string;
   email: string;
-  password?: string;
-  first_name?: string;
-  last_name?: string;
-  phone?: string;
+  password: string;
+  name: string;
+}
+
+export interface RegisterResponse {
+  status: boolean;
+  log: string;
+  user: User;
 }
 
 export interface ChangePasswordPayload {
