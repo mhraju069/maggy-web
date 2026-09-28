@@ -14,6 +14,7 @@ const publicPaths = [
   "/lunchroom",
   "/eventspace",
   "/signup",
+  "/verify-otp",
   "/book",
   "/login",
 ];

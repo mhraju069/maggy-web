@@ -5,23 +5,23 @@ import Navbar from "@/components/shared/Navbar";
 import { authService } from "@/lib/api";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { FiArrowRight } from "react-icons/fi";
 import { HiOutlineEye, HiOutlineLockClosed, HiOutlineMail, HiOutlineUser } from "react-icons/hi";
 
 export default function SignupPage() {
+  const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [successLog, setSuccessLog] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
-    setSuccessLog(null);
 
     if (!name.trim() || !email.trim() || !password) {
       setError("Please fill in all fields.");
@@ -31,17 +31,18 @@ export default function SignupPage() {
     setLoading(true);
 
     try {
+      const userEmail = email.trim();
       const response = await authService.register({
         name: name.trim(),
-        email: email.trim(),
+        email: userEmail,
         password,
       });
 
-      if (response.status || response.log) {
-        setSuccessLog(response.log || "Registration successful!");
-        setName("");
-        setEmail("");
-        setPassword("");
+      if (response.status !== false) {
+        // Redirect to OTP verification page with email parameter
+        router.push(`/verify-otp?email=${encodeURIComponent(userEmail)}`);
+      } else {
+        setError(response.log || "Registration failed.");
       }
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : "Registration failed. Please try again.";
@@ -161,13 +162,6 @@ export default function SignupPage() {
                   </button>
                 </div>
               </div>
-
-              {/* Success Alert */}
-              {successLog && (
-                <div className="p-3 bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs rounded-sm">
-                  {successLog}
-                </div>
-              )}
 
               {/* Error Alert */}
               {error && (

@@ -7,7 +7,7 @@ export const ENDPOINTS = {
     REGISTER: "/auth/register/",
     LOGIN: "/auth/login/",
     LOGOUT: "/auth/logout/",
-    VERIFY_OTP: "/auth/otp-verify/",
+    VERIFY_OTP: "/auth/verify-otp/",
     REFRESH: "/auth/token/refresh/",
     PROFILE: "/auth/profile/",
     CHANGE_PASSWORD: "/auth/password/change/",

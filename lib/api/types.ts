@@ -96,6 +96,19 @@ export interface RegisterResponse {
   user: User;
 }
 
+export interface VerifyOtpPayload {
+  email: string;
+  otp_code: string;
+}
+
+export interface VerifyOtpResponse {
+  user?: User;
+  refresh?: string;
+  access?: string;
+  status?: boolean;
+  log?: string;
+}
+
 export interface ChangePasswordPayload {
   old_password?: string;
   new_password?: string;

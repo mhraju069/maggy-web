@@ -15,6 +15,8 @@ import {
   ResetPasswordPayload,
   TokenPair,
   User,
+  VerifyOtpPayload,
+  VerifyOtpResponse,
 } from "../types";
 
 export const authService = {
@@ -45,6 +47,23 @@ export const authService = {
     return ApiClient.post<RegisterResponse>(ENDPOINTS.AUTH.REGISTER, credentials, {
       skipAuth: true,
     });
+  },
+
+  /**
+   * Verify OTP code for email activation
+   * Endpoint: http://localhost/api/auth/verify-otp/
+   */
+  async verifyOtp(payload: VerifyOtpPayload): Promise<VerifyOtpResponse> {
+    const response = await ApiClient.post<VerifyOtpResponse>(ENDPOINTS.AUTH.VERIFY_OTP, payload, {
+      skipAuth: true,
+    });
+
+    if (response.access) {
+      const role = response.user?.role || "user";
+      setAuthToken(response.access, response.refresh, role);
+    }
+
+    return response;
   },
 
   /**
