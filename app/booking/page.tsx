@@ -3,7 +3,14 @@
 import DecorativeUnderline from "@/components/shared/DecorativeUnderline";
 import Image from "next/image";
 import Link from "next/link";
-import { MdOutlineAutoAwesome, MdOutlineHotTub, MdOutlineRestaurantMenu, MdOutlineSelfImprovement } from "react-icons/md";
+import {
+  MdOutlineAutoAwesome,
+  MdOutlineCardGiftcard,
+  MdOutlineEventNote,
+  MdOutlineHotTub,
+  MdOutlineRestaurantMenu,
+  MdOutlineSelfImprovement,
+} from "react-icons/md";
 
 const categories = [
   {
@@ -17,9 +24,9 @@ const categories = [
   },
   {
     id: "arrangements",
-    title: "Arrangements",
-    slogan: "Curated journeys of renewal",
-    description: "Multi-sensory experiences thoughtfully designed to restore balance and vitality.",
+    title: "Salt Room",
+    slogan: "Halotherapy. Purify. Breathe.",
+    description: "Therapeutic micro-climate salt room sessions designed to purify respiratory health, cleanse skin, and restore vitality.",
     image: "/images/booking/arrangement.png",
     icon: <MdOutlineAutoAwesome className="w-6 h-6" />,
     href: "/booking/arrangements",
@@ -41,6 +48,24 @@ const categories = [
     image: "/images/booking/lunchroom.png",
     icon: <MdOutlineRestaurantMenu className="w-6 h-6" />,
     href: "/booking/lunchroom",
+  },
+  {
+    id: "events",
+    title: "Events & Space Rental",
+    slogan: "Gather. Celebrate. Unwind.",
+    description: "Multifunctional tranquil setting for weddings, corporate retreats, and private celebrations.",
+    image: "/images/eventspace/hero/eventhero.png",
+    icon: <MdOutlineEventNote className="w-6 h-6" />,
+    href: "/booking/eventspace",
+  },
+  {
+    id: "packages",
+    title: "Wellness Packages",
+    slogan: "Curated journeys of renewal",
+    description: "Complete half-day and full-day wellness journeys combining sauna, salt room halotherapy, and lunch.",
+    image: "/images/arrangements/hero/arrangementshero.png",
+    icon: <MdOutlineCardGiftcard className="w-6 h-6" />,
+    href: "/booking/packages",
   },
 ];
 

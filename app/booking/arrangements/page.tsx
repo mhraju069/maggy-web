@@ -25,34 +25,34 @@ const fallbackArrangements: Arrangement[] = [
     id: 6,
     image: "/images/arrangements/cardimages/img1.png",
     rating: 4.9,
-    title: "Wellness Escape",
-    combo: "Sauna + Massage + Lunch",
-    description: "A complete day of relaxation combining our finest wellness services.",
-    includes: ["2-hour private sauna session", "60-minute therapeutic massage", "Seasonal lunch menu", "Herbal tea selection"],
+    title: "Express Salt Room Session",
+    combo: "45-Min Halotherapy Session",
+    description: "Deep aerosol salt therapy to cleanse respiratory pathways and revitalize skin.",
+    includes: ["45-minute salt room therapy", "Zero-gravity relaxation recliner", "Infrared salt cave ambiance", "Herbal tea service"],
     paymentType: "full",
-    price: "$210",
+    price: "€45",
   },
   {
     id: 2,
     image: "/images/arrangements/cardimages/img2.png",
     rating: 4.9,
-    title: "Active Retreat",
-    combo: "Yoga + Sauna + Dining",
-    description: "Balance mind and body with movement, heat, and nourishment.",
-    includes: ["Morning yoga session", "Shared sauna access", "Healthy lunch bowl", "Meditation guide"],
-    paymentType: "partial",
-    price: "$210",
+    title: "Private Salt Room Sanctuary",
+    combo: "60-Min Private Experience",
+    description: "Exclusive salt cave session for up to 4 guests with personalized acoustic soundscapes.",
+    includes: ["60-minute private salt room access", "Aromatherapy dry salt aerosol", "Private relaxation lounge", "Refreshment platter"],
+    paymentType: "full",
+    price: "€85",
   },
   {
     id: 3,
     image: "/images/arrangements/cardimages/img3.png",
     rating: 4.9,
-    title: "Group Experience",
-    combo: "Private Sauna + Activities + Catering",
-    description: "Perfect for celebrations, team building, or gatherings with loved ones.",
-    includes: ["Private sauna (up to 18 persons)", "Guided wellness activity", "Premium catering service", "Dedicated host"],
-    paymentType: "spot",
-    price: "$210",
+    title: "Salt & Sauna Detox Journey",
+    combo: "Salt Therapy + Private Sauna + Dining",
+    description: "Complete respiratory and thermal detox combining Himalayan salt therapy with sauna relaxation.",
+    includes: ["45-min Salt room session", "90-min Private sauna access", "Organic cold-pressed juice", "Seasonal wellness meal"],
+    paymentType: "full",
+    price: "€150",
   },
 ];
 
@@ -89,7 +89,7 @@ export default function ArrangementsBookingPage() {
     services.length > 0
       ? services.map((s) => {
           const descLines = (s.description || "").split(/\r?\n/).map((l) => l.trim()).filter(Boolean);
-          const comboText = s.subtitle || (descLines[0]?.includes("+") ? descLines[0] : "Wellness Package");
+          const comboText = s.subtitle || (descLines[0]?.includes("+") ? descLines[0] : "Salt Room Package");
           const actualDesc = descLines.length > 1 && descLines[0].includes("+") ? descLines.slice(1).join(" ") : s.description;
 
           let payType: PaymentType = "full";
@@ -98,7 +98,7 @@ export default function ArrangementsBookingPage() {
 
           const includesList = s.features && s.features.length > 0
             ? s.features.map((f) => f.feature)
-            : ["Full access to wellness facilities", "Personalized experience"];
+            : ["Full access to salt room therapy", "Personalized wellness experience"];
 
           return {
             id: s.id,
@@ -109,7 +109,7 @@ export default function ArrangementsBookingPage() {
             description: actualDesc,
             includes: includesList,
             paymentType: payType,
-            price: `$${parseFloat(String(s.price)) || 0}`,
+            price: `€${parseFloat(String(s.price)) || 45}`,
           };
         })
       : fallbackArrangements;
@@ -118,9 +118,9 @@ export default function ArrangementsBookingPage() {
     <div className="w-full px-6 md:px-12">
       {/* ── Title Section ── */}
       <div className="text-center mb-16 flex flex-col items-center">
-        <h1 className="font-displayPlayFair text-5xl text-[#1d1a17] mb-2 uppercase tracking-tight">Arrangements</h1>
+        <h1 className="font-displayPlayFair text-5xl text-[#1d1a17] mb-2 uppercase tracking-tight">Salt Room Service</h1>
         <DecorativeUnderline />
-        <p className="font-cambria text-sm text-[#475569] mt-6 italic">Multi-sensory experiences thoughtfully designed to restore balance and vitality.</p>
+        <p className="font-cambria text-sm text-[#475569] mt-6 italic">Therapeutic micro-climate salt room sessions designed to purify respiratory health, cleanse skin, and restore vitality.</p>
       </div>
 
       {/* ── Loading Alert ── */}

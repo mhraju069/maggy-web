@@ -12,10 +12,10 @@ const ArrangementsPage = () => {
     <div className="min-h-screen bg-white">
       <PageHero
         backgroundImage="/images/arrangements/hero/arrangementshero.png"
-        title={t.arrangementsPage?.hero?.title || "Arrangements"}
+        title={t.arrangementsPage?.hero?.title || "Salt Room"}
         subtitle={
           t.arrangementsPage?.hero?.subtitle ||
-          "Celebrate your birthday, baby shower, bachelor or bachelorette party, or any other special occasion with us."
+          "Experience pure aerosol halotherapy for respiratory wellness, skin revitalization, and deep relaxation."
         }
       />
 
