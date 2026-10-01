@@ -1,13 +1,26 @@
 "use client";
 
 import DecorativeUnderline from "@/components/shared/DecorativeUnderline";
+import { getStoredBookingData, updateStoredBookingData } from "@/lib/bookingStore";
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FaCreditCard, FaLock } from "react-icons/fa";
 import { MdOutlinePayments } from "react-icons/md";
 
 export default function PaymentPage() {
-  const [method, setMethod] = useState<string>("card");
+  const [method, setMethod] = useState<string>("ideal");
+  const [data, setData] = useState(getStoredBookingData());
+
+  useEffect(() => {
+    const current = getStoredBookingData();
+    setData(current);
+    if (current.paymentMethod) setMethod(current.paymentMethod);
+  }, []);
+
+  const handleSelectMethod = (m: string) => {
+    setMethod(m);
+    updateStoredBookingData({ paymentMethod: m });
+  };
 
   return (
     <div className="w-full px-6 md:px-12">
@@ -15,7 +28,7 @@ export default function PaymentPage() {
       <div className="text-center mb-16 flex flex-col items-center">
         <h1 className="font-displayPlayFair text-5xl text-[#1d1a17] mb-2 leading-tight">Secure Payment</h1>
         <DecorativeUnderline />
-        <p className="font-cambria text-sm text-[#475569] mt-6 italic tracking-wide">Complete your booking with confidence.</p>
+        <p className="font-cambria text-sm text-[#475569] mt-6 italic tracking-wide">Complete your booking with confidence via iDEAL or Credit Card.</p>
       </div>
 
       {/* ── Content Card ── */}
@@ -23,21 +36,21 @@ export default function PaymentPage() {
         {/* Security Info */}
         <div className="flex items-center gap-4 mb-10 p-4 bg-[#F8FAFC] rounded-2xl border border-[#E2E8F0]">
           <div className="w-12 h-12 rounded-full bg-white flex items-center justify-center border border-[#E2E8F0]">
-            <FaLock className="text-[#94A3B8]" />
+            <FaLock className="text-[#8B7355]" />
           </div>
           <div>
-            <h4 className="text-sm font-bold text-[#0F172A]">Encrypted & Secure</h4>
-            <p className="text-xs text-[#64748B]">Your information is protected</p>
+            <h4 className="text-sm font-bold text-[#0F172A]">256-Bit SSL Encrypted & Secure</h4>
+            <p className="text-xs text-[#64748B]">Your payment details are protected</p>
           </div>
         </div>
 
         {/* Experience Summary */}
         <div className="mb-10">
-          <span className="text-xs text-[#94A3B8] uppercase block mb-1">Experience</span>
-          <h3 className="text-2xl font-bold text-[#0F172A] font-displayPlayFair mb-6">Shared Sauna</h3>
+          <span className="text-xs text-[#94A3B8] uppercase block mb-1">Selected Experience</span>
+          <h3 className="text-2xl font-bold text-[#0F172A] font-displayPlayFair mb-4">{data.serviceName || "Private Sauna Session"}</h3>
           <div className="flex items-baseline gap-2">
-            <span className="text-4xl font-bold text-[#CFB9A3] font-displayPlayFair">$45</span>
-            <span className="text-xs text-[#94A3B8] italic">Payment required online</span>
+            <span className="text-4xl font-bold text-[#8B7355] font-displayPlayFair">{data.price || "€250"}</span>
+            <span className="text-xs text-[#94A3B8] italic">Payment required to secure reservation slot</span>
           </div>
         </div>
 

@@ -34,8 +34,12 @@ export default function InformationPage() {
     otherDetails: "",
   });
 
+  const [storedData, setStoredData] = useState(getStoredBookingData());
+  const isLunchroom = storedData.serviceType === "lunchroom" || storedData.serviceName.toLowerCase().includes("lunchroom");
+
   useEffect(() => {
     const data = getStoredBookingData();
+    setStoredData(data);
     setFormData({
       name: data.name || "",
       email: data.email || "",
@@ -176,160 +180,162 @@ export default function InformationPage() {
           </div>
         </div>
 
-        {/* ── Celebration Details Card ── */}
-        <div className="bg-white rounded-[32px] p-10 shadow-sm border border-[#E8E2DC] transition-all">
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
-            <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-2xl bg-[#FCF2E9] flex items-center justify-center text-[#8B7355] flex-shrink-0">
-                <FaCakeCandles size={22} />
-              </div>
-              <div>
-                <h3 className="text-xl font-bold font-displayPlayFair text-[#0F172A]">
-                  Are you celebrating something?
-                </h3>
-                <p className="text-xs text-[#64748B]">
-                  Birthdays, anniversaries, or special milestones
-                </p>
-              </div>
-            </div>
-
-            {/* Yes / No Toggle */}
-            <div className="inline-flex p-1 bg-[#F8FAFC] rounded-xl border border-[#E2E8F0] self-start md:self-auto">
-              <button
-                type="button"
-                onClick={() => toggleCelebrating(true)}
-                className={`px-6 py-2.5 rounded-lg text-xs font-bold transition-all ${
-                  celebration.isCelebrating
-                    ? "bg-[#8B7355] text-white shadow-sm"
-                    : "text-[#64748B] hover:text-[#0F172A]"
-                }`}
-              >
-                Yes 🎉
-              </button>
-              <button
-                type="button"
-                onClick={() => toggleCelebrating(false)}
-                className={`px-6 py-2.5 rounded-lg text-xs font-bold transition-all ${
-                  !celebration.isCelebrating
-                    ? "bg-[#8B7355] text-white shadow-sm"
-                    : "text-[#64748B] hover:text-[#0F172A]"
-                }`}
-              >
-                No
-              </button>
-            </div>
-          </div>
-
-          {/* Conditional Celebration Form */}
-          {celebration.isCelebrating && (
-            <div className="mt-8 pt-8 border-t border-[#F1F5F9] space-y-6 animate-fadeIn">
-              <div className="p-4 rounded-2xl bg-[#FCF2E9]/70 border border-[#E8E2DC]/80 flex items-center gap-3 text-xs text-[#8B7355] font-medium">
-                <FaGift className="text-base flex-shrink-0" />
-                <span>
-                  Tell us a bit about the occasion so we can prepare a warm, personalized table experience for your guest of honor!
-                </span>
-              </div>
-
-              {/* What is being celebrated? */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <label
-                    className="block text-xs font-bold text-[#0F172A] mb-2 uppercase tracking-wider"
-                    style={{ fontFamily: "Inter, sans-serif" }}
-                  >
-                    What is being celebrated? *
-                  </label>
-                  <select
-                    name="occasion"
-                    value={celebration.occasion}
-                    onChange={handleCelebrationChange}
-                    className="w-full p-4 border border-[#E2E8F0] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#D1B191] text-[#475569] bg-white cursor-pointer"
-                  >
-                    {occasionOptions.map((occ) => (
-                      <option key={occ} value={occ}>
-                        {occ}
-                      </option>
-                    ))}
-                  </select>
+        {/* ── Celebration Details Card (Lunchroom Only) ── */}
+        {isLunchroom && (
+          <div className="bg-white rounded-[32px] p-10 shadow-sm border border-[#E8E2DC] transition-all">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 rounded-2xl bg-[#FCF2E9] flex items-center justify-center text-[#8B7355] flex-shrink-0">
+                  <FaCakeCandles size={22} />
                 </div>
-
-                {/* Who is it for? */}
                 <div>
-                  <label
-                    className="block text-xs font-bold text-[#0F172A] mb-2 uppercase tracking-wider"
-                    style={{ fontFamily: "Inter, sans-serif" }}
-                  >
-                    Who is it for? (Name of Celebrant) *
-                  </label>
-                  <input
-                    type="text"
-                    name="celebrantName"
-                    value={celebration.celebrantName}
-                    onChange={handleCelebrationChange}
-                    placeholder="e.g. John / Mom / Alex"
-                    className="w-full p-4 border border-[#E2E8F0] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#D1B191] text-[#475569]"
-                  />
+                  <h3 className="text-xl font-bold font-displayPlayFair text-[#0F172A]">
+                    Are you celebrating something?
+                  </h3>
+                  <p className="text-xs text-[#64748B]">
+                    Birthdays, anniversaries, or special milestones
+                  </p>
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {/* Age */}
-                <div>
-                  <label
-                    className="block text-xs font-bold text-[#0F172A] mb-2 uppercase tracking-wider"
-                    style={{ fontFamily: "Inter, sans-serif" }}
-                  >
-                    Age / Milestone Number (Optional)
-                  </label>
-                  <input
-                    type="text"
-                    name="age"
-                    value={celebration.age}
-                    onChange={handleCelebrationChange}
-                    placeholder="e.g. 30th Birthday / 25th Anniversary"
-                    className="w-full p-4 border border-[#E2E8F0] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#D1B191] text-[#475569]"
-                  />
-                </div>
-
-                {/* Hobbies / Interests / Personal details */}
-                <div>
-                  <label
-                    className="block text-xs font-bold text-[#0F172A] mb-2 uppercase tracking-wider"
-                    style={{ fontFamily: "Inter, sans-serif" }}
-                  >
-                    Hobbies / Interests or Personal Details
-                  </label>
-                  <input
-                    type="text"
-                    name="hobbiesInterests"
-                    value={celebration.hobbiesInterests}
-                    onChange={handleCelebrationChange}
-                    placeholder="e.g. Loves chocolate, jazz music, coffee..."
-                    className="w-full p-4 border border-[#E2E8F0] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#D1B191] text-[#475569]"
-                  />
-                </div>
-              </div>
-
-              {/* Any other relevant details */}
-              <div>
-                <label
-                  className="block text-xs font-bold text-[#0F172A] mb-2 uppercase tracking-wider"
-                  style={{ fontFamily: "Inter, sans-serif" }}
+              {/* Yes / No Toggle */}
+              <div className="inline-flex p-1 bg-[#F8FAFC] rounded-xl border border-[#E2E8F0] self-start md:self-auto">
+                <button
+                  type="button"
+                  onClick={() => toggleCelebrating(true)}
+                  className={`px-6 py-2.5 rounded-lg text-xs font-bold transition-all ${
+                    celebration.isCelebrating
+                      ? "bg-[#8B7355] text-white shadow-sm"
+                      : "text-[#64748B] hover:text-[#0F172A]"
+                  }`}
                 >
-                  Any Other Relevant Celebration Details
-                </label>
-                <textarea
-                  name="otherDetails"
-                  value={celebration.otherDetails}
-                  onChange={handleCelebrationChange}
-                  rows={3}
-                  placeholder="e.g. Surprise party setup, special candle on dessert, favorite seating corner..."
-                  className="w-full p-4 border border-[#E2E8F0] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#D1B191] text-[#475569] resize-none text-sm"
-                />
+                  Yes 🎉
+                </button>
+                <button
+                  type="button"
+                  onClick={() => toggleCelebrating(false)}
+                  className={`px-6 py-2.5 rounded-lg text-xs font-bold transition-all ${
+                    !celebration.isCelebrating
+                      ? "bg-[#8B7355] text-white shadow-sm"
+                      : "text-[#64748B] hover:text-[#0F172A]"
+                  }`}
+                >
+                  No
+                </button>
               </div>
             </div>
-          )}
-        </div>
+
+            {/* Conditional Celebration Form */}
+            {celebration.isCelebrating && (
+              <div className="mt-8 pt-8 border-t border-[#F1F5F9] space-y-6 animate-fadeIn">
+                <div className="p-4 rounded-2xl bg-[#FCF2E9]/70 border border-[#E8E2DC]/80 flex items-center gap-3 text-xs text-[#8B7355] font-medium">
+                  <FaGift className="text-base flex-shrink-0" />
+                  <span>
+                    Tell us a bit about the occasion so we can prepare a warm, personalized table experience for your guest of honor!
+                  </span>
+                </div>
+
+                {/* What is being celebrated? */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <label
+                      className="block text-xs font-bold text-[#0F172A] mb-2 uppercase tracking-wider"
+                      style={{ fontFamily: "Inter, sans-serif" }}
+                    >
+                      What is being celebrated? *
+                    </label>
+                    <select
+                      name="occasion"
+                      value={celebration.occasion}
+                      onChange={handleCelebrationChange}
+                      className="w-full p-4 border border-[#E2E8F0] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#D1B191] text-[#475569] bg-white cursor-pointer"
+                    >
+                      {occasionOptions.map((occ) => (
+                        <option key={occ} value={occ}>
+                          {occ}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  {/* Who is it for? */}
+                  <div>
+                    <label
+                      className="block text-xs font-bold text-[#0F172A] mb-2 uppercase tracking-wider"
+                      style={{ fontFamily: "Inter, sans-serif" }}
+                    >
+                      Who is it for? (Name of Celebrant) *
+                    </label>
+                    <input
+                      type="text"
+                      name="celebrantName"
+                      value={celebration.celebrantName}
+                      onChange={handleCelebrationChange}
+                      placeholder="e.g. John / Mom / Alex"
+                      className="w-full p-4 border border-[#E2E8F0] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#D1B191] text-[#475569]"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {/* Age */}
+                  <div>
+                    <label
+                      className="block text-xs font-bold text-[#0F172A] mb-2 uppercase tracking-wider"
+                      style={{ fontFamily: "Inter, sans-serif" }}
+                    >
+                      Age / Milestone Number (Optional)
+                    </label>
+                    <input
+                      type="text"
+                      name="age"
+                      value={celebration.age}
+                      onChange={handleCelebrationChange}
+                      placeholder="e.g. 30th Birthday / 25th Anniversary"
+                      className="w-full p-4 border border-[#E2E8F0] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#D1B191] text-[#475569]"
+                    />
+                  </div>
+
+                  {/* Hobbies / Interests / Personal details */}
+                  <div>
+                    <label
+                      className="block text-xs font-bold text-[#0F172A] mb-2 uppercase tracking-wider"
+                      style={{ fontFamily: "Inter, sans-serif" }}
+                    >
+                      Hobbies / Interests or Personal Details
+                    </label>
+                    <input
+                      type="text"
+                      name="hobbiesInterests"
+                      value={celebration.hobbiesInterests}
+                      onChange={handleCelebrationChange}
+                      placeholder="e.g. Loves chocolate, jazz music, coffee..."
+                      className="w-full p-4 border border-[#E2E8F0] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#D1B191] text-[#475569]"
+                    />
+                  </div>
+                </div>
+
+                {/* Any other relevant details */}
+                <div>
+                  <label
+                    className="block text-xs font-bold text-[#0F172A] mb-2 uppercase tracking-wider"
+                    style={{ fontFamily: "Inter, sans-serif" }}
+                  >
+                    Any Other Relevant Celebration Details
+                  </label>
+                  <textarea
+                    name="otherDetails"
+                    value={celebration.otherDetails}
+                    onChange={handleCelebrationChange}
+                    rows={3}
+                    placeholder="e.g. Surprise party setup, special candle on dessert, favorite seating corner..."
+                    className="w-full p-4 border border-[#E2E8F0] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#D1B191] text-[#475569] resize-none text-sm"
+                  />
+                </div>
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
       {/* ── Footer Buttons ── */}

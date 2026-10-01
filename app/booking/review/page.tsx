@@ -15,6 +15,7 @@ export default function ReviewPage() {
   }, []);
 
   const celebration = data.celebration;
+  const isLunchroom = data.serviceType === "lunchroom" || data.serviceName.toLowerCase().includes("lunchroom");
 
   return (
     <div className="w-full px-6 md:px-12">
@@ -51,7 +52,7 @@ export default function ReviewPage() {
                   </p>
                 </div>
                 <div>
-                  <span className="text-xs text-[#94A3B8] uppercase block mb-1">Time Slot</span>
+                  <span className="text-xs text-[#94A3B8] uppercase block mb-1">Start Time Slot</span>
                   <p className="text-lg font-bold text-[#0F172A]">{data.timeSlot || "Not selected"}</p>
                 </div>
                 <div>
@@ -62,11 +63,38 @@ export default function ReviewPage() {
                 </div>
               </div>
 
+              {data.durationHours && (
+                <div className="pt-3 border-t border-[#F1F5F9] grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <span className="text-xs text-[#94A3B8] uppercase block mb-1">Session Duration</span>
+                    <p className="text-base font-bold text-[#0F172A]">{data.durationHours} Hours Private Access</p>
+                  </div>
+                  <div>
+                    <span className="text-xs text-[#94A3B8] uppercase block mb-1">Automatic Cleaning Buffer</span>
+                    <p className="text-base font-bold text-[#8B7355]">+30 Minutes Reserved Afterwards</p>
+                  </div>
+                </div>
+              )}
+
+              {data.selectedExtras && data.selectedExtras.length > 0 && (
+                <div className="pt-3 border-t border-[#F1F5F9]">
+                  <span className="text-xs text-[#94A3B8] uppercase block mb-2">Selected Add-on Extras</span>
+                  <div className="flex flex-wrap gap-2">
+                    {data.selectedExtras.map((ext) => (
+                      <span key={ext.id} className="px-3 py-1 bg-[#FCF2E9] border border-[#E8E2DC] rounded-lg text-xs font-bold text-[#8B7355]">
+                        {ext.name} (+€{ext.price})
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               {data.price && data.price !== "$0" && (
-                <div className="pt-2">
-                  <span className="text-xs text-[#94A3B8] uppercase block mb-1">Reservation Fee / Price</span>
+                <div className="pt-4 border-t border-[#F1F5F9]">
+                  <span className="text-xs text-[#94A3B8] uppercase block mb-1">Total Calculated Investment</span>
                   <div className="flex items-baseline gap-2">
-                    <span className="text-3xl font-bold text-[#CFB9A3] font-displayPlayFair">{data.price}</span>
+                    <span className="text-4xl font-bold text-[#8B7355] font-displayPlayFair">{data.price}</span>
+                    <span className="text-xs text-[#94A3B8] italic">All inclusive pricing</span>
                   </div>
                 </div>
               )}
@@ -109,8 +137,8 @@ export default function ReviewPage() {
             </div>
           </section>
 
-          {/* Celebration Details Section (If Celebrating) */}
-          {celebration?.isCelebrating && (
+          {/* Celebration Details Section (Lunchroom Only) */}
+          {isLunchroom && celebration?.isCelebrating && (
             <>
               <hr className="border-[#F1F5F9]" />
               <section className="bg-gradient-to-r from-[#FCF2E9] to-[#FBF6F3] p-6 md:p-8 rounded-2xl border border-[#E8E2DC]">

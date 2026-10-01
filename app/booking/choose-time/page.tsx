@@ -89,6 +89,29 @@ export default function ChooseTimePage() {
         </div>
       )}
 
+      {/* ── Private Sauna Cleaning Time Banner ── */}
+      {storedData.serviceType === "sauna" && (
+        <div className="max-w-4xl mx-auto mb-8 bg-white rounded-2xl p-6 border border-[#E8E2DC] shadow-xs flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-[#FCF2E9] flex items-center justify-center text-[#8B7355] flex-shrink-0">
+              <BiTimeFive size={20} />
+            </div>
+            <div>
+              <h4 className="font-bold text-[#0F172A] text-sm">
+                Private Sauna ({storedData.durationHours || 3} Hours Session)
+              </h4>
+              <p className="text-xs text-[#8B7355] font-medium">
+                Automatic 30-minute cleaning buffer reserved after your time slot.
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2 bg-[#FCF2E9]/70 px-4 py-2 rounded-xl text-xs font-semibold text-[#8B7355]">
+            <span>Total Blocked Period: {(storedData.durationHours || 3)}h 30m</span>
+          </div>
+        </div>
+      )}
+
       {/* ── Content Card ── */}
       <div className="max-w-4xl mx-auto bg-white rounded-[32px] p-10 shadow-sm border border-[#E8E2DC]">
         <div className="space-y-10">

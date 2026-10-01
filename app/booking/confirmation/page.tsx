@@ -16,6 +16,7 @@ export default function ConfirmationPage() {
   }, []);
 
   const celebration = data.celebration;
+  const isLunchroom = data.serviceType === "lunchroom" || data.serviceName.toLowerCase().includes("lunchroom");
 
   return (
     <div className="w-full px-6 md:px-12">
@@ -27,7 +28,9 @@ export default function ConfirmationPage() {
         <h1 className="font-displayPlayFair text-5xl text-[#1d1a17] mb-4">Reservation Confirmed!</h1>
         <DecorativeUnderline />
         <p className="font-cambria text-sm text-[#475569] mt-6 italic tracking-wide">
-          Your table is set. We look forward to welcoming you to the Lunchroom.
+          {isLunchroom
+            ? "Your table is set. We look forward to welcoming you to the Lunchroom."
+            : "Your reservation is confirmed. We look forward to welcoming you for pure relaxation."}
         </p>
       </div>
 
@@ -43,7 +46,7 @@ export default function ConfirmationPage() {
               <h4 className="text-xs font-bold text-[#0F172A] uppercase tracking-wider" style={{ fontFamily: "Inter, sans-serif" }}>
                 Confirmed & Secured
               </h4>
-              <p className="text-[11px] text-[#64748B]">Your table reservation has been saved in our system.</p>
+              <p className="text-[11px] text-[#64748B]">Your reservation has been saved in our system.</p>
             </div>
           </div>
 
@@ -69,7 +72,7 @@ export default function ConfirmationPage() {
               <span className="text-[10px] text-[#94A3B8] uppercase tracking-widest block mb-1" style={{ fontFamily: "Inter, sans-serif" }}>
                 Experience
               </span>
-              <h3 className="text-2xl font-bold text-[#0F172A] font-displayPlayFair">{data.serviceName || "Lunchroom Table Reservation"}</h3>
+              <h3 className="text-2xl font-bold text-[#0F172A] font-displayPlayFair">{data.serviceName || "Private Sauna Session"}</h3>
               <p className="text-base font-medium text-[#475569] mt-1">
                 {data.date
                   ? new Date(data.date).toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric", year: "numeric" })
@@ -79,8 +82,8 @@ export default function ConfirmationPage() {
             </div>
           </div>
 
-          {/* Celebration Card If Active */}
-          {celebration?.isCelebrating && (
+          {/* Celebration Card If Active (Lunchroom Only) */}
+          {isLunchroom && celebration?.isCelebrating && (
             <div className="bg-[#FCF2E9] p-6 rounded-2xl border border-[#E8E2DC] flex items-start gap-4">
               <div className="w-10 h-10 rounded-xl bg-[#8B7355] text-white flex items-center justify-center flex-shrink-0">
                 <FaCakeCandles size={20} />

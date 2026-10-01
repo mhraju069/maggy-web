@@ -3,36 +3,25 @@
 import DecorativeUnderline from "@/components/shared/DecorativeUnderline";
 import SaunaCard from "@/components/shared/SaunaCard";
 import { formatImageUrl, parseApiErrorMessage, ServiceItem, servicesService } from "@/lib/api";
+import { BookingExtra, calculatePrivateSaunaPrice, getStoredBookingData, updateStoredBookingData } from "@/lib/bookingStore";
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
+import { BiCheckCircle, BiInfoCircle, BiTimeFive } from "react-icons/bi";
+import { FaBroom, FaHotTub, FaSpa } from "react-icons/fa";
 
-const fallbackSaunas = [
-  {
-    id: 4,
-    title: "Private Sauna",
-    description: "Your own exclusive sanctuary for ultimate privacy and relaxation.",
-    image: "/images/wellness/bookings/private-sauna-v2.png",
-    rating: 4.9,
-    capacity: "Up to 6 persons",
-    duration: "2-hour sessions",
-    paymentType: "Prepayment required",
-    price: 210,
-  },
-  {
-    id: 3,
-    title: "Shared Sauna",
-    description: "Join our wellness experience in a peaceful, shared space.",
-    image: "/images/wellness/bookings/shared-sauna-v2.png",
-    rating: 4.9,
-    capacity: "Limited capacity",
-    duration: "Flexible sessions",
-    paymentType: "Pay upon arrival",
-    price: 140,
-  },
+const availableExtras: BookingExtra[] = [
+  { id: "towels", name: "Premium Towel & Bathrobe Set", price: 15 },
+  { id: "refreshments", name: "Organic Food & Refreshment Platter", price: 35 },
+  { id: "decorations", name: "Celebration & Romantic Decorations", price: 30 },
+  { id: "wellness_pack", name: "Essential Oils & Scrub Package", price: 25 },
 ];
 
 export default function SaunaBookingPage() {
-  const [selectedIds, setSelectedIds] = useState<number[]>([]);
+  const [selectedSaunaType, setSelectedSaunaType] = useState<"private" | "shared">("private");
+  const [durationHours, setDurationHours] = useState<3 | 4>(3);
+  const [guestsCount, setGuestsCount] = useState<number>(2);
+  const [selectedExtras, setSelectedExtras] = useState<BookingExtra[]>([]);
+
   const [services, setServices] = useState<ServiceItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -54,87 +43,350 @@ export default function SaunaBookingPage() {
     fetchServices();
   }, [fetchServices]);
 
-  const toggleSelection = (id: number) => {
-    setSelectedIds((prev) =>
-      prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]
-    );
+  // Sync state to bookingStore
+  useEffect(() => {
+    if (selectedSaunaType === "private") {
+      const total = calculatePrivateSaunaPrice(durationHours, guestsCount, selectedExtras);
+      updateStoredBookingData({
+        serviceName: `Private Sauna (${durationHours} Hours)`,
+        serviceType: "sauna",
+        durationHours,
+        guestsCount,
+        cleaningTimeMinutes: 30,
+        selectedExtras,
+        totalAmount: total,
+        price: `€${total}`,
+      });
+    } else {
+      updateStoredBookingData({
+        serviceName: "Shared Sauna Experience",
+        serviceType: "sauna",
+        guestsCount,
+        price: `€${35 * guestsCount}`,
+        totalAmount: 35 * guestsCount,
+        selectedExtras: [],
+      });
+    }
+  }, [selectedSaunaType, durationHours, guestsCount, selectedExtras]);
+
+  const toggleExtra = (extra: BookingExtra) => {
+    setSelectedExtras((prev) => {
+      const exists = prev.some((e) => e.id === extra.id);
+      if (exists) {
+        return prev.filter((e) => e.id !== extra.id);
+      }
+      return [...prev, extra];
+    });
   };
 
-  const displayList =
-    services.length > 0
-      ? services.map((s) => {
-          const featureTexts = s.features?.map((f) => f.feature) || [];
-          const capacityText =
-            featureTexts.find((f) => /person|people|capacity|up to/i.test(f)) ||
-            (s.capacity ? `Up to ${s.capacity} persons` : "Up to 6 persons");
-          const durationText =
-            featureTexts.find((f) => /hour|min|session|flexible/i.test(f)) ||
-            "2-hour sessions";
-
-          let payType = "Prepayment required";
-          if (s.payment_type === "on_spot") payType = "Pay upon arrival";
-          else if (s.payment_type === "partial") payType = "Partial payment";
-          else if (s.payment_type === "full") payType = "Prepayment required";
-
-          return {
-            id: s.id,
-            title: s.title,
-            description: s.description,
-            image: formatImageUrl(s.image, "/images/wellness/bookings/private-sauna-v2.png"),
-            rating: 4.9,
-            capacity: capacityText,
-            duration: durationText,
-            paymentType: payType,
-            price: typeof s.price === "number" ? s.price : parseFloat(String(s.price)) || 0,
-          };
-        })
-      : fallbackSaunas;
+  const currentTotalPrice =
+    selectedSaunaType === "private"
+      ? calculatePrivateSaunaPrice(durationHours, guestsCount, selectedExtras)
+      : 35 * guestsCount;
 
   return (
     <div className="w-full px-6 md:px-12">
       {/* ── Title Section ── */}
-      <div className="text-center mb-16 flex flex-col items-center">
-        <h1 className="font-displayPlayFair text-5xl text-[#1d1a17] mb-2 uppercase tracking-tight">Sauna & Wellness</h1>
+      <div className="text-center mb-12 flex flex-col items-center">
+        <h1 className="font-displayPlayFair text-5xl text-[#1d1a17] mb-2 uppercase tracking-tight">
+          Sauna & Wellness
+        </h1>
         <DecorativeUnderline />
-        <p className="font-cambria text-sm text-[#475569] mt-6 italic">Pure restoration in every breath.</p>
+        <p className="font-cambria text-sm text-[#475569] mt-6 italic">
+          Exclusive private sanctuary or peaceful shared wellness experience.
+        </p>
       </div>
 
-      {/* ── Loading Alert ── */}
-      {loading && (
-        <div className="text-center py-12 text-[#8b7355] text-base font-medium">
-          Loading sauna experiences...
-        </div>
-      )}
-
-      {/* ── Error Alert ── */}
-      {error && !loading && (
-        <div className="max-w-xl mx-auto mb-8 p-4 bg-amber-50 border border-amber-200 text-amber-800 text-sm rounded-lg flex items-center justify-between">
-          <span>Failed to connect to API ({error}). Showing default options.</span>
+      {/* ── Sauna Type Selector ── */}
+      <div className="max-w-4xl mx-auto mb-10 flex justify-center">
+        <div className="inline-flex p-1.5 bg-white rounded-2xl border border-[#E8E2DC] shadow-xs">
           <button
-            onClick={fetchServices}
-            className="px-3 py-1 bg-[#8b7355] text-white text-xs font-bold rounded hover:bg-[#725e45] transition-colors"
+            type="button"
+            onClick={() => setSelectedSaunaType("private")}
+            className={`px-8 py-3.5 rounded-xl font-bold text-sm transition-all flex items-center gap-2 ${
+              selectedSaunaType === "private"
+                ? "bg-[#8B7355] text-white shadow-md"
+                : "text-[#64748B] hover:text-[#0F172A]"
+            }`}
           >
-            Retry
+            <FaSpa size={18} />
+            Private Sauna (Exclusive Group)
+          </button>
+          <button
+            type="button"
+            onClick={() => setSelectedSaunaType("shared")}
+            className={`px-8 py-3.5 rounded-xl font-bold text-sm transition-all flex items-center gap-2 ${
+              selectedSaunaType === "shared"
+                ? "bg-[#8B7355] text-white shadow-md"
+                : "text-[#64748B] hover:text-[#0F172A]"
+            }`}
+          >
+            <FaHotTub size={18} />
+            Shared Sauna
           </button>
         </div>
-      )}
+      </div>
 
-      {/* ── Grid ── */}
-      {!loading && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-6xl mx-auto">
-          {displayList.map((sauna) => (
-            <SaunaCard
-              key={sauna.id}
-              {...sauna}
-              isSelected={selectedIds.includes(sauna.id)}
-              onClick={() => toggleSelection(sauna.id)}
-            />
-          ))}
+      {/* ── Private Sauna Configurator ── */}
+      {selectedSaunaType === "private" ? (
+        <div className="max-w-4xl mx-auto bg-white rounded-[32px] p-8 md:p-10 shadow-sm border border-[#E8E2DC] space-y-10">
+          {/* Badge & Banner */}
+          <div className="p-6 rounded-2xl bg-[#FCF2E9] border border-[#E8E2DC] flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 rounded-2xl bg-[#8B7355] text-white flex items-center justify-center flex-shrink-0 shadow-xs">
+                <FaSpa size={22} />
+              </div>
+              <div>
+                <span className="text-[11px] font-bold uppercase tracking-widest text-[#8B7355] block">
+                  Exclusive Reservation
+                </span>
+                <h3 className="text-xl font-bold font-displayPlayFair text-[#0F172A]">
+                  Private Sauna Sanctuary
+                </h3>
+                <p className="text-xs text-[#64748B] mt-0.5">
+                  Booked exclusively by your group (2 to 6 people). Includes private sauna, jacuzzi & lounge.
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2 bg-white px-4 py-2 rounded-xl border border-[#D1B191]/60 text-xs font-bold text-[#8B7355] flex-shrink-0">
+              <FaBroom size={14} />
+              <span>+30 Mins Auto Cleaning Buffer</span>
+            </div>
+          </div>
+
+          {/* Duration Selector */}
+          <div>
+            <label
+              className="block text-sm font-bold text-[#0F172A] mb-4 uppercase tracking-wider"
+              style={{ fontFamily: "Inter, sans-serif" }}
+            >
+              1. Select Session Duration
+            </label>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <button
+                type="button"
+                onClick={() => setDurationHours(3)}
+                className={`p-6 rounded-2xl border transition-all text-left flex items-start justify-between ${
+                  durationHours === 3
+                    ? "bg-[#FCF2E9] border-[#8B7355] shadow-md ring-2 ring-[#8B7355]/20"
+                    : "bg-white border-[#E2E8F0] hover:border-[#D1B191]"
+                }`}
+              >
+                <div>
+                  <span className="text-xs font-bold uppercase tracking-widest text-[#8B7355] block mb-1">
+                    Popular Choice
+                  </span>
+                  <h4 className="text-2xl font-bold font-displayPlayFair text-[#0F172A]">
+                    3 Hours Session
+                  </h4>
+                  <p className="text-xs text-[#64748B] mt-1">
+                    Includes 2 people base (€250) • €50/extra person
+                  </p>
+                </div>
+                <div
+                  className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${
+                    durationHours === 3 ? "border-[#8B7355] bg-[#8B7355] text-white" : "border-[#CBD5E1]"
+                  }`}
+                >
+                  {durationHours === 3 && <BiCheckCircle size={16} />}
+                </div>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setDurationHours(4)}
+                className={`p-6 rounded-2xl border transition-all text-left flex items-start justify-between ${
+                  durationHours === 4
+                    ? "bg-[#FCF2E9] border-[#8B7355] shadow-md ring-2 ring-[#8B7355]/20"
+                    : "bg-white border-[#E2E8F0] hover:border-[#D1B191]"
+                }`}
+              >
+                <div>
+                  <span className="text-xs font-bold uppercase tracking-widest text-[#8B7355] block mb-1">
+                    Extended Relaxation
+                  </span>
+                  <h4 className="text-2xl font-bold font-displayPlayFair text-[#0F172A]">
+                    4 Hours Session
+                  </h4>
+                  <p className="text-xs text-[#64748B] mt-1">
+                    Includes 2 people base (€300) • €50/extra person
+                  </p>
+                </div>
+                <div
+                  className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${
+                    durationHours === 4 ? "border-[#8B7355] bg-[#8B7355] text-white" : "border-[#CBD5E1]"
+                  }`}
+                >
+                  {durationHours === 4 && <BiCheckCircle size={16} />}
+                </div>
+              </button>
+            </div>
+          </div>
+
+          {/* Number of People (Capacity 2 to 6) */}
+          <div>
+            <div className="flex justify-between items-center mb-4">
+              <label
+                className="block text-sm font-bold text-[#0F172A] uppercase tracking-wider"
+                style={{ fontFamily: "Inter, sans-serif" }}
+              >
+                2. Number of Guests (2 to 6 People)
+              </label>
+              <span className="text-xs font-semibold text-[#8B7355]">
+                {guestsCount > 2 ? `Base (2 people) + ${guestsCount - 2} Extra Guests` : "Base Group (2 People)"}
+              </span>
+            </div>
+
+            <div className="grid grid-cols-5 gap-3">
+              {[2, 3, 4, 5, 6].map((num) => (
+                <button
+                  key={num}
+                  type="button"
+                  onClick={() => setGuestsCount(num)}
+                  className={`py-4 rounded-xl border font-bold text-center transition-all ${
+                    guestsCount === num
+                      ? "bg-[#8B7355] border-[#8B7355] text-white shadow-md scale-[1.03]"
+                      : "bg-white border-[#E2E8F0] text-[#475569] hover:border-[#D1B191]"
+                  }`}
+                >
+                  <span className="block text-lg font-displayPlayFair">{num}</span>
+                  <span className="text-[10px] uppercase font-mono tracking-tight opacity-90">
+                    {num === 2 ? "Base" : `+€${(num - 2) * 50}`}
+                  </span>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Optional Extras */}
+          <div>
+            <label
+              className="block text-sm font-bold text-[#0F172A] mb-4 uppercase tracking-wider"
+              style={{ fontFamily: "Inter, sans-serif" }}
+            >
+              3. Enhance Your Experience (Optional Extras)
+            </label>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {availableExtras.map((extra) => {
+                const isSelected = selectedExtras.some((e) => e.id === extra.id);
+                return (
+                  <button
+                    key={extra.id}
+                    type="button"
+                    onClick={() => toggleExtra(extra)}
+                    className={`p-4 rounded-xl border transition-all text-left flex items-center justify-between ${
+                      isSelected
+                        ? "bg-[#FCF2E9] border-[#8B7355] shadow-xs"
+                        : "bg-white border-[#E2E8F0] hover:border-[#D1B191]"
+                    }`}
+                  >
+                    <div className="flex items-center gap-3">
+                      <div
+                        className={`w-5 h-5 rounded-md border flex items-center justify-center text-xs ${
+                          isSelected ? "bg-[#8B7355] border-[#8B7355] text-white" : "border-[#CBD5E1]"
+                        }`}
+                      >
+                        {isSelected && "✓"}
+                      </div>
+                      <span className="text-xs font-bold text-[#0F172A]">{extra.name}</span>
+                    </div>
+                    <span className="text-xs font-bold text-[#8B7355]">+€{extra.price}</span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Price Breakdown & Automatic Total Calculation */}
+          <div className="p-6 rounded-2xl bg-[#FBF6F3] border border-[#E8E2DC] space-y-4">
+            <div className="flex justify-between items-center text-xs text-[#64748B] pb-3 border-b border-[#E8E2DC]/80">
+              <span>
+                {durationHours} Hours Session Base (2 Guests)
+              </span>
+              <span className="font-bold text-[#0F172A]">€{durationHours === 4 ? 300 : 250}</span>
+            </div>
+
+            {guestsCount > 2 && (
+              <div className="flex justify-between items-center text-xs text-[#64748B] pb-3 border-b border-[#E8E2DC]/80">
+                <span>Additional Guests ({guestsCount - 2} × €50)</span>
+                <span className="font-bold text-[#0F172A]">+€{(guestsCount - 2) * 50}</span>
+              </div>
+            )}
+
+            {selectedExtras.map((ext) => (
+              <div key={ext.id} className="flex justify-between items-center text-xs text-[#64748B] pb-2">
+                <span>Extra: {ext.name}</span>
+                <span className="font-bold text-[#0F172A]">+€{ext.price}</span>
+              </div>
+            ))}
+
+            <div className="flex justify-between items-center pt-2">
+              <div>
+                <span className="text-xs font-bold uppercase tracking-widest text-[#8B7355] block">
+                  Total Calculated Price
+                </span>
+                <span className="text-[11px] text-[#64748B]">Includes all taxes & private access</span>
+              </div>
+              <div className="text-right">
+                <span className="text-4xl font-bold font-displayPlayFair text-[#8B7355]">
+                  €{currentTotalPrice}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* Cleaning Buffer Notice */}
+          <div className="p-4 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0] flex items-center gap-3 text-xs text-[#64748B]">
+            <BiInfoCircle className="text-[#8B7355] text-lg flex-shrink-0" />
+            <span>
+              <strong>Automatic Cleaning Buffer:</strong> After your {durationHours}-hour booking, 30 minutes is automatically reserved for thorough cleaning and sanitation before the next group.
+            </span>
+          </div>
+        </div>
+      ) : (
+        /* Shared Sauna Fallback Card */
+        <div className="max-w-4xl mx-auto bg-white rounded-[32px] p-8 md:p-10 shadow-sm border border-[#E8E2DC] space-y-6">
+          <div className="flex items-center gap-4 mb-4">
+            <div className="w-12 h-12 rounded-2xl bg-[#FCF2E9] flex items-center justify-center text-[#8B7355]">
+              <FaHotTub size={22} />
+            </div>
+            <div>
+              <h3 className="text-2xl font-bold font-displayPlayFair text-[#0F172A]">
+                Shared Sauna Experience
+              </h3>
+              <p className="text-xs text-[#64748B]">
+                Enjoy access to our Finnish sauna & wellness lounge in a peaceful shared space.
+              </p>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4 border-t border-[#F1F5F9]">
+            <div>
+              <label className="block text-xs font-bold text-[#0F172A] uppercase mb-2">Number of Guests</label>
+              <select
+                value={guestsCount}
+                onChange={(e) => setGuestsCount(parseInt(e.target.value, 10))}
+                className="w-full p-4 border border-[#E2E8F0] rounded-xl text-sm"
+              >
+                {[1, 2, 3, 4, 5, 6].map((n) => (
+                  <option key={n} value={n}>{n} {n === 1 ? "Guest" : "Guests"}</option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold text-[#0F172A] uppercase mb-2">Price Per Person</label>
+              <div className="p-4 bg-[#FCF2E9] rounded-xl font-bold text-lg text-[#8B7355]">
+                €35 / person (Total: €{35 * guestsCount})
+              </div>
+            </div>
+          </div>
         </div>
       )}
 
       {/* ── Footer Buttons ── */}
-      <div className="max-w-6xl mx-auto mt-16 flex justify-between items-center bg-[#FBF6F3] p-8 rounded-2xl shadow-sm border border-[#E8E2DC]">
+      <div className="max-w-4xl mx-auto mt-12 flex justify-between items-center bg-[#FBF6F3] p-8 rounded-2xl shadow-sm border border-[#E8E2DC]">
         <Link
           href="/booking"
           className="px-10 py-4 rounded-xl border border-[#CFB9A3] text-[#1d1a17] font-bold text-sm hover:bg-[#CFB9A3] hover:bg-opacity-10 transition-all flex items-center gap-3"
@@ -149,9 +401,7 @@ export default function SaunaBookingPage() {
 
         <Link
           href="/booking/choose-time"
-          className={`px-12 py-4 rounded-xl text-white font-bold text-sm flex items-center gap-3 transition-all shadow-md ${
-            selectedIds.length > 0 ? "bg-[#D1B191] hover:bg-[#C4A484] shadow-lg transform translate-y-[-2px]" : "bg-[#D1B191] opacity-50 cursor-not-allowed pointer-events-none"
-          }`}
+          className="px-12 py-4 rounded-xl bg-[#D1B191] hover:bg-[#C4A484] text-white font-bold text-sm flex items-center gap-3 transition-all shadow-lg transform translate-y-[-2px]"
           style={{ fontFamily: "Inter, sans-serif" }}
         >
           Continue
