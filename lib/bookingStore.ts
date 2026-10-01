@@ -18,6 +18,22 @@ export interface BookingExtra {
   price: number;
 }
 
+export interface ActivityBookingDetails {
+  id: string;
+  name: string;
+  category: string;
+  description: string;
+  date: string;
+  startTime: string;
+  endTime: string;
+  price: number;
+  maxParticipants: number;
+  bookedParticipants: number;
+  teacherHost: string;
+  additionalInfo: string;
+  isRecurring: boolean;
+}
+
 export interface BookingData {
   serviceId?: number;
   serviceName: string;
@@ -32,6 +48,7 @@ export interface BookingData {
   isSharedSauna?: boolean;
   hasActiveMembership?: boolean;
   membershipType?: "none" | "once_a_week" | "unlimited";
+  activityDetails?: ActivityBookingDetails;
   selectedExtras?: BookingExtra[];
   totalAmount?: number;
   paymentMethod?: string;

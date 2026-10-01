@@ -82,6 +82,30 @@ export default function ReviewPage() {
                 </div>
               )}
 
+              {data.activityDetails && (
+                <div className="pt-3 border-t border-[#F1F5F9] space-y-3">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <span className="text-xs text-[#94A3B8] uppercase block mb-1">Teacher / Host</span>
+                      <p className="text-base font-bold text-[#0F172A]">{data.activityDetails.teacherHost}</p>
+                    </div>
+                    <div>
+                      <span className="text-xs text-[#94A3B8] uppercase block mb-1">Category & Type</span>
+                      <p className="text-base font-bold text-[#8B7355]">
+                        {data.activityDetails.category} ({data.activityDetails.isRecurring ? "Recurring Class" : "One-Time Event"})
+                      </p>
+                    </div>
+                  </div>
+
+                  {data.activityDetails.additionalInfo && (
+                    <div className="p-3 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0] text-xs text-[#475569]">
+                      <span className="font-bold text-[#0F172A] block mb-0.5">Additional Information:</span>
+                      {data.activityDetails.additionalInfo}
+                    </div>
+                  )}
+                </div>
+              )}
+
               {data.selectedExtras && data.selectedExtras.length > 0 && (
                 <div className="pt-3 border-t border-[#F1F5F9]">
                   <span className="text-xs text-[#94A3B8] uppercase block mb-2">Selected Add-on Extras</span>
