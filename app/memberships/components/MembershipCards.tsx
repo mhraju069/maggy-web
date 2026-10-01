@@ -33,16 +33,47 @@ const ArrowIcon = ({ color }: { color: string }) => (
   </svg>
 );
 
+const sharedSaunaPlans = [
+  {
+    variant: "essential",
+    name: "Once a Week",
+    price: "€60",
+    perPeriod: "/ 4 weeks",
+    features: [
+      "Entitlement to 1 session per week",
+      "1.5-hour Shared Sauna access",
+      "Automatic member recognition",
+      "Exempt from €19.95 session fee",
+      "Advance online session booking",
+    ],
+  },
+  {
+    variant: "infinite",
+    name: "Unlimited",
+    price: "€100",
+    perPeriod: "/ 4 weeks",
+    features: [
+      "Unlimited use within available capacity",
+      "1.5-hour Shared Sauna access",
+      "Up to 10 active future reservations",
+      "Automatic member recognition",
+      "Exempt from €19.95 session fee",
+      "Priority session access",
+    ],
+  },
+];
+
 const MembershipCards = () => {
   const { t } = useLanguage();
-  const s = t.membershipsPage.cards;
+  const s = t?.membershipsPage?.cards;
 
-  const variants = ["essential", "ethereal", "infinite"] as const;
-
-  const plans = s.plans.map((plan, i) => ({
-    ...plan,
-    variant: variants[i],
-  }));
+  const plans = (s?.plans && s.plans.length > 0)
+    ? s.plans.map((plan: any, i: number) => ({
+        ...plan,
+        variant: i === 0 ? "essential" : "infinite",
+        perPeriod: s.perMonth || "/ 4 weeks",
+      }))
+    : sharedSaunaPlans;
 
   return (
     <section
@@ -96,7 +127,7 @@ const MembershipCards = () => {
                       margin: 0,
                     }}
                   >
-                    {plan.features.map((feature, i) => (
+                    {plan.features.map((feature: string, i: number) => (
                       <li
                         key={i}
                         className="flex items-start"
@@ -161,7 +192,7 @@ const MembershipCards = () => {
                           lineHeight: "130%",
                         }}
                       >
-                        {s.perMonth}
+                        {plan.perPeriod || s?.perMonth || "/ 4 weeks"}
                       </span>
                     </div>
                   </div>

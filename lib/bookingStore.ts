@@ -1,6 +1,6 @@
 /**
  * Booking Session Storage Utility
- * Retains booking selection, date/time, customer information, celebration details, and sauna options across booking steps.
+ * Retains booking selection, date/time, customer information, celebration details, private & shared sauna options across booking steps.
  */
 
 export interface CelebrationData {
@@ -26,8 +26,12 @@ export interface BookingData {
   date: string;
   timeSlot: string;
   guestsCount: number;
-  durationHours?: number; // 3 or 4 hours for Private Sauna
-  cleaningTimeMinutes?: number; // Default 30 mins
+  durationHours?: number; // 3 or 4 hours for Private Sauna, 1.5 for Shared Sauna
+  cleaningTimeMinutes?: number; // 30 mins for Private Sauna
+  changeoverMinutes?: number; // 15 mins for Shared Sauna
+  isSharedSauna?: boolean;
+  hasActiveMembership?: boolean;
+  membershipType?: "none" | "once_a_week" | "unlimited";
   selectedExtras?: BookingExtra[];
   totalAmount?: number;
   paymentMethod?: string;
@@ -49,6 +53,10 @@ export const initialBookingData: BookingData = {
   guestsCount: 2,
   durationHours: 3,
   cleaningTimeMinutes: 30,
+  changeoverMinutes: 15,
+  isSharedSauna: false,
+  hasActiveMembership: false,
+  membershipType: "none",
   selectedExtras: [],
   totalAmount: 250,
   paymentMethod: "ideal",
@@ -66,12 +74,25 @@ export const initialBookingData: BookingData = {
   },
 };
 
-export const calculatePrivateSaunaPrice = (durationHours: number, guestsCount: number, extras: BookingExtra[] = []): number => {
+export const calculatePrivateSaunaPrice = (
+  durationHours: number,
+  guestsCount: number,
+  extras: BookingExtra[] = []
+): number => {
   const validGuests = Math.min(Math.max(guestsCount, 2), 6);
   const basePrice = durationHours === 4 ? 300 : 250;
   const extraGuestPrice = (validGuests - 2) * 50;
   const extrasTotal = extras.reduce((sum, item) => sum + (item.price || 0), 0);
   return basePrice + extraGuestPrice + extrasTotal;
+};
+
+export const calculateSharedSaunaPrice = (
+  guestsCount: number,
+  hasActiveMembership: boolean = false
+): number => {
+  if (hasActiveMembership) return 0;
+  const validGuests = Math.min(Math.max(guestsCount, 1), 6);
+  return parseFloat((validGuests * 19.95).toFixed(2));
 };
 
 export const getStoredBookingData = (): BookingData => {

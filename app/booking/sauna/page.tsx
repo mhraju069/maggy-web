@@ -345,41 +345,130 @@ export default function SaunaBookingPage() {
           </div>
         </div>
       ) : (
-        /* Shared Sauna Fallback Card */
-        <div className="max-w-4xl mx-auto bg-white rounded-[32px] p-8 md:p-10 shadow-sm border border-[#E8E2DC] space-y-6">
-          <div className="flex items-center gap-4 mb-4">
-            <div className="w-12 h-12 rounded-2xl bg-[#FCF2E9] flex items-center justify-center text-[#8B7355]">
-              <FaHotTub size={22} />
+        /* ── Shared Sauna Configurator ── */
+        <div className="max-w-4xl mx-auto bg-white rounded-[32px] p-8 md:p-10 shadow-sm border border-[#E8E2DC] space-y-8">
+          {/* Header Banner */}
+          <div className="p-6 rounded-2xl bg-[#FCF2E9] border border-[#E8E2DC] flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 rounded-2xl bg-[#8B7355] text-white flex items-center justify-center flex-shrink-0 shadow-xs">
+                <FaHotTub size={22} />
+              </div>
+              <div>
+                <span className="text-[11px] font-bold uppercase tracking-widest text-[#8B7355] block">
+                  Shared Session Access
+                </span>
+                <h3 className="text-xl font-bold font-displayPlayFair text-[#0F172A]">
+                  Shared Sauna Experience
+                </h3>
+                <p className="text-xs text-[#64748B] mt-0.5">
+                  Different customers can book the same 1.5-hour session. Max 6 people per session.
+                </p>
+              </div>
             </div>
-            <div>
-              <h3 className="text-2xl font-bold font-displayPlayFair text-[#0F172A]">
-                Shared Sauna Experience
-              </h3>
-              <p className="text-xs text-[#64748B]">
-                Enjoy access to our Finnish sauna & wellness lounge in a peaceful shared space.
-              </p>
+
+            <div className="flex items-center gap-2 bg-white px-4 py-2 rounded-xl border border-[#D1B191]/60 text-xs font-bold text-[#8B7355] flex-shrink-0">
+              <BiTimeFive size={16} />
+              <span>1.5 Hours + 15 Mins Changeover Buffer</span>
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4 border-t border-[#F1F5F9]">
-            <div>
-              <label className="block text-xs font-bold text-[#0F172A] uppercase mb-2">Number of Guests</label>
-              <select
-                value={guestsCount}
-                onChange={(e) => setGuestsCount(parseInt(e.target.value, 10))}
-                className="w-full p-4 border border-[#E2E8F0] rounded-xl text-sm"
-              >
-                {[1, 2, 3, 4, 5, 6].map((n) => (
-                  <option key={n} value={n}>{n} {n === 1 ? "Guest" : "Guests"}</option>
-                ))}
-              </select>
+          {/* Session Overview Badges */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="p-5 rounded-2xl bg-[#FBF6F3] border border-[#E8E2DC] text-center">
+              <span className="text-xs text-[#64748B] block mb-1">Session Duration</span>
+              <span className="text-lg font-bold text-[#0F172A] font-displayPlayFair">1.5 Hours (90 Mins)</span>
             </div>
 
-            <div>
-              <label className="block text-xs font-bold text-[#0F172A] uppercase mb-2">Price Per Person</label>
-              <div className="p-4 bg-[#FCF2E9] rounded-xl font-bold text-lg text-[#8B7355]">
-                €35 / person (Total: €{35 * guestsCount})
+            <div className="p-5 rounded-2xl bg-[#FBF6F3] border border-[#E8E2DC] text-center">
+              <span className="text-xs text-[#64748B] block mb-1">Price Per Person</span>
+              <span className="text-lg font-bold text-[#8B7355] font-displayPlayFair">€19.95 / Person</span>
+            </div>
+
+            <div className="p-5 rounded-2xl bg-[#FBF6F3] border border-[#E8E2DC] text-center">
+              <span className="text-xs text-[#64748B] block mb-1">Changeover Period</span>
+              <span className="text-lg font-bold text-[#0F172A] font-displayPlayFair">15 Mins (Blocked)</span>
+            </div>
+          </div>
+
+          {/* Guest Count Selector */}
+          <div>
+            <label className="block text-sm font-bold text-[#0F172A] mb-3 uppercase tracking-wider" style={{ fontFamily: "Inter, sans-serif" }}>
+              Number of Places / Guests (1 to 6)
+            </label>
+            <div className="grid grid-cols-6 gap-3">
+              {[1, 2, 3, 4, 5, 6].map((num) => (
+                <button
+                  key={num}
+                  type="button"
+                  onClick={() => setGuestsCount(num)}
+                  className={`py-3.5 rounded-xl border font-bold text-center transition-all ${
+                    guestsCount === num
+                      ? "bg-[#8B7355] border-[#8B7355] text-white shadow-md scale-[1.03]"
+                      : "bg-white border-[#E2E8F0] text-[#475569] hover:border-[#D1B191]"
+                  }`}
+                >
+                  <span className="block text-base font-displayPlayFair">{num}</span>
+                  <span className="text-[10px] uppercase font-mono">
+                    {num === 1 ? "1 Person" : `${num} Places`}
+                  </span>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Memberships Card Highlight */}
+          <div className="p-6 rounded-2xl bg-gradient-to-r from-[#FCF2E9] to-[#FBF6F3] border border-[#E8E2DC] space-y-4">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-[#E8E2DC]/80 pb-4">
+              <div>
+                <span className="text-[10px] font-bold uppercase tracking-widest text-[#8B7355] block mb-1">
+                  Active Membership Check
+                </span>
+                <h4 className="text-lg font-bold text-[#0F172A] font-displayPlayFair">
+                  Are you a Shared Sauna Member?
+                </h4>
+                <p className="text-xs text-[#64748B]">
+                  Active members are automatically recognized and exempt from the €19.95 session fee.
+                </p>
               </div>
+
+              <Link
+                href="/memberships"
+                className="px-4 py-2.5 rounded-xl bg-white border border-[#D1B191] text-[#8B7355] hover:bg-[#8B7355] hover:text-white transition-all text-xs font-bold text-center flex-shrink-0"
+              >
+                View Membership Plans (€60 / €100)
+              </Link>
+            </div>
+
+            {/* Shared Sauna Membership Plans Quick Info */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+              <div className="p-4 rounded-xl bg-white border border-[#E8E2DC]">
+                <h5 className="font-bold text-[#0F172A] mb-1">Once a Week Membership</h5>
+                <p className="text-[#8B7355] font-bold text-sm">€60 / 4 weeks</p>
+                <p className="text-[#64748B] mt-1">Entitlement to 1 shared sauna session per week.</p>
+              </div>
+
+              <div className="p-4 rounded-xl bg-white border border-[#E8E2DC]">
+                <h5 className="font-bold text-[#0F172A] mb-1">Unlimited Membership</h5>
+                <p className="text-[#8B7355] font-bold text-sm">€100 / 4 weeks</p>
+                <p className="text-[#64748B] mt-1">Unlimited sessions (max 10 future active reservations).</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Price Calculation Summary */}
+          <div className="p-6 rounded-2xl bg-[#FBF6F3] border border-[#E8E2DC] flex justify-between items-center">
+            <div>
+              <span className="text-xs font-bold uppercase tracking-widest text-[#8B7355] block">
+                Total Amount Due
+              </span>
+              <span className="text-[11px] text-[#64748B]">
+                {guestsCount} guest(s) × €19.95 (1.5h session)
+              </span>
+            </div>
+            <div className="text-right">
+              <span className="text-4xl font-bold font-displayPlayFair text-[#8B7355]">
+                €{(guestsCount * 19.95).toFixed(2)}
+              </span>
             </div>
           </div>
         </div>

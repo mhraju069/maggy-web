@@ -12,13 +12,38 @@ const defaultTimeSlots = [
   "12:00 PM", "1:00 PM", "2:00 PM", "3:00 PM", "4:00 PM"
 ];
 
+export interface SharedSaunaSessionSlot {
+  slot: string;
+  startTime: string;
+  endTime: string;
+  duration: string;
+  changeover: string;
+  totalCapacity: number;
+  bookedPlaces: number;
+}
+
+const sharedSaunaSessions: SharedSaunaSessionSlot[] = [
+  { slot: "06:00–07:30", startTime: "06:00 AM", endTime: "07:30 AM", duration: "1.5 Hours", changeover: "07:30–07:45", totalCapacity: 6, bookedPlaces: 1 },
+  { slot: "07:45–09:15", startTime: "07:45 AM", endTime: "09:15 AM", duration: "1.5 Hours", changeover: "09:15–09:30", totalCapacity: 6, bookedPlaces: 3 },
+  { slot: "09:30–11:00", startTime: "09:30 AM", endTime: "11:00 AM", duration: "1.5 Hours", changeover: "11:00–11:15", totalCapacity: 6, bookedPlaces: 4 },
+  { slot: "11:15–12:45", startTime: "11:15 AM", endTime: "12:45 PM", duration: "1.5 Hours", changeover: "12:45–13:00", totalCapacity: 6, bookedPlaces: 6 }, // Fully Booked
+  { slot: "13:00–14:30", startTime: "01:00 PM", endTime: "02:30 PM", duration: "1.5 Hours", changeover: "14:30–14:45", totalCapacity: 6, bookedPlaces: 2 },
+  { slot: "14:45–16:15", startTime: "02:45 PM", endTime: "04:15 PM", duration: "1.5 Hours", changeover: "16:15–16:30", totalCapacity: 6, bookedPlaces: 0 },
+  { slot: "16:30–18:00", startTime: "04:30 PM", endTime: "06:00 PM", duration: "1.5 Hours", changeover: "18:00–18:15", totalCapacity: 6, bookedPlaces: 5 },
+  { slot: "18:15–19:45", startTime: "06:15 PM", endTime: "07:45 PM", duration: "1.5 Hours", changeover: "19:45–20:00", totalCapacity: 6, bookedPlaces: 2 },
+  { slot: "20:00–21:30", startTime: "08:00 PM", endTime: "09:30 PM", duration: "1.5 Hours", changeover: "21:30–21:45", totalCapacity: 6, bookedPlaces: 1 },
+  { slot: "21:45–23:15", startTime: "09:45 PM", endTime: "11:15 PM", duration: "1.5 Hours", changeover: "23:15–23:30", totalCapacity: 6, bookedPlaces: 0 },
+];
+
 export default function ChooseTimePage() {
   const [storedData, setStoredData] = useState(getStoredBookingData());
   const isLunchroom = storedData.serviceType === "lunchroom" || storedData.serviceName.toLowerCase().includes("lunchroom");
+  const isSharedSauna = storedData.isSharedSauna || storedData.serviceName.toLowerCase().includes("shared");
+  const isPrivateSauna = !isLunchroom && !isSharedSauna && (storedData.serviceType === "sauna" || storedData.serviceName.toLowerCase().includes("private"));
 
   const [date, setDate] = useState(storedData.date || "");
   const [selectedTime, setSelectedTime] = useState<string | null>(storedData.timeSlot || null);
-  const [guests, setGuests] = useState(String(storedData.guestsCount || 2));
+  const [guests, setGuests] = useState(String(storedData.guestsCount || 1));
   const [dayError, setDayError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -89,8 +114,8 @@ export default function ChooseTimePage() {
         </div>
       )}
 
-      {/* ── Private Sauna Cleaning Time Banner ── */}
-      {storedData.serviceType === "sauna" && (
+      {/* ── Private Sauna Banner ── */}
+      {isPrivateSauna && (
         <div className="max-w-4xl mx-auto mb-8 bg-white rounded-2xl p-6 border border-[#E8E2DC] shadow-xs flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-[#FCF2E9] flex items-center justify-center text-[#8B7355] flex-shrink-0">
@@ -108,6 +133,29 @@ export default function ChooseTimePage() {
 
           <div className="flex items-center gap-2 bg-[#FCF2E9]/70 px-4 py-2 rounded-xl text-xs font-semibold text-[#8B7355]">
             <span>Total Blocked Period: {(storedData.durationHours || 3)}h 30m</span>
+          </div>
+        </div>
+      )}
+
+      {/* ── Shared Sauna Session Banner ── */}
+      {isSharedSauna && (
+        <div className="max-w-4xl mx-auto mb-8 bg-white rounded-2xl p-6 border border-[#E8E2DC] shadow-xs flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-[#FCF2E9] flex items-center justify-center text-[#8B7355] flex-shrink-0">
+              <BiTimeFive size={20} />
+            </div>
+            <div>
+              <h4 className="font-bold text-[#0F172A] text-sm">
+                Shared Sauna (1.5 Hours Session • €19.95 / Person)
+              </h4>
+              <p className="text-xs text-[#8B7355] font-medium">
+                15-minute changeover period automatically blocked between sessions. Max 6 places per session.
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2 bg-[#FCF2E9]/70 px-4 py-2 rounded-xl text-xs font-bold text-[#8B7355]">
+            <span>Max 6 Places / Session</span>
           </div>
         </div>
       )}
@@ -146,35 +194,87 @@ export default function ChooseTimePage() {
           <div>
             <div className="flex justify-between items-center mb-4">
               <label className="block text-sm font-bold text-[#0F172A] uppercase tracking-wider" style={{ fontFamily: "Inter, sans-serif" }}>
-                Time Slot
+                {isSharedSauna ? "Select Shared Session Slot (1.5 Hours + 15m Changeover)" : "Time Slot"}
               </label>
               {isLunchroom && (
                 <span className="text-xs text-[#64748B]">Operating hours: 09:00 – 16:00</span>
               )}
             </div>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              {defaultTimeSlots.map((time) => (
-                <button
-                  key={time}
-                  type="button"
-                  onClick={() => handleTimeSelect(time)}
-                  className={`py-4 rounded-xl border transition-all font-medium text-sm ${
-                    selectedTime === time
-                      ? "bg-[#D1B191] border-[#D1B191] text-white shadow-md shadow-[#D1B191]/20 font-bold scale-[1.02]"
-                      : "bg-white border-[#E2E8F0] text-[#475569] hover:border-[#D1B191]"
-                  }`}
-                  style={{ fontFamily: "Inter, sans-serif" }}
-                >
-                  {time}
-                </button>
-              ))}
-            </div>
+
+            {isSharedSauna ? (
+              /* Shared Sauna 10 Dedicated Time Slots with Remaining Places */
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {sharedSaunaSessions.map((sess) => {
+                  const remaining = Math.max(0, sess.totalCapacity - sess.bookedPlaces);
+                  const isSoldOut = remaining === 0;
+                  const isSelected = selectedTime === sess.slot;
+
+                  return (
+                    <button
+                      key={sess.slot}
+                      type="button"
+                      disabled={isSoldOut}
+                      onClick={() => handleTimeSelect(sess.slot)}
+                      className={`p-4 rounded-xl border text-left transition-all flex items-center justify-between ${
+                        isSelected
+                          ? "bg-[#FCF2E9] border-[#8B7355] shadow-md ring-2 ring-[#8B7355]/20"
+                          : isSoldOut
+                          ? "bg-gray-50 border-gray-200 opacity-60 cursor-not-allowed"
+                          : "bg-white border-[#E2E8F0] hover:border-[#D1B191]"
+                      }`}
+                    >
+                      <div>
+                        <span className="text-base font-bold font-displayPlayFair text-[#0F172A] block">
+                          {sess.slot}
+                        </span>
+                        <span className="text-[11px] text-[#64748B]">
+                          1.5h session • 15m changeover buffer ({sess.changeover})
+                        </span>
+                      </div>
+
+                      <div className="text-right flex flex-col items-end">
+                        {isSoldOut ? (
+                          <span className="px-2.5 py-1 bg-rose-100 text-rose-700 text-[10px] font-bold rounded-full">
+                            Fully Booked (0/6)
+                          </span>
+                        ) : (
+                          <span className={`px-2.5 py-1 text-[10px] font-bold rounded-full border ${
+                            remaining <= 2 ? "bg-amber-100 text-amber-800 border-amber-300" : "bg-emerald-50 text-emerald-700 border-emerald-300"
+                          }`}>
+                            {remaining} {remaining === 1 ? "place" : "places"} remaining
+                          </span>
+                        )}
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            ) : (
+              /* Standard Time Slots Grid */
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                {defaultTimeSlots.map((time) => (
+                  <button
+                    key={time}
+                    type="button"
+                    onClick={() => handleTimeSelect(time)}
+                    className={`py-4 rounded-xl border transition-all font-medium text-sm ${
+                      selectedTime === time
+                        ? "bg-[#D1B191] border-[#D1B191] text-white shadow-md shadow-[#D1B191]/20 font-bold scale-[1.02]"
+                        : "bg-white border-[#E2E8F0] text-[#475569] hover:border-[#D1B191]"
+                    }`}
+                    style={{ fontFamily: "Inter, sans-serif" }}
+                  >
+                    {time}
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* Guests Picker */}
           <div>
             <label className="block text-sm font-bold text-[#0F172A] mb-4 uppercase tracking-wider" style={{ fontFamily: "Inter, sans-serif" }}>
-              Number of People / Guests
+              Number of People / Places
             </label>
             <select
               value={guests}
@@ -189,9 +289,9 @@ export default function ChooseTimePage() {
                 backgroundSize: "1.2em",
               }}
             >
-              {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 15, 20].map((n) => (
+              {[1, 2, 3, 4, 5, 6].map((n) => (
                 <option key={n} value={n}>
-                  {n} {n === 1 ? "Person" : "People"}
+                  {n} {n === 1 ? "Person / Place" : "People / Places"} (€{(n * (isSharedSauna ? 19.95 : 35)).toFixed(2)})
                 </option>
               ))}
             </select>
