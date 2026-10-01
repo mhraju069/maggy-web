@@ -186,6 +186,15 @@ export interface ResetPasswordPayload {
 }
 
 // Domain Model Types (Booking, Services, etc.)
+export interface CelebrationDetails {
+  is_celebrating?: boolean;
+  occasion?: string;
+  celebrant_name?: string;
+  age?: string | number;
+  hobbies_interests?: string;
+  other_details?: string;
+}
+
 export interface Booking {
   id: string | number;
   service_name?: string;
@@ -194,6 +203,7 @@ export interface Booking {
   status?: "pending" | "confirmed" | "cancelled" | "completed";
   guests_count?: number;
   special_requests?: string;
+  celebration?: CelebrationDetails;
   created_at?: string;
   user?: User | number | string;
 }
@@ -204,6 +214,7 @@ export interface CreateBookingPayload {
   time_slot: string;
   guests_count?: number;
   special_requests?: string;
+  celebration?: CelebrationDetails;
 }
 
 export interface ServiceFeature {

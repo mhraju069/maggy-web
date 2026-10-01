@@ -11,6 +11,7 @@ import { PiArmchair } from "react-icons/pi";
 import BeveragesSection from "./components/BeveragesSection";
 import IceCreamSection from "./components/IceCreamSection";
 import MenuSection from "./components/MenuSection";
+import LunchroomHoursWalkin from "./components/LunchroomHoursWalkin";
 import MoreToDiscover from "./components/MoreToDiscover";
 
 const LunchroomPage = () => {
@@ -95,6 +96,9 @@ const LunchroomPage = () => {
           </div>
         </div>
       </section>
+
+      {/* Opening Hours & Walk-In Information */}
+      <LunchroomHoursWalkin />
 
       {/* Menu Section */}
       <MenuSection />

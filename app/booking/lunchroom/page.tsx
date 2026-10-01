@@ -3,8 +3,11 @@
 import ArrangementCard from "@/components/shared/ArrangementCard";
 import DecorativeUnderline from "@/components/shared/DecorativeUnderline";
 import { formatImageUrl, parseApiErrorMessage, ServiceItem, servicesService } from "@/lib/api";
+import { updateStoredBookingData } from "@/lib/bookingStore";
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
+import { BiInfoCircle, BiTimeFive } from "react-icons/bi";
+import { FaWalking } from "react-icons/fa";
 
 type PaymentType = "full" | "partial" | "spot";
 
@@ -25,22 +28,22 @@ const fallbackLunchroomPackages: LunchroomPackage[] = [
     id: 7,
     image: "/images/lunchroom/hero/lunchroomhero.png",
     rating: 4.8,
-    title: "Lunchroom Experience",
+    title: "Lunchroom Table Reservation",
     combo: "Organic + Seasonal + Fresh",
-    description: "Relax and nourish yourself with our carefully crafted menu. No reservation usually needed, but you can book a guaranteed spot.",
+    description: "Relax and nourish yourself with our carefully crafted menu. Walk-ins are always welcome, or reserve your guaranteed table online.",
     includes: [
       "Access to seasonal menu",
-      "Reserved seating for 120 mins",
-      "Organic tea or coffee",
-      "Instagram-worthy atmosphere",
+      "Reserved table seating",
+      "Special occasion celebration options",
+      "Organic tea & fresh juices",
     ],
     paymentType: "spot",
-    price: "$35",
+    price: "$0",
   },
 ];
 
 export default function LunchroomBookingPage() {
-  const [selectedIds, setSelectedIds] = useState<number[]>([]);
+  const [selectedIds, setSelectedIds] = useState<number[]>([7]);
   const [services, setServices] = useState<ServiceItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -63,9 +66,19 @@ export default function LunchroomBookingPage() {
   }, [fetchServices]);
 
   const toggleSelection = (id: number) => {
-    setSelectedIds((prev) =>
-      prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]
-    );
+    setSelectedIds((prev) => {
+      const next = prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id];
+      const selectedItem = displayList.find((item) => item.id === id);
+      if (selectedItem) {
+        updateStoredBookingData({
+          serviceId: selectedItem.id,
+          serviceName: selectedItem.title,
+          serviceType: "lunchroom",
+          price: selectedItem.price,
+        });
+      }
+      return next;
+    });
   };
 
   const displayList: LunchroomPackage[] =
@@ -92,18 +105,53 @@ export default function LunchroomBookingPage() {
             description: actualDesc,
             includes: includesList,
             paymentType: payType,
-            price: `$${parseFloat(String(s.price)) || 35}`,
+            price: s.price ? `$${parseFloat(String(s.price))}` : "$0",
           };
         })
       : fallbackLunchroomPackages;
 
+  // Initialize store on mount
+  useEffect(() => {
+    if (displayList.length > 0) {
+      const initial = displayList[0];
+      updateStoredBookingData({
+        serviceId: initial.id,
+        serviceName: initial.title,
+        serviceType: "lunchroom",
+        price: initial.price,
+      });
+    }
+  }, [services]);
+
   return (
     <div className="w-full px-6 md:px-12">
       {/* ── Title Section ── */}
-      <div className="text-center mb-16 flex flex-col items-center">
+      <div className="text-center mb-10 flex flex-col items-center">
         <h1 className="font-displayPlayFair text-5xl text-[#1d1a17] mb-2 uppercase tracking-tight">Lunchroom</h1>
         <DecorativeUnderline />
         <p className="font-cambria text-sm text-[#475569] mt-6 italic">Nourishment for body and soul.</p>
+      </div>
+
+      {/* ── Opening Hours & Walk-In Banner ── */}
+      <div className="max-w-xl mx-auto mb-10 bg-white rounded-2xl p-6 border border-[#E8E2DC] shadow-sm space-y-4">
+        <div className="flex items-center gap-3 pb-3 border-b border-[#F1F5F9]">
+          <div className="w-10 h-10 rounded-full bg-[#FCF2E9] flex items-center justify-center text-[#8B7355]">
+            <BiTimeFive size={20} />
+          </div>
+          <div>
+            <h3 className="font-bold text-[#0F172A] text-sm">Opening Hours</h3>
+            <p className="text-xs text-[#8B7355] font-semibold">Wednesday through Sunday: 09:00 – 16:00</p>
+            <p className="text-[11px] text-[#94A3B8]">Monday & Tuesday: Closed</p>
+          </div>
+        </div>
+
+        <div className="flex items-start gap-3 bg-[#FCF2E9]/60 p-3.5 rounded-xl text-xs text-[#475569]">
+          <FaWalking className="text-[#8B7355] text-base flex-shrink-0 mt-0.5" />
+          <div>
+            <span className="font-bold text-[#0F172A] block mb-0.5">Walk-Ins Welcome!</span>
+            You are always welcome to walk in without a reservation during opening hours. Book online below to reserve a guaranteed table for your party or special celebration.
+          </div>
+        </div>
       </div>
 
       {/* ── Loading Alert ── */}
@@ -116,7 +164,7 @@ export default function LunchroomBookingPage() {
       {/* ── Error Alert ── */}
       {error && !loading && (
         <div className="max-w-xl mx-auto mb-8 p-4 bg-amber-50 border border-amber-200 text-amber-800 text-sm rounded-lg flex items-center justify-between">
-          <span>Failed to connect to API ({error}). Showing available packages.</span>
+          <span>Failed to connect to API ({error}). Showing default package.</span>
           <button
             onClick={fetchServices}
             className="px-3 py-1 bg-[#8b7355] text-white text-xs font-bold rounded hover:bg-[#725e45] transition-colors"
