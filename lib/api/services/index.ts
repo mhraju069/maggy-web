@@ -4,4 +4,5 @@
 
 export * from "./authService";
 export * from "./bookingService";
+export * from "./servicesService";
 export * from "./userService";

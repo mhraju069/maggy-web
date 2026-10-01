@@ -205,3 +205,27 @@ export interface CreateBookingPayload {
   guests_count?: number;
   special_requests?: string;
 }
+
+export interface ServiceFeature {
+  id?: number;
+  feature: string;
+}
+
+export type ServiceType = "sauna" | "arrangement" | "activity" | "lunchroom" | string;
+export type PaymentType = "full" | "partial" | "on_spot" | string;
+
+export interface ServiceItem {
+  id: number;
+  service_type: ServiceType;
+  title: string;
+  subtitle?: string;
+  description: string;
+  image?: string | null;
+  price: string | number;
+  payment_type?: PaymentType;
+  is_active?: boolean;
+  features?: ServiceFeature[];
+  capacity?: number;
+  created_at?: string;
+  updated_at?: string;
+}

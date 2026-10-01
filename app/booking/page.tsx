@@ -65,6 +65,7 @@ export default function BookingCategoryPage() {
                   src={cat.image}
                   alt={cat.title}
                   fill
+                  sizes="(max-width: 768px) 100vw, 50vw"
                   className="object-cover transition-transform duration-700 group-hover:scale-105"
                 />
                 <div className="absolute inset-0 bg-black/30 group-hover:bg-black/20 transition-colors duration-500" />

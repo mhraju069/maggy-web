@@ -32,3 +32,29 @@ export const buildApiUrl = (endpoint: string, params?: Record<string, string | n
   const queryString = searchParams.toString();
   return queryString ? `${fullUrl}?${queryString}` : fullUrl;
 };
+
+/**
+ * Formats image URLs returned from backend API or relative paths.
+ */
+export const formatImageUrl = (
+  imageSrc: string | null | undefined,
+  fallback: string = "/images/logo.png"
+): string => {
+  if (!imageSrc) return fallback;
+
+  if (imageSrc.startsWith("http://") || imageSrc.startsWith("https://")) {
+    return imageSrc;
+  }
+
+  if (imageSrc.startsWith("/media/") || imageSrc.startsWith("media/")) {
+    const cleanPath = imageSrc.startsWith("/") ? imageSrc : `/${imageSrc}`;
+    const baseHost = API_BASE_URL.replace(/\/api\/?$/, "");
+    return `${baseHost}${cleanPath}`;
+  }
+
+  if (imageSrc.startsWith("/")) {
+    return imageSrc;
+  }
+
+  return fallback;
+};

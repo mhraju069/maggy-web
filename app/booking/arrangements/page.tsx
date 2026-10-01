@@ -2,8 +2,9 @@
 
 import ArrangementCard from "@/components/shared/ArrangementCard";
 import DecorativeUnderline from "@/components/shared/DecorativeUnderline";
+import { formatImageUrl, parseApiErrorMessage, ServiceItem, servicesService } from "@/lib/api";
 import Link from "next/link";
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 type PaymentType = "full" | "partial" | "spot";
 
@@ -19,9 +20,9 @@ interface Arrangement {
   price: string;
 }
 
-const arrangements: Arrangement[] = [
+const fallbackArrangements: Arrangement[] = [
   {
-    id: 1,
+    id: 6,
     image: "/images/arrangements/cardimages/img1.png",
     rating: 4.9,
     title: "Wellness Escape",
@@ -57,12 +58,61 @@ const arrangements: Arrangement[] = [
 
 export default function ArrangementsBookingPage() {
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
+  const [services, setServices] = useState<ServiceItem[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchServices = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const data = await servicesService.getServices("arrangement");
+      setServices(data);
+    } catch (err: unknown) {
+      setError(parseApiErrorMessage(err));
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchServices();
+  }, [fetchServices]);
 
   const toggleSelection = (id: number) => {
     setSelectedIds((prev) =>
       prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]
     );
   };
+
+  const displayList: Arrangement[] =
+    services.length > 0
+      ? services.map((s) => {
+          const descLines = (s.description || "").split(/\r?\n/).map((l) => l.trim()).filter(Boolean);
+          const comboText = s.subtitle || (descLines[0]?.includes("+") ? descLines[0] : "Wellness Package");
+          const actualDesc = descLines.length > 1 && descLines[0].includes("+") ? descLines.slice(1).join(" ") : s.description;
+
+          let payType: PaymentType = "full";
+          if (s.payment_type === "on_spot") payType = "spot";
+          else if (s.payment_type === "partial") payType = "partial";
+
+          const includesList = s.features && s.features.length > 0
+            ? s.features.map((f) => f.feature)
+            : ["Full access to wellness facilities", "Personalized experience"];
+
+          return {
+            id: s.id,
+            image: formatImageUrl(s.image, "/images/arrangements/cardimages/img1.png"),
+            rating: 4.9,
+            title: s.title,
+            combo: comboText,
+            description: actualDesc,
+            includes: includesList,
+            paymentType: payType,
+            price: `$${parseFloat(String(s.price)) || 0}`,
+          };
+        })
+      : fallbackArrangements;
 
   return (
     <div className="w-full px-6 md:px-12">
@@ -73,17 +123,39 @@ export default function ArrangementsBookingPage() {
         <p className="font-cambria text-sm text-[#475569] mt-6 italic">Multi-sensory experiences thoughtfully designed to restore balance and vitality.</p>
       </div>
 
+      {/* ── Loading Alert ── */}
+      {loading && (
+        <div className="text-center py-12 text-[#8b7355] text-base font-medium">
+          Loading arrangement packages...
+        </div>
+      )}
+
+      {/* ── Error Alert ── */}
+      {error && !loading && (
+        <div className="max-w-xl mx-auto mb-8 p-4 bg-amber-50 border border-amber-200 text-amber-800 text-sm rounded-lg flex items-center justify-between">
+          <span>Failed to connect to API ({error}). Showing available packages.</span>
+          <button
+            onClick={fetchServices}
+            className="px-3 py-1 bg-[#8b7355] text-white text-xs font-bold rounded hover:bg-[#725e45] transition-colors"
+          >
+            Retry
+          </button>
+        </div>
+      )}
+
       {/* ── Grid ── */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
-        {arrangements.map((item) => (
-          <ArrangementCard
-            key={item.id}
-            {...item}
-            isSelected={selectedIds.includes(item.id)}
-            onClick={() => toggleSelection(item.id)}
-          />
-        ))}
-      </div>
+      {!loading && (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
+          {displayList.map((item) => (
+            <ArrangementCard
+              key={item.id}
+              {...item}
+              isSelected={selectedIds.includes(item.id)}
+              onClick={() => toggleSelection(item.id)}
+            />
+          ))}
+        </div>
+      )}
 
       {/* ── Footer Buttons ── */}
       <div className="max-w-7xl mx-auto mt-16 flex justify-between items-center bg-[#FBF6F3] p-8 rounded-2xl shadow-sm border border-[#E8E2DC]">

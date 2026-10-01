@@ -61,6 +61,7 @@ const Navbar = () => {
                 src="/images/logo.png"
                 alt="Haven on Earth Logo"
                 fill
+                sizes="54px"
                 className="object-cover"
                 priority
               />

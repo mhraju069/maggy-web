@@ -2,10 +2,21 @@
 
 import ActivityCard from "@/components/shared/ActivityCard";
 import DecorativeUnderline from "@/components/shared/DecorativeUnderline";
+import { formatImageUrl, parseApiErrorMessage, ServiceItem, servicesService } from "@/lib/api";
 import Link from "next/link";
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
-const activities = [
+interface ActivityItem {
+  name: string;
+  time: string;
+  capacity: string;
+  location: string;
+  duration: string;
+  price: string;
+  image: string;
+}
+
+const fallbackActivities: ActivityItem[] = [
   {
     name: "Morning Flow Yoga",
     time: "8:00 AM - 9:00 AM",
@@ -64,12 +75,53 @@ const activities = [
 
 export default function ActivitiesBookingPage() {
   const [selectedNames, setSelectedNames] = useState<string[]>([]);
+  const [services, setServices] = useState<ServiceItem[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchServices = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const data = await servicesService.getServices("activity");
+      setServices(data);
+    } catch (err: unknown) {
+      setError(parseApiErrorMessage(err));
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchServices();
+  }, [fetchServices]);
 
   const toggleSelection = (name: string) => {
     setSelectedNames((prev) =>
       prev.includes(name) ? prev.filter((i) => i !== name) : [...prev, name]
     );
   };
+
+  const displayList: ActivityItem[] =
+    services.length > 0
+      ? services.map((s) => {
+          const featureTexts = s.features?.map((f) => f.feature) || [];
+          const timeText = featureTexts.find((f) => /AM|PM|:\d{2}/i.test(f)) || "8:00 AM - 9:00 AM";
+          const capacityText = featureTexts.find((f) => /people|person|capacity/i.test(f)) || (s.capacity ? `${s.capacity} people` : "12 people");
+          const durationText = featureTexts.find((f) => /min|hour/i.test(f)) || "60 minutes";
+          const locationText = featureTexts.find((f) => /studio|room|hall|space/i.test(f)) || "Movement Studio";
+
+          return {
+            name: s.title,
+            time: timeText,
+            capacity: capacityText,
+            location: locationText,
+            duration: durationText,
+            price: `€${parseFloat(String(s.price)) || 40}`,
+            image: formatImageUrl(s.image, "/images/activities/weeklyschedule/img1.png"),
+          };
+        })
+      : fallbackActivities;
 
   return (
     <div className="w-full px-6 md:px-12">
@@ -80,17 +132,39 @@ export default function ActivitiesBookingPage() {
         <p className="font-cambria text-sm text-[#475569] mt-6 italic">Guided classes that unite body and mind through mindful practice.</p>
       </div>
 
+      {/* ── Loading Alert ── */}
+      {loading && (
+        <div className="text-center py-12 text-[#8b7355] text-base font-medium">
+          Loading active classes...
+        </div>
+      )}
+
+      {/* ── Error Alert ── */}
+      {error && !loading && (
+        <div className="max-w-xl mx-auto mb-8 p-4 bg-amber-50 border border-amber-200 text-amber-800 text-sm rounded-lg flex items-center justify-between">
+          <span>Failed to connect to API ({error}). Showing available classes.</span>
+          <button
+            onClick={fetchServices}
+            className="px-3 py-1 bg-[#8b7355] text-white text-xs font-bold rounded hover:bg-[#725e45] transition-colors"
+          >
+            Retry
+          </button>
+        </div>
+      )}
+
       {/* ── Grid ── */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
-        {activities.map((activity) => (
-          <ActivityCard
-            key={activity.name}
-            activity={activity}
-            isSelected={selectedNames.includes(activity.name)}
-            onClick={() => toggleSelection(activity.name)}
-          />
-        ))}
-      </div>
+      {!loading && (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
+          {displayList.map((activity) => (
+            <ActivityCard
+              key={activity.name}
+              activity={activity}
+              isSelected={selectedNames.includes(activity.name)}
+              onClick={() => toggleSelection(activity.name)}
+            />
+          ))}
+        </div>
+      )}
 
       {/* ── Footer Buttons ── */}
       <div className="max-w-7xl mx-auto mt-16 flex justify-between items-center bg-[#FBF6F3] p-8 rounded-2xl shadow-sm border border-[#E8E2DC]">

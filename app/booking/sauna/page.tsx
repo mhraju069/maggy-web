@@ -2,12 +2,13 @@
 
 import DecorativeUnderline from "@/components/shared/DecorativeUnderline";
 import SaunaCard from "@/components/shared/SaunaCard";
+import { formatImageUrl, parseApiErrorMessage, ServiceItem, servicesService } from "@/lib/api";
 import Link from "next/link";
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
-const saunaData = [
+const fallbackSaunas = [
   {
-    id: 1,
+    id: 4,
     title: "Private Sauna",
     description: "Your own exclusive sanctuary for ultimate privacy and relaxation.",
     image: "/images/wellness/bookings/private-sauna-v2.png",
@@ -18,7 +19,7 @@ const saunaData = [
     price: 210,
   },
   {
-    id: 2,
+    id: 3,
     title: "Shared Sauna",
     description: "Join our wellness experience in a peaceful, shared space.",
     image: "/images/wellness/bookings/shared-sauna-v2.png",
@@ -32,12 +33,62 @@ const saunaData = [
 
 export default function SaunaBookingPage() {
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
+  const [services, setServices] = useState<ServiceItem[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchServices = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const data = await servicesService.getServices("sauna");
+      setServices(data);
+    } catch (err: unknown) {
+      setError(parseApiErrorMessage(err));
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchServices();
+  }, [fetchServices]);
 
   const toggleSelection = (id: number) => {
     setSelectedIds((prev) =>
       prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]
     );
   };
+
+  const displayList =
+    services.length > 0
+      ? services.map((s) => {
+          const featureTexts = s.features?.map((f) => f.feature) || [];
+          const capacityText =
+            featureTexts.find((f) => /person|people|capacity|up to/i.test(f)) ||
+            (s.capacity ? `Up to ${s.capacity} persons` : "Up to 6 persons");
+          const durationText =
+            featureTexts.find((f) => /hour|min|session|flexible/i.test(f)) ||
+            "2-hour sessions";
+
+          let payType = "Prepayment required";
+          if (s.payment_type === "on_spot") payType = "Pay upon arrival";
+          else if (s.payment_type === "partial") payType = "Partial payment";
+          else if (s.payment_type === "full") payType = "Prepayment required";
+
+          return {
+            id: s.id,
+            title: s.title,
+            description: s.description,
+            image: formatImageUrl(s.image, "/images/wellness/bookings/private-sauna-v2.png"),
+            rating: 4.9,
+            capacity: capacityText,
+            duration: durationText,
+            paymentType: payType,
+            price: typeof s.price === "number" ? s.price : parseFloat(String(s.price)) || 0,
+          };
+        })
+      : fallbackSaunas;
 
   return (
     <div className="w-full px-6 md:px-12">
@@ -48,17 +99,39 @@ export default function SaunaBookingPage() {
         <p className="font-cambria text-sm text-[#475569] mt-6 italic">Pure restoration in every breath.</p>
       </div>
 
+      {/* ── Loading Alert ── */}
+      {loading && (
+        <div className="text-center py-12 text-[#8b7355] text-base font-medium">
+          Loading sauna experiences...
+        </div>
+      )}
+
+      {/* ── Error Alert ── */}
+      {error && !loading && (
+        <div className="max-w-xl mx-auto mb-8 p-4 bg-amber-50 border border-amber-200 text-amber-800 text-sm rounded-lg flex items-center justify-between">
+          <span>Failed to connect to API ({error}). Showing default options.</span>
+          <button
+            onClick={fetchServices}
+            className="px-3 py-1 bg-[#8b7355] text-white text-xs font-bold rounded hover:bg-[#725e45] transition-colors"
+          >
+            Retry
+          </button>
+        </div>
+      )}
+
       {/* ── Grid ── */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-6xl mx-auto">
-        {saunaData.map((sauna) => (
-          <SaunaCard
-            key={sauna.id}
-            {...sauna}
-            isSelected={selectedIds.includes(sauna.id)}
-            onClick={() => toggleSelection(sauna.id)}
-          />
-        ))}
-      </div>
+      {!loading && (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-6xl mx-auto">
+          {displayList.map((sauna) => (
+            <SaunaCard
+              key={sauna.id}
+              {...sauna}
+              isSelected={selectedIds.includes(sauna.id)}
+              onClick={() => toggleSelection(sauna.id)}
+            />
+          ))}
+        </div>
+      )}
 
       {/* ── Footer Buttons ── */}
       <div className="max-w-6xl mx-auto mt-16 flex justify-between items-center bg-[#FBF6F3] p-8 rounded-2xl shadow-sm border border-[#E8E2DC]">

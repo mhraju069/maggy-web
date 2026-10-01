@@ -57,6 +57,7 @@ export default function ActivityCard({
           src={activity.image}
           alt={activity.name}
           fill
+          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
           style={{
             objectFit: "cover",
             borderRadius: "16px 16px 0 0",

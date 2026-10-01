@@ -45,6 +45,10 @@ export const ENDPOINTS = {
     LIST: "/events/",
     DETAIL: (id: string | number) => `/events/${id}/`,
   },
+  SERVICES: {
+    LIST: "/services/",
+    DETAIL: (id: string | number) => `/services/${id}/`,
+  },
   CONTACT: {
     SUBMIT: "/contact/",
   },

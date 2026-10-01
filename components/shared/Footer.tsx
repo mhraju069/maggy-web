@@ -18,6 +18,7 @@ export default function Footer() {
                 src="/images/logo.png"
                 alt="Heaven Logo"
                 fill
+                sizes="84px"
                 className="object-cover"
               />
             </div>

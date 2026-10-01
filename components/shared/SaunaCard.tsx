@@ -43,7 +43,7 @@ export default function SaunaCard({
     >
       {/* Image Section with Rating Badge */}
       <div className="relative w-full h-64 md:h-72">
-        <Image src={image} alt={title} fill className="object-cover" />
+        <Image src={image} alt={title} fill sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" className="object-cover" />
         {/* Rating Badge */}
         <div
           className="absolute top-4 right-4 bg-white/95 rounded-[14px] px-3 py-2 shadow-lg flex items-center gap-1.5"
