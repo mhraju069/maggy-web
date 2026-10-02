@@ -3,6 +3,7 @@
 import DecorativeUnderline from "@/components/shared/DecorativeUnderline";
 import Image from "next/image";
 import Link from "next/link";
+import { updateStoredBookingData } from "@/lib/bookingStore";
 import {
   MdOutlineAutoAwesome,
   MdOutlineCardGiftcard,
@@ -69,7 +70,24 @@ const categories = [
   },
 ];
 
-export default function BookingCategoryPage() {
+export default function BookingPage() {
+  const handleCategoryClick = (cat: typeof categories[number], e: React.MouseEvent) => {
+    if (cat.id === "lunchroom") {
+      e.preventDefault();
+      updateStoredBookingData({
+        serviceName: "Lunchroom Table Reservation",
+        serviceType: "lunchroom",
+        price: "€0",
+        durationHours: undefined,
+        activityDetails: undefined,
+        isSharedSauna: false,
+        isSaltRoom: false,
+        selectedExtras: [],
+      });
+      window.location.href = "/booking/information";
+    }
+  };
+
   return (
     <div className="w-full px-6 md:px-12">
       {/* ── Title Section ── */}
@@ -82,7 +100,12 @@ export default function BookingCategoryPage() {
       {/* ── Grid ── */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-6xl mx-auto">
         {categories.map((cat) => (
-          <Link key={cat.id} href={cat.href} className="group cursor-pointer">
+          <Link
+            key={cat.id}
+            href={cat.href}
+            onClick={(e) => handleCategoryClick(cat, e)}
+            className="group cursor-pointer"
+          >
             <div className="bg-white rounded-[32px] overflow-hidden shadow-sm hover:shadow-xl transition-all duration-500 border border-[#E8E2DC] flex flex-col h-full">
               {/* Image Section */}
               <div className="relative h-80 w-full overflow-hidden">

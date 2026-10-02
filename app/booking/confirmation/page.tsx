@@ -77,7 +77,7 @@ export default function ConfirmationPage() {
                 {data.date
                   ? new Date(data.date).toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric", year: "numeric" })
                   : "Upcoming Date"}{" "}
-                at {data.timeSlot || "09:00 AM"} • {data.guestsCount} {data.guestsCount === 1 ? "Person" : "People"}
+                at {data.timeSlot ? data.timeSlot.split(/[-–]/)[0].trim() : "09:00 AM"} • {data.guestsCount} {data.guestsCount === 1 ? "Person" : "People"}
               </p>
             </div>
           </div>

@@ -4,6 +4,8 @@ import DecorativeUnderline from "@/components/shared/DecorativeUnderline";
 import { CelebrationData, getStoredBookingData, updateStoredBookingData } from "@/lib/bookingStore";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { BiTimeFive } from "react-icons/bi";
+import { FaWalking } from "react-icons/fa";
 import { FaCakeCandles, FaGift, FaHeart } from "react-icons/fa6";
 
 const occasionOptions = [
@@ -37,9 +39,17 @@ export default function InformationPage() {
   const [storedData, setStoredData] = useState(getStoredBookingData());
   const isLunchroom = storedData.serviceType === "lunchroom" || storedData.serviceName.toLowerCase().includes("lunchroom");
 
+  const [date, setDate] = useState("");
+  const [timeSlot, setTimeSlot] = useState("12:00");
+  const [guestsCount, setGuestsCount] = useState(2);
+  const [dayError, setDayError] = useState<string | null>(null);
+
   useEffect(() => {
     const data = getStoredBookingData();
     setStoredData(data);
+    setDate(data.date || "");
+    setTimeSlot(data.timeSlot || "12:00");
+    setGuestsCount(data.guestsCount || 2);
     setFormData({
       name: data.name || "",
       email: data.email || "",
@@ -50,6 +60,33 @@ export default function InformationPage() {
       setCelebration(data.celebration);
     }
   }, []);
+
+  const handleDateChange = (newDate: string) => {
+    setDate(newDate);
+    if (isLunchroom && newDate) {
+      const selected = new Date(newDate);
+      const dayOfWeek = selected.getUTCDay();
+      if (dayOfWeek === 1 || dayOfWeek === 2) {
+        setDayError("The Lunchroom is closed on Mondays & Tuesdays. Please pick Wednesday through Sunday (09:00–16:00).");
+      } else {
+        setDayError(null);
+      }
+    } else {
+      setDayError(null);
+    }
+    updateStoredBookingData({ date: newDate });
+  };
+
+  const handleTimeChange = (newTime: string) => {
+    setTimeSlot(newTime);
+    updateStoredBookingData({ timeSlot: newTime });
+  };
+
+  const handleGuestsChange = (num: number) => {
+    const valid = Math.max(1, num);
+    setGuestsCount(valid);
+    updateStoredBookingData({ guestsCount: valid });
+  };
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
@@ -81,7 +118,9 @@ export default function InformationPage() {
     });
   };
 
-  const isFormValid = Boolean(formData.name && formData.email && formData.phone);
+  const isFormValid = isLunchroom
+    ? Boolean(formData.name && formData.email && formData.phone && date && timeSlot && !dayError)
+    : Boolean(formData.name && formData.email && formData.phone);
 
   return (
     <div className="w-full px-6 md:px-12">
@@ -98,6 +137,106 @@ export default function InformationPage() {
 
       {/* ── Content Card ── */}
       <div className="max-w-4xl mx-auto space-y-8">
+        {/* Table Reservation Details Card (Lunchroom Only) */}
+        {isLunchroom && (
+          <div className="bg-white rounded-[32px] p-10 shadow-sm border border-[#E8E2DC]">
+            <h2
+              className="text-xs font-bold text-[#64748B] uppercase tracking-[0.2em] mb-6"
+              style={{ fontFamily: "Inter, sans-serif" }}
+            >
+              Table Reservation Details
+            </h2>
+
+            {/* Opening Hours Banner */}
+            <div className="mb-6 p-4 rounded-2xl bg-[#FCF2E9]/70 border border-[#E8E2DC]/80 flex flex-col md:flex-row md:items-center justify-between gap-3 text-xs text-[#8B7355]">
+              <div className="flex items-center gap-2">
+                <BiTimeFive className="text-lg flex-shrink-0" />
+                <span><strong>Lunchroom Opening Hours:</strong> Wednesday through Sunday • 09:00–16:00 [Mon & Tue Closed]</span>
+              </div>
+              <div className="flex items-center gap-1.5 font-semibold bg-white/80 px-3 py-1.5 rounded-xl border border-[#E8E2DC] self-start md:self-auto">
+                <FaWalking />
+                <span>Walk-ins welcome anytime!</span>
+              </div>
+            </div>
+
+            {dayError && (
+              <div className="mb-6 p-4 rounded-xl bg-red-50 border border-red-200 text-xs font-semibold text-red-700">
+                {dayError}
+              </div>
+            )}
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {/* Date */}
+              <div>
+                <label
+                  className="block text-xs font-bold text-[#0F172A] mb-2 uppercase tracking-wider"
+                  style={{ fontFamily: "Inter, sans-serif" }}
+                >
+                  Reservation Date *
+                </label>
+                <input
+                  type="date"
+                  value={date}
+                  onChange={(e) => handleDateChange(e.target.value)}
+                  className="w-full p-4 border border-[#E2E8F0] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#D1B191] text-[#475569] font-medium"
+                />
+              </div>
+
+              {/* Preferred Time */}
+              <div>
+                <label
+                  className="block text-xs font-bold text-[#0F172A] mb-2 uppercase tracking-wider"
+                  style={{ fontFamily: "Inter, sans-serif" }}
+                >
+                  Preferred Arrival Time *
+                </label>
+                <select
+                  value={timeSlot}
+                  onChange={(e) => handleTimeChange(e.target.value)}
+                  className="w-full p-4 border border-[#E2E8F0] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#D1B191] text-[#475569] font-medium bg-white cursor-pointer"
+                >
+                  <option value="09:00">09:00 AM</option>
+                  <option value="09:30">09:30 AM</option>
+                  <option value="10:00">10:00 AM</option>
+                  <option value="10:30">10:30 AM</option>
+                  <option value="11:00">11:00 AM</option>
+                  <option value="11:30">11:30 AM</option>
+                  <option value="12:00">12:00 PM</option>
+                  <option value="12:30">12:30 PM</option>
+                  <option value="13:00">01:00 PM</option>
+                  <option value="13:30">01:30 PM</option>
+                  <option value="14:00">02:00 PM</option>
+                  <option value="14:30">02:30 PM</option>
+                  <option value="15:00">03:00 PM</option>
+                  <option value="15:30">03:30 PM</option>
+                  <option value="16:00">04:00 PM</option>
+                </select>
+              </div>
+
+              {/* Number of Guests */}
+              <div>
+                <label
+                  className="block text-xs font-bold text-[#0F172A] mb-2 uppercase tracking-wider"
+                  style={{ fontFamily: "Inter, sans-serif" }}
+                >
+                  Number of Guests *
+                </label>
+                <select
+                  value={guestsCount}
+                  onChange={(e) => handleGuestsChange(parseInt(e.target.value, 10))}
+                  className="w-full p-4 border border-[#E2E8F0] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#D1B191] text-[#475569] font-medium bg-white cursor-pointer"
+                >
+                  {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 15, 20].map((num) => (
+                    <option key={num} value={num}>
+                      {num} {num === 1 ? "Guest" : "Guests"}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Contact Details Card */}
         <div className="bg-white rounded-[32px] p-10 shadow-sm border border-[#E8E2DC]">
           <h2

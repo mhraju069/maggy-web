@@ -52,8 +52,12 @@ export default function ReviewPage() {
                   </p>
                 </div>
                 <div>
-                  <span className="text-xs text-[#94A3B8] uppercase block mb-1">Start Time Slot</span>
-                  <p className="text-lg font-bold text-[#0F172A]">{data.timeSlot || "Not selected"}</p>
+                  <span className="text-xs text-[#94A3B8] uppercase block mb-1">
+                    {isLunchroom ? "Start Time" : "Start Time Slot"}
+                  </span>
+                  <p className="text-lg font-bold text-[#0F172A]">
+                    {data.timeSlot ? data.timeSlot.split(/[-–]/)[0].trim() : "Not selected"}
+                  </p>
                 </div>
                 <div>
                   <span className="text-xs text-[#94A3B8] uppercase block mb-1">Number of People</span>
@@ -63,7 +67,7 @@ export default function ReviewPage() {
                 </div>
               </div>
 
-              {data.durationHours && (
+              {!isLunchroom && data.durationHours && (
                 <div className="pt-3 border-t border-[#F1F5F9] grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <span className="text-xs text-[#94A3B8] uppercase block mb-1">Session Duration</span>
@@ -82,7 +86,7 @@ export default function ReviewPage() {
                 </div>
               )}
 
-              {data.activityDetails && (
+              {!isLunchroom && data.activityDetails && (
                 <div className="pt-3 border-t border-[#F1F5F9] space-y-3">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
@@ -106,7 +110,7 @@ export default function ReviewPage() {
                 </div>
               )}
 
-              {data.selectedExtras && data.selectedExtras.length > 0 && (
+              {!isLunchroom && data.selectedExtras && data.selectedExtras.length > 0 && (
                 <div className="pt-3 border-t border-[#F1F5F9]">
                   <span className="text-xs text-[#94A3B8] uppercase block mb-2">Selected Add-on Extras</span>
                   <div className="flex flex-wrap gap-2">
@@ -119,7 +123,7 @@ export default function ReviewPage() {
                 </div>
               )}
 
-              {data.price && data.price !== "$0" && (
+              {!isLunchroom && data.price && data.price !== "€0" && data.price !== "$0" && (
                 <div className="pt-4 border-t border-[#F1F5F9]">
                   <span className="text-xs text-[#94A3B8] uppercase block mb-1">Total Calculated Investment</span>
                   <div className="flex items-baseline gap-2">
