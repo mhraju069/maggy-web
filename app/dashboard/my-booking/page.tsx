@@ -50,6 +50,39 @@ export default function MyBookingPage() {
         View and manage your wellness experiences
       </p>
 
+      {/* Active Passes & Memberships Balance Widget */}
+      <div className="mb-8 p-6 bg-white rounded-2xl border border-[#F1EDE8] shadow-xs flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+        <div className="flex items-center gap-4">
+          <div className="w-12 h-12 rounded-2xl bg-[#FCF2E9] text-[#8B7355] flex items-center justify-center font-bold flex-shrink-0">
+            10-Pass
+          </div>
+          <div>
+            <div className="flex items-center gap-2">
+              <h3 className="font-bold text-[#1d1a17] text-base font-displayPlayFair">
+                Salt Room 10-Session Pass
+              </h3>
+              <span className="px-2 py-0.5 bg-emerald-100 text-emerald-800 text-[10px] font-bold rounded-full">
+                Active
+              </span>
+            </div>
+            <p className="text-xs text-[#64748B] mt-0.5">
+              Valid for 1 year • Linked to account (Auto deducts 1 session upon reservation)
+            </p>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-4 bg-[#FCF2E9] px-6 py-3 rounded-xl border border-[#E8E2DC] flex-shrink-0">
+          <div>
+            <span className="text-[10px] text-[#8B7355] font-bold uppercase tracking-wider block">
+              Remaining Balance
+            </span>
+            <span className="text-xl font-bold font-displayPlayFair text-[#0F172A]">
+              7 / 10 Sessions
+            </span>
+          </div>
+        </div>
+      </div>
+
       {/* Tabs */}
       <div className="flex gap-2 mb-6">
         <button

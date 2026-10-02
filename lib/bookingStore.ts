@@ -44,8 +44,11 @@ export interface BookingData {
   guestsCount: number;
   durationHours?: number; // 3 or 4 hours for Private Sauna, 1.5 for Shared Sauna
   cleaningTimeMinutes?: number; // 30 mins for Private Sauna
-  changeoverMinutes?: number; // 15 mins for Shared Sauna
+  changeoverMinutes?: number; // 15 mins for Shared Sauna, 10 mins for Salt Room
   isSharedSauna?: boolean;
+  isSaltRoom?: boolean;
+  passType?: "single" | "10_session_pass" | "once_a_week" | "unlimited";
+  remainingPassSessions?: number;
   hasActiveMembership?: boolean;
   membershipType?: "none" | "once_a_week" | "unlimited";
   activityDetails?: ActivityBookingDetails;
@@ -72,6 +75,9 @@ export const initialBookingData: BookingData = {
   cleaningTimeMinutes: 30,
   changeoverMinutes: 15,
   isSharedSauna: false,
+  isSaltRoom: false,
+  passType: "single",
+  remainingPassSessions: 10,
   hasActiveMembership: false,
   membershipType: "none",
   selectedExtras: [],
@@ -110,6 +116,26 @@ export const calculateSharedSaunaPrice = (
   if (hasActiveMembership) return 0;
   const validGuests = Math.min(Math.max(guestsCount, 1), 6);
   return parseFloat((validGuests * 19.95).toFixed(2));
+};
+
+export const calculateSaltRoomPrice = (
+  guestsCount: number,
+  passType: "single" | "10_session_pass" | "once_a_week" | "unlimited" = "single",
+  hasActivePassOrMembership: boolean = false
+): number => {
+  if (hasActivePassOrMembership) return 0;
+  const validGuests = Math.min(Math.max(guestsCount, 1), 2);
+  switch (passType) {
+    case "10_session_pass":
+      return 200;
+    case "once_a_week":
+      return 70;
+    case "unlimited":
+      return 100;
+    case "single":
+    default:
+      return validGuests * 25;
+  }
 };
 
 export const getStoredBookingData = (): BookingData => {

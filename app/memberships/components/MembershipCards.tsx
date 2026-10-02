@@ -1,6 +1,7 @@
 "use client";
 
-import { useLanguage } from "@/lib/i18n/LanguageContext";
+import Link from "next/link";
+import { useState } from "react";
 
 const CheckIcon = ({ white }: { white?: boolean }) => (
   <svg
@@ -33,6 +34,48 @@ const ArrowIcon = ({ color }: { color: string }) => (
   </svg>
 );
 
+const saltRoomPlans = [
+  {
+    variant: "essential",
+    name: "10-Session Pass",
+    price: "€200",
+    perPeriod: "/ 10 sessions",
+    features: [
+      "10-session salt pass (€20 per session)",
+      "Linked directly to customer account",
+      "Auto deducts 1 session upon reservation",
+      "View remaining sessions in account",
+      "Valid for 1 full year after purchase",
+    ],
+  },
+  {
+    variant: "weekly",
+    name: "Once a Week",
+    price: "€70",
+    perPeriod: "/ 4 weeks",
+    features: [
+      "1 Salt Room session per week included",
+      "Maximum 4 included sessions per 4-week period",
+      "Capacity max 2 people per session",
+      "Automatic member recognition",
+      "Online advance session booking",
+    ],
+  },
+  {
+    variant: "infinite",
+    name: "Unlimited",
+    price: "€100",
+    perPeriod: "/ 4 weeks",
+    features: [
+      "Unlimited use within available capacity",
+      "1-hour Salt Room halotherapy access",
+      "Max 10 future active reservations at once",
+      "Automatic member recognition",
+      "Priority booking access",
+    ],
+  },
+];
+
 const sharedSaunaPlans = [
   {
     variant: "essential",
@@ -64,16 +107,9 @@ const sharedSaunaPlans = [
 ];
 
 const MembershipCards = () => {
-  const { t } = useLanguage();
-  const s = t?.membershipsPage?.cards;
+  const [category, setCategory] = useState<"salt" | "sauna">("salt");
 
-  const plans = (s?.plans && s.plans.length > 0)
-    ? s.plans.map((plan: any, i: number) => ({
-        ...plan,
-        variant: i === 0 ? "essential" : "infinite",
-        perPeriod: s.perMonth || "/ 4 weeks",
-      }))
-    : sharedSaunaPlans;
+  const plans = category === "salt" ? saltRoomPlans : sharedSaunaPlans;
 
   return (
     <section
@@ -81,21 +117,47 @@ const MembershipCards = () => {
       className="min-h-screen flex items-center scroll-mt-20 py-16 lg:py-24 bg-[#FCF2E9]"
     >
       <div className="container mx-auto flex flex-col items-center gap-12 lg:gap-16 px-4 sm:px-6 md:px-12 lg:px-16 xl:px-24">
+        {/* Toggle Switch */}
+        <div className="inline-flex p-1.5 bg-white rounded-2xl border border-[#E8E2DC] shadow-xs">
+          <button
+            type="button"
+            onClick={() => setCategory("salt")}
+            className={`px-8 py-3.5 rounded-xl font-bold text-sm transition-all ${
+              category === "salt"
+                ? "bg-[#8B7355] text-white shadow-md"
+                : "text-[#64748B] hover:text-[#0F172A]"
+            }`}
+          >
+            Salt Room Passes & Memberships
+          </button>
+          <button
+            type="button"
+            onClick={() => setCategory("sauna")}
+            className={`px-8 py-3.5 rounded-xl font-bold text-sm transition-all ${
+              category === "sauna"
+                ? "bg-[#8B7355] text-white shadow-md"
+                : "text-[#64748B] hover:text-[#0F172A]"
+            }`}
+          >
+            Sauna Memberships
+          </button>
+        </div>
+
         {/* Cards row */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8 w-full items-stretch">
+        <div className={`grid grid-cols-1 ${plans.length === 3 ? "md:grid-cols-3" : "md:grid-cols-2 max-w-4xl"} gap-6 lg:gap-8 w-full items-stretch`}>
           {plans.map((plan) => {
             const isDark = plan.variant === "infinite";
-            const isFilled = plan.variant === "ethereal" || isDark;
+            const isFilled = plan.variant === "weekly" || isDark;
 
             return (
               <div
-                key={plan.variant}
+                key={plan.name}
                 className="flex flex-col justify-between items-start w-full min-h-[500px] p-6 sm:p-8 lg:p-10 rounded-2xl"
                 style={{
                   background: isDark ? "#081228" : "#FFFFFF",
                   border: isDark
                     ? "1px solid rgba(212,196,176,0.2)"
-                    : undefined,
+                    : "1px solid #E8E2DC",
                 }}
               >
                 {/* Top: title + features */}
@@ -108,10 +170,10 @@ const MembershipCards = () => {
                     style={{
                       fontFamily:
                         "var(--font-playfair), 'Playfair Display', Georgia, serif",
-                      fontSize: 36,
+                      fontSize: 32,
                       fontWeight: 700,
                       color: isDark ? "#FFFFFF" : "#0F172A",
-                      lineHeight: "150%",
+                      lineHeight: "130%",
                     }}
                   >
                     {plan.name}
@@ -137,7 +199,7 @@ const MembershipCards = () => {
                         <span
                           style={{
                             fontFamily: "Cambria, Georgia, serif",
-                            fontSize: 16,
+                            fontSize: 15,
                             fontWeight: 400,
                             color: isDark
                               ? "rgba(255,255,255,0.80)"
@@ -159,23 +221,12 @@ const MembershipCards = () => {
                 >
                   {/* Price */}
                   <div>
-                    <p
-                      style={{
-                        fontFamily: "Cambria, Georgia, serif",
-                        fontSize: 14,
-                        fontWeight: 400,
-                        color: isDark ? "rgba(255,255,255,0.60)" : "#6B5D54",
-                        lineHeight: "130%",
-                      }}
-                    >
-                      {s.from}
-                    </p>
                     <div className="flex items-baseline" style={{ gap: 6 }}>
                       <span
                         style={{
                           fontFamily:
                             "var(--font-playfair), 'Playfair Display', Georgia, serif",
-                          fontSize: 24,
+                          fontSize: 28,
                           fontWeight: 700,
                           color: isDark ? "#FFFFFF" : "#0F172A",
                           lineHeight: "150%",
@@ -192,14 +243,15 @@ const MembershipCards = () => {
                           lineHeight: "130%",
                         }}
                       >
-                        {plan.perPeriod || s?.perMonth || "/ 4 weeks"}
+                        {plan.perPeriod}
                       </span>
                     </div>
                   </div>
 
                   {/* Button */}
-                  <button
-                    className="w-full flex items-center justify-center"
+                  <Link
+                    href={category === "salt" ? "/booking/arrangements" : "/booking/sauna"}
+                    className="w-full flex items-center justify-center transition-all"
                     style={{
                       padding: "16px 32px",
                       borderRadius: 12,
@@ -226,10 +278,10 @@ const MembershipCards = () => {
                         lineHeight: "150%",
                       }}
                     >
-                      {s.applyNow}
+                      Apply Now
                     </span>
                     <ArrowIcon color={isFilled ? "#FFFFFF" : "#5D360F"} />
-                  </button>
+                  </Link>
                 </div>
               </div>
             );
@@ -241,14 +293,14 @@ const MembershipCards = () => {
           className="text-center"
           style={{
             fontFamily: "Cambria, Georgia, serif",
-            fontSize: 24,
+            fontSize: 20,
             fontWeight: 400,
             color: "#6B5D54",
             lineHeight: "150%",
             maxWidth: 812,
           }}
         >
-          {s.subtitle}
+          All passes and memberships are automatically linked to your customer account and allow effortless advance online session booking.
         </p>
       </div>
     </section>
