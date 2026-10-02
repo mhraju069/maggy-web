@@ -2,19 +2,37 @@
 
 import DecorativeUnderline from "@/components/shared/DecorativeUnderline";
 import SaunaCard from "@/components/shared/SaunaCard";
-import { formatImageUrl, parseApiErrorMessage, ServiceItem, servicesService } from "@/lib/api";
-import { BookingExtra, calculatePrivateSaunaPrice, getStoredBookingData, updateStoredBookingData } from "@/lib/bookingStore";
+import {
+  parseApiErrorMessage,
+  PrivateSaunaItem,
+  SaunaServicesResponse,
+  servicesService,
+  SharedSaunaItem,
+} from "@/lib/api";
+import { BookingExtra, getStoredBookingData, updateStoredBookingData } from "@/lib/bookingStore";
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 import { BiCheckCircle, BiInfoCircle, BiTimeFive } from "react-icons/bi";
 import { FaBroom, FaHotTub, FaSpa } from "react-icons/fa";
 
-const availableExtras: BookingExtra[] = [
+const defaultExtras: BookingExtra[] = [
   { id: "towels", name: "Premium Towel & Bathrobe Set", price: 15 },
   { id: "refreshments", name: "Organic Food & Refreshment Platter", price: 35 },
   { id: "decorations", name: "Celebration & Romantic Decorations", price: 30 },
   { id: "wellness_pack", name: "Essential Oils & Scrub Package", price: 25 },
 ];
+
+const parsePrice = (val: string | number | undefined, defaultVal: number): number => {
+  if (val === undefined || val === null || val === "") return defaultVal;
+  const str = String(val).trim();
+  const isNegative = str.startsWith("-");
+  const cleanStr = str.replace(/[^0-9.]/g, "");
+  if (!cleanStr) return defaultVal;
+  const num = parseFloat(cleanStr);
+  if (isNaN(num)) return defaultVal;
+  if (isNegative && num > 1000) return defaultVal;
+  return num;
+};
 
 export default function SaunaBookingPage() {
   const [selectedSaunaType, setSelectedSaunaType] = useState<"private" | "shared">("private");
@@ -22,7 +40,7 @@ export default function SaunaBookingPage() {
   const [guestsCount, setGuestsCount] = useState<number>(2);
   const [selectedExtras, setSelectedExtras] = useState<BookingExtra[]>([]);
 
-  const [services, setServices] = useState<ServiceItem[]>([]);
+  const [saunaData, setSaunaData] = useState<SaunaServicesResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -30,8 +48,8 @@ export default function SaunaBookingPage() {
     setLoading(true);
     setError(null);
     try {
-      const data = await servicesService.getServices("sauna");
-      setServices(data);
+      const data = await servicesService.getSaunaServices();
+      setSaunaData(data);
     } catch (err: unknown) {
       setError(parseApiErrorMessage(err));
     } finally {
@@ -43,10 +61,47 @@ export default function SaunaBookingPage() {
     fetchServices();
   }, [fetchServices]);
 
+  // Dynamic pricing calculated from API
+  const rawData = (saunaData as any)?.data || saunaData;
+  const privateItem: PrivateSaunaItem | undefined =
+    rawData?.private_sauna?.[0] || (Array.isArray(rawData) ? rawData[0] : undefined);
+  const sharedItem: SharedSaunaItem | undefined = rawData?.shared_sauna?.[0];
+
+  const price3Hrs = parsePrice(privateItem?.base_price_3hrs, 250);
+  const price4Hrs = parsePrice(privateItem?.base_price_4hrs, 300);
+  const extraPersonFee = parsePrice(privateItem?.extra_person_price, 50);
+  const sharedPricePerson = parsePrice(sharedItem?.price_per_person, 35);
+
+  const privateBasePrice = durationHours === 4 ? price4Hrs : price3Hrs;
+  const extraGuestsCount = Math.max(0, guestsCount - 2);
+
+  const rawFeatures: any[] =
+    privateItem?.features ||
+    (privateItem as any)?.service_features ||
+    (privateItem as any)?.addons ||
+    (rawData as any)?.features ||
+    [];
+
+  const apiFeatures: BookingExtra[] = rawFeatures.map((f: any, idx: number) => ({
+    id: String(f.id ?? idx),
+    name: f.feature || f.name || f.title || f.description || `Feature ${idx + 1}`,
+    price: parsePrice(f.price, 0),
+  }));
+
+  const sharedMaxPerson =
+    sharedItem?.max_person && sharedItem.max_person > 0 && sharedItem.max_person <= 50
+      ? sharedItem.max_person
+      : 6;
+  const sharedGuestOptions = Array.from({ length: Math.min(sharedMaxPerson, 10) }, (_, i) => i + 1);
+
+  const currentTotalPrice =
+    selectedSaunaType === "private"
+      ? privateBasePrice + extraGuestsCount * extraPersonFee + selectedExtras.reduce((s, e) => s + e.price, 0)
+      : parseFloat((guestsCount * sharedPricePerson).toFixed(2));
+
   // Sync state to bookingStore
   useEffect(() => {
     if (selectedSaunaType === "private") {
-      const total = calculatePrivateSaunaPrice(durationHours, guestsCount, selectedExtras);
       updateStoredBookingData({
         serviceName: `Private Sauna (${durationHours} Hours)`,
         serviceType: "sauna",
@@ -54,20 +109,21 @@ export default function SaunaBookingPage() {
         guestsCount,
         cleaningTimeMinutes: 30,
         selectedExtras,
-        totalAmount: total,
-        price: `€${total}`,
+        totalAmount: currentTotalPrice,
+        price: `€${currentTotalPrice}`,
       });
     } else {
       updateStoredBookingData({
         serviceName: "Shared Sauna Experience",
         serviceType: "sauna",
+        isSharedSauna: true,
         guestsCount,
-        price: `€${35 * guestsCount}`,
-        totalAmount: 35 * guestsCount,
+        price: `€${currentTotalPrice}`,
+        totalAmount: currentTotalPrice,
         selectedExtras: [],
       });
     }
-  }, [selectedSaunaType, durationHours, guestsCount, selectedExtras]);
+  }, [selectedSaunaType, durationHours, guestsCount, selectedExtras, currentTotalPrice]);
 
   const toggleExtra = (extra: BookingExtra) => {
     setSelectedExtras((prev) => {
@@ -78,11 +134,6 @@ export default function SaunaBookingPage() {
       return [...prev, extra];
     });
   };
-
-  const currentTotalPrice =
-    selectedSaunaType === "private"
-      ? calculatePrivateSaunaPrice(durationHours, guestsCount, selectedExtras)
-      : 35 * guestsCount;
 
   return (
     <div className="w-full px-6 md:px-12">
@@ -267,35 +318,43 @@ export default function SaunaBookingPage() {
             >
               3. Enhance Your Experience (Optional Extras)
             </label>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {availableExtras.map((extra) => {
-                const isSelected = selectedExtras.some((e) => e.id === extra.id);
-                return (
-                  <button
-                    key={extra.id}
-                    type="button"
-                    onClick={() => toggleExtra(extra)}
-                    className={`p-4 rounded-xl border transition-all text-left flex items-center justify-between ${
-                      isSelected
-                        ? "bg-[#FCF2E9] border-[#8B7355] shadow-xs"
-                        : "bg-white border-[#E2E8F0] hover:border-[#D1B191]"
-                    }`}
-                  >
-                    <div className="flex items-center gap-3">
-                      <div
-                        className={`w-5 h-5 rounded-md border flex items-center justify-center text-xs ${
-                          isSelected ? "bg-[#8B7355] border-[#8B7355] text-white" : "border-[#CBD5E1]"
-                        }`}
-                      >
-                        {isSelected && "✓"}
+            {apiFeatures.length > 0 ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {apiFeatures.map((extra) => {
+                  const isSelected = selectedExtras.some((e) => e.id === extra.id);
+                  return (
+                    <button
+                      key={extra.id}
+                      type="button"
+                      onClick={() => toggleExtra(extra)}
+                      className={`p-4 rounded-xl border transition-all text-left flex items-center justify-between ${
+                        isSelected
+                          ? "bg-[#FCF2E9] border-[#8B7355] shadow-xs"
+                          : "bg-white border-[#E2E8F0] hover:border-[#D1B191]"
+                      }`}
+                    >
+                      <div className="flex items-center gap-3">
+                        <div
+                          className={`w-5 h-5 rounded-md border flex items-center justify-center text-xs ${
+                            isSelected ? "bg-[#8B7355] border-[#8B7355] text-white" : "border-[#CBD5E1]"
+                          }`}
+                        >
+                          {isSelected && "✓"}
+                        </div>
+                        <span className="text-xs font-bold text-[#0F172A]">{extra.name}</span>
                       </div>
-                      <span className="text-xs font-bold text-[#0F172A]">{extra.name}</span>
-                    </div>
-                    <span className="text-xs font-bold text-[#8B7355]">+€{extra.price}</span>
-                  </button>
-                );
-              })}
-            </div>
+                      <span className="text-xs font-bold text-[#8B7355]">
+                        {extra.price > 0 ? `+€${extra.price}` : "Included"}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            ) : (
+              <div className="p-6 rounded-2xl bg-[#F8FAFC] border border-[#E2E8F0] text-center text-xs font-medium text-[#64748B]">
+                No extras found
+              </div>
+            )}
           </div>
 
           {/* Price Breakdown & Automatic Total Calculation */}
@@ -304,13 +363,13 @@ export default function SaunaBookingPage() {
               <span>
                 {durationHours} Hours Session Base (2 Guests)
               </span>
-              <span className="font-bold text-[#0F172A]">€{durationHours === 4 ? 300 : 250}</span>
+              <span className="font-bold text-[#0F172A]">€{durationHours === 4 ? price4Hrs : price3Hrs}</span>
             </div>
 
             {guestsCount > 2 && (
               <div className="flex justify-between items-center text-xs text-[#64748B] pb-3 border-b border-[#E8E2DC]/80">
-                <span>Additional Guests ({guestsCount - 2} × €50)</span>
-                <span className="font-bold text-[#0F172A]">+€{(guestsCount - 2) * 50}</span>
+                <span>Additional Guests ({guestsCount - 2} × €{extraPersonFee})</span>
+                <span className="font-bold text-[#0F172A]">+€{(guestsCount - 2) * extraPersonFee}</span>
               </div>
             )}
 
@@ -361,7 +420,7 @@ export default function SaunaBookingPage() {
                   Shared Sauna Experience
                 </h3>
                 <p className="text-xs text-[#64748B] mt-0.5">
-                  Different customers can book the same 1.5-hour session. Max 6 people per session.
+                  Different customers can book the same 1.5-hour session. Max {sharedMaxPerson} people per session.
                 </p>
               </div>
             </div>
@@ -381,7 +440,7 @@ export default function SaunaBookingPage() {
 
             <div className="p-5 rounded-2xl bg-[#FBF6F3] border border-[#E8E2DC] text-center">
               <span className="text-xs text-[#64748B] block mb-1">Price Per Person</span>
-              <span className="text-lg font-bold text-[#8B7355] font-displayPlayFair">€19.95 / Person</span>
+              <span className="text-lg font-bold text-[#8B7355] font-displayPlayFair">€{sharedPricePerson} / Person</span>
             </div>
 
             <div className="p-5 rounded-2xl bg-[#FBF6F3] border border-[#E8E2DC] text-center">
@@ -393,10 +452,10 @@ export default function SaunaBookingPage() {
           {/* Guest Count Selector */}
           <div>
             <label className="block text-sm font-bold text-[#0F172A] mb-3 uppercase tracking-wider" style={{ fontFamily: "Inter, sans-serif" }}>
-              Number of Places / Guests (1 to 6)
+              Number of Places / Guests (1 to {sharedMaxPerson})
             </label>
             <div className="grid grid-cols-6 gap-3">
-              {[1, 2, 3, 4, 5, 6].map((num) => (
+              {sharedGuestOptions.map((num) => (
                 <button
                   key={num}
                   type="button"
@@ -427,7 +486,7 @@ export default function SaunaBookingPage() {
                   Are you a Shared Sauna Member?
                 </h4>
                 <p className="text-xs text-[#64748B]">
-                  Active members are automatically recognized and exempt from the €19.95 session fee.
+                  Active members are automatically recognized and exempt from the €{sharedPricePerson} session fee.
                 </p>
               </div>
 
@@ -462,12 +521,12 @@ export default function SaunaBookingPage() {
                 Total Amount Due
               </span>
               <span className="text-[11px] text-[#64748B]">
-                {guestsCount} guest(s) × €19.95 (1.5h session)
+                {guestsCount} guest(s) × €{sharedPricePerson} (1.5h session)
               </span>
             </div>
             <div className="text-right">
               <span className="text-4xl font-bold font-displayPlayFair text-[#8B7355]">
-                €{(guestsCount * 19.95).toFixed(2)}
+                €{currentTotalPrice}
               </span>
             </div>
           </div>
