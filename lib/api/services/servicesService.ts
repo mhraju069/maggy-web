@@ -36,6 +36,36 @@ export interface SaunaServicesResponse {
   shared_sauna?: SharedSaunaItem[];
 }
 
+export interface ActivityFeature {
+  id?: number;
+  feature: string;
+}
+
+export interface ActivityApiItem {
+  id: number;
+  title?: string;
+  name?: string;
+  description?: string;
+  image?: string | null;
+  images?: string | null;
+  price?: string | number;
+  features?: ActivityFeature[];
+  category?: string;
+  teacher_host?: string;
+  teacherHost?: string;
+  start_time?: string;
+  startTime?: string;
+  end_time?: string;
+  endTime?: string;
+  date?: string;
+  max_participants?: number;
+  maxParticipants?: number;
+  booked_participants?: number;
+  bookedParticipants?: number;
+  is_recurring?: boolean;
+  isRecurring?: boolean;
+}
+
 export interface SaltRoomInfo {
   pricing: {
     single_session_price: number | string;
@@ -141,8 +171,12 @@ export const servicesService = {
     return res || {};
   },
 
-  async getActivities(): Promise<any> {
-    return ApiClient.get(ENDPOINTS.SERVICES.ACTIVITIES, { skipAuth: true });
+  async getActivities(): Promise<ActivityApiItem[]> {
+    const res = await ApiClient.get<any>(ENDPOINTS.SERVICES.ACTIVITIES, { skipAuth: true });
+    if (res?.data && Array.isArray(res.data)) return res.data;
+    if (res?.results && Array.isArray(res.results)) return res.results;
+    if (Array.isArray(res)) return res;
+    return [];
   },
 
   async getSaltRoomInfo(): Promise<{ success: boolean; data: SaltRoomInfo }> {

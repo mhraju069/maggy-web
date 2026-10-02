@@ -7,7 +7,7 @@
 export interface Activity {
   id: string;
   name: string;
-  category: "Yoga" | "Breathwork" | "Workshops" | "Special classes" | "One-time activities" | "Event evenings";
+  category: "Yoga" | "Breathwork" | "Workshops" | "Special classes" | "One-time activities" | "Event evenings" | string;
   description: string;
   date: string; // e.g. "2026-10-15" or "Every Mon & Wed"
   startTime: string; // e.g. "08:00"
@@ -19,6 +19,7 @@ export interface Activity {
   additionalInfo: string; // Any additional info e.g. "Yoga mats provided. Tea afterwards."
   isRecurring: boolean; // true = recurring, false = one-time event
   image: string;
+  features?: string[];
 }
 
 export const initialActivities: Activity[] = [
