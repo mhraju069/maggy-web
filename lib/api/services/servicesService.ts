@@ -153,14 +153,21 @@ export interface EventInquiryPayload {
   email: string;
 }
 
+export interface PackageFeature {
+  id: number;
+  feature: string;
+}
+
 export interface ServicePackage {
   id: number;
   title: string;
+  packages?: string;
   description: string;
   price: string | number;
-  is_custom_inquiry: boolean;
   image?: string | null;
-  is_active: boolean;
+  features?: PackageFeature[];
+  is_custom_inquiry?: boolean;
+  is_active?: boolean;
 }
 
 export interface MembershipPlan {
@@ -207,34 +214,58 @@ export const servicesService = {
   },
 
   async getSaunaServices(): Promise<SaunaServicesResponse> {
-    const res = await ApiClient.get<any>(ENDPOINTS.SERVICES.SAUNA, { skipAuth: true });
-    if (res?.data?.private_sauna || res?.data?.shared_sauna) {
-      return res.data;
+    try {
+      let res: any;
+      try {
+        res = await ApiClient.get<any>(ENDPOINTS.SERVICES.DETAILS("sauna"), { skipAuth: true });
+      } catch {
+        res = await ApiClient.get<any>("/services/sauna/", { skipAuth: true });
+      }
+      if (res?.data?.private_sauna || res?.data?.shared_sauna) {
+        return res.data;
+      }
+      if (res?.private_sauna || res?.shared_sauna) {
+        return res;
+      }
+      if (Array.isArray(res)) {
+        return { private_sauna: res };
+      }
+      return res?.data || res || {};
+    } catch (err) {
+      console.error("Error fetching sauna services:", err);
+      return {};
     }
-    if (res?.private_sauna || res?.shared_sauna) {
-      return res;
-    }
-    if (Array.isArray(res)) {
-      return { private_sauna: res };
-    }
-    return res || {};
   },
 
   async getActivities(): Promise<ActivityApiItem[]> {
-    const res = await ApiClient.get<any>(ENDPOINTS.SERVICES.ACTIVITIES, { skipAuth: true });
-    if (res?.data && Array.isArray(res.data)) return res.data;
-    if (res?.results && Array.isArray(res.results)) return res.results;
-    if (Array.isArray(res)) return res;
-    return [];
+    try {
+      let res: any;
+      try {
+        res = await ApiClient.get<any>(ENDPOINTS.SERVICES.DETAILS("activity"), { skipAuth: true });
+      } catch {
+        res = await ApiClient.get<any>("/services/activities/", { skipAuth: true });
+      }
+      if (res?.data && Array.isArray(res.data)) return res.data;
+      if (res?.results && Array.isArray(res.results)) return res.results;
+      if (Array.isArray(res)) return res;
+      return [];
+    } catch (err) {
+      console.error("Error fetching activities:", err);
+      return [];
+    }
   },
 
   async getSaltRoomServices(): Promise<SaltroomServicesData> {
     try {
       let res: any;
       try {
-        res = await ApiClient.get<any>("/services/saltroom/", { skipAuth: true });
+        res = await ApiClient.get<any>(ENDPOINTS.SERVICES.DETAILS("saltroom"), { skipAuth: true });
       } catch {
-        res = await ApiClient.get<any>("/services/salt-room/", { skipAuth: true });
+        try {
+          res = await ApiClient.get<any>("/services/saltroom/", { skipAuth: true });
+        } catch {
+          res = await ApiClient.get<any>("/services/salt-room/", { skipAuth: true });
+        }
       }
       if (res?.data?.saltroom || res?.data?.subscription_plans || res?.data?.session_pass) {
         return res.data;
@@ -261,8 +292,21 @@ export const servicesService = {
     return ApiClient.post(ENDPOINTS.SERVICES.EVENTS_INQUIRY, payload, { skipAuth: true });
   },
 
-  async getPackages(): Promise<{ success: boolean; data: ServicePackage[] }> {
-    return ApiClient.get<{ success: boolean; data: ServicePackage[] }>(ENDPOINTS.SERVICES.PACKAGES, { skipAuth: true });
+  async getPackages(): Promise<ServicePackage[]> {
+    try {
+      let res: any;
+      try {
+        res = await ApiClient.get<any>(ENDPOINTS.SERVICES.DETAILS("package"), { skipAuth: true });
+      } catch {
+        res = await ApiClient.get<any>("/services/packages/", { skipAuth: true });
+      }
+      if (res?.data && Array.isArray(res.data)) return res.data;
+      if (Array.isArray(res)) return res;
+      return [];
+    } catch (err) {
+      console.error("Error fetching packages:", err);
+      return [];
+    }
   },
 
   async getMembershipPlans(): Promise<{ success: boolean; data: MembershipPlan[] }> {
@@ -273,8 +317,8 @@ export const servicesService = {
     return ApiClient.get(ENDPOINTS.SERVICES.SCHEDULES, { skipAuth: true });
   },
 
-  async getServiceDetails(id: string | number): Promise<ServiceItem> {
-    return ApiClient.get<ServiceItem>(`/services/${id}/`, { skipAuth: true });
+  async getServiceDetails(serviceType: string): Promise<any> {
+    return ApiClient.get<any>(ENDPOINTS.SERVICES.DETAILS(serviceType), { skipAuth: true });
   },
 };
 

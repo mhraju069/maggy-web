@@ -2,10 +2,13 @@
 
 import ArrangementCard from "@/components/shared/ArrangementCard";
 import DecorativeUnderline from "@/components/shared/DecorativeUnderline";
+import { formatImageUrl } from "@/lib/api/config";
+import { servicesService, ServicePackage } from "@/lib/api/services/servicesService";
 import { updateStoredBookingData } from "@/lib/bookingStore";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { FaSpa } from "react-icons/fa";
 
 interface PackageItem {
   id: number;
@@ -17,64 +20,60 @@ interface PackageItem {
   includes: string[];
   paymentType: "full" | "partial" | "spot";
   price: string;
+  rawPriceNum: number;
 }
-
-const packagesList: PackageItem[] = [
-  {
-    id: 1,
-    image: "/images/arrangements/cardimages/img1.png",
-    rating: 4.9,
-    title: "Signature Harmony Package",
-    combo: "Sauna + Salt Therapy + Lunch",
-    description: "Our signature full-day experience combining heat therapy, respiratory halotherapy, and farm-to-table lunch.",
-    includes: [
-      "2-hour private sauna session",
-      "45-minute salt room session",
-      "Organic lunch menu in Lunchroom",
-      "Complimentary herbal tea & towels",
-    ],
-    paymentType: "full",
-    price: "€185",
-  },
-  {
-    id: 2,
-    image: "/images/arrangements/cardimages/img2.png",
-    rating: 4.9,
-    title: "Revitalizing Detox Package",
-    combo: "Yoga + Breathwork + Salt Room",
-    description: "Deep Mind-Body reset blending active morning movement with restorative salt air halotherapy.",
-    includes: [
-      "60-minute Morning Flow Yoga",
-      "45-minute Transformational Breathwork",
-      "45-minute Salt room recovery",
-      "Cold-pressed wellness juice",
-    ],
-    paymentType: "full",
-    price: "€120",
-  },
-  {
-    id: 3,
-    image: "/images/arrangements/cardimages/img3.png",
-    rating: 4.9,
-    title: "VIP Wellness Sanctuary Package",
-    combo: "Private Sauna + Salt Cave + Dining + Massages",
-    description: "Ultimate luxury wellness experience designed for couples or exclusive small groups.",
-    includes: [
-      "3-hour private sauna sanctuary",
-      "60-minute private salt cave access",
-      "2x 60-minute relaxing massages",
-      "3-course seasonal lunch menu",
-    ],
-    paymentType: "full",
-    price: "€320",
-  },
-];
 
 export default function PackagesBookingPage() {
   const router = useRouter();
   const [selectedId, setSelectedId] = useState<number | null>(null);
+  const [packages, setPackages] = useState<PackageItem[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
 
-  const selectedPkg = packagesList.find((p) => p.id === selectedId);
+  useEffect(() => {
+    setLoading(true);
+    servicesService
+      .getPackages()
+      .then((apiData) => {
+        if (apiData && Array.isArray(apiData) && apiData.length > 0) {
+          const mapped: PackageItem[] = apiData.map((item: ServicePackage, idx: number) => {
+            const priceVal = typeof item.price === "number"
+              ? item.price
+              : parseFloat(String(item.price || 0)) || 0;
+
+            return {
+              id: item.id,
+              image: formatImageUrl(
+                item.image,
+                `/images/arrangements/cardimages/img${(idx % 3) + 1}.png`
+              ),
+              rating: 4.9,
+              title: item.title || "Wellness Package",
+              combo: item.packages || "Sauna + Salt + Wellness",
+              description: item.description || "",
+              includes: item.features?.map((f) => f.feature.replace(/^[✓✔\s]+/, "")) || [],
+              paymentType: "full" as const,
+              price: `€${priceVal.toFixed(0)}`,
+              rawPriceNum: priceVal,
+            };
+          });
+          setPackages(mapped);
+          if (mapped.length > 0) {
+            setSelectedId(mapped[0].id);
+          }
+        } else {
+          setPackages([]);
+        }
+      })
+      .catch((err) => {
+        console.error("Error fetching packages:", err);
+        setPackages([]);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  }, []);
+
+  const selectedPkg = packages.find((p) => p.id === selectedId);
 
   const handleContinue = () => {
     if (!selectedPkg) return;
@@ -84,7 +83,7 @@ export default function PackagesBookingPage() {
       serviceType: "package",
       price: selectedPkg.price,
       guestsCount: 2,
-      totalAmount: parseFloat(selectedPkg.price.replace(/[^0-9.]/g, "")) || 185,
+      totalAmount: selectedPkg.rawPriceNum,
     });
 
     router.push("/booking/choose-time");
@@ -103,17 +102,42 @@ export default function PackagesBookingPage() {
         </p>
       </div>
 
-      {/* ── Grid ── */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto mb-12">
-        {packagesList.map((item) => (
-          <ArrangementCard
-            key={item.id}
-            {...item}
-            isSelected={selectedId === item.id}
-            onClick={() => setSelectedId(item.id)}
-          />
-        ))}
-      </div>
+      {/* ── Loading Spinner ── */}
+      {loading && (
+        <div className="w-full py-24 text-center">
+          <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-[#8B7355] border-t-transparent mb-4"></div>
+          <p className="text-[#64748B] font-cambria italic">Loading Wellness Packages...</p>
+        </div>
+      )}
+
+      {/* ── Empty State ── */}
+      {!loading && packages.length === 0 && (
+        <div className="bg-white rounded-[32px] p-12 shadow-sm border border-[#E8E2DC] text-center max-w-2xl mx-auto my-12">
+          <div className="w-16 h-16 bg-[#FCF2E9] rounded-2xl flex items-center justify-center mx-auto mb-4 text-[#8B7355]">
+            <FaSpa className="w-8 h-8" />
+          </div>
+          <h3 className="text-2xl font-bold font-displayPlayFair text-[#0F172A] mb-2">
+            No Packages Available
+          </h3>
+          <p className="text-sm text-[#64748B] font-cambria italic">
+            Currently there are no wellness packages available from the server. Please check back later or explore our individual services.
+          </p>
+        </div>
+      )}
+
+      {/* ── Packages Grid ── */}
+      {!loading && packages.length > 0 && (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto mb-12">
+          {packages.map((item) => (
+            <ArrangementCard
+              key={item.id}
+              {...item}
+              isSelected={selectedId === item.id}
+              onClick={() => setSelectedId(item.id)}
+            />
+          ))}
+        </div>
+      )}
 
       {/* ── Footer Navigation ── */}
       <div className="max-w-7xl mx-auto mt-8 flex justify-between items-center bg-[#FBF6F3] p-8 rounded-2xl shadow-sm border border-[#E8E2DC]">
@@ -131,9 +155,9 @@ export default function PackagesBookingPage() {
 
         <button
           onClick={handleContinue}
-          disabled={!selectedId}
+          disabled={!selectedId || packages.length === 0}
           className={`px-12 py-4 rounded-xl text-white font-bold text-sm flex items-center gap-3 transition-all shadow-lg ${
-            selectedId
+            selectedId && packages.length > 0
               ? "bg-[#D1B191] hover:bg-[#C4A484] shadow-lg transform translate-y-[-2px]"
               : "bg-[#D1B191] opacity-50 cursor-not-allowed"
           }`}
