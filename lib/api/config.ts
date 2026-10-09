@@ -10,6 +10,7 @@ export const DEFAULT_TIMEOUT = Number(process.env.NEXT_PUBLIC_API_TIMEOUT) || 30
 export const DEFAULT_HEADERS = {
   "Content-Type": "application/json",
   Accept: "application/json",
+  "ngrok-skip-browser-warning": "true",
 };
 
 /**

@@ -28,6 +28,11 @@ export const ENDPOINTS = {
     AVAILABLE_SLOTS: "/bookings/available-slots/",
     USER_MEMBERSHIPS: "/bookings/memberships/",
     USER_SESSION_PASSES: "/bookings/session-passes/",
+    SAUNA_CREATE: "/bookings/sauna/",
+    SAUNA_CONFIRM: "/bookings/sauna/confirm/",
+  },
+  PAYMENTS: {
+    CREATE_INTENT: "/payments/create-intent/",
   },
   SERVICES: {
     ALL: "/services/",

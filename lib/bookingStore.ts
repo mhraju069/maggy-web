@@ -35,6 +35,7 @@ export interface ActivityBookingDetails {
 }
 
 export interface BookingData {
+  bookingId?: string;
   serviceId?: number;
   serviceName: string;
   serviceType: string;

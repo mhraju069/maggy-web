@@ -9,10 +9,13 @@ import { FaCakeCandles } from "react-icons/fa6";
 
 export default function ConfirmationPage() {
   const [data, setData] = useState(getStoredBookingData());
-  const [bookingRef] = useState(() => `LUNCH-${Math.floor(1000 + Math.random() * 9000)}`);
+  const [bookingRef, setBookingRef] = useState("");
 
   useEffect(() => {
-    setData(getStoredBookingData());
+    const current = getStoredBookingData();
+    setData(current);
+    const initialRef = current.bookingId || `${current.isSharedSauna ? "SS" : current.isSaltRoom ? "SR" : "PS"}-${Math.floor(1000 + Math.random() * 9000)}`;
+    setBookingRef(initialRef);
   }, []);
 
   const celebration = data.celebration;

@@ -16,6 +16,31 @@ export interface AvailableSlotsParams extends Record<string, string | number | b
   service_type: string;
 }
 
+export interface CreateSaunaBookingPayload {
+  sauna_type: "private" | "shared" | string;
+  booking_date: string;
+  booking_time: string;
+  time_slot: "90_mins" | "3_hours" | "4_hours" | string;
+  capacity: number;
+  name: string;
+  email: string;
+  phone: string;
+  special_request?: string | null;
+  selected_features?: (number | string)[];
+  total_price: number | string;
+}
+
+export interface CreateSaunaBookingResponse {
+  success: boolean;
+  booking_id: string;
+  client_secret: string;
+  payment_intent_id?: string;
+  amount?: string;
+  currency?: string;
+  data?: any;
+  message?: string;
+}
+
 export const bookingService = {
   async getBookings(params?: Record<string, string | number>): Promise<PaginatedResponse<Booking> | Booking[]> {
     return ApiClient.get<PaginatedResponse<Booking> | Booking[]>(ENDPOINTS.BOOKINGS.LIST, { params });
@@ -23,6 +48,14 @@ export const bookingService = {
 
   async createBooking(payload: CreateBookingPayload | Record<string, any>): Promise<Booking> {
     return ApiClient.post<Booking>(ENDPOINTS.BOOKINGS.CREATE, payload);
+  },
+
+  async createSaunaBooking(payload: CreateSaunaBookingPayload): Promise<CreateSaunaBookingResponse> {
+    return ApiClient.post<CreateSaunaBookingResponse>(ENDPOINTS.BOOKINGS.SAUNA_CREATE, payload, { skipAuth: true });
+  },
+
+  async createPaymentIntent(bookingId: string, currency: string = "eur"): Promise<{ success: boolean; client_secret: string; booking_id: string }> {
+    return ApiClient.post(ENDPOINTS.PAYMENTS.CREATE_INTENT, { booking_id: bookingId, currency }, { skipAuth: true });
   },
 
   async getBookingDetails(id: string | number): Promise<Booking> {
