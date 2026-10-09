@@ -209,8 +209,17 @@ export const servicesService = {
     return items;
   },
 
-  async getAllServices(): Promise<any> {
-    return ApiClient.get(ENDPOINTS.SERVICES.ALL, { skipAuth: true });
+  async getAllServices(): Promise<any[]> {
+    try {
+      const res = await ApiClient.get<any>(ENDPOINTS.SERVICES.ALL, { skipAuth: true });
+      if (res?.data && Array.isArray(res.data)) return res.data;
+      if (Array.isArray(res)) return res;
+      if (res?.results && Array.isArray(res.results)) return res.results;
+      return [];
+    } catch (err) {
+      console.error("Error fetching all services:", err);
+      return [];
+    }
   },
 
   async getSaunaServices(): Promise<SaunaServicesResponse> {

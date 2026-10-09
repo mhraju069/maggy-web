@@ -1,9 +1,13 @@
 "use client";
 
 import DecorativeUnderline from "@/components/shared/DecorativeUnderline";
+import { formatImageUrl } from "@/lib/api/config";
+import { servicesService } from "@/lib/api/services/servicesService";
+import { updateStoredBookingData } from "@/lib/bookingStore";
 import Image from "next/image";
 import Link from "next/link";
-import { updateStoredBookingData } from "@/lib/bookingStore";
+import { useEffect, useState } from "react";
+import { FaSpa } from "react-icons/fa";
 import {
   MdOutlineAutoAwesome,
   MdOutlineCardGiftcard,
@@ -13,66 +17,89 @@ import {
   MdOutlineSelfImprovement,
 } from "react-icons/md";
 
-const categories = [
-  {
-    id: "sauna",
-    title: "Sauna & Wellness",
-    slogan: "Heat. Release. Renew.",
-    description: "Experience the transformative power of heat therapy in private or shared sanctuaries.",
-    image: "/images/booking/sauna.png",
-    icon: <MdOutlineHotTub className="w-6 h-6" />,
-    href: "/booking/sauna",
-  },
-  {
-    id: "arrangements",
-    title: "Salt Room",
-    slogan: "Halotherapy. Purify. Breathe.",
-    description: "Therapeutic micro-climate salt room sessions designed to purify respiratory health, cleanse skin, and restore vitality.",
-    image: "/images/booking/arrangement.png",
-    icon: <MdOutlineAutoAwesome className="w-6 h-6" />,
-    href: "/booking/arrangements",
-  },
-  {
-    id: "activities",
-    title: "Activities",
-    slogan: "Movement. Breath. Flow.",
-    description: "Guided classes that unite body and mind through mindful practice.",
-    image: "/images/booking/activity.png",
-    icon: <MdOutlineSelfImprovement className="w-6 h-6" />,
-    href: "/booking/activities",
-  },
-  {
-    id: "lunchroom",
-    title: "Lunchroom",
-    slogan: "Nourishment for body and soul",
-    description: "Seasonal, organic cuisine crafted to complement your wellness journey.",
-    image: "/images/booking/lunchroom.png",
-    icon: <MdOutlineRestaurantMenu className="w-6 h-6" />,
-    href: "/booking/lunchroom",
-  },
-  {
-    id: "events",
-    title: "Events & Space Rental",
-    slogan: "Gather. Celebrate. Unwind.",
-    description: "Multifunctional tranquil setting for weddings, corporate retreats, and private celebrations.",
-    image: "/images/eventspace/hero/eventhero.png",
-    icon: <MdOutlineEventNote className="w-6 h-6" />,
-    href: "/booking/eventspace",
-  },
-  {
-    id: "packages",
-    title: "Wellness Packages",
-    slogan: "Curated journeys of renewal",
-    description: "Complete half-day and full-day wellness journeys combining sauna, salt room halotherapy, and lunch.",
-    image: "/images/arrangements/hero/arrangementshero.png",
-    icon: <MdOutlineCardGiftcard className="w-6 h-6" />,
-    href: "/booking/packages",
-  },
-];
+interface CategoryCard {
+  id: string | number;
+  type: string;
+  title: string;
+  slogan: string;
+  description: string;
+  image: string;
+  icon: React.ReactNode;
+  href: string;
+}
+
+const getCategoryHref = (type: string): string => {
+  const t = (type || "").toLowerCase().trim();
+  if (t === "sauna") return "/booking/sauna";
+  if (t === "saltroom" || t === "salt_room" || t === "arrangements") return "/booking/arrangements";
+  if (t === "activity" || t === "activities") return "/booking/activities";
+  if (t === "lunchroom") return "/booking/lunchroom";
+  if (t === "event" || t === "events" || t === "eventspace") return "/booking/eventspace";
+  if (t === "package" || t === "packages") return "/booking/packages";
+  return "/booking";
+};
+
+const getCategoryIcon = (type: string): React.ReactNode => {
+  const t = (type || "").toLowerCase().trim();
+  if (t === "sauna") return <MdOutlineHotTub className="w-6 h-6" />;
+  if (t === "saltroom" || t === "salt_room" || t === "arrangements") return <MdOutlineAutoAwesome className="w-6 h-6" />;
+  if (t === "activity" || t === "activities") return <MdOutlineSelfImprovement className="w-6 h-6" />;
+  if (t === "lunchroom") return <MdOutlineRestaurantMenu className="w-6 h-6" />;
+  if (t === "event" || t === "events" || t === "eventspace") return <MdOutlineEventNote className="w-6 h-6" />;
+  if (t === "package" || t === "packages") return <MdOutlineCardGiftcard className="w-6 h-6" />;
+  return <MdOutlineHotTub className="w-6 h-6" />;
+};
+
+const defaultFallbacks: Record<string, string> = {
+  sauna: "/images/booking/sauna.png",
+  saltroom: "/images/booking/arrangement.png",
+  activity: "/images/booking/activity.png",
+  lunchroom: "/images/booking/lunchroom.png",
+  event: "/images/eventspace/hero/eventhero.png",
+  package: "/images/arrangements/hero/arrangementshero.png",
+};
 
 export default function BookingPage() {
-  const handleCategoryClick = (cat: typeof categories[number], e: React.MouseEvent) => {
-    if (cat.id === "lunchroom") {
+  const [categories, setCategories] = useState<CategoryCard[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+
+  useEffect(() => {
+    setLoading(true);
+    servicesService
+      .getAllServices()
+      .then((apiData) => {
+        if (apiData && Array.isArray(apiData) && apiData.length > 0) {
+          const mapped: CategoryCard[] = apiData.map((item: any) => {
+            const rawType = (item.type || "").toLowerCase().trim();
+            const fallbackImg = defaultFallbacks[rawType] || "/images/booking/sauna.png";
+
+            return {
+              id: item.id || item.type,
+              type: rawType,
+              title: item.title || "Service Experience",
+              slogan: item.subtitle || item.slogan || "",
+              description: item.description || "",
+              image: formatImageUrl(item.image, fallbackImg),
+              icon: getCategoryIcon(rawType),
+              href: getCategoryHref(rawType),
+            };
+          });
+          setCategories(mapped);
+        } else {
+          setCategories([]);
+        }
+      })
+      .catch((err) => {
+        console.error("Error fetching all services:", err);
+        setCategories([]);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  }, []);
+
+  const handleCategoryClick = (cat: CategoryCard, e: React.MouseEvent) => {
+    if (cat.type === "lunchroom") {
       e.preventDefault();
       updateStoredBookingData({
         serviceName: "Lunchroom Table Reservation",
@@ -97,51 +124,78 @@ export default function BookingPage() {
         <p className="font-cambria text-sm text-[#475569] mt-6 italic">A carefully curated moment, designed around you.</p>
       </div>
 
-      {/* ── Grid ── */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-6xl mx-auto">
-        {categories.map((cat) => (
-          <Link
-            key={cat.id}
-            href={cat.href}
-            onClick={(e) => handleCategoryClick(cat, e)}
-            className="group cursor-pointer"
-          >
-            <div className="bg-white rounded-[32px] overflow-hidden shadow-sm hover:shadow-xl transition-all duration-500 border border-[#E8E2DC] flex flex-col h-full">
-              {/* Image Section */}
-              <div className="relative h-80 w-full overflow-hidden">
-                <Image
-                  src={cat.image}
-                  alt={cat.title}
-                  fill
-                  sizes="(max-width: 768px) 100vw, 50vw"
-                  className="object-cover transition-transform duration-700 group-hover:scale-105"
-                />
-                <div className="absolute inset-0 bg-black/30 group-hover:bg-black/20 transition-colors duration-500" />
+      {/* ── Loading State ── */}
+      {loading && (
+        <div className="w-full py-24 text-center">
+          <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-[#8B7355] border-t-transparent mb-4"></div>
+          <p className="text-[#64748B] font-cambria italic">Loading Services...</p>
+        </div>
+      )}
 
-                {/* Overlay Text */}
-                <div className="absolute inset-x-0 bottom-0 p-10 text-white">
-                  <div className="flex items-center gap-4">
-                    <div className="flex items-center justify-center">
-                      {cat.icon}
-                    </div>
-                    <div>
-                      <h3 className="font-displayPlayFair text-4xl mb-1 leading-tight">{cat.title}</h3>
-                      <p className="text-sm font-medium opacity-90 tracking-wide uppercase">{cat.slogan}</p>
+      {/* ── Empty State ── */}
+      {!loading && categories.length === 0 && (
+        <div className="bg-white rounded-[32px] p-12 shadow-sm border border-[#E8E2DC] text-center max-w-2xl mx-auto my-12">
+          <div className="w-16 h-16 bg-[#FCF2E9] rounded-2xl flex items-center justify-center mx-auto mb-4 text-[#8B7355]">
+            <FaSpa className="w-8 h-8" />
+          </div>
+          <h3 className="text-2xl font-bold font-displayPlayFair text-[#0F172A] mb-2">
+            No Services Available
+          </h3>
+          <p className="text-sm text-[#64748B] font-cambria italic">
+            Currently there are no services available from the server. Please check back later.
+          </p>
+        </div>
+      )}
+
+      {/* ── Grid ── */}
+      {!loading && categories.length > 0 && (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-6xl mx-auto">
+          {categories.map((cat) => (
+            <Link
+              key={cat.id}
+              href={cat.href}
+              onClick={(e) => handleCategoryClick(cat, e)}
+              className="group cursor-pointer"
+            >
+              <div className="bg-white rounded-[32px] overflow-hidden shadow-sm hover:shadow-xl transition-all duration-500 border border-[#E8E2DC] flex flex-col h-full">
+                {/* Image Section */}
+                <div className="relative h-80 w-full overflow-hidden">
+                  <Image
+                    src={cat.image}
+                    alt={cat.title}
+                    fill
+                    sizes="(max-width: 768px) 100vw, 50vw"
+                    className="object-cover transition-transform duration-700 group-hover:scale-105"
+                  />
+                  <div className="absolute inset-0 bg-black/30 group-hover:bg-black/20 transition-colors duration-500" />
+
+                  {/* Overlay Text */}
+                  <div className="absolute inset-x-0 bottom-0 p-10 text-white">
+                    <div className="flex items-center gap-4">
+                      <div className="flex items-center justify-center">
+                        {cat.icon}
+                      </div>
+                      <div>
+                        <h3 className="font-displayPlayFair text-4xl mb-1 leading-tight">{cat.title}</h3>
+                        {cat.slogan && (
+                          <p className="text-sm font-medium opacity-90 tracking-wide uppercase">{cat.slogan}</p>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
 
-              {/* Description Section */}
-              <div className="p-10 flex-grow">
-                <p className="font-cambria text-[#475569] text-lg leading-relaxed">
-                  {cat.description}
-                </p>
+                {/* Description Section */}
+                <div className="p-10 flex-grow">
+                  <p className="font-cambria text-[#475569] text-lg leading-relaxed">
+                    {cat.description}
+                  </p>
+                </div>
               </div>
-            </div>
-          </Link>
-        ))}
-      </div>
+            </Link>
+          ))}
+        </div>
+      )}
 
       {/* ── Footer Buttons ── */}
       <div className="max-w-6xl mx-auto mt-16 flex justify-between items-center bg-[#FBF6F3] p-8 rounded-2xl shadow-sm border border-[#E8E2DC]">
