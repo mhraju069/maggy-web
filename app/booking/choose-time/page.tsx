@@ -1,10 +1,11 @@
 "use client";
 
 import DecorativeUnderline from "@/components/shared/DecorativeUnderline";
+import { servicesService, ServiceSlotsResponse } from "@/lib/api";
 import { getStoredBookingData, updateStoredBookingData } from "@/lib/bookingStore";
 import Link from "next/link";
-import { useEffect, useState } from "react";
-import { BiInfoCircle, BiTimeFive } from "react-icons/bi";
+import { useCallback, useEffect, useState } from "react";
+import { BiCheckCircle, BiInfoCircle, BiTimeFive } from "react-icons/bi";
 import { FaSpa, FaWalking } from "react-icons/fa";
 
 const defaultTimeSlots = [
@@ -55,26 +56,95 @@ export const saltRoomSessions: SessionSlotInfo[] = [
 
 export default function ChooseTimePage() {
   const [storedData, setStoredData] = useState(getStoredBookingData());
-  const isLunchroom = storedData.serviceType === "lunchroom" || storedData.serviceName.toLowerCase().includes("lunchroom");
-  const isSharedSauna = storedData.isSharedSauna || (storedData.serviceType === "sauna" && storedData.serviceName.toLowerCase().includes("shared"));
-  const isSaltRoom = storedData.isSaltRoom || storedData.serviceType === "salt_room" || storedData.serviceName.toLowerCase().includes("salt");
-  const isPrivateSauna = !isLunchroom && !isSharedSauna && !isSaltRoom && (storedData.serviceType === "sauna" || storedData.serviceName.toLowerCase().includes("private"));
+  const serviceTypeLower = (storedData.serviceType || "").toLowerCase().trim();
+  const serviceNameLower = (storedData.serviceName || "").toLowerCase().trim();
+
+  const isLunchroom = serviceTypeLower === "lunchroom" || serviceNameLower.includes("lunchroom");
+  const isSaltRoom = !isLunchroom && serviceTypeLower !== "sauna" && (serviceTypeLower === "salt_room" || serviceTypeLower === "saltroom" || storedData.isSaltRoom || serviceNameLower.includes("salt"));
+  const isSharedSauna = !isLunchroom && !isSaltRoom && (storedData.isSharedSauna || (serviceTypeLower === "sauna" && (serviceNameLower.includes("shared") || (!serviceNameLower.includes("private") && storedData.isSharedSauna))));
+  const isPrivateSauna = !isLunchroom && !isSaltRoom && !isSharedSauna;
+
+  const [saunaPrices, setSaunaPrices] = useState<{
+    price3Hrs: number;
+    price4Hrs: number;
+    extraPersonFee: number;
+    sharedPricePerson: number;
+  }>({
+    price3Hrs: 250,
+    price4Hrs: 300,
+    extraPersonFee: 50,
+    sharedPricePerson: 35,
+  });
+
+  useEffect(() => {
+    if (isPrivateSauna || isSharedSauna) {
+      servicesService
+        .getSaunaServices()
+        .then((res: any) => {
+          const rawData = res?.data || res;
+          const privateItem = rawData?.private_sauna?.[0] || (Array.isArray(rawData) ? rawData[0] : undefined);
+          const sharedItem = rawData?.shared_sauna?.[0];
+
+          const p3 = privateItem?.base_price_3hrs ? parseFloat(String(privateItem.base_price_3hrs)) : 250;
+          const p4 = privateItem?.base_price_4hrs ? parseFloat(String(privateItem.base_price_4hrs)) : 300;
+          const extraP = privateItem?.extra_person_price ? parseFloat(String(privateItem.extra_person_price)) : 50;
+          const sharedP = sharedItem?.price_per_person ? parseFloat(String(sharedItem.price_per_person)) : 35;
+
+          setSaunaPrices({
+            price3Hrs: isNaN(p3) ? 250 : p3,
+            price4Hrs: isNaN(p4) ? 300 : p4,
+            extraPersonFee: isNaN(extraP) ? 50 : extraP,
+            sharedPricePerson: isNaN(sharedP) ? 35 : sharedP,
+          });
+        })
+        .catch((err) => console.error("Error fetching sauna prices in choose-time:", err));
+    }
+  }, [isPrivateSauna, isSharedSauna]);
 
   const [date, setDate] = useState(storedData.date || "");
   const [selectedTime, setSelectedTime] = useState<string | null>(storedData.timeSlot || null);
-  const [guests, setGuests] = useState(String(storedData.guestsCount || 1));
+  const [guests, setGuests] = useState(String(storedData.guestsCount || (isPrivateSauna ? 2 : 1)));
   const [dayError, setDayError] = useState<string | null>(null);
+
+  const [apiSlots, setApiSlots] = useState<ServiceSlotsResponse | null>(null);
+  const [loadingApiSlots, setLoadingApiSlots] = useState<boolean>(false);
+
+  const fetchSlots = useCallback(async (dateVal: string, typeVal: string) => {
+    if (!dateVal) {
+      setApiSlots(null);
+      return;
+    }
+    setLoadingApiSlots(true);
+    try {
+      const serviceTypeKey = typeVal || "sauna";
+      const res = await servicesService.getServiceSlots(serviceTypeKey, dateVal);
+      setApiSlots(res);
+    } catch (err) {
+      console.error("Error fetching slots in choose-time:", err);
+      setApiSlots(null);
+    } finally {
+      setLoadingApiSlots(false);
+    }
+  }, []);
 
   useEffect(() => {
     const data = getStoredBookingData();
     setStoredData(data);
-    if (data.date) setDate(data.date);
+    if (data.date) {
+      setDate(data.date);
+      fetchSlots(data.date, data.serviceType || "sauna");
+    }
     if (data.timeSlot) setSelectedTime(data.timeSlot);
-    if (data.guestsCount) setGuests(String(data.guestsCount));
-  }, []);
+    if (data.guestsCount) {
+      setGuests(String(data.guestsCount));
+    } else if (isPrivateSauna) {
+      setGuests("2");
+    }
+  }, [fetchSlots, isPrivateSauna]);
 
   const handleDateChange = (newDate: string) => {
     setDate(newDate);
+    setSelectedTime(null);
     if (isLunchroom && newDate) {
       const selected = new Date(newDate);
       const dayOfWeek = selected.getUTCDay();
@@ -87,23 +157,102 @@ export default function ChooseTimePage() {
       setDayError(null);
     }
 
-    updateStoredBookingData({ date: newDate });
+    updateStoredBookingData({ date: newDate, timeSlot: "" });
+    if (newDate) {
+      fetchSlots(newDate, storedData.serviceType || "sauna");
+    }
   };
 
-  const handleTimeSelect = (time: string) => {
-    setSelectedTime(time);
-    updateStoredBookingData({ timeSlot: time });
+  const sharedSlotsList = apiSlots?.data?.shared_sauna?.slots || [];
+  const selectedSlotObj = isSharedSauna && selectedTime
+    ? sharedSlotsList.find((s) => `${s.start_time} - ${s.end_time}` === selectedTime)
+    : null;
+
+  const handleTimeSelect = (timeStr: string) => {
+    setSelectedTime(timeStr);
+
+    if (isSharedSauna && sharedSlotsList.length > 0) {
+      const clickedSlot = sharedSlotsList.find((s) => `${s.start_time} - ${s.end_time}` === timeStr);
+      if (clickedSlot) {
+        const currentG = parseInt(guests, 10) || 1;
+        if (currentG > clickedSlot.remaining_capacity) {
+          const adjustedG = Math.max(1, clickedSlot.remaining_capacity);
+          setGuests(String(adjustedG));
+          const newTotal = parseFloat((adjustedG * saunaPrices.sharedPricePerson).toFixed(2));
+          updateStoredBookingData({
+            timeSlot: timeStr,
+            guestsCount: adjustedG,
+            totalAmount: newTotal,
+            price: `€${newTotal}`,
+          });
+          return;
+        }
+      }
+    }
+
+    updateStoredBookingData({ timeSlot: timeStr });
   };
 
   const handleGuestsChange = (g: string) => {
+    const gCount = parseInt(g, 10) || (isPrivateSauna ? 2 : 1);
     setGuests(g);
-    updateStoredBookingData({ guestsCount: parseInt(g, 10) || 1 });
+
+    let newTotal = storedData.totalAmount || 0;
+    if (isPrivateSauna) {
+      const duration = storedData.durationHours || 3;
+      const base = duration === 4 ? saunaPrices.price4Hrs : saunaPrices.price3Hrs;
+      const extrasTotal = (storedData.selectedExtras || []).reduce((sum, ext) => sum + (ext.price || 0), 0);
+      const extraGuests = Math.max(0, gCount - 2);
+      newTotal = base + extraGuests * saunaPrices.extraPersonFee + extrasTotal;
+    } else if (isSharedSauna) {
+      newTotal = parseFloat((gCount * saunaPrices.sharedPricePerson).toFixed(2));
+    } else if (isSaltRoom) {
+      newTotal = gCount * 25;
+    }
+
+    updateStoredBookingData({
+      guestsCount: gCount,
+      totalAmount: newTotal,
+      price: `€${newTotal}`,
+    });
+  };
+
+  const calculateOptionPrice = (n: number): string => {
+    if (isPrivateSauna) {
+      const duration = storedData.durationHours || 3;
+      const base = duration === 4 ? saunaPrices.price4Hrs : saunaPrices.price3Hrs;
+      const extrasTotal = (storedData.selectedExtras || []).reduce((sum, ext) => sum + (ext.price || 0), 0);
+      const extraGuests = Math.max(0, n - 2);
+      const total = base + extraGuests * saunaPrices.extraPersonFee + extrasTotal;
+      return `€${total.toFixed(2)}`;
+    } else if (isSharedSauna) {
+      const total = n * saunaPrices.sharedPricePerson;
+      return `€${total.toFixed(2)}`;
+    } else if (isSaltRoom) {
+      const total = n * 25;
+      return `€${total.toFixed(2)}`;
+    }
+    return `€${(n * 35).toFixed(2)}`;
   };
 
   const isFormValid = date && selectedTime && (!isLunchroom || !dayError);
 
-  const maxGuestsLimit = isSaltRoom ? 2 : 6;
-  const guestOptions = Array.from({ length: maxGuestsLimit }, (_, i) => i + 1);
+  const maxSelectableGuests = isPrivateSauna
+    ? 6
+    : isSaltRoom
+    ? 2
+    : selectedSlotObj
+    ? Math.min(6, Math.max(1, selectedSlotObj.remaining_capacity))
+    : 6;
+
+  const minSelectableGuests = isPrivateSauna ? 2 : 1;
+
+  const guestOptions = isPrivateSauna
+    ? [2, 3, 4, 5, 6]
+    : Array.from(
+        { length: Math.max(1, maxSelectableGuests - minSelectableGuests + 1) },
+        (_, i) => minSelectableGuests + i
+      );
 
   return (
     <div className="w-full px-6 md:px-12">
@@ -230,7 +379,24 @@ export default function ChooseTimePage() {
               )}
             </div>
 
-            {isSaltRoom ? (
+            {loadingApiSlots && (
+              <div className="p-8 text-center text-xs text-[#64748B] italic">
+                <div className="inline-block animate-spin rounded-full h-6 w-6 border-2 border-[#8B7355] border-t-transparent mr-2 align-middle"></div>
+                Checking live available slots for {date}...
+              </div>
+            )}
+
+            {!loadingApiSlots && apiSlots?.is_blocked && (
+              <div className="p-6 rounded-2xl bg-rose-50 border border-rose-200 text-rose-700 text-sm font-bold flex items-center gap-3">
+                <BiInfoCircle size={22} className="flex-shrink-0" />
+                <div>
+                  <h5 className="font-bold">Date Blocked</h5>
+                  <p className="text-xs font-normal mt-0.5">{apiSlots.message || "No slots available. This date is blocked by administration."}</p>
+                </div>
+              </div>
+            )}
+
+            {!loadingApiSlots && !apiSlots?.is_blocked && isSaltRoom ? (
               /* Salt Room 15 Specific Calculated Start Times with Changeovers */
               <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                 {saltRoomSessions.map((sess) => {
@@ -276,55 +442,153 @@ export default function ChooseTimePage() {
                   );
                 })}
               </div>
-            ) : isSharedSauna ? (
-              /* Shared Sauna 10 Time Slots */
+            ) : !loadingApiSlots && !apiSlots?.is_blocked && isSharedSauna ? (
+              /* Shared Sauna Live API Slots or Fallback */
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {sharedSaunaSessions.map((sess) => {
-                  const remaining = Math.max(0, sess.totalCapacity - sess.bookedPlaces);
-                  const isSoldOut = remaining === 0;
-                  const isSelected = selectedTime === sess.slot;
+                {(() => {
+                  const slotsList = apiSlots?.data?.shared_sauna?.slots;
+                  if (slotsList && slotsList.length > 0) {
+                    return slotsList.map((slot, i) => {
+                      const label = `${slot.start_time} - ${slot.end_time}`;
+                      const isSelected = selectedTime === label;
+                      const isFullyBooked = slot.is_fully_booked || slot.remaining_capacity === 0;
+                      const currentGuestsCount = parseInt(guests, 10) || 1;
+                      const isNotEnoughCapacity = !isFullyBooked && slot.remaining_capacity < currentGuestsCount;
+                      const isSoldOut = isFullyBooked || isNotEnoughCapacity;
 
-                  return (
-                    <button
-                      key={sess.slot}
-                      type="button"
-                      disabled={isSoldOut}
-                      onClick={() => handleTimeSelect(sess.slot)}
-                      className={`p-4 rounded-xl border text-left transition-all flex items-center justify-between ${
-                        isSelected
-                          ? "bg-[#FCF2E9] border-[#8B7355] shadow-md ring-2 ring-[#8B7355]/20"
-                          : isSoldOut
-                          ? "bg-gray-50 border-gray-200 opacity-60 cursor-not-allowed"
-                          : "bg-white border-[#E2E8F0] hover:border-[#D1B191]"
-                      }`}
-                    >
-                      <div>
-                        <span className="text-base font-bold font-displayPlayFair text-[#0F172A] block">
-                          {sess.slot}
-                        </span>
-                        <span className="text-[11px] text-[#64748B]">
-                          1.5h session • 15m changeover buffer ({sess.changeover})
-                        </span>
-                      </div>
+                      return (
+                        <button
+                          key={i}
+                          type="button"
+                          disabled={isSoldOut}
+                          onClick={() => handleTimeSelect(label)}
+                          className={`p-4 rounded-xl border text-left transition-all flex items-center justify-between ${
+                            isSelected
+                              ? "bg-[#FCF2E9] border-[#8B7355] shadow-md ring-2 ring-[#8B7355]/20"
+                              : isSoldOut
+                              ? "bg-gray-50 border-gray-200 opacity-60 cursor-not-allowed"
+                              : "bg-white border-[#E2E8F0] hover:border-[#D1B191]"
+                          }`}
+                        >
+                          <div>
+                            <span className="text-base font-bold font-displayPlayFair text-[#0F172A] block">
+                              {label}
+                            </span>
+                            <span className="text-[11px] text-[#64748B]">
+                              90m session • Changeover buffer ({slot.buffer_end_time})
+                            </span>
+                          </div>
 
-                      <div className="text-right flex flex-col items-end">
-                        {isSoldOut ? (
-                          <span className="px-2.5 py-1 bg-rose-100 text-rose-700 text-[10px] font-bold rounded-full">
-                            Fully Booked (0/6)
+                          <div className="text-right flex flex-col items-end">
+                            {isFullyBooked ? (
+                              <span className="px-2.5 py-1 bg-rose-100 text-rose-700 text-[10px] font-bold rounded-full">
+                                Fully Booked
+                              </span>
+                            ) : isNotEnoughCapacity ? (
+                              <span className="px-2.5 py-1 bg-amber-100 text-amber-800 text-[10px] font-bold rounded-full border border-amber-300">
+                                Only {slot.remaining_capacity} {slot.remaining_capacity === 1 ? "place" : "places"} left
+                              </span>
+                            ) : (
+                              <span className={`px-2.5 py-1 text-[10px] font-bold rounded-full border ${
+                                slot.remaining_capacity <= 2 ? "bg-amber-100 text-amber-800 border-amber-300" : "bg-emerald-50 text-emerald-700 border-emerald-300"
+                              }`}>
+                                {slot.remaining_capacity} {slot.remaining_capacity === 1 ? "place" : "places"} remaining
+                              </span>
+                            )}
+                          </div>
+                        </button>
+                      );
+                    });
+                  }
+
+                  return sharedSaunaSessions.map((sess) => {
+                    const remaining = Math.max(0, sess.totalCapacity - sess.bookedPlaces);
+                    const isSoldOut = remaining === 0;
+                    const isSelected = selectedTime === sess.slot;
+
+                    return (
+                      <button
+                        key={sess.slot}
+                        type="button"
+                        disabled={isSoldOut}
+                        onClick={() => handleTimeSelect(sess.slot)}
+                        className={`p-4 rounded-xl border text-left transition-all flex items-center justify-between ${
+                          isSelected
+                            ? "bg-[#FCF2E9] border-[#8B7355] shadow-md ring-2 ring-[#8B7355]/20"
+                            : isSoldOut
+                            ? "bg-gray-50 border-gray-200 opacity-60 cursor-not-allowed"
+                            : "bg-white border-[#E2E8F0] hover:border-[#D1B191]"
+                        }`}
+                      >
+                        <div>
+                          <span className="text-base font-bold font-displayPlayFair text-[#0F172A] block">
+                            {sess.slot}
                           </span>
-                        ) : (
-                          <span className={`px-2.5 py-1 text-[10px] font-bold rounded-full border ${
-                            remaining <= 2 ? "bg-amber-100 text-amber-800 border-amber-300" : "bg-emerald-50 text-emerald-700 border-emerald-300"
-                          }`}>
-                            {remaining} {remaining === 1 ? "place" : "places"} remaining
+                          <span className="text-[11px] text-[#64748B]">
+                            1.5h session • 15m changeover buffer ({sess.changeover})
                           </span>
-                        )}
-                      </div>
-                    </button>
-                  );
-                })}
+                        </div>
+
+                        <div className="text-right flex flex-col items-end">
+                          {isSoldOut ? (
+                            <span className="px-2.5 py-1 bg-rose-100 text-rose-700 text-[10px] font-bold rounded-full">
+                              Fully Booked (0/6)
+                            </span>
+                          ) : (
+                            <span className={`px-2.5 py-1 text-[10px] font-bold rounded-full border ${
+                              remaining <= 2 ? "bg-amber-100 text-amber-800 border-amber-300" : "bg-emerald-50 text-emerald-700 border-emerald-300"
+                            }`}>
+                              {remaining} {remaining === 1 ? "place" : "places"} remaining
+                            </span>
+                          )}
+                        </div>
+                      </button>
+                    );
+                  });
+                })()}
               </div>
-            ) : (
+            ) : !loadingApiSlots && !apiSlots?.is_blocked && isPrivateSauna && (apiSlots?.data?.private_sauna?.slots || apiSlots?.data?.private_sauna?.available_slots) ? (
+              /* Private Sauna Live API Slots */
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                {(() => {
+                  const durationKey = storedData.durationHours === 4 ? "4_hours" : "3_hours";
+                  const pSlots = apiSlots.data?.private_sauna?.slots?.[durationKey] || apiSlots.data?.private_sauna?.available_slots?.[durationKey] || [];
+                  if (pSlots.length === 0) {
+                    return (
+                      <div className="col-span-full p-4 bg-amber-50 border border-amber-200 rounded-xl text-amber-800 text-xs font-semibold">
+                        No {storedData.durationHours || 3}-hour private sauna slots available on this date.
+                      </div>
+                    );
+                  }
+                  return pSlots.map((slot, i) => {
+                    const label = `${slot.start_time} - ${slot.end_time}`;
+                    const isSelected = selectedTime === label;
+                    return (
+                      <button
+                        key={i}
+                        type="button"
+                        onClick={() => handleTimeSelect(label)}
+                        className={`p-4 rounded-xl border text-left transition-all flex flex-col justify-between ${
+                          isSelected
+                            ? "bg-[#FCF2E9] border-[#8B7355] shadow-md ring-2 ring-[#8B7355]/20"
+                            : "bg-white border-[#E2E8F0] hover:border-[#D1B191]"
+                        }`}
+                      >
+                        <div className="flex items-center justify-between">
+                          <span className="text-base font-bold font-displayPlayFair text-[#0F172A]">
+                            {label}
+                          </span>
+                          {isSelected && <BiCheckCircle className="text-[#8B7355]" size={18} />}
+                        </div>
+                        <span className="text-[10px] text-[#64748B] mt-1">
+                          Buffer until {slot.buffer_end_time}
+                        </span>
+                      </button>
+                    );
+                  });
+                })()}
+              </div>
+            ) : !loadingApiSlots && !apiSlots?.is_blocked ? (
               /* Standard Time Slots Grid */
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 {defaultTimeSlots.map((time) => (
@@ -343,7 +607,7 @@ export default function ChooseTimePage() {
                   </button>
                 ))}
               </div>
-            )}
+            ) : null}
           </div>
 
           {/* Guests Picker */}
@@ -372,11 +636,7 @@ export default function ChooseTimePage() {
             >
               {guestOptions.map((n) => (
                 <option key={n} value={n}>
-                  {n} {n === 1 ? "Person / Place" : "People / Places"} (
-                  {isSaltRoom
-                    ? `€${n * 25}`
-                    : `€${(n * (isSharedSauna ? 19.95 : 35)).toFixed(2)}`}
-                  )
+                  {n} {n === 1 ? "Person / Place" : "People / Places"} ({calculateOptionPrice(n)})
                 </option>
               ))}
             </select>

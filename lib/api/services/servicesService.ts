@@ -170,6 +170,53 @@ export interface ServicePackage {
   is_active?: boolean;
 }
 
+export interface PrivateSaunaSlot {
+  start_time: string;
+  end_time: string;
+  buffer_end_time: string;
+  time_slot: "3_hours" | "4_hours" | string;
+}
+
+export interface SharedSaunaSlot {
+  start_time: string;
+  end_time: string;
+  buffer_end_time: string;
+  duration: string;
+  max_capacity: number;
+  booked_capacity: number;
+  remaining_capacity: number;
+  is_available: boolean;
+  is_fully_booked: boolean;
+}
+
+export interface ServiceSlotsData {
+  private_sauna?: {
+    slots?: {
+      "3_hours"?: PrivateSaunaSlot[];
+      "4_hours"?: PrivateSaunaSlot[];
+    };
+    available_slots?: {
+      "3_hours"?: PrivateSaunaSlot[];
+      "4_hours"?: PrivateSaunaSlot[];
+    };
+  };
+  shared_sauna?: {
+    max_capacity_per_slot?: number;
+    slots?: SharedSaunaSlot[];
+    booked_slots?: any[];
+  };
+}
+
+export interface ServiceSlotsResponse {
+  success: boolean;
+  is_blocked?: boolean;
+  date?: string;
+  open_time?: string;
+  close_time?: string;
+  data?: ServiceSlotsData;
+  message?: string;
+}
+
 export interface MembershipPlan {
   id: number;
   name: string;
@@ -328,6 +375,13 @@ export const servicesService = {
 
   async getServiceDetails(serviceType: string): Promise<any> {
     return ApiClient.get<any>(ENDPOINTS.SERVICES.DETAILS(serviceType), { skipAuth: true });
+  },
+
+  async getServiceSlots(serviceType: string = "sauna", date: string): Promise<ServiceSlotsResponse> {
+    return ApiClient.get<ServiceSlotsResponse>(ENDPOINTS.SERVICES.SLOTS(serviceType), {
+      skipAuth: true,
+      params: { date },
+    });
   },
 };
 

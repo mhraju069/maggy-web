@@ -7,13 +7,14 @@ import {
   PrivateSaunaItem,
   SaunaServicesResponse,
   servicesService,
+  ServiceSlotsResponse,
   SharedSaunaItem,
 } from "@/lib/api";
 import { BookingExtra, getStoredBookingData, updateStoredBookingData } from "@/lib/bookingStore";
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 import { BiCheckCircle, BiInfoCircle, BiTimeFive } from "react-icons/bi";
-import { FaBroom, FaHotTub, FaSpa } from "react-icons/fa";
+import { FaBroom, FaCalendarAlt, FaHotTub, FaSpa } from "react-icons/fa";
 
 const defaultExtras: BookingExtra[] = [
   { id: "towels", name: "Premium Towel & Bathrobe Set", price: 15 },
@@ -40,9 +41,54 @@ export default function SaunaBookingPage() {
   const [guestsCount, setGuestsCount] = useState<number>(2);
   const [selectedExtras, setSelectedExtras] = useState<BookingExtra[]>([]);
 
+  const [selectedDate, setSelectedDate] = useState<string>("");
+  const [selectedTimeSlot, setSelectedTimeSlot] = useState<string>("");
+  const [slotsData, setSlotsData] = useState<ServiceSlotsResponse | null>(null);
+  const [loadingSlots, setLoadingSlots] = useState<boolean>(false);
+
   const [saunaData, setSaunaData] = useState<SaunaServicesResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const stored = getStoredBookingData();
+    if (stored.date) setSelectedDate(stored.date);
+    if (stored.timeSlot) setSelectedTimeSlot(stored.timeSlot);
+  }, []);
+
+  const fetchSlotsForDate = useCallback(async (dateVal: string) => {
+    if (!dateVal) {
+      setSlotsData(null);
+      return;
+    }
+    setLoadingSlots(true);
+    try {
+      const res = await servicesService.getServiceSlots("sauna", dateVal);
+      setSlotsData(res);
+    } catch (err) {
+      console.error("Error fetching slots:", err);
+      setSlotsData(null);
+    } finally {
+      setLoadingSlots(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (selectedDate) {
+      fetchSlotsForDate(selectedDate);
+    }
+  }, [selectedDate, fetchSlotsForDate]);
+
+  const handleDateChange = (dateVal: string) => {
+    setSelectedDate(dateVal);
+    setSelectedTimeSlot("");
+    updateStoredBookingData({ date: dateVal, timeSlot: "" });
+  };
+
+  const handleTimeSlotSelect = (slotStr: string) => {
+    setSelectedTimeSlot(slotStr);
+    updateStoredBookingData({ timeSlot: slotStr });
+  };
 
   const fetchServices = useCallback(async () => {
     setLoading(true);
@@ -105,6 +151,8 @@ export default function SaunaBookingPage() {
       updateStoredBookingData({
         serviceName: `Private Sauna (${durationHours} Hours)`,
         serviceType: "sauna",
+        isSharedSauna: false,
+        isSaltRoom: false,
         durationHours,
         guestsCount,
         cleaningTimeMinutes: 30,
@@ -117,6 +165,8 @@ export default function SaunaBookingPage() {
         serviceName: "Shared Sauna Experience",
         serviceType: "sauna",
         isSharedSauna: true,
+        isSaltRoom: false,
+        durationHours: 1.5,
         guestsCount,
         price: `€${currentTotalPrice}`,
         totalAmount: currentTotalPrice,
