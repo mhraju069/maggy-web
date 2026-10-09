@@ -1,5 +1,6 @@
 "use client";
 
+import StripePaymentForm from "@/components/booking/StripePaymentForm";
 import DecorativeUnderline from "@/components/shared/DecorativeUnderline";
 import { getStoredBookingData } from "@/lib/bookingStore";
 import Link from "next/link";
@@ -221,6 +222,22 @@ export default function ReviewPage() {
               </section>
             </>
           )}
+
+          <hr className="border-[#F1F5F9]" />
+
+          {/* ── Stripe Payment Gateway Section ── */}
+          <section>
+            <h2 className="text-xs font-bold text-[#64748B] uppercase tracking-[0.2em] mb-6" style={{ fontFamily: "Inter, sans-serif" }}>
+              Payment Information
+            </h2>
+            <StripePaymentForm
+              totalAmount={data.totalAmount || data.price || 250}
+              serviceName={data.serviceName}
+              onSuccess={() => {
+                window.location.href = "/booking/confirmation";
+              }}
+            />
+          </section>
         </div>
       </div>
 

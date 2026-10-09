@@ -1,5 +1,6 @@
 "use client";
 
+import StripePaymentForm from "@/components/booking/StripePaymentForm";
 import DecorativeUnderline from "@/components/shared/DecorativeUnderline";
 import { getStoredBookingData, updateStoredBookingData } from "@/lib/bookingStore";
 import Link from "next/link";
@@ -32,65 +33,14 @@ export default function PaymentPage() {
       </div>
 
       {/* ── Content Card ── */}
-      <div className="max-w-4xl mx-auto bg-white rounded-[32px] p-10 shadow-sm border border-[#E8E2DC]">
-        {/* Security Info */}
-        <div className="flex items-center gap-4 mb-10 p-4 bg-[#F8FAFC] rounded-2xl border border-[#E2E8F0]">
-          <div className="w-12 h-12 rounded-full bg-white flex items-center justify-center border border-[#E2E8F0]">
-            <FaLock className="text-[#8B7355]" />
-          </div>
-          <div>
-            <h4 className="text-sm font-bold text-[#0F172A]">256-Bit SSL Encrypted & Secure</h4>
-            <p className="text-xs text-[#64748B]">Your payment details are protected</p>
-          </div>
-        </div>
-
-        {/* Experience Summary */}
-        <div className="mb-10">
-          <span className="text-xs text-[#94A3B8] uppercase block mb-1">Selected Experience</span>
-          <h3 className="text-2xl font-bold text-[#0F172A] font-displayPlayFair mb-4">{data.serviceName || "Private Sauna Session"}</h3>
-          <div className="flex items-baseline gap-2">
-            <span className="text-4xl font-bold text-[#8B7355] font-displayPlayFair">{data.price || "€250"}</span>
-            <span className="text-xs text-[#94A3B8] italic">Payment required to secure reservation slot</span>
-          </div>
-        </div>
-
-        {/* Payment Methods */}
-        <div className="space-y-4">
-          <button
-            onClick={() => setMethod("card")}
-            className={`w-full flex items-center justify-between p-6 rounded-2xl border transition-all ${
-              method === "card"
-                ? "bg-[#FCF2E9] border-[#D1B191] shadow-sm"
-                : "bg-white border-[#E2E8F0] hover:border-[#D1B191]"
-            }`}
-          >
-            <div className="flex items-center gap-4">
-              <FaCreditCard className={method === "card" ? "text-[#D1B191]" : "text-[#94A3B8]"} size={20} />
-              <span className="font-bold text-[#0F172A]">Credit / Debit Card</span>
-            </div>
-            <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${method === "card" ? "border-[#D1B191]" : "border-[#E2E8F0]"}`}>
-              {method === "card" && <div className="w-2.5 h-2.5 rounded-full bg-[#D1B191]" />}
-            </div>
-          </button>
-
-          <button
-            onClick={() => setMethod("ideal")}
-            className={`w-full flex items-center justify-between p-6 rounded-2xl border transition-all ${
-              method === "ideal"
-                ? "bg-[#FCF2E9] border-[#D1B191] shadow-sm"
-                : "bg-white border-[#E2E8F0] hover:border-[#D1B191]"
-            }`}
-          >
-            <div className="flex items-center gap-4">
-              <MdOutlinePayments className={method === "ideal" ? "text-[#D1B191]" : "text-[#94A3B8]"} size={20} />
-              <span className="font-bold text-[#0F172A]">iDEAL</span>
-            </div>
-            <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${method === "ideal" ? "border-[#D1B191]" : "border-[#E2E8F0]"}`}>
-              {method === "ideal" && <div className="w-2.5 h-2.5 rounded-full bg-[#D1B191]" />}
-            </div>
-          </button>
-        </div>
-      </div>
+        {/* Stripe Payment Form Component */}
+        <StripePaymentForm
+          totalAmount={data.totalAmount || data.price || 250}
+          serviceName={data.serviceName}
+          onSuccess={() => {
+            window.location.href = "/booking/confirmation";
+          }}
+        />
 
       {/* ── Footer Buttons ── */}
       <div className="max-w-4xl mx-auto mt-16 flex justify-between items-center bg-[#FBF6F3] p-8 rounded-2xl shadow-sm border border-[#E8E2DC]">
