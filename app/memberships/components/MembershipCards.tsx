@@ -1,7 +1,8 @@
 "use client";
 
+import { servicesService, SaltroomServicesData } from "@/lib/api/services/servicesService";
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 const CheckIcon = ({ white }: { white?: boolean }) => (
   <svg
@@ -34,7 +35,7 @@ const ArrowIcon = ({ color }: { color: string }) => (
   </svg>
 );
 
-const saltRoomPlans = [
+const defaultSaltRoomPlans = [
   {
     variant: "essential",
     name: "10-Session Pass",
@@ -76,7 +77,7 @@ const saltRoomPlans = [
   },
 ];
 
-const sharedSaunaPlans = [
+const defaultSharedSaunaPlans = [
   {
     variant: "essential",
     name: "Once a Week",
@@ -108,8 +109,91 @@ const sharedSaunaPlans = [
 
 const MembershipCards = () => {
   const [category, setCategory] = useState<"salt" | "sauna">("salt");
+  const [apiData, setApiData] = useState<SaltroomServicesData | null>(null);
 
-  const plans = category === "salt" ? saltRoomPlans : sharedSaunaPlans;
+  useEffect(() => {
+    servicesService.getSaltRoomServices().then((res) => {
+      if (res && (res.saltroom || res.subscription_plans || res.session_pass)) {
+        setApiData(res);
+      }
+    });
+  }, []);
+
+  const sessionPass = apiData?.session_pass?.[0];
+  const saltPlans = apiData?.subscription_plans?.filter(
+    (p) => p.plan_category?.toLowerCase() === "saltroom"
+  ) || [];
+
+  const saltWeekly = saltPlans.find((p) => p.plan_type?.toLowerCase() === "weekly");
+  const saltUnlimited = saltPlans.find((p) => p.plan_type?.toLowerCase() === "unlimited");
+
+  const dynamicSaltPlans = [];
+  if (sessionPass) {
+    dynamicSaltPlans.push({
+      variant: "essential",
+      name: sessionPass.name || "10-Session Pass",
+      price: sessionPass.price ? `€${parseFloat(String(sessionPass.price)).toFixed(0)}` : "€0",
+      perPeriod: `/ ${sessionPass.entry_limit || 10} sessions`,
+      features: sessionPass.features?.length
+        ? sessionPass.features.map((f) => f.feature.replace(/^[✓✔\s]+/, ""))
+        : [],
+    });
+  }
+  if (saltWeekly) {
+    dynamicSaltPlans.push({
+      variant: "weekly",
+      name: saltWeekly.name || "Once a Week",
+      price: saltWeekly.price ? `€${parseFloat(String(saltWeekly.price)).toFixed(0)}` : "€0",
+      perPeriod: "/ 4 weeks",
+      features: saltWeekly.features?.length
+        ? saltWeekly.features.map((f) => f.feature.replace(/^[✓✔\s]+/, ""))
+        : [],
+    });
+  }
+  if (saltUnlimited) {
+    dynamicSaltPlans.push({
+      variant: "infinite",
+      name: saltUnlimited.name || "Unlimited",
+      price: saltUnlimited.price ? `€${parseFloat(String(saltUnlimited.price)).toFixed(0)}` : "€0",
+      perPeriod: "/ 4 weeks",
+      features: saltUnlimited.features?.length
+        ? saltUnlimited.features.map((f) => f.feature.replace(/^[✓✔\s]+/, ""))
+        : [],
+    });
+  }
+
+  const saunaPlans = apiData?.subscription_plans?.filter(
+    (p) => p.plan_category?.toLowerCase() === "sauna"
+  ) || [];
+
+  const saunaWeekly = saunaPlans.find((p) => p.plan_type?.toLowerCase() === "weekly");
+  const saunaUnlimited = saunaPlans.find((p) => p.plan_type?.toLowerCase() === "unlimited");
+
+  const dynamicSaunaPlans = [];
+  if (saunaWeekly) {
+    dynamicSaunaPlans.push({
+      variant: "essential",
+      name: saunaWeekly.name || "Once a Week",
+      price: saunaWeekly.price ? `€${parseFloat(String(saunaWeekly.price)).toFixed(0)}` : "€0",
+      perPeriod: "/ 4 weeks",
+      features: saunaWeekly.features?.length
+        ? saunaWeekly.features.map((f) => f.feature.replace(/^[✓✔\s]+/, ""))
+        : [],
+    });
+  }
+  if (saunaUnlimited) {
+    dynamicSaunaPlans.push({
+      variant: "infinite",
+      name: saunaUnlimited.name || "Unlimited",
+      price: saunaUnlimited.price ? `€${parseFloat(String(saunaUnlimited.price)).toFixed(0)}` : "€0",
+      perPeriod: "/ 4 weeks",
+      features: saunaUnlimited.features?.length
+        ? saunaUnlimited.features.map((f) => f.feature.replace(/^[✓✔\s]+/, ""))
+        : [],
+    });
+  }
+
+  const plans = category === "salt" ? dynamicSaltPlans : dynamicSaunaPlans;
 
   return (
     <section
@@ -144,7 +228,15 @@ const MembershipCards = () => {
         </div>
 
         {/* Cards row */}
-        <div className={`grid grid-cols-1 ${plans.length === 3 ? "md:grid-cols-3" : "md:grid-cols-2 max-w-4xl"} gap-6 lg:gap-8 w-full items-stretch`}>
+        {plans.length === 0 ? (
+          <div className="w-full text-center py-16 px-6 bg-white rounded-3xl border border-[#E8E2DC] shadow-xs max-w-lg">
+            <p className="text-xl font-bold font-displayPlayFair text-[#0F172A] mb-2">No Service Available</p>
+            <p className="text-sm text-[#64748B] font-cambria italic">
+              Currently there are no membership plans available for this category.
+            </p>
+          </div>
+        ) : (
+          <div className={`grid grid-cols-1 ${plans.length === 3 ? "md:grid-cols-3" : "md:grid-cols-2 max-w-4xl"} gap-6 lg:gap-8 w-full items-stretch`}>
           {plans.map((plan) => {
             const isDark = plan.variant === "infinite";
             const isFilled = plan.variant === "weekly" || isDark;
@@ -287,6 +379,7 @@ const MembershipCards = () => {
             );
           })}
         </div>
+        )}
 
         {/* Bottom subtitle */}
         <p

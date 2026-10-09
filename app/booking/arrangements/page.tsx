@@ -5,6 +5,7 @@ import {
   calculateSaltRoomPrice,
   updateStoredBookingData,
 } from "@/lib/bookingStore";
+import { servicesService, SaltroomServicesData } from "@/lib/api/services/servicesService";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -28,65 +29,6 @@ interface SaltOption {
   features: string[];
 }
 
-const saltOptions: SaltOption[] = [
-  {
-    id: "single",
-    title: "Single Session Reservation",
-    badge: "Standard Booking",
-    price: "€25 / person",
-    subtitle: "1-Hour Aerosol Halotherapy Session",
-    icon: <FaSpa className="w-5 h-5 text-[#8B7355]" />,
-    features: [
-      "1-hour pure aerosol halotherapy session",
-      "Maximum 2 people per session",
-      "Automatic 10-minute changeover period",
-      "Herbal tea & relaxation recliners included",
-    ],
-  },
-  {
-    id: "10_session_pass",
-    title: "10-Session Pass",
-    badge: "Best Value Pass",
-    price: "€200",
-    subtitle: "10 Sessions (€20 per session)",
-    icon: <FaBoxes className="w-5 h-5 text-[#8B7355]" />,
-    features: [
-      "Linked directly to your customer account",
-      "Automatically deducts 1 session when booking",
-      "View remaining session balance anytime in account",
-      "Valid for 1 full year after purchase date",
-    ],
-  },
-  {
-    id: "once_a_week",
-    title: "Once-a-Week Membership",
-    badge: "Weekly Ritual",
-    price: "€70 / 4 weeks",
-    subtitle: "1 Session Every Week",
-    icon: <FaCalendarAlt className="w-5 h-5 text-[#8B7355]" />,
-    features: [
-      "1 included session per week",
-      "Maximum 4 included sessions per 4-week period",
-      "Automatic account membership recognition",
-      "Flexible online scheduling in advance",
-    ],
-  },
-  {
-    id: "unlimited",
-    title: "Unlimited Membership",
-    badge: "Ultimate Wellness",
-    price: "€100 / 4 weeks",
-    subtitle: "Unlimited Halotherapy Access",
-    icon: <FaInfinity className="w-5 h-5 text-[#8B7355]" />,
-    features: [
-      "Unlimited use within available capacity",
-      "Each session reserved in advance",
-      "Maximum 10 active future reservations at the same time",
-      "Priority booking access for prime time slots",
-    ],
-  },
-];
-
 const packagesCombinations = [
   {
     title: "Salt & Sauna Detox Journey",
@@ -107,13 +49,123 @@ export default function SaltRoomBookingPage() {
   const [selectedOption, setSelectedOption] = useState<OptionType>("single");
   const [guestsCount, setGuestsCount] = useState<number>(1);
   const [hasActivePass, setHasActivePass] = useState<boolean>(false);
+  const [apiData, setApiData] = useState<SaltroomServicesData | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    const total = calculateSaltRoomPrice(guestsCount, selectedOption, hasActivePass);
-    let name = "Salt Room Session";
-    if (selectedOption === "10_session_pass") name = "Salt Room (10-Session Pass)";
-    else if (selectedOption === "once_a_week") name = "Salt Room (Once-a-Week Membership)";
-    else if (selectedOption === "unlimited") name = "Salt Room (Unlimited Membership)";
+    setLoading(true);
+    servicesService
+      .getSaltRoomServices()
+      .then((res) => {
+        if (res && (res.saltroom?.length || res.subscription_plans?.length || res.session_pass?.length)) {
+          setApiData(res);
+        } else {
+          setApiData(null);
+        }
+      })
+      .catch((err) => {
+        console.error("Error fetching saltroom services:", err);
+        setApiData(null);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  }, []);
+
+  const saltroomInfo = apiData?.saltroom?.[0];
+  const singlePriceNum = parseFloat(String(saltroomInfo?.price_per_person || 0)) || 0;
+  const singlePrice = `€${singlePriceNum.toFixed(0)} / person`;
+
+  const saltPlans = apiData?.subscription_plans?.filter(
+    (p) => p.plan_category?.toLowerCase() === "saltroom"
+  ) || apiData?.subscription_plans || [];
+
+  const weeklyPlan = saltPlans.find((p) => p.plan_type?.toLowerCase() === "weekly");
+  const unlimitedPlan = saltPlans.find((p) => p.plan_type?.toLowerCase() === "unlimited");
+  const sessionPass = apiData?.session_pass?.[0];
+
+  const saltOptions: SaltOption[] = [];
+
+  if (saltroomInfo) {
+    saltOptions.push({
+      id: "single",
+      title: saltroomInfo.title ? `${saltroomInfo.title} Session` : "Single Session Reservation",
+      badge: "Standard Booking",
+      price: singlePrice,
+      subtitle: saltroomInfo.subtitle || "1-Hour Aerosol Halotherapy Session",
+      icon: <FaSpa className="w-5 h-5 text-[#8B7355]" />,
+      features: saltroomInfo.features?.length
+        ? saltroomInfo.features.map((f) => f.feature.replace(/^[✓✔\s]+/, ""))
+        : [],
+    });
+  }
+
+  if (sessionPass) {
+    saltOptions.push({
+      id: "10_session_pass",
+      title: sessionPass.name || "10-Session Pass",
+      badge: "Best Value Pass",
+      price: sessionPass.price ? `€${parseFloat(String(sessionPass.price)).toFixed(0)}` : "€0",
+      subtitle: sessionPass.entry_limit
+        ? `${sessionPass.entry_limit} Sessions (€20 per session)`
+        : "10 Sessions",
+      icon: <FaBoxes className="w-5 h-5 text-[#8B7355]" />,
+      features: sessionPass.features?.length
+        ? sessionPass.features.map((f) => f.feature.replace(/^[✓✔\s]+/, ""))
+        : [],
+    });
+  }
+
+  if (weeklyPlan) {
+    saltOptions.push({
+      id: "once_a_week",
+      title: weeklyPlan.name ? `${weeklyPlan.name} Membership` : "Once-a-Week Membership",
+      badge: "Weekly Ritual",
+      price: weeklyPlan.price ? `€${parseFloat(String(weeklyPlan.price)).toFixed(0)} / 4 weeks` : "€0 / 4 weeks",
+      subtitle: "1 Session Every Week",
+      icon: <FaCalendarAlt className="w-5 h-5 text-[#8B7355]" />,
+      features: weeklyPlan.features?.length
+        ? weeklyPlan.features.map((f) => f.feature.replace(/^[✓✔\s]+/, ""))
+        : [],
+    });
+  }
+
+  if (unlimitedPlan) {
+    saltOptions.push({
+      id: "unlimited",
+      title: unlimitedPlan.name ? `${unlimitedPlan.name} Membership` : "Unlimited Membership",
+      badge: "Ultimate Wellness",
+      price: unlimitedPlan.price ? `€${parseFloat(String(unlimitedPlan.price)).toFixed(0)} / 4 weeks` : "€0 / 4 weeks",
+      subtitle: "Unlimited Halotherapy Access",
+      icon: <FaInfinity className="w-5 h-5 text-[#8B7355]" />,
+      features: unlimitedPlan.features?.length
+        ? unlimitedPlan.features.map((f) => f.feature.replace(/^[✓✔\s]+/, ""))
+        : [],
+    });
+  }
+
+  useEffect(() => {
+    if (saltOptions.length > 0 && !saltOptions.some((o) => o.id === selectedOption)) {
+      setSelectedOption(saltOptions[0].id);
+    }
+  }, [saltOptions, selectedOption]);
+
+  const calculateDynamicTotal = (): number => {
+    if (hasActivePass) return 0;
+    if (selectedOption === "single") return guestsCount * singlePriceNum;
+    if (selectedOption === "10_session_pass") return parseFloat(String(sessionPass?.price || 0)) || 0;
+    if (selectedOption === "once_a_week") return parseFloat(String(weeklyPlan?.price || 0)) || 0;
+    if (selectedOption === "unlimited") return parseFloat(String(unlimitedPlan?.price || 0)) || 0;
+    return 0;
+  };
+
+  const calculatedTotal = calculateDynamicTotal();
+
+  useEffect(() => {
+    let name = saltroomInfo?.title || "Salt Room Session";
+    if (selectedOption === "10_session_pass") name = `${sessionPass?.name || "Salt Room"} (10-Session Pass)`;
+    else if (selectedOption === "once_a_week") name = `${weeklyPlan?.name || "Salt Room"} (Once-a-Week Membership)`;
+    else if (selectedOption === "unlimited") name = `${unlimitedPlan?.name || "Salt Room"} (Unlimited Membership)`;
 
     updateStoredBookingData({
       serviceName: name,
@@ -123,27 +175,59 @@ export default function SaltRoomBookingPage() {
       guestsCount,
       changeoverMinutes: 10,
       durationHours: 1,
-      totalAmount: total,
-      price: hasActivePass ? "€0 (Pass / Membership Deducted)" : `€${total}`,
+      totalAmount: calculatedTotal,
+      price: hasActivePass ? "€0 (Pass / Membership Deducted)" : `€${calculatedTotal}`,
     });
-  }, [selectedOption, guestsCount, hasActivePass]);
+  }, [selectedOption, guestsCount, hasActivePass, calculatedTotal, saltroomInfo, sessionPass, weeklyPlan, unlimitedPlan]);
 
   const handleContinue = () => {
     router.push("/booking/choose-time");
   };
 
-  const calculatedTotal = calculateSaltRoomPrice(guestsCount, selectedOption, hasActivePass);
+  if (loading) {
+    return (
+      <div className="w-full px-6 md:px-12 max-w-6xl mx-auto py-24 text-center">
+        <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-[#8B7355] border-t-transparent mb-4"></div>
+        <p className="text-[#64748B] font-cambria italic">Loading Salt Room Services...</p>
+      </div>
+    );
+  }
+
+  if (!apiData || saltOptions.length === 0) {
+    return (
+      <div className="w-full px-6 md:px-12 max-w-6xl mx-auto py-16">
+        <div className="text-center mb-12 flex flex-col items-center">
+          <h1 className="font-displayPlayFair text-5xl text-[#1d1a17] mb-2 uppercase tracking-tight">
+            Salt Room Halotherapy
+          </h1>
+          <DecorativeUnderline />
+        </div>
+        <div className="bg-white rounded-[32px] p-12 shadow-sm border border-[#E8E2DC] text-center max-w-2xl mx-auto">
+          <div className="w-16 h-16 bg-[#FCF2E9] rounded-2xl flex items-center justify-center mx-auto mb-4 text-[#8B7355]">
+            <FaSpa className="w-8 h-8" />
+          </div>
+          <h3 className="text-2xl font-bold font-displayPlayFair text-[#0F172A] mb-2">
+            No Service Available
+          </h3>
+          <p className="text-sm text-[#64748B] font-cambria italic">
+            Currently there are no salt room services available from the server. Please check back later.
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="w-full px-6 md:px-12 max-w-6xl mx-auto">
       {/* ── Title Section ── */}
       <div className="text-center mb-12 flex flex-col items-center">
         <h1 className="font-displayPlayFair text-5xl text-[#1d1a17] mb-2 uppercase tracking-tight">
-          Salt Room Halotherapy
+          {saltroomInfo?.title ? `${saltroomInfo.title} Halotherapy` : "Salt Room Halotherapy"}
         </h1>
         <DecorativeUnderline />
         <p className="font-cambria text-sm text-[#475569] mt-6 italic">
-          Therapeutic micro-climate salt room sessions designed to purify respiratory health, cleanse skin, and restore vitality.
+          {saltroomInfo?.description ||
+            "Therapeutic micro-climate salt room sessions designed to purify respiratory health, cleanse skin, and restore vitality."}
         </p>
       </div>
 

@@ -66,6 +66,55 @@ export interface ActivityApiItem {
   isRecurring?: boolean;
 }
 
+export interface SaltroomFeature {
+  id: number;
+  feature: string;
+}
+
+export interface SaltroomItem {
+  id: number;
+  title: string;
+  subtitle?: string;
+  description?: string;
+  images?: string | null;
+  price_per_person?: string | number;
+  features?: SaltroomFeature[];
+}
+
+export interface SubscriptionPlanFeature {
+  id: number;
+  feature: string;
+}
+
+export interface SubscriptionPlanItem {
+  id: number;
+  features?: SubscriptionPlanFeature[];
+  name: string;
+  price: string | number;
+  plan_type: "weekly" | "unlimited" | string;
+  plan_category: "sauna" | "saltroom" | string;
+  max_reservations?: number;
+}
+
+export interface SessionPassFeature {
+  id: number;
+  feature: string;
+}
+
+export interface SessionPassItem {
+  id: number;
+  features?: SessionPassFeature[];
+  name: string;
+  price: string | number;
+  entry_limit?: number;
+}
+
+export interface SaltroomServicesData {
+  saltroom?: SaltroomItem[];
+  subscription_plans?: SubscriptionPlanItem[];
+  session_pass?: SessionPassItem[];
+}
+
 export interface SaltRoomInfo {
   pricing: {
     single_session_price: number | string;
@@ -177,6 +226,27 @@ export const servicesService = {
     if (res?.results && Array.isArray(res.results)) return res.results;
     if (Array.isArray(res)) return res;
     return [];
+  },
+
+  async getSaltRoomServices(): Promise<SaltroomServicesData> {
+    try {
+      let res: any;
+      try {
+        res = await ApiClient.get<any>("/services/saltroom/", { skipAuth: true });
+      } catch {
+        res = await ApiClient.get<any>("/services/salt-room/", { skipAuth: true });
+      }
+      if (res?.data?.saltroom || res?.data?.subscription_plans || res?.data?.session_pass) {
+        return res.data;
+      }
+      if (res?.saltroom || res?.subscription_plans || res?.session_pass) {
+        return res;
+      }
+      return res?.data || {};
+    } catch (err) {
+      console.error("Error fetching saltroom services:", err);
+      return {};
+    }
   },
 
   async getSaltRoomInfo(): Promise<{ success: boolean; data: SaltRoomInfo }> {

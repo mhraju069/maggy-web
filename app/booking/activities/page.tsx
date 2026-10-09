@@ -84,15 +84,13 @@ export default function ActivitiesBookingPage() {
         setActivities(mapped);
         setSelectedActivity(mapped[0]);
       } else {
-        const fallback = getActivities();
-        setActivities(fallback);
-        if (fallback.length > 0) setSelectedActivity(fallback[0]);
+        setActivities([]);
+        setSelectedActivity(null);
       }
     } catch (err: unknown) {
       setError(parseApiErrorMessage(err));
-      const fallback = getActivities();
-      setActivities(fallback);
-      if (fallback.length > 0) setSelectedActivity(fallback[0]);
+      setActivities([]);
+      setSelectedActivity(null);
     } finally {
       setLoading(false);
     }

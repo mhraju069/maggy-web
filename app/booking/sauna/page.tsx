@@ -135,6 +135,39 @@ export default function SaunaBookingPage() {
     });
   };
 
+  if (loading) {
+    return (
+      <div className="w-full px-6 md:px-12 max-w-4xl mx-auto py-24 text-center">
+        <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-[#8B7355] border-t-transparent mb-4"></div>
+        <p className="text-[#64748B] font-cambria italic">Loading Sauna Services...</p>
+      </div>
+    );
+  }
+
+  if (!privateItem && !sharedItem) {
+    return (
+      <div className="w-full px-6 md:px-12 max-w-4xl mx-auto py-16">
+        <div className="text-center mb-12 flex flex-col items-center">
+          <h1 className="font-displayPlayFair text-5xl text-[#1d1a17] mb-2 uppercase tracking-tight">
+            Sauna & Wellness
+          </h1>
+          <DecorativeUnderline />
+        </div>
+        <div className="bg-white rounded-[32px] p-12 shadow-sm border border-[#E8E2DC] text-center max-w-2xl mx-auto">
+          <div className="w-16 h-16 bg-[#FCF2E9] rounded-2xl flex items-center justify-center mx-auto mb-4 text-[#8B7355]">
+            <FaSpa className="w-8 h-8" />
+          </div>
+          <h3 className="text-2xl font-bold font-displayPlayFair text-[#0F172A] mb-2">
+            No Service Available
+          </h3>
+          <p className="text-sm text-[#64748B] font-cambria italic">
+            Currently there are no sauna services available from the server. Please check back later.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="w-full px-6 md:px-12">
       {/* ── Title Section ── */}
