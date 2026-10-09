@@ -25,8 +25,15 @@ export class ApiClient {
     const url = buildApiUrl(endpoint, params);
 
     // Build Headers
+    const activeLang =
+      typeof window !== "undefined"
+        ? localStorage.getItem("haven_language") || "en"
+        : "en";
+
     const headers: Record<string, string> = {
       ...DEFAULT_HEADERS,
+      "Accept-Language": activeLang,
+      lang: activeLang,
       ...customHeaders,
     };
 

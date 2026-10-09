@@ -8,18 +8,6 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 
-const navHrefs = [
-  "/",
-  "/about",
-  "/lunchroom",
-  "/menu",
-  "/wellness",
-  "/eventspace",
-  "/arrangements",
-  "/activities",
-  "/memberships",
-  "/contact",
-];
 const languageOptions: { label: string; value: Language }[] = [
   { label: "EN", value: "en" },
   { label: "NL", value: "nl" },
@@ -50,13 +38,14 @@ const Navbar = () => {
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 w-full bg-[#FCF2E9]">
-      <div className="mx-auto flex h-[88px] container items-center justify-between px-6">
-        <div className="flex items-center gap-8">
+      <div className="mx-auto flex h-[88px] max-w-[1550px] items-center justify-between px-4 sm:px-6">
+        {/* ── Left: Logo + Language ── */}
+        <div className="flex items-center gap-3 sm:gap-4 xl:gap-6 shrink-0">
           <Link
             href="/"
             className="flex items-center transition-transform hover:scale-105"
           >
-            <div className="relative h-[54px] w-[54px] overflow-hidden rounded-[41px]">
+            <div className="relative h-[48px] w-[48px] sm:h-[54px] sm:w-[54px] overflow-hidden rounded-[41px]">
               <Image
                 src="/images/logo.png"
                 alt="Haven on Earth Logo"
@@ -75,7 +64,7 @@ const Navbar = () => {
               aria-haspopup="listbox"
               aria-expanded={isLanguageOpen}
             >
-              <span className="text-[16px] font-bold text-[#1A1A1A] font-serif">
+              <span className="text-[15px] sm:text-[16px] font-bold text-[#1A1A1A] font-serif">
                 {activeLanguageLabel}
               </span>
               <svg
@@ -100,7 +89,7 @@ const Navbar = () => {
               </svg>
             </button>
             {isLanguageOpen && (
-              <div className="absolute left-0 top-full mt-2 w-20 rounded-md border border-[#E5D6C7] bg-white/95 py-1 shadow-lg">
+              <div className="absolute left-0 top-full mt-2 w-20 rounded-md border border-[#E5D6C7] bg-white/95 py-1 shadow-lg z-50">
                 {languageOptions.map((option) => (
                   <button
                     key={option.value}
@@ -125,12 +114,13 @@ const Navbar = () => {
           </div>
         </div>
 
-        <div className="hidden items-center gap-1 xl:gap-2 lg:flex shrink-0">
+        {/* ── Center: Nav Links (Desktop >= 1280px) ── */}
+        <div className="hidden xl:flex flex-1 items-center justify-center gap-0.5 xl:gap-1 2xl:gap-2 px-2 mx-auto">
           {navLinks.map((link) => (
             <Link
               key={link.href}
               href={link.href}
-              className={`rounded-md px-2 xl:px-3.5 py-2.5 text-[15px] xl:text-[16px] font-medium font-serif whitespace-nowrap transition-colors ${
+              className={`rounded-md px-1.5 xl:px-2.5 2xl:px-3.5 py-2 text-[13px] xl:text-[14px] 2xl:text-[15px] font-medium font-serif whitespace-nowrap transition-colors ${
                 pathname === link.href
                   ? "bg-[#F5D8BB] text-[#0F172A]"
                   : "text-[#2D2D2D] hover:text-[#CA7521]"
@@ -141,15 +131,16 @@ const Navbar = () => {
           ))}
         </div>
 
-        <div className="hidden items-center gap-2 xl:gap-4 lg:flex shrink-0">
+        {/* ── Right: Login + Book Now (Desktop >= 1280px) ── */}
+        <div className="hidden xl:flex items-center gap-2 2xl:gap-3 shrink-0">
           <Link
             href="/login"
-            className="flex items-center gap-2.5 rounded-md border border-[#CFB9A3] bg-transparent px-5 xl:px-7 py-3.5 text-[15px] xl:text-[16px] font-bold font-serif text-[#0F172A] whitespace-nowrap shrink-0 transition-all hover:border-[#C4AD96] hover:text-[#0F172A] active:scale-95"
+            className="flex items-center gap-2 rounded-md border border-[#CFB9A3] bg-transparent px-4 2xl:px-6 py-2.5 2xl:py-3 text-[14px] 2xl:text-[15px] font-bold font-serif text-[#0F172A] whitespace-nowrap shrink-0 transition-all hover:border-[#C4AD96] hover:text-[#0F172A] active:scale-95"
           >
             {t.navbar.login}
             <svg
-              width="18"
-              height="18"
+              width="16"
+              height="16"
               viewBox="0 0 24 24"
               fill="none"
               xmlns="http://www.w3.org/2000/svg"
@@ -166,9 +157,10 @@ const Navbar = () => {
           <BookNow href="/booking" label={t.navbar.bookNow} />
         </div>
 
+        {/* ── Mobile & Tablet Hamburger Button (< 1280px) ── */}
         <button
           type="button"
-          className="flex h-10 w-10 items-center justify-center rounded-md border border-[#E5D6C7] text-[#1A1A1A] lg:hidden"
+          className="flex h-10 w-10 items-center justify-center rounded-md border border-[#E5D6C7] text-[#1A1A1A] xl:hidden shrink-0"
           aria-label="Toggle menu"
           aria-expanded={isMenuOpen}
           onClick={() => setIsMenuOpen((prev) => !prev)}
@@ -184,15 +176,16 @@ const Navbar = () => {
         </button>
       </div>
 
+      {/* ── Mobile & Tablet Menu Drawer (< 1280px) ── */}
       {isMenuOpen && (
-        <div className="border-t border-[#E5D6C7] bg-[#FCF2E9] lg:hidden">
-          <div className="container mx-auto flex flex-col gap-2 px-6 py-4">
+        <div className="border-t border-[#E5D6C7] bg-[#FCF2E9] xl:hidden max-h-[calc(100vh-88px)] overflow-y-auto">
+          <div className="mx-auto flex flex-col gap-2 px-6 py-4">
             {navLinks.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
                 onClick={() => setIsMenuOpen(false)}
-                className={`rounded-md px-4 py-2 text-[16px] font-medium font-serif transition-colors ${
+                className={`rounded-md px-4 py-2.5 text-[16px] font-medium font-serif transition-colors ${
                   pathname === link.href
                     ? "bg-[#F5D8BB] text-[#0F172A]"
                     : "text-[#2D2D2D] hover:text-[#CA7521]"
@@ -211,7 +204,7 @@ const Navbar = () => {
                     setLanguage(option.value as Language);
                     setIsMenuOpen(false);
                   }}
-                  className={`px-3 py-1 rounded-md text-[14px] font-semibold font-serif border transition-colors ${
+                  className={`px-3 py-1.5 rounded-md text-[14px] font-semibold font-serif border transition-colors ${
                     language === option.value
                       ? "bg-[#CFB9A3] text-[#0F172A] border-[#CFB9A3]"
                       : "bg-transparent text-[#1A1A1A] border-[#E5D6C7] hover:border-[#CFB9A3]"
@@ -221,10 +214,10 @@ const Navbar = () => {
                 </button>
               ))}
             </div>
-            <div className="mt-2 flex flex-col gap-2">
+            <div className="mt-2 flex flex-col gap-2.5">
               <Link
                 href="/login"
-                className="flex items-center justify-center gap-3 rounded-md border border-[#CFB9A3] bg-transparent px-8 py-4 text-[16px] font-bold font-serif text-[#0F172A] transition-all hover:border-[#C4AD96] hover:text-[#0F172A] active:scale-95"
+                className="flex items-center justify-center gap-3 rounded-md border border-[#CFB9A3] bg-transparent px-8 py-3.5 text-[16px] font-bold font-serif text-[#0F172A] transition-all hover:border-[#C4AD96] hover:text-[#0F172A] active:scale-95"
               >
                 {t.navbar.login}
                 <svg
