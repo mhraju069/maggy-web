@@ -90,6 +90,27 @@ export interface CreateActivityBookingResponse {
   message?: string;
 }
 
+export interface EventBookingPayload {
+  name: string;
+  email: string;
+  phone: string;
+  date: string;
+  start_time: string;
+  end_time: string;
+  guests: number;
+  food_preference?: string;
+  drink_preference?: string;
+  music_preference?: string;
+  notes?: string;
+}
+
+export interface EventBookingResponse {
+  success: boolean;
+  booking_id: string;
+  data?: any;
+  message?: string;
+}
+
 export const bookingService = {
   async getBookings(params?: Record<string, string | number>): Promise<PaginatedResponse<Booking> | Booking[]> {
     return ApiClient.get<PaginatedResponse<Booking> | Booking[]>(ENDPOINTS.BOOKINGS.LIST, { params });
@@ -109,6 +130,10 @@ export const bookingService = {
 
   async createActivityBooking(payload: CreateActivityBookingPayload): Promise<CreateActivityBookingResponse> {
     return ApiClient.post<CreateActivityBookingResponse>(ENDPOINTS.BOOKINGS.ACTIVITIES_CREATE, payload, { skipAuth: true });
+  },
+
+  async createEventBooking(payload: EventBookingPayload): Promise<EventBookingResponse> {
+    return ApiClient.post<EventBookingResponse>(ENDPOINTS.BOOKINGS.EVENTS_CREATE, payload, { skipAuth: true });
   },
 
   async createPaymentIntent(bookingId: string, currency: string = "eur"): Promise<{ success: boolean; client_secret: string; booking_id: string }> {
