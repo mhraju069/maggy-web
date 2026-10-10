@@ -133,11 +133,33 @@ export default function StripePaymentForm({
       }
 
       const isLunchroom = bookingData.serviceType === "lunchroom" || bookingData.serviceName?.toLowerCase().includes("lunchroom");
+      const isActivity = bookingData.serviceType === "activity" || Boolean(bookingData.activityDetails);
 
       // Call Combined API: Create Booking & Get Stripe Client Secret
       let clientSecret: string | undefined;
       try {
-        if (isLunchroom) {
+        if (isActivity) {
+          const actId = bookingData.activityDetails?.id || 1;
+          const parsedActId = typeof actId === "string" && !isNaN(Number(actId)) ? parseInt(actId, 10) : actId;
+
+          const actPayload = {
+            activity: parsedActId,
+            capacity: bookingData.guestsCount || 1,
+            name: cardName.trim() || bookingData.name || "Guest",
+            email: bookingData.email || "guest@example.com",
+            phone: bookingData.phone || "+31612345678",
+            special_request: bookingData.requests || undefined,
+            total_price: numericPrice.toFixed(2),
+          };
+
+          const res = await bookingService.createActivityBooking(actPayload);
+          if (res && res.booking_id) {
+            updateStoredBookingData({ bookingId: res.booking_id });
+          }
+          if (res && res.client_secret) {
+            clientSecret = res.client_secret;
+          }
+        } else if (isLunchroom) {
           const celebration = bookingData.celebration;
           const lunchPayload = {
             booking_date: bookingData.date || new Date().toISOString().split("T")[0],
@@ -193,7 +215,7 @@ export default function StripePaymentForm({
       } catch (apiErr: any) {
         console.warn("Booking API notice:", apiErr);
         // Fallback booking reference if backend is offline/mock
-        const fallbackPrefix = isLunchroom ? "LR" : bookingData.isSharedSauna ? "SS" : "PS";
+        const fallbackPrefix = isActivity ? "ACT" : isLunchroom ? "LR" : bookingData.isSharedSauna ? "SS" : "PS";
         const fallbackRef = `${fallbackPrefix}-${Math.floor(1000 + Math.random() * 9000)}`;
         updateStoredBookingData({ bookingId: fallbackRef });
       }

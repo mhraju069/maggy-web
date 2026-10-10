@@ -32,6 +32,8 @@ export interface ActivityBookingDetails {
   teacherHost: string;
   additionalInfo: string;
   isRecurring: boolean;
+  availableSlots?: number;
+  bookedSlots?: number;
 }
 
 export interface BookingData {

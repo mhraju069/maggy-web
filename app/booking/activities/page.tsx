@@ -58,6 +58,25 @@ export default function ActivitiesBookingPage() {
           const defaultCategory = CATEGORIES[(idx % (CATEGORIES.length - 1)) + 1];
           const rawPrice = parsePrice(item.price, 40);
 
+          // Format session times
+          const startTime = item.open_time
+            ? item.open_time.slice(0, 5)
+            : item.start_time
+            ? item.start_time.slice(0, 5)
+            : item.startTime || "10:00";
+          const endTime = item.close_time
+            ? item.close_time.slice(0, 5)
+            : item.end_time
+            ? item.end_time.slice(0, 5)
+            : item.endTime || "11:30";
+
+          const maxCapacity = item.capacity ?? item.max_participants ?? item.maxParticipants ?? 12;
+          const bookedCount = item.booked_slots ?? item.booked_participants ?? item.bookedParticipants ?? 0;
+          const availableCount = item.available_slots !== undefined ? item.available_slots : Math.max(0, maxCapacity - bookedCount);
+          const hostName = item.host || item.teacher_host || item.teacherHost || "Elena Rostova";
+          const notes = item.additional_notes || item.description || "Complimentary herbal tea & mat provided.";
+          const available = (item.is_available ?? true) && availableCount > 0;
+
           return {
             id: String(item.id ?? idx),
             name: item.title || item.name || "Mindful Session",
@@ -70,15 +89,18 @@ export default function ActivitiesBookingPage() {
               fallbackImages[idx % fallbackImages.length]
             ),
             date: item.date || "2026-10-15",
-            startTime: item.start_time || item.startTime || "08:00",
-            endTime: item.end_time || item.endTime || "09:15",
+            startTime,
+            endTime,
             price: rawPrice,
-            maxParticipants: item.max_participants || item.maxParticipants || 12,
-            bookedParticipants: item.booked_participants || item.bookedParticipants || 4,
-            teacherHost: item.teacher_host || item.teacherHost || "Elena Rostova",
-            additionalInfo: "Complimentary herbal tea & mat provided.",
+            maxParticipants: maxCapacity,
+            bookedParticipants: bookedCount,
+            availableSlots: availableCount,
+            bookedSlots: bookedCount,
+            teacherHost: hostName,
+            additionalInfo: notes,
             isRecurring: item.is_recurring ?? item.isRecurring ?? true,
-            features: item.features?.map((f) => f.feature) || [],
+            features: item.features?.map((f: any) => (typeof f === "string" ? f : f.feature)) || [],
+            isAvailable: available,
           };
         });
         setActivities(mapped);
@@ -112,8 +134,8 @@ export default function ActivitiesBookingPage() {
   const handleContinue = () => {
     if (!selectedActivity) return;
 
-    const remaining = selectedActivity.maxParticipants - selectedActivity.bookedParticipants;
-    if (remaining <= 0) return;
+    const remaining = selectedActivity.availableSlots !== undefined ? selectedActivity.availableSlots : selectedActivity.maxParticipants - selectedActivity.bookedParticipants;
+    if (remaining <= 0 || selectedActivity.isAvailable === false) return;
 
     updateStoredBookingData({
       serviceName: selectedActivity.name,
@@ -123,6 +145,10 @@ export default function ActivitiesBookingPage() {
       timeSlot: `${selectedActivity.startTime} - ${selectedActivity.endTime}`,
       guestsCount: 1,
       totalAmount: selectedActivity.price,
+      selectedExtras: [],
+      durationHours: undefined,
+      isSharedSauna: false,
+      isSaltRoom: false,
       activityDetails: {
         id: selectedActivity.id,
         name: selectedActivity.name,
@@ -137,10 +163,12 @@ export default function ActivitiesBookingPage() {
         teacherHost: selectedActivity.teacherHost,
         additionalInfo: selectedActivity.additionalInfo,
         isRecurring: selectedActivity.isRecurring,
+        availableSlots: selectedActivity.availableSlots,
+        bookedSlots: selectedActivity.bookedSlots,
       },
     });
 
-    router.push("/booking/choose-time");
+    router.push("/booking/information");
   };
 
   return (
@@ -206,33 +234,36 @@ export default function ActivitiesBookingPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
           {filteredActivities.map((act, idx) => {
             const isSelected = selectedActivity?.id === act.id;
-            const remaining = act.maxParticipants - act.bookedParticipants;
-            const isSoldOut = remaining <= 0;
+            const remaining = act.availableSlots !== undefined ? act.availableSlots : act.maxParticipants - act.bookedParticipants;
+            const isSoldOut = remaining <= 0 || act.isAvailable === false;
 
             return (
               <div
                 key={act.id}
-                onClick={() => handleSelectActivity(act)}
-                className={`bg-white rounded-3xl overflow-hidden shadow-sm border transition-all cursor-pointer flex flex-col justify-between ${
-                  isSelected
+                onClick={() => !isSoldOut && handleSelectActivity(act)}
+                className={`bg-white rounded-3xl overflow-hidden shadow-sm border transition-all flex flex-col justify-between ${
+                  isSoldOut
+                    ? "opacity-75 cursor-not-allowed border-[#E2E8F0]"
+                    : "cursor-pointer"
+                } ${
+                  isSelected && !isSoldOut
                     ? "border-[#8B7355] ring-2 ring-[#8B7355]/30 shadow-lg transform -translate-y-1"
                     : "border-[#E8E2DC] hover:border-[#D1B191]"
                 }`}
               >
                 {/* Top Image Banner */}
-                <div className="relative w-full h-48 bg-[#F5F0EB]">
+                <div className="relative w-full h-52 bg-[#F5F0EB]">
                   <Image
                     src={act.image}
                     alt={act.name}
                     fill
                     className="object-cover"
                     onError={(e) => {
-                      // Fallback image if remote URL fails
                       const target = e.target as HTMLImageElement;
                       target.src = fallbackImages[idx % fallbackImages.length];
                     }}
                   />
-                  <div className="absolute top-3 left-3 flex items-center gap-2">
+                  <div className="absolute top-3 left-3 flex flex-wrap items-center gap-2">
                     <span className="px-3 py-1 bg-white/95 backdrop-blur-md rounded-full text-[11px] font-bold text-[#8B7355] shadow-xs">
                       {act.category}
                     </span>
@@ -252,8 +283,9 @@ export default function ActivitiesBookingPage() {
                       </span>
                     </div>
                   ) : (
-                    <div className="absolute bottom-3 right-3 bg-white/95 backdrop-blur-md px-3 py-1 rounded-lg border border-[#E8E2DC] text-[11px] font-bold text-[#0F172A]">
-                      {remaining} {remaining === 1 ? "place left" : "places remaining"}
+                    <div className="absolute bottom-3 right-3 bg-white/95 backdrop-blur-md px-3 py-1 rounded-lg border border-[#E8E2DC] text-[11px] font-bold text-[#0F172A] flex items-center gap-1.5 shadow-xs">
+                      <LuUsers className="text-[#8B7355]" size={13} />
+                      <span>{remaining <= 5 ? `Only ${remaining} ${remaining === 1 ? "spot" : "spots"} left` : `${remaining} spots remaining`}</span>
                     </div>
                   )}
                 </div>
@@ -264,13 +296,36 @@ export default function ActivitiesBookingPage() {
                     <h3 className="font-displayPlayFair text-xl font-bold text-[#0F172A] mb-2 leading-snug">
                       {act.name}
                     </h3>
-                    <p className="text-xs text-[#64748B] line-clamp-2 leading-relaxed">
+                    <p className="text-xs text-[#64748B] line-clamp-2 leading-relaxed mb-3">
                       {act.description}
                     </p>
+
+                    {/* Schedule, Host & Capacity Info Badges */}
+                    <div className="space-y-2 py-3 border-y border-[#F1F5F9] text-xs text-[#475569]">
+                      <div className="flex items-center justify-between gap-2">
+                        <div className="flex items-center gap-2 font-medium">
+                          <AiOutlineClockCircle className="text-[#8B7355] text-sm flex-shrink-0" />
+                          <span>
+                            {act.date ? new Date(act.date).toLocaleDateString("en-US", { month: "short", day: "numeric" }) : ""} • {act.startTime} - {act.endTime}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-1.5 text-[11px] font-semibold text-[#64748B] bg-[#F8FAFC] px-2.5 py-1 rounded-md border border-[#E2E8F0]">
+                          <LuUsers size={12} className="text-[#8B7355]" />
+                          <span>Max {act.maxParticipants}</span>
+                        </div>
+                      </div>
+
+                      {act.teacherHost && (
+                        <div className="flex items-center gap-2 text-xs font-semibold text-[#8B7355]">
+                          <FaChalkboardTeacher className="flex-shrink-0" />
+                          <span>Host: {act.teacherHost}</span>
+                        </div>
+                      )}
+                    </div>
                   </div>
 
                   {/* Features / Highlights Section */}
-                  <div className="border-t border-[#F1F5F9] pt-4 min-h-[48px] flex items-center">
+                  <div className="min-h-[44px] flex flex-col justify-center">
                     {act.features && act.features.length > 0 ? (
                       <div className="flex flex-wrap gap-1.5">
                         {act.features.map((feat, fIdx) => (
@@ -282,21 +337,27 @@ export default function ActivitiesBookingPage() {
                           </span>
                         ))}
                       </div>
+                    ) : act.additionalInfo ? (
+                      <div className="text-[11px] text-[#64748B] italic flex items-center gap-1.5">
+                        <FaInfoCircle className="text-[#8B7355] flex-shrink-0" size={11} />
+                        <span className="line-clamp-1">{act.additionalInfo}</span>
+                      </div>
                     ) : (
                       <span className="text-[11px] text-[#94A3B8] italic">
-                        Standard class access included
+                        Standard session access included
                       </span>
                     )}
                   </div>
 
+                  {/* Price & Selection Indicator */}
                   <div className="flex justify-between items-center pt-3 border-t border-[#F1F5F9]">
                     <span className="text-2xl font-bold font-displayPlayFair text-[#8B7355]">
                       €{act.price} <span className="text-xs text-[#64748B] font-normal">/ person</span>
                     </span>
 
                     <div
-                      className={`w-7 h-7 rounded-full border flex items-center justify-center ${
-                        isSelected
+                      className={`w-7 h-7 rounded-full border flex items-center justify-center transition-all ${
+                        isSelected && !isSoldOut
                           ? "bg-[#8B7355] border-[#8B7355] text-white"
                           : "border-[#CBD5E1] text-transparent"
                       }`}

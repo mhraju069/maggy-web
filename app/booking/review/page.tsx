@@ -22,6 +22,7 @@ export default function ReviewPage() {
 
   const celebration = data.celebration;
   const isLunchroom = data.serviceType === "lunchroom" || data.serviceName.toLowerCase().includes("lunchroom");
+  const isActivity = data.serviceType === "activity" || Boolean(data.activityDetails);
 
   const handleConfirmLunchroom = async () => {
     try {
@@ -108,10 +109,14 @@ export default function ReviewPage() {
                 </div>
                 <div>
                   <span className="text-xs text-[#94A3B8] uppercase block mb-1">
-                    {isLunchroom ? "Start Time" : "Start Time Slot"}
+                    {isActivity ? "Session Time" : isLunchroom ? "Start Time" : "Start Time Slot"}
                   </span>
                   <p className="text-lg font-bold text-[#0F172A]">
-                    {data.timeSlot ? data.timeSlot.split(/[-–]/)[0].trim() : "Not selected"}
+                    {isActivity && data.activityDetails?.startTime
+                      ? `${data.activityDetails.startTime} - ${data.activityDetails.endTime}`
+                      : data.timeSlot
+                      ? data.timeSlot
+                      : "Not selected"}
                   </p>
                 </div>
                 <div>
@@ -122,7 +127,8 @@ export default function ReviewPage() {
                 </div>
               </div>
 
-              {!isLunchroom && data.durationHours && (
+              {/* Sauna Duration & Buffer (Sauna Only) */}
+              {!isLunchroom && !isActivity && data.durationHours && (
                 <div className="pt-3 border-t border-[#F1F5F9] grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <span className="text-xs text-[#94A3B8] uppercase block mb-1">Session Duration</span>
@@ -141,20 +147,15 @@ export default function ReviewPage() {
                 </div>
               )}
 
-              {!isLunchroom && data.activityDetails && (
+              {/* Activity Teacher / Host & Additional Notes (Activity Only) */}
+              {isActivity && data.activityDetails && (
                 <div className="pt-3 border-t border-[#F1F5F9] space-y-3">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {data.activityDetails.teacherHost && (
                     <div>
                       <span className="text-xs text-[#94A3B8] uppercase block mb-1">Teacher / Host</span>
                       <p className="text-base font-bold text-[#0F172A]">{data.activityDetails.teacherHost}</p>
                     </div>
-                    <div>
-                      <span className="text-xs text-[#94A3B8] uppercase block mb-1">Category & Type</span>
-                      <p className="text-base font-bold text-[#8B7355]">
-                        {data.activityDetails.category} ({data.activityDetails.isRecurring ? "Recurring Class" : "One-Time Event"})
-                      </p>
-                    </div>
-                  </div>
+                  )}
 
                   {data.activityDetails.additionalInfo && (
                     <div className="p-3 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0] text-xs text-[#475569]">
@@ -165,7 +166,8 @@ export default function ReviewPage() {
                 </div>
               )}
 
-              {!isLunchroom && data.selectedExtras && data.selectedExtras.length > 0 && (
+              {/* Sauna Extras (Sauna Only) */}
+              {!isLunchroom && !isActivity && data.selectedExtras && data.selectedExtras.length > 0 && (
                 <div className="pt-3 border-t border-[#F1F5F9]">
                   <span className="text-xs text-[#94A3B8] uppercase block mb-2">Selected Add-on Extras</span>
                   <div className="flex flex-wrap gap-2">

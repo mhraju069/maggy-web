@@ -69,6 +69,27 @@ export interface CreateLunchroomBookingResponse {
   currency?: string;
 }
 
+export interface CreateActivityBookingPayload {
+  activity: number | string;
+  capacity: number;
+  name: string;
+  email: string;
+  phone: string;
+  special_request?: string | null;
+  total_price?: number | string;
+}
+
+export interface CreateActivityBookingResponse {
+  success: boolean;
+  booking_id: string;
+  client_secret: string;
+  payment_intent_id?: string;
+  amount?: string;
+  currency?: string;
+  data?: any;
+  message?: string;
+}
+
 export const bookingService = {
   async getBookings(params?: Record<string, string | number>): Promise<PaginatedResponse<Booking> | Booking[]> {
     return ApiClient.get<PaginatedResponse<Booking> | Booking[]>(ENDPOINTS.BOOKINGS.LIST, { params });
@@ -84,6 +105,10 @@ export const bookingService = {
 
   async createLunchroomBooking(payload: CreateLunchroomBookingPayload): Promise<CreateLunchroomBookingResponse> {
     return ApiClient.post<CreateLunchroomBookingResponse>(ENDPOINTS.BOOKINGS.LUNCHROOM_CREATE, payload, { skipAuth: true });
+  },
+
+  async createActivityBooking(payload: CreateActivityBookingPayload): Promise<CreateActivityBookingResponse> {
+    return ApiClient.post<CreateActivityBookingResponse>(ENDPOINTS.BOOKINGS.ACTIVITIES_CREATE, payload, { skipAuth: true });
   },
 
   async createPaymentIntent(bookingId: string, currency: string = "eur"): Promise<{ success: boolean; client_secret: string; booking_id: string }> {

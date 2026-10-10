@@ -20,6 +20,9 @@ export interface Activity {
   isRecurring: boolean; // true = recurring, false = one-time event
   image: string;
   features?: string[];
+  isAvailable?: boolean;
+  availableSlots?: number;
+  bookedSlots?: number;
 }
 
 export const initialActivities: Activity[] = [

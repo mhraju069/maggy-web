@@ -53,15 +53,23 @@ export interface ActivityApiItem {
   category?: string;
   teacher_host?: string;
   teacherHost?: string;
+  host?: string;
   start_time?: string;
   startTime?: string;
+  open_time?: string;
   end_time?: string;
   endTime?: string;
+  close_time?: string;
   date?: string;
+  capacity?: number;
+  available_slots?: number;
+  booked_slots?: number;
   max_participants?: number;
   maxParticipants?: number;
   booked_participants?: number;
   bookedParticipants?: number;
+  additional_notes?: string | null;
+  is_available?: boolean;
   is_recurring?: boolean;
   isRecurring?: boolean;
 }

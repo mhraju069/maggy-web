@@ -38,10 +38,11 @@ export default function InformationPage() {
 
   const [storedData, setStoredData] = useState(getStoredBookingData());
   const isLunchroom = storedData.serviceType === "lunchroom" || storedData.serviceName.toLowerCase().includes("lunchroom");
+  const isActivity = storedData.serviceType === "activity" || Boolean(storedData.activityDetails);
 
   const [date, setDate] = useState("");
   const [timeSlot, setTimeSlot] = useState("12:00");
-  const [guestsCount, setGuestsCount] = useState(2);
+  const [guestsCount, setGuestsCount] = useState(1);
   const [dayError, setDayError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -49,7 +50,7 @@ export default function InformationPage() {
     setStoredData(data);
     setDate(data.date || "");
     setTimeSlot(data.timeSlot || "12:00");
-    setGuestsCount(data.guestsCount || 2);
+    setGuestsCount(data.guestsCount || (data.serviceType === "activity" ? 1 : 2));
     setFormData({
       name: data.name || "",
       email: data.email || "",
@@ -85,7 +86,18 @@ export default function InformationPage() {
   const handleGuestsChange = (num: number) => {
     const valid = Math.max(1, num);
     setGuestsCount(valid);
-    updateStoredBookingData({ guestsCount: valid });
+
+    if (isActivity && storedData.activityDetails?.price) {
+      const singlePrice = storedData.activityDetails.price;
+      const calculatedTotal = singlePrice * valid;
+      updateStoredBookingData({
+        guestsCount: valid,
+        totalAmount: calculatedTotal,
+        price: `€${calculatedTotal}`,
+      });
+    } else {
+      updateStoredBookingData({ guestsCount: valid });
+    }
   };
 
   const handleChange = (
@@ -232,6 +244,109 @@ export default function InformationPage() {
                     </option>
                   ))}
                 </select>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Activity Session Summary & Participants Card (Activity Only) */}
+        {isActivity && storedData.activityDetails && (
+          <div className="bg-white rounded-[32px] p-10 shadow-sm border border-[#E8E2DC]">
+            <h2
+              className="text-xs font-bold text-[#64748B] uppercase tracking-[0.2em] mb-6"
+              style={{ fontFamily: "Inter, sans-serif" }}
+            >
+              Activity Session Details
+            </h2>
+
+            <div className="p-6 rounded-2xl bg-gradient-to-r from-[#FCF2E9] to-[#FBF6F3] border border-[#E8E2DC] mb-6">
+              <span className="text-[10px] font-bold uppercase tracking-widest text-[#8B7355] block mb-1">
+                {storedData.activityDetails.category}
+              </span>
+              <h3 className="text-2xl font-bold font-displayPlayFair text-[#0F172A] mb-2">
+                {storedData.activityDetails.name}
+              </h3>
+              <p className="text-xs text-[#64748B] mb-4 leading-relaxed line-clamp-2">
+                {storedData.activityDetails.description}
+              </p>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4 border-t border-[#E8E2DC]/80 text-xs text-[#475569]">
+                <div>
+                  <span className="text-[10px] uppercase font-bold text-[#8B7355] block">Date & Schedule</span>
+                  <span className="font-semibold text-[#0F172A]">
+                    {storedData.activityDetails.date ? new Date(storedData.activityDetails.date).toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric", year: "numeric" }) : "Upcoming"}
+                  </span>
+                </div>
+
+                <div>
+                  <span className="text-[10px] uppercase font-bold text-[#8B7355] block">Time Slot</span>
+                  <span className="font-semibold text-[#0F172A]">
+                    {storedData.activityDetails.startTime} - {storedData.activityDetails.endTime}
+                  </span>
+                </div>
+
+                <div>
+                  <span className="text-[10px] uppercase font-bold text-[#8B7355] block">Host / Guide</span>
+                  <span className="font-semibold text-[#0F172A]">
+                    {storedData.activityDetails.teacherHost || "Elena Rostova"}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Participants Selection & Price Calculation */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-center pt-2">
+              <div>
+                <label
+                  className="block text-xs font-bold text-[#0F172A] mb-2 uppercase tracking-wider"
+                  style={{ fontFamily: "Inter, sans-serif" }}
+                >
+                  Number of Participants / Tickets *
+                </label>
+                {(() => {
+                  const maxAllowed = storedData.activityDetails?.availableSlots !== undefined
+                    ? storedData.activityDetails.availableSlots
+                    : Math.max(0, (storedData.activityDetails?.maxParticipants || 12) - (storedData.activityDetails?.bookedParticipants || 0));
+
+                  if (maxAllowed <= 0) {
+                    return (
+                      <div className="p-4 rounded-xl bg-red-50 border border-red-200 text-xs font-bold text-red-700">
+                        This session is currently Sold Out. Please choose another session.
+                      </div>
+                    );
+                  }
+
+                  return (
+                    <select
+                      value={guestsCount}
+                      onChange={(e) => handleGuestsChange(parseInt(e.target.value, 10))}
+                      className="w-full p-4 border border-[#E2E8F0] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#D1B191] text-[#475569] font-medium bg-white cursor-pointer"
+                    >
+                      {Array.from({ length: Math.min(10, maxAllowed) }, (_, i) => i + 1).map((num) => (
+                        <option key={num} value={num}>
+                          {num} {num === 1 ? "Person" : "People"} (€{(storedData.activityDetails!.price * num).toFixed(2)})
+                        </option>
+                      ))}
+                    </select>
+                  );
+                })()}
+                <span className="text-[11px] text-[#64748B] mt-1.5 block">
+                  €{storedData.activityDetails.price} per person
+                </span>
+              </div>
+
+              <div className="bg-[#F8FAFC] p-5 rounded-2xl border border-[#E2E8F0] flex flex-col justify-between">
+                <span className="text-[10px] uppercase font-bold tracking-widest text-[#64748B] block mb-1">
+                  Total Investment Due
+                </span>
+                <div className="flex items-baseline gap-2">
+                  <span className="text-3xl font-bold font-displayPlayFair text-[#8B7355]">
+                    €{(storedData.activityDetails.price * guestsCount).toFixed(2)}
+                  </span>
+                  <span className="text-xs text-[#94A3B8]">
+                    ({guestsCount} {guestsCount === 1 ? "ticket" : "tickets"})
+                  </span>
+                </div>
               </div>
             </div>
           </div>
