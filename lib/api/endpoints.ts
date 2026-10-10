@@ -30,6 +30,7 @@ export const ENDPOINTS = {
     USER_SESSION_PASSES: "/bookings/session-passes/",
     SAUNA_CREATE: "/bookings/sauna/",
     SAUNA_CONFIRM: "/bookings/sauna/confirm/",
+    LUNCHROOM_CREATE: "/bookings/lunchroom/",
   },
   PAYMENTS: {
     CREATE_INTENT: "/payments/create-intent/",

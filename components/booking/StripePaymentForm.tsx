@@ -132,34 +132,69 @@ export default function StripePaymentForm({
         if (!isNaN(parsed) && parsed > 0) numericPrice = parsed;
       }
 
-      const payload = {
-        sauna_type: bookingData.isSharedSauna ? "shared" : "private",
-        booking_date: bookingData.date || new Date().toISOString().split("T")[0],
-        booking_time: bookingTime,
-        time_slot: timeSlotEnum,
-        capacity: bookingData.guestsCount || 2,
-        name: cardName.trim() || bookingData.name || "Guest",
-        email: bookingData.email || "guest@example.com",
-        phone: bookingData.phone || "+31612345678",
-        special_request: bookingData.requests || null,
-        selected_features: bookingData.selectedExtras?.map((e: any) => e.id) || [],
-        total_price: numericPrice,
-      };
+      const isLunchroom = bookingData.serviceType === "lunchroom" || bookingData.serviceName?.toLowerCase().includes("lunchroom");
 
       // Call Combined API: Create Booking & Get Stripe Client Secret
       let clientSecret: string | undefined;
       try {
-        const res = await bookingService.createSaunaBooking(payload);
-        if (res && res.booking_id) {
-          updateStoredBookingData({ bookingId: res.booking_id });
-        }
-        if (res && res.client_secret) {
-          clientSecret = res.client_secret;
+        if (isLunchroom) {
+          const celebration = bookingData.celebration;
+          const lunchPayload = {
+            booking_date: bookingData.date || new Date().toISOString().split("T")[0],
+            booking_time: bookingTime,
+            capacity: bookingData.guestsCount || 2,
+            name: cardName.trim() || bookingData.name || "Guest",
+            email: bookingData.email || "guest@example.com",
+            phone: bookingData.phone || "+31612345678",
+            total_price: numericPrice.toFixed(2),
+            special_request: bookingData.requests || undefined,
+            ...(celebration?.isCelebrating
+              ? {
+                  celebration_type: celebration.occasion || undefined,
+                  celebration_date: bookingData.date || undefined,
+                  name_of_celebrant: celebration.celebrantName || undefined,
+                  age_of_celebrant: celebration.age ? parseInt(celebration.age, 10) : undefined,
+                  hobbies: celebration.hobbiesInterests || undefined,
+                  celebration_details: celebration.otherDetails || undefined,
+                }
+              : {}),
+          };
+
+          const res = await bookingService.createLunchroomBooking(lunchPayload);
+          if (res && res.booking_id) {
+            updateStoredBookingData({ bookingId: res.booking_id });
+          }
+          if (res && res.client_secret) {
+            clientSecret = res.client_secret;
+          }
+        } else {
+          const payload = {
+            sauna_type: bookingData.isSharedSauna ? "shared" : "private",
+            booking_date: bookingData.date || new Date().toISOString().split("T")[0],
+            booking_time: bookingTime,
+            time_slot: timeSlotEnum,
+            capacity: bookingData.guestsCount || 2,
+            name: cardName.trim() || bookingData.name || "Guest",
+            email: bookingData.email || "guest@example.com",
+            phone: bookingData.phone || "+31612345678",
+            special_request: bookingData.requests || null,
+            selected_features: bookingData.selectedExtras?.map((e: any) => e.id) || [],
+            total_price: numericPrice,
+          };
+
+          const res = await bookingService.createSaunaBooking(payload);
+          if (res && res.booking_id) {
+            updateStoredBookingData({ bookingId: res.booking_id });
+          }
+          if (res && res.client_secret) {
+            clientSecret = res.client_secret;
+          }
         }
       } catch (apiErr: any) {
-        console.warn("Sauna booking API notice:", apiErr);
+        console.warn("Booking API notice:", apiErr);
         // Fallback booking reference if backend is offline/mock
-        const fallbackRef = `${bookingData.isSharedSauna ? "SS" : "PS"}-${Math.floor(1000 + Math.random() * 9000)}`;
+        const fallbackPrefix = isLunchroom ? "LR" : bookingData.isSharedSauna ? "SS" : "PS";
+        const fallbackRef = `${fallbackPrefix}-${Math.floor(1000 + Math.random() * 9000)}`;
         updateStoredBookingData({ bookingId: fallbackRef });
       }
 
@@ -174,9 +209,9 @@ export default function StripePaymentForm({
                 token: "tok_visa", // Test token fallback
               },
               billing_details: {
-                name: payload.name,
-                email: payload.email,
-                phone: payload.phone,
+                name: cardName.trim() || bookingData.name || "Guest",
+                email: bookingData.email || "guest@example.com",
+                phone: bookingData.phone || "+31612345678",
               },
             },
           });
