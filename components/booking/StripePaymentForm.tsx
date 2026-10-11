@@ -78,11 +78,18 @@ export default function StripePaymentForm({
     }
   }, []);
 
+  const numericAmountVal =
+    typeof totalAmount === "number"
+      ? totalAmount
+      : parseFloat(String(totalAmount).replace(/[^0-9.]/g, "")) || 0;
+  const isZeroPayment = numericAmountVal <= 0;
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMsg(null);
 
-    if (paymentMethod === "card") {
+    // Only validate card fields if payment is required (> €0)
+    if (!isZeroPayment && paymentMethod === "card") {
       if (!cardName.trim()) {
         setErrorMsg("Please enter the name on your card.");
         return;
@@ -250,6 +257,47 @@ export default function StripePaymentForm({
           if (res && res.client_secret) {
             clientSecret = res.client_secret;
           }
+        } else if (bookingData.isSaltRoom || bookingData.serviceType === "salt_room" || bookingData.serviceType === "saltroom" || bookingData.serviceName?.toLowerCase().includes("salt")) {
+          let saltStartTime = "06:00";
+          let saltEndTime: string | undefined = undefined;
+
+          if (bookingData.timeSlot) {
+            // Check if format is "06:00–07:00" or "06:00 - 07:00"
+            const rangeMatch = bookingData.timeSlot.match(/(\d{1,2}:\d{2})\s*[-–—]\s*(\d{1,2}:\d{2})/);
+            if (rangeMatch) {
+              saltStartTime = rangeMatch[1];
+              saltEndTime = rangeMatch[2];
+            } else {
+              const singleMatch = bookingData.timeSlot.match(/(\d{1,2}:\d{2})/);
+              if (singleMatch) saltStartTime = singleMatch[1];
+            }
+          }
+
+          const saltPayload: any = {
+            name: cardName.trim() || bookingData.name || "Guest",
+            email: bookingData.email || "guest@example.com",
+            phone: bookingData.phone || "+31612345678",
+            date: bookingData.date || new Date().toISOString().split("T")[0],
+            start_time: saltStartTime,
+            ...(saltEndTime ? { end_time: saltEndTime } : {}),
+            capacity: bookingData.guestsCount || 1,
+            payment_mode: bookingData.paymentMode || "card",
+            purchase_id: bookingData.purchaseId || undefined,
+            plan_id: bookingData.planId || undefined,
+            pass_id: bookingData.passId || undefined,
+            special_request: bookingData.requests || null,
+          };
+
+          const res = await bookingService.createSaltRoomBooking(saltPayload);
+          if (res && res.booking_id) {
+            updateStoredBookingData({
+              bookingId: res.booking_id,
+              ...(res.purchase_id ? { purchaseId: res.purchase_id } : {}),
+            });
+          }
+          if (res && res.client_secret) {
+            clientSecret = res.client_secret;
+          }
         } else {
           const payload = {
             sauna_type: bookingData.isSharedSauna ? "shared" : "private",
@@ -276,7 +324,15 @@ export default function StripePaymentForm({
       } catch (apiErr: any) {
         console.warn("Booking API notice:", apiErr);
         // Fallback booking reference if backend is offline/mock
-        const fallbackPrefix = isActivity ? "ACT" : isLunchroom ? "LR" : bookingData.isSharedSauna ? "SS" : "PS";
+        const fallbackPrefix = (bookingData.isSaltRoom || bookingData.serviceType === "salt_room" || bookingData.serviceType === "saltroom")
+          ? "SR"
+          : isActivity
+          ? "ACT"
+          : isLunchroom
+          ? "LR"
+          : bookingData.isSharedSauna
+          ? "SS"
+          : "PS";
         const fallbackRef = `${fallbackPrefix}-${Math.floor(1000 + Math.random() * 9000)}`;
         updateStoredBookingData({ bookingId: fallbackRef });
       }
@@ -300,6 +356,20 @@ export default function StripePaymentForm({
           });
           if (confirmRes.error) {
             console.warn("Stripe card confirmation detail:", confirmRes.error.message);
+          } else if (confirmRes.paymentIntent && confirmRes.paymentIntent.status === "succeeded") {
+            // Confirm payment with backend database
+            const stored = getStoredBookingData();
+            const latestBookingId = stored.bookingId || "";
+            const latestPurchaseId = stored.purchaseId || undefined;
+            try {
+              await bookingService.confirmPayment({
+                payment_intent_id: confirmRes.paymentIntent.id,
+                ...(latestBookingId ? { booking_id: latestBookingId } : {}),
+                ...(latestPurchaseId ? { purchase_id: latestPurchaseId } : {}),
+              });
+            } catch (backendConfirmErr) {
+              console.warn("Backend payment confirm notice:", backendConfirmErr);
+            }
           }
         } catch (sErr) {
           console.warn("Stripe confirmation note:", sErr);
@@ -345,180 +415,200 @@ export default function StripePaymentForm({
         </div>
       </div>
 
-      {/* Payment Method Selector Tabs */}
-      <div>
-        <label className="block text-xs font-bold text-[#64748B] uppercase tracking-wider mb-3">
-          Select Payment Method
-        </label>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <button
-            type="button"
-            onClick={() => setPaymentMethod("card")}
-            className={`p-5 rounded-2xl border transition-all text-left flex items-center justify-between ${
-              paymentMethod === "card"
-                ? "bg-[#FCF2E9] border-[#8B7355] shadow-sm ring-2 ring-[#8B7355]/20"
-                : "bg-white border-[#E2E8F0] hover:border-[#D1B191]"
-            }`}
-          >
-            <div className="flex items-center gap-3">
-              <div
-                className={`w-10 h-10 rounded-xl flex items-center justify-center ${
-                  paymentMethod === "card" ? "bg-[#8B7355] text-white" : "bg-[#F1F5F9] text-[#64748B]"
-                }`}
-              >
-                <FaCreditCard size={18} />
-              </div>
-              <div>
-                <span className="font-bold text-sm text-[#0F172A] block">Credit / Debit Card</span>
-                <span className="text-[11px] text-[#64748B]">Visa, Mastercard, Amex</span>
-              </div>
-            </div>
-
-            <div
-              className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
-                paymentMethod === "card" ? "border-[#8B7355] bg-[#8B7355] text-white" : "border-[#CBD5E1]"
-              }`}
-            >
-              {paymentMethod === "card" && <BiCheckIcon size={14} />}
-            </div>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => setPaymentMethod("ideal")}
-            className={`p-5 rounded-2xl border transition-all text-left flex items-center justify-between ${
-              paymentMethod === "ideal"
-                ? "bg-[#FCF2E9] border-[#8B7355] shadow-sm ring-2 ring-[#8B7355]/20"
-                : "bg-white border-[#E2E8F0] hover:border-[#D1B191]"
-            }`}
-          >
-            <div className="flex items-center gap-3">
-              <div
-                className={`w-10 h-10 rounded-xl flex items-center justify-center ${
-                  paymentMethod === "ideal" ? "bg-[#8B7355] text-white" : "bg-[#F1F5F9] text-[#64748B]"
-                }`}
-              >
-                <MdOutlinePayments size={22} />
-              </div>
-              <div>
-                <span className="font-bold text-sm text-[#0F172A] block">iDEAL Online Banking</span>
-                <span className="text-[11px] text-[#64748B]">Dutch Banks (ING, Rabo, ABN)</span>
-              </div>
-            </div>
-
-            <div
-              className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
-                paymentMethod === "ideal" ? "border-[#8B7355] bg-[#8B7355] text-white" : "border-[#CBD5E1]"
-              }`}
-            >
-              {paymentMethod === "ideal" && <BiCheckIcon size={14} />}
-            </div>
-          </button>
-        </div>
-      </div>
-
       {/* Form Fields */}
       <form onSubmit={handleSubmit} className="space-y-6">
-        {paymentMethod === "card" ? (
-          <div className="space-y-4 p-6 rounded-2xl bg-[#FBF6F3] border border-[#E8E2DC]">
-            {/* Cardholder Name */}
-            <div>
-              <label className="block text-xs font-bold text-[#0F172A] mb-1.5 uppercase tracking-wide">
-                Name on Card
-              </label>
-              <input
-                type="text"
-                placeholder="e.g. John Doe"
-                value={cardName}
-                onChange={(e) => setCardName(e.target.value)}
-                className="w-full p-3.5 bg-white border border-[#E2E8F0] rounded-xl text-sm text-[#0F172A] focus:outline-none focus:ring-2 focus:ring-[#8B7355]"
-              />
-            </div>
-
-            {/* Card Number */}
-            <div>
-              <label className="block text-xs font-bold text-[#0F172A] mb-1.5 uppercase tracking-wide">
-                Card Number
-              </label>
-              <div className="relative">
-                <input
-                  type="text"
-                  placeholder="4111 1111 1111 1111"
-                  value={cardNumber}
-                  onChange={handleCardNumberChange}
-                  maxLength={19}
-                  className="w-full p-3.5 pl-11 bg-white border border-[#E2E8F0] rounded-xl text-sm font-mono text-[#0F172A] focus:outline-none focus:ring-2 focus:ring-[#8B7355]"
-                />
-                <BiCreditCard className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#94A3B8]" size={20} />
+        {isZeroPayment ? (
+          <div className="p-6 rounded-2xl bg-gradient-to-r from-[#FCF2E9] to-[#FBF6F3] border border-[#E8E2DC] space-y-3">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-emerald-600 text-white flex items-center justify-center font-bold text-lg shadow-sm">
+                ✓
               </div>
-            </div>
-
-            {/* Expiry, CVC & Zip */}
-            <div className="grid grid-cols-3 gap-3">
               <div>
-                <label className="block text-[11px] font-bold text-[#0F172A] mb-1 uppercase tracking-wide">
-                  Expires (MM/YY)
-                </label>
-                <input
-                  type="text"
-                  placeholder="MM/YY"
-                  value={expiry}
-                  onChange={handleExpiryChange}
-                  maxLength={5}
-                  className="w-full p-3.5 bg-white border border-[#E2E8F0] rounded-xl text-sm font-mono text-center text-[#0F172A] focus:outline-none focus:ring-2 focus:ring-[#8B7355]"
-                />
-              </div>
-
-              <div>
-                <label className="block text-[11px] font-bold text-[#0F172A] mb-1 uppercase tracking-wide">
-                  CVC / CVV
-                </label>
-                <input
-                  type="password"
-                  placeholder="123"
-                  value={cvc}
-                  onChange={(e) => setCvc(e.target.value.replace(/\D/g, "").slice(0, 4))}
-                  maxLength={4}
-                  className="w-full p-3.5 bg-white border border-[#E2E8F0] rounded-xl text-sm font-mono text-center text-[#0F172A] focus:outline-none focus:ring-2 focus:ring-[#8B7355]"
-                />
-              </div>
-
-              <div>
-                <label className="block text-[11px] font-bold text-[#0F172A] mb-1 uppercase tracking-wide">
-                  Zip / Postal Code
-                </label>
-                <input
-                  type="text"
-                  placeholder="1011 AB"
-                  value={zip}
-                  onChange={(e) => setZip(e.target.value)}
-                  className="w-full p-3.5 bg-white border border-[#E2E8F0] rounded-xl text-sm text-center text-[#0F172A] focus:outline-none focus:ring-2 focus:ring-[#8B7355]"
-                />
+                <h4 className="font-bold text-[#0F172A] text-base font-displayPlayFair">
+                  Session Included with Pass / Membership
+                </h4>
+                <p className="text-xs text-[#64748B] mt-0.5">
+                  No payment card is required. 1 session credit will be deducted directly from your account.
+                </p>
               </div>
             </div>
           </div>
         ) : (
-          /* iDEAL Bank Selector */
-          <div className="p-6 rounded-2xl bg-[#FBF6F3] border border-[#E8E2DC] space-y-4">
-            <label className="block text-xs font-bold text-[#0F172A] uppercase tracking-wide">
-              Select your Dutch Bank
-            </label>
-            <select
-              value={selectedBank}
-              onChange={(e) => setSelectedBank(e.target.value)}
-              className="w-full p-4 bg-white border border-[#E2E8F0] rounded-xl text-sm text-[#0F172A] font-medium focus:outline-none focus:ring-2 focus:ring-[#8B7355] cursor-pointer"
-            >
-              {idealBanks.map((bank) => (
-                <option key={bank.id} value={bank.id}>
-                  {bank.name}
-                </option>
-              ))}
-            </select>
-            <p className="text-xs text-[#64748B] italic">
-              You will be redirected securely to your bank app to authorize the iDEAL transaction.
-            </p>
-          </div>
+          <>
+            {/* Payment Method Selector Tabs */}
+            <div>
+              <label className="block text-xs font-bold text-[#64748B] uppercase tracking-wider mb-3">
+                Select Payment Method
+              </label>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <button
+                  type="button"
+                  onClick={() => setPaymentMethod("card")}
+                  className={`p-5 rounded-2xl border transition-all text-left flex items-center justify-between ${
+                    paymentMethod === "card"
+                      ? "bg-[#FCF2E9] border-[#8B7355] shadow-sm ring-2 ring-[#8B7355]/20"
+                      : "bg-white border-[#E2E8F0] hover:border-[#D1B191]"
+                  }`}
+                >
+                  <div className="flex items-center gap-3">
+                    <div
+                      className={`w-10 h-10 rounded-xl flex items-center justify-center ${
+                        paymentMethod === "card" ? "bg-[#8B7355] text-white" : "bg-[#F1F5F9] text-[#64748B]"
+                      }`}
+                    >
+                      <FaCreditCard size={18} />
+                    </div>
+                    <div>
+                      <span className="font-bold text-sm text-[#0F172A] block">Credit / Debit Card</span>
+                      <span className="text-[11px] text-[#64748B]">Visa, Mastercard, Amex</span>
+                    </div>
+                  </div>
+
+                  <div
+                    className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
+                      paymentMethod === "card" ? "border-[#8B7355] bg-[#8B7355] text-white" : "border-[#CBD5E1]"
+                    }`}
+                  >
+                    {paymentMethod === "card" && <BiCheckIcon size={14} />}
+                  </div>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setPaymentMethod("ideal")}
+                  className={`p-5 rounded-2xl border transition-all text-left flex items-center justify-between ${
+                    paymentMethod === "ideal"
+                      ? "bg-[#FCF2E9] border-[#8B7355] shadow-sm ring-2 ring-[#8B7355]/20"
+                      : "bg-white border-[#E2E8F0] hover:border-[#D1B191]"
+                  }`}
+                >
+                  <div className="flex items-center gap-3">
+                    <div
+                      className={`w-10 h-10 rounded-xl flex items-center justify-center ${
+                        paymentMethod === "ideal" ? "bg-[#8B7355] text-white" : "bg-[#F1F5F9] text-[#64748B]"
+                      }`}
+                    >
+                      <MdOutlinePayments size={22} />
+                    </div>
+                    <div>
+                      <span className="font-bold text-sm text-[#0F172A] block">iDEAL Online Banking</span>
+                      <span className="text-[11px] text-[#64748B]">Dutch Banks (ING, Rabo, ABN)</span>
+                    </div>
+                  </div>
+
+                  <div
+                    className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
+                      paymentMethod === "ideal" ? "border-[#8B7355] bg-[#8B7355] text-white" : "border-[#CBD5E1]"
+                    }`}
+                  >
+                    {paymentMethod === "ideal" && <BiCheckIcon size={14} />}
+                  </div>
+                </button>
+              </div>
+            </div>
+
+            {paymentMethod === "card" ? (
+              <div className="space-y-4 p-6 rounded-2xl bg-[#FBF6F3] border border-[#E8E2DC]">
+                {/* Cardholder Name */}
+                <div>
+                  <label className="block text-xs font-bold text-[#0F172A] mb-1.5 uppercase tracking-wide">
+                    Name on Card
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="e.g. John Doe"
+                    value={cardName}
+                    onChange={(e) => setCardName(e.target.value)}
+                    className="w-full p-3.5 bg-white border border-[#E2E8F0] rounded-xl text-sm text-[#0F172A] focus:outline-none focus:ring-2 focus:ring-[#8B7355]"
+                  />
+                </div>
+
+                {/* Card Number */}
+                <div>
+                  <label className="block text-xs font-bold text-[#0F172A] mb-1.5 uppercase tracking-wide">
+                    Card Number
+                  </label>
+                  <div className="relative">
+                    <input
+                      type="text"
+                      placeholder="4111 1111 1111 1111"
+                      value={cardNumber}
+                      onChange={handleCardNumberChange}
+                      maxLength={19}
+                      className="w-full p-3.5 pl-11 bg-white border border-[#E2E8F0] rounded-xl text-sm font-mono text-[#0F172A] focus:outline-none focus:ring-2 focus:ring-[#8B7355]"
+                    />
+                    <BiCreditCard className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#94A3B8]" size={20} />
+                  </div>
+                </div>
+
+                {/* Expiry, CVC & Zip */}
+                <div className="grid grid-cols-3 gap-3">
+                  <div>
+                    <label className="block text-[11px] font-bold text-[#0F172A] mb-1 uppercase tracking-wide">
+                      Expires (MM/YY)
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="MM/YY"
+                      value={expiry}
+                      onChange={handleExpiryChange}
+                      maxLength={5}
+                      className="w-full p-3.5 bg-white border border-[#E2E8F0] rounded-xl text-sm font-mono text-center text-[#0F172A] focus:outline-none focus:ring-2 focus:ring-[#8B7355]"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-[11px] font-bold text-[#0F172A] mb-1 uppercase tracking-wide">
+                      CVC / CVV
+                    </label>
+                    <input
+                      type="password"
+                      placeholder="123"
+                      value={cvc}
+                      onChange={(e) => setCvc(e.target.value.replace(/\D/g, "").slice(0, 4))}
+                      maxLength={4}
+                      className="w-full p-3.5 bg-white border border-[#E2E8F0] rounded-xl text-sm font-mono text-center text-[#0F172A] focus:outline-none focus:ring-2 focus:ring-[#8B7355]"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-[11px] font-bold text-[#0F172A] mb-1 uppercase tracking-wide">
+                      Zip / Postal Code
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="1011 AB"
+                      value={zip}
+                      onChange={(e) => setZip(e.target.value)}
+                      className="w-full p-3.5 bg-white border border-[#E2E8F0] rounded-xl text-sm text-center text-[#0F172A] focus:outline-none focus:ring-2 focus:ring-[#8B7355]"
+                    />
+                  </div>
+                </div>
+              </div>
+            ) : (
+              /* iDEAL Bank Selector */
+              <div className="p-6 rounded-2xl bg-[#FBF6F3] border border-[#E8E2DC] space-y-4">
+                <label className="block text-xs font-bold text-[#0F172A] uppercase tracking-wide">
+                  Select your Dutch Bank
+                </label>
+                <select
+                  value={selectedBank}
+                  onChange={(e) => setSelectedBank(e.target.value)}
+                  className="w-full p-4 bg-white border border-[#E2E8F0] rounded-xl text-sm text-[#0F172A] font-medium focus:outline-none focus:ring-2 focus:ring-[#8B7355] cursor-pointer"
+                >
+                  {idealBanks.map((bank) => (
+                    <option key={bank.id} value={bank.id}>
+                      {bank.name}
+                    </option>
+                  ))}
+                </select>
+                <p className="text-xs text-[#64748B] italic">
+                  You will be redirected securely to your bank app to authorize the iDEAL transaction.
+                </p>
+              </div>
+            )}
+          </>
         )}
 
         {/* Error Alert */}
@@ -531,9 +621,11 @@ export default function StripePaymentForm({
         {/* Amount & Pay Button */}
         <div className="pt-4 flex flex-col md:flex-row items-center justify-between gap-4">
           <div>
-            <span className="text-xs text-[#64748B] uppercase font-bold block">Total Amount Due</span>
+            <span className="text-xs text-[#64748B] uppercase font-bold block">
+              {isZeroPayment ? "Total Due Today" : "Total Amount Due"}
+            </span>
             <span className="text-3xl font-bold font-displayPlayFair text-[#8B7355]">
-              {formattedAmount}
+              {isZeroPayment ? "€0.00" : formattedAmount}
             </span>
           </div>
 
@@ -547,7 +639,12 @@ export default function StripePaymentForm({
             {processing ? (
               <>
                 <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent" />
-                <span>Processing Payment...</span>
+                <span>Confirming Booking...</span>
+              </>
+            ) : isZeroPayment ? (
+              <>
+                <BiCheckIcon size={20} />
+                <span>Confirm Booking (Deduct Session)</span>
               </>
             ) : (
               <>

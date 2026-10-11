@@ -118,10 +118,52 @@ export interface SessionPassItem {
   entry_limit?: number;
 }
 
+export interface UserMembershipPass {
+  purchase_id: string;
+  name: string;
+  remaining_sessions: number;
+  total_sessions: number;
+  total_remaining_across_all_passes: number;
+  max_active_reservations: number;
+  status: string;
+  payment_status: string;
+}
+
+export interface UserMembershipSubscription {
+  purchase_id: string;
+  name: string;
+  plan_type: "weekly" | "unlimited" | string;
+  plan_category: string;
+  start_date: string;
+  end_date: string;
+  is_unlimited: boolean;
+  remaining_sessions: number;
+  total_sessions: number;
+  sessions_per_week: number;
+  max_active_reservations: number;
+  status: string;
+  payment_status: string;
+  is_available_for_date?: boolean;
+  is_available_for_today?: boolean;
+  is_available_for_week?: boolean;
+  week_bookings_count?: number;
+  unavailable_reason?: string;
+}
+
+export interface UserMembershipData {
+  is_authenticated: boolean;
+  has_active_pass: boolean;
+  has_active_subscription: boolean;
+  total_available_sessions: number;
+  session_pass: UserMembershipPass | null;
+  subscription: UserMembershipSubscription | null;
+}
+
 export interface SaltroomServicesData {
   saltroom?: SaltroomItem[];
   subscription_plans?: SubscriptionPlanItem[];
   session_pass?: SessionPassItem[];
+  user_membership?: UserMembershipData;
 }
 
 export interface SaltRoomInfo {
@@ -246,6 +288,35 @@ export interface PackageSlotsResponse {
   message?: string;
 }
 
+export interface SaltRoomSlotItem {
+  start_time: string;
+  end_time: string;
+  buffer_end_time?: string;
+  duration_minutes?: number;
+  buffer_minutes?: number;
+  max_capacity: number;
+  booked_capacity: number;
+  remaining_capacity: number;
+  is_available: boolean;
+  is_fully_booked: boolean;
+}
+
+export interface SaltRoomSlotData {
+  is_available?: boolean;
+  open_time?: string;
+  close_time?: string;
+  duration_minutes?: number;
+  buffer_minutes?: number;
+  max_capacity?: number;
+  price_per_person?: string | number;
+  total_slots_count?: number;
+  available_slots_count?: number;
+  slots?: SaltRoomSlotItem[];
+  available_slots?: SaltRoomSlotItem[];
+  info?: string;
+  user_membership?: UserMembershipData;
+}
+
 export interface ServiceSlotsData {
   private_sauna?: {
     slots?: {
@@ -262,10 +333,25 @@ export interface ServiceSlotsData {
     slots?: SharedSaunaSlot[];
     booked_slots?: any[];
   };
+  saltroom?: SaltRoomSlotData;
+  duration_minutes?: number;
+  buffer_minutes?: number;
+  max_capacity?: number;
+  total_slots_count?: number;
+  available_slots_count?: number;
+  slots?: SaltRoomSlotItem[];
+  available_slots?: SaltRoomSlotItem[];
+  is_available?: boolean;
+  open_time?: string;
+  close_time?: string;
+  price_per_person?: string | number;
+  info?: string;
+  user_membership?: UserMembershipData;
 }
 
 export interface ServiceSlotsResponse {
   success: boolean;
+  service_type?: string;
   is_blocked?: boolean;
   date?: string;
   open_time?: string;
@@ -372,18 +458,18 @@ export const servicesService = {
     try {
       let res: any;
       try {
-        res = await ApiClient.get<any>(ENDPOINTS.SERVICES.DETAILS("saltroom"), { skipAuth: true });
+        res = await ApiClient.get<any>(ENDPOINTS.SERVICES.DETAILS("saltroom"));
       } catch {
         try {
-          res = await ApiClient.get<any>("/services/saltroom/", { skipAuth: true });
+          res = await ApiClient.get<any>("/services/saltroom/");
         } catch {
-          res = await ApiClient.get<any>("/services/salt-room/", { skipAuth: true });
+          res = await ApiClient.get<any>("/services/salt-room/");
         }
       }
-      if (res?.data?.saltroom || res?.data?.subscription_plans || res?.data?.session_pass) {
+      if (res?.data?.saltroom || res?.data?.subscription_plans || res?.data?.session_pass || res?.data?.user_membership) {
         return res.data;
       }
-      if (res?.saltroom || res?.subscription_plans || res?.session_pass) {
+      if (res?.saltroom || res?.subscription_plans || res?.session_pass || res?.user_membership) {
         return res;
       }
       return res?.data || {};
@@ -435,8 +521,19 @@ export const servicesService = {
   },
 
   async getServiceSlots(serviceType: string = "sauna", date: string): Promise<ServiceSlotsResponse> {
-    return ApiClient.get<ServiceSlotsResponse>(ENDPOINTS.SERVICES.SLOTS(serviceType), {
-      skipAuth: true,
+    const cleanType = (serviceType || "sauna").toLowerCase() === "salt_room" ? "saltroom" : (serviceType || "sauna").toLowerCase();
+    
+    // First try query param style /services/slots/?type=saltroom&date=...
+    try {
+      const res = await ApiClient.get<ServiceSlotsResponse>("/services/slots/", {
+        params: { type: cleanType, date },
+      });
+      if (res && (res.success || res.data)) return res;
+    } catch {
+      // Fallback to path style /services/slots/:type/?date=...
+    }
+
+    return ApiClient.get<ServiceSlotsResponse>(ENDPOINTS.SERVICES.SLOTS(cleanType), {
       params: { date },
     });
   },

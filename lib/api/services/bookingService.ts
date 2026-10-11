@@ -143,6 +143,40 @@ export interface CreatePackageBookingResponse {
   message?: string;
 }
 
+export interface CreateSaltRoomBookingPayload {
+  name: string;
+  email: string;
+  phone?: string;
+  date: string;
+  start_time: string;
+  end_time?: string;
+  capacity?: number;
+  payment_mode?: "card" | "pass" | "subscription" | "weekly_subscription" | "unlimited_subscription" | string;
+  purchase_id?: string;
+  plan_id?: number | string;
+  pass_id?: number | string;
+  special_request?: string | null;
+}
+
+export interface CreateSaltRoomBookingResponse {
+  success: boolean;
+  booking_id: string;
+  purchase_id?: string;
+  payment_mode?: string;
+  item_name?: string;
+  status?: string;
+  payment_status?: string;
+  is_paid?: boolean;
+  remaining_sessions?: number;
+  is_unlimited?: boolean;
+  client_secret?: string;
+  payment_intent_id?: string;
+  amount?: number | string;
+  currency?: string;
+  data?: any;
+  message?: string;
+}
+
 export const bookingService = {
   async getBookings(params?: Record<string, string | number>): Promise<PaginatedResponse<Booking> | Booking[]> {
     return ApiClient.get<PaginatedResponse<Booking> | Booking[]>(ENDPOINTS.BOOKINGS.LIST, { params });
@@ -154,6 +188,19 @@ export const bookingService = {
 
   async createSaunaBooking(payload: CreateSaunaBookingPayload): Promise<CreateSaunaBookingResponse> {
     return ApiClient.post<CreateSaunaBookingResponse>(ENDPOINTS.BOOKINGS.SAUNA_CREATE, payload, { skipAuth: true });
+  },
+
+  async createSaltRoomBooking(payload: CreateSaltRoomBookingPayload): Promise<CreateSaltRoomBookingResponse> {
+    const isGuestCard = payload.payment_mode === "card" || !payload.payment_mode;
+    return ApiClient.post<CreateSaltRoomBookingResponse>(
+      ENDPOINTS.BOOKINGS.SALTROOM_CREATE,
+      payload,
+      isGuestCard ? { skipAuth: false } : { skipAuth: false }
+    );
+  },
+
+  async confirmPayment(payload: { payment_intent_id: string; booking_id?: string; purchase_id?: string }): Promise<any> {
+    return ApiClient.post(ENDPOINTS.PAYMENTS.CONFIRM, payload, { skipAuth: true });
   },
 
   async createLunchroomBooking(payload: CreateLunchroomBookingPayload): Promise<CreateLunchroomBookingResponse> {

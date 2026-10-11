@@ -32,6 +32,7 @@ export const ENDPOINTS = {
     SAUNA_CONFIRM: "/bookings/sauna/confirm/",
     LUNCHROOM_CREATE: "/bookings/lunchroom/",
     ACTIVITIES_CREATE: "/bookings/activities/",
+    SALTROOM_CREATE: "/bookings/saltroom/",
     EVENTS_CREATE: "/bookings/events/",
     PACKAGES_CREATE: "/bookings/packages/",
   },
@@ -41,6 +42,7 @@ export const ENDPOINTS = {
     SESSION_PASSES: "/payments/session-passes/",
     SUBSCRIPTION_PLANS: "/payments/subscription-plans/",
     PURCHASE: "/payments/purchase/",
+    CONFIRM: "/payments/confirm/",
     CONFIRM_PAYMENT: "/payments/confirm-payment/",
   },
   SERVICES: {

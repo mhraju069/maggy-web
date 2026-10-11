@@ -72,6 +72,11 @@ export interface BookingData {
   remainingPassSessions?: number;
   hasActiveMembership?: boolean;
   membershipType?: "none" | "once_a_week" | "unlimited";
+  paymentMode?: "pass" | "subscription" | "weekly_subscription" | "unlimited_subscription" | "card" | string;
+  purchaseId?: string;
+  planId?: number | string;
+  passId?: number | string;
+  activeMembershipInfo?: any;
   activityDetails?: ActivityBookingDetails;
   packageSelections?: PackageSubServiceSelections;
   isCustomPackage?: boolean;

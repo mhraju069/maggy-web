@@ -117,6 +117,15 @@ export default function ChooseTimePage() {
   const [pkgLunchTime, setPkgLunchTime] = useState<string>(storedData.packageSelections?.lunchroomTime || "12:30");
   const [pkgSelectedActivityId, setPkgSelectedActivityId] = useState<number | null>(storedData.packageSelections?.activitySession?.id || null);
 
+  const [slotMembership, setSlotMembership] = useState<any | null>(null);
+  const [saltRoomSlotData, setSaltRoomSlotData] = useState<{
+    openTime?: string;
+    closeTime?: string;
+    pricePerPerson?: number;
+    info?: string;
+    isAvailable?: boolean;
+  }>({});
+
   const fetchSlots = useCallback(async (dateVal: string, typeVal: string) => {
     if (!dateVal) {
       setApiSlots(null);
@@ -129,8 +138,27 @@ export default function ChooseTimePage() {
         const res = await servicesService.getPackageSlots(dateVal);
         setPackageSlots(res);
       } else {
-        const res = await servicesService.getServiceSlots(typeVal || "sauna", dateVal);
+        const queryType = isSaltRoom || typeVal === "salt_room" || typeVal === "saltroom" ? "saltroom" : (typeVal || "sauna");
+        const res = await servicesService.getServiceSlots(queryType, dateVal);
         setApiSlots(res);
+
+        // Check if saltroom slots response returned user_membership or saltroom slot info
+        const memberInfo = (res?.data as any)?.user_membership || (res as any)?.user_membership;
+        if (memberInfo) {
+          setSlotMembership(memberInfo);
+        }
+
+        const rawData: any = res?.data || res;
+        const sInfo = rawData?.saltroom || rawData;
+        if (sInfo && (sInfo.open_time || sInfo.price_per_person || sInfo.info !== undefined)) {
+          setSaltRoomSlotData({
+            openTime: sInfo.open_time,
+            closeTime: sInfo.close_time,
+            pricePerPerson: sInfo.price_per_person ? parseFloat(String(sInfo.price_per_person)) : undefined,
+            info: sInfo.info,
+            isAvailable: sInfo.is_available,
+          });
+        }
       }
     } catch (err) {
       console.error("Error fetching slots in choose-time:", err);
@@ -139,7 +167,7 @@ export default function ChooseTimePage() {
     } finally {
       setLoadingApiSlots(false);
     }
-  }, [isPackage]);
+  }, [isPackage, isSaltRoom]);
 
   useEffect(() => {
     const data = getStoredBookingData();
@@ -209,6 +237,42 @@ export default function ChooseTimePage() {
       }
     }
 
+    if (isSaltRoom && slotMembership) {
+      const activePass = slotMembership.session_pass;
+      const activeSub = slotMembership.subscription;
+      const passType = storedData.passType || "single";
+
+      // If user explicitly chose 'single' session in arrangements, NEVER force pass/subscription mode
+      if (passType === "single") {
+        updateStoredBookingData({
+          timeSlot: timeStr,
+          paymentMode: "card",
+          purchaseId: undefined,
+          activeMembershipInfo: slotMembership,
+        });
+        return;
+      }
+
+      let paymentMode: "pass" | "subscription" | "weekly_subscription" | "unlimited_subscription" | "card" | string = storedData.paymentMode || "card";
+      let purchaseId = storedData.purchaseId;
+
+      if (passType === "10_session_pass" && slotMembership.has_active_pass && activePass) {
+        paymentMode = "pass";
+        purchaseId = activePass.purchase_id;
+      } else if ((passType === "once_a_week" || passType === "unlimited") && slotMembership.has_active_subscription && activeSub) {
+        paymentMode = "subscription";
+        purchaseId = activeSub.purchase_id;
+      }
+
+      updateStoredBookingData({
+        timeSlot: timeStr,
+        paymentMode,
+        purchaseId,
+        activeMembershipInfo: slotMembership,
+      });
+      return;
+    }
+
     updateStoredBookingData({ timeSlot: timeStr });
   };
 
@@ -223,6 +287,11 @@ export default function ChooseTimePage() {
       return;
     }
 
+    const passType = storedData.passType || "single";
+    // If the user selected 'single' (Standard €25/person reservation), they are paying via card, NOT covered by membership
+    const effectivePass = passType !== "single" && (storedData.hasActiveMembership || slotMembership?.has_active_pass || slotMembership?.has_active_subscription);
+    const saltPrice = saltRoomSlotData.pricePerPerson || 25;
+
     let newTotal = storedData.totalAmount || 0;
     if (isPrivateSauna) {
       const duration = storedData.durationHours || 3;
@@ -233,17 +302,22 @@ export default function ChooseTimePage() {
     } else if (isSharedSauna) {
       newTotal = parseFloat((gCount * saunaPrices.sharedPricePerson).toFixed(2));
     } else if (isSaltRoom) {
-      newTotal = gCount * 25;
+      newTotal = effectivePass ? 0 : gCount * saltPrice;
     }
 
     updateStoredBookingData({
       guestsCount: gCount,
       totalAmount: newTotal,
-      price: `€${newTotal}`,
+      price: effectivePass && isSaltRoom ? "€0 (Pass / Membership Deducted)" : `€${newTotal}`,
+      hasActiveMembership: Boolean(effectivePass),
     });
   };
 
   const calculateOptionPrice = (n: number): string => {
+    const passType = storedData.passType || "single";
+    const effectivePass = passType !== "single" && (storedData.hasActiveMembership || slotMembership?.has_active_pass || slotMembership?.has_active_subscription);
+    const saltPrice = saltRoomSlotData.pricePerPerson || 25;
+
     if (isPrivateSauna) {
       const duration = storedData.durationHours || 3;
       const base = duration === 4 ? saunaPrices.price4Hrs : saunaPrices.price3Hrs;
@@ -255,7 +329,8 @@ export default function ChooseTimePage() {
       const total = n * saunaPrices.sharedPricePerson;
       return `€${total.toFixed(2)}`;
     } else if (isSaltRoom) {
-      const total = n * 25;
+      if (effectivePass) return "€0 (Covered by Membership)";
+      const total = n * saltPrice;
       return `€${total.toFixed(2)}`;
     }
     return `€${(n * 35).toFixed(2)}`;
@@ -399,20 +474,41 @@ export default function ChooseTimePage() {
               <FaSpa size={18} />
             </div>
             <div>
-              <h4 className="font-bold text-[#0F172A] text-sm">
-                Salt Room Session (1 Hour • €25 / Person)
-              </h4>
-              <p className="text-xs text-[#8B7355] font-medium">
-                Maximum 2 people per session. Automatic 10-minute changeover buffer calculated between sessions (First start: 06:00, Last session: 22:20–23:20).
+              <div className="flex items-center gap-2">
+                <h4 className="font-bold text-[#0F172A] text-sm">
+                  {storedData.serviceName || "Salt Room"} (1 Hour • €{saltRoomSlotData.pricePerPerson || 25} / Person)
+                </h4>
+                {storedData.passType !== "single" && (storedData.hasActiveMembership || slotMembership?.has_active_pass || slotMembership?.has_active_subscription) && (
+                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-emerald-100 text-emerald-800 border border-emerald-300">
+                    Included in Membership
+                  </span>
+                )}
+              </div>
+              <p className="text-xs text-[#8B7355] font-medium mt-1">
+                {saltRoomSlotData.info ||
+                  `Maximum 2 people per session. Automatic 10-minute changeover buffer between sessions (${saltRoomSlotData.openTime || "06:00"}–${saltRoomSlotData.closeTime || "23:20"}).`}
               </p>
+              {slotMembership?.session_pass && (
+                <p className="text-[11px] text-amber-700 font-semibold mt-0.5">
+                  ✓ {slotMembership.session_pass.remaining_sessions} Pass credits remaining on your account
+                </p>
+              )}
+              {slotMembership?.subscription?.is_available_for_date === false && (
+                <p className="text-[11px] text-rose-700 font-semibold mt-0.5 flex items-center gap-1">
+                  <BiInfoCircle size={14} className="flex-shrink-0" />
+                  <span>Subscription: {slotMembership.subscription.unavailable_reason || "Weekly limit reached for this period."}</span>
+                </p>
+              )}
             </div>
           </div>
 
-          <div className="flex flex-col items-end gap-1">
+          <div className="flex flex-col items-end gap-1 flex-shrink-0">
             <span className="px-3 py-1 bg-[#8B7355] text-white text-xs font-bold rounded-lg shadow-xs">
               Max 2 People / Session
             </span>
-            <span className="text-[11px] text-[#64748B] font-semibold">10-Min Auto Changeover</span>
+            <span className="text-[11px] text-[#64748B] font-semibold">
+              Hours: {saltRoomSlotData.openTime || "09:00"} – {saltRoomSlotData.closeTime || "21:00"}
+            </span>
           </div>
         </div>
       )}
@@ -771,50 +867,120 @@ export default function ChooseTimePage() {
               )}
 
               {!loadingApiSlots && !apiSlots?.is_blocked && isSaltRoom ? (
-                /* Salt Room 15 Specific Calculated Start Times with Changeovers */
+                /* Salt Room Calculated Slots from API (with fallback) */
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                  {saltRoomSessions.map((sess) => {
-                    const remaining = Math.max(0, sess.totalCapacity - sess.bookedPlaces);
-                    const isSoldOut = remaining === 0;
-                    const isSelected = selectedTime === sess.slot;
+                  {(() => {
+                    const rawData: any = apiSlots?.data || apiSlots;
+                    const liveSlots: any[] = rawData?.slots || rawData?.saltroom?.slots || [];
+                    const currentGuestsCount = parseInt(guests, 10) || 1;
 
-                    return (
-                      <button
-                        key={sess.slot}
-                        type="button"
-                        disabled={isSoldOut}
-                        onClick={() => handleTimeSelect(sess.slot)}
-                        className={`p-3.5 rounded-xl border text-left transition-all flex flex-col justify-between ${
-                          isSelected
-                            ? "bg-[#FCF2E9] border-[#8B7355] shadow-md ring-2 ring-[#8B7355]/20"
-                            : isSoldOut
-                            ? "bg-gray-50 border-gray-200 opacity-60 cursor-not-allowed"
-                            : "bg-white border-[#E2E8F0] hover:border-[#D1B191]"
-                        }`}
-                      >
-                        <div className="flex items-center justify-between w-full mb-1">
-                          <span className="text-base font-bold font-displayPlayFair text-[#0F172A]">
-                            {sess.slot}
+                    if (liveSlots && liveSlots.length > 0) {
+                      return liveSlots.map((sess: any, idx: number) => {
+                        const slotKey = `${sess.start_time}–${sess.end_time}`;
+                        const isSelected = selectedTime === slotKey || selectedTime === sess.start_time;
+                        const remaining = sess.remaining_capacity ?? (sess.max_capacity - sess.booked_capacity);
+                        const isFullyBooked = sess.is_fully_booked || remaining <= 0;
+                        const notEnoughSeats = !isFullyBooked && remaining < currentGuestsCount;
+                        const isSoldOut = isFullyBooked || notEnoughSeats;
+
+                        return (
+                          <button
+                            key={idx}
+                            type="button"
+                            disabled={isSoldOut}
+                            onClick={() => handleTimeSelect(slotKey)}
+                            className={`p-3.5 rounded-xl border text-left transition-all flex flex-col justify-between ${
+                              isSelected
+                                ? "bg-[#FCF2E9] border-[#8B7355] shadow-md ring-2 ring-[#8B7355]/20"
+                                : isSoldOut
+                                ? "bg-gray-50 border-gray-200 opacity-60 cursor-not-allowed"
+                                : "bg-white border-[#E2E8F0] hover:border-[#D1B191]"
+                            }`}
+                          >
+                            <div className="flex items-center justify-between w-full mb-1">
+                              <span className="text-base font-bold font-displayPlayFair text-[#0F172A]">
+                                {sess.start_time} – {sess.end_time}
+                              </span>
+                              {isFullyBooked ? (
+                                <span className="px-2 py-0.5 bg-rose-100 text-rose-700 text-[9px] font-bold rounded-full">
+                                  Full (0/{sess.max_capacity || 2})
+                                </span>
+                              ) : notEnoughSeats ? (
+                                <span className="px-2 py-0.5 bg-amber-100 text-amber-800 text-[9px] font-bold rounded-full border border-amber-300">
+                                  Only {remaining} left
+                                </span>
+                              ) : (
+                                <span
+                                  className={`px-2 py-0.5 text-[9px] font-bold rounded-full border ${
+                                    remaining === 1
+                                      ? "bg-amber-100 text-amber-800 border-amber-300"
+                                      : "bg-emerald-50 text-emerald-700 border-emerald-300"
+                                  }`}
+                                >
+                                  {remaining} {remaining === 1 ? "spot left" : "spots left"}
+                                </span>
+                              )}
+                            </div>
+
+                            <span className="text-[10px] text-[#64748B] block">
+                              {sess.duration_minutes || 60}m session • Buffer ({sess.buffer_end_time || `${sess.end_time}+${sess.buffer_minutes || 10}m`})
+                            </span>
+                          </button>
+                        );
+                      });
+                    }
+
+                    return saltRoomSessions.map((sess) => {
+                      const remaining = Math.max(0, sess.totalCapacity - sess.bookedPlaces);
+                      const isSoldOut = remaining === 0 || remaining < currentGuestsCount;
+                      const isSelected = selectedTime === sess.slot;
+
+                      return (
+                        <button
+                          key={sess.slot}
+                          type="button"
+                          disabled={isSoldOut}
+                          onClick={() => handleTimeSelect(sess.slot)}
+                          className={`p-3.5 rounded-xl border text-left transition-all flex flex-col justify-between ${
+                            isSelected
+                              ? "bg-[#FCF2E9] border-[#8B7355] shadow-md ring-2 ring-[#8B7355]/20"
+                              : isSoldOut
+                              ? "bg-gray-50 border-gray-200 opacity-60 cursor-not-allowed"
+                              : "bg-white border-[#E2E8F0] hover:border-[#D1B191]"
+                          }`}
+                        >
+                          <div className="flex items-center justify-between w-full mb-1">
+                            <span className="text-base font-bold font-displayPlayFair text-[#0F172A]">
+                              {sess.slot}
+                            </span>
+                            {remaining === 0 ? (
+                              <span className="px-2 py-0.5 bg-rose-100 text-rose-700 text-[9px] font-bold rounded-full">
+                                Full (0/2)
+                              </span>
+                            ) : remaining < currentGuestsCount ? (
+                              <span className="px-2 py-0.5 bg-amber-100 text-amber-800 text-[9px] font-bold rounded-full border border-amber-300">
+                                Only {remaining} left
+                              </span>
+                            ) : (
+                              <span
+                                className={`px-2 py-0.5 text-[9px] font-bold rounded-full border ${
+                                  remaining === 1
+                                    ? "bg-amber-100 text-amber-800 border-amber-300"
+                                    : "bg-emerald-50 text-emerald-700 border-emerald-300"
+                                }`}
+                              >
+                                {remaining} {remaining === 1 ? "spot left" : "spots left"}
+                              </span>
+                            )}
+                          </div>
+
+                          <span className="text-[10px] text-[#64748B] block">
+                            1h session • Changeover ({sess.changeover})
                           </span>
-                          {isSoldOut ? (
-                            <span className="px-2 py-0.5 bg-rose-100 text-rose-700 text-[9px] font-bold rounded-full">
-                              Full (0/2)
-                            </span>
-                          ) : (
-                            <span className={`px-2 py-0.5 text-[9px] font-bold rounded-full border ${
-                              remaining === 1 ? "bg-amber-100 text-amber-800 border-amber-300" : "bg-emerald-50 text-emerald-700 border-emerald-300"
-                            }`}>
-                              {remaining} {remaining === 1 ? "spot left" : "spots left"}
-                            </span>
-                          )}
-                        </div>
-
-                        <span className="text-[10px] text-[#64748B] block">
-                          1h session • Changeover ({sess.changeover})
-                        </span>
-                      </button>
-                    );
-                  })}
+                        </button>
+                      );
+                    });
+                  })()}
                 </div>
               ) : !loadingApiSlots && !apiSlots?.is_blocked && isSharedSauna ? (
                 /* Shared Sauna Live API Slots or Fallback */
