@@ -273,18 +273,33 @@ export default function StripePaymentForm({
             }
           }
 
+          const isPurchaseFlow = !bookingData.hasActiveMembership && (bookingData.passType === "once_a_week" || bookingData.passType === "unlimited" || bookingData.passType === "10_session_pass");
+          const purchasePlanId = isPurchaseFlow ? (bookingData.planId || bookingData.passId) : undefined;
+          const currentPaymentMode = bookingData.paymentMode || (
+            bookingData.passType === "unlimited" && bookingData.hasActiveMembership ? "unlimited_subscription" :
+            bookingData.passType === "once_a_week" && bookingData.hasActiveMembership ? "weekly_subscription" :
+            bookingData.passType === "10_session_pass" && bookingData.hasActiveMembership ? "pass" : "card"
+          );
+
           const saltPayload: any = {
+            guest_name: cardName.trim() || bookingData.name || "Guest",
+            guest_email: bookingData.email || "guest@example.com",
+            guest_phone: bookingData.phone || "+31612345678",
             name: cardName.trim() || bookingData.name || "Guest",
             email: bookingData.email || "guest@example.com",
             phone: bookingData.phone || "+31612345678",
             date: bookingData.date || new Date().toISOString().split("T")[0],
+            time: saltStartTime.length === 5 ? `${saltStartTime}:00` : saltStartTime,
             start_time: saltStartTime,
             ...(saltEndTime ? { end_time: saltEndTime } : {}),
             capacity: bookingData.guestsCount || 1,
-            payment_mode: bookingData.paymentMode || "card",
+            payment_mode: currentPaymentMode,
             purchase_id: bookingData.purchaseId || undefined,
+            subscription_id: bookingData.purchaseId || undefined,
+            pass_id: bookingData.passId || (currentPaymentMode === "pass" ? bookingData.purchaseId : undefined),
+            ...(purchasePlanId ? { purchase_plan_id: purchasePlanId } : {}),
             plan_id: bookingData.planId || undefined,
-            pass_id: bookingData.passId || undefined,
+            notes: bookingData.requests || undefined,
             special_request: bookingData.requests || null,
           };
 

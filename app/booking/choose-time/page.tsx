@@ -238,8 +238,23 @@ export default function ChooseTimePage() {
     }
 
     if (isSaltRoom && slotMembership) {
-      const activePass = slotMembership.session_pass;
+      const activePass = slotMembership.session_pass || slotMembership.pass;
       const activeSub = slotMembership.subscription;
+      const weeklySub = slotMembership.weekly_subscription || (
+        (activeSub?.plan_type?.toLowerCase() === "weekly" ||
+         activeSub?.type?.toLowerCase() === "weekly" ||
+         activeSub?.name?.toLowerCase().includes("week"))
+          ? activeSub
+          : null
+      );
+      const unlimitedSub = slotMembership.unlimited_subscription || (
+        (activeSub?.plan_type?.toLowerCase() === "unlimited" ||
+         activeSub?.type?.toLowerCase() === "unlimited" ||
+         activeSub?.is_unlimited ||
+         activeSub?.name?.toLowerCase().includes("unlimited"))
+          ? activeSub
+          : null
+      );
       const passType = storedData.passType || "single";
 
       // If user explicitly chose 'single' session in arrangements, NEVER force pass/subscription mode
@@ -256,12 +271,15 @@ export default function ChooseTimePage() {
       let paymentMode: "pass" | "subscription" | "weekly_subscription" | "unlimited_subscription" | "card" | string = storedData.paymentMode || "card";
       let purchaseId = storedData.purchaseId;
 
-      if (passType === "10_session_pass" && slotMembership.has_active_pass && activePass) {
+      if (passType === "10_session_pass" && (slotMembership.has_active_pass || slotMembership.has_pass) && activePass) {
         paymentMode = "pass";
-        purchaseId = activePass.purchase_id;
-      } else if ((passType === "once_a_week" || passType === "unlimited") && slotMembership.has_active_subscription && activeSub) {
-        paymentMode = "subscription";
-        purchaseId = activeSub.purchase_id;
+        purchaseId = activePass.purchase_id || activePass.pass_id;
+      } else if (passType === "once_a_week" && weeklySub && weeklySub.is_available_for_date !== false) {
+        paymentMode = "weekly_subscription";
+        purchaseId = weeklySub.purchase_id || weeklySub.subscription_id;
+      } else if (passType === "unlimited" && unlimitedSub && unlimitedSub.is_available_for_date !== false) {
+        paymentMode = "unlimited_subscription";
+        purchaseId = unlimitedSub.purchase_id || unlimitedSub.subscription_id;
       }
 
       updateStoredBookingData({
@@ -545,17 +563,26 @@ export default function ChooseTimePage() {
               <label className="block text-sm font-bold text-[#0F172A] uppercase tracking-wider" style={{ fontFamily: "Inter, sans-serif" }}>
                 Date
               </label>
-              {isLunchroom && (
+              {isSaltRoom ? (
+                <span className="text-xs text-[#8B7355] font-semibold bg-[#FCF2E9] px-2.5 py-1 rounded-md border border-[#E8E2DC]">
+                  🔒 Date locked from previous step
+                </span>
+              ) : isLunchroom ? (
                 <span className="text-xs text-[#8B7355] font-semibold">Available: Wed – Sun</span>
-              )}
+              ) : null}
             </div>
             <div className="relative">
               <input
                 type="date"
                 value={date}
-                onChange={(e) => handleDateChange(e.target.value)}
-                className={`w-full p-4 border rounded-xl focus:outline-none focus:ring-2 focus:ring-[#D1B191] text-[#475569] cursor-pointer ${
-                  dayError ? "border-red-400 bg-red-50/30" : "border-[#E2E8F0]"
+                disabled={isSaltRoom}
+                onChange={(e) => !isSaltRoom && handleDateChange(e.target.value)}
+                className={`w-full p-4 border rounded-xl focus:outline-none focus:ring-2 focus:ring-[#D1B191] text-[#475569] ${
+                  isSaltRoom
+                    ? "bg-[#F8FAFC] border-[#E2E8F0] opacity-80 cursor-not-allowed font-medium text-[#1E293B]"
+                    : dayError
+                    ? "border-red-400 bg-red-50/30 cursor-pointer"
+                    : "border-[#E2E8F0] cursor-pointer"
                 }`}
               />
             </div>

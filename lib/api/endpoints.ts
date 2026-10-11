@@ -57,6 +57,7 @@ export const ENDPOINTS = {
     EVENTS_INQUIRY: "/services/events/inquiry/",
     MEMBERSHIPS: "/services/memberships/",
     SCHEDULES: "/services/schedules/",
+    GET_SLOT: "/services/get_slot/",
     SLOTS: (serviceType?: string) => serviceType ? `/services/slots/${serviceType}/` : "/services/slots/",
   },
   CONTACT: {

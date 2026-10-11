@@ -119,44 +119,60 @@ export interface SessionPassItem {
 }
 
 export interface UserMembershipPass {
-  purchase_id: string;
-  name: string;
+  id?: number;
+  pass_id?: string;
+  purchase_id?: string;
+  name?: string;
+  plan_name?: string;
   remaining_sessions: number;
-  total_sessions: number;
-  total_remaining_across_all_passes: number;
-  max_active_reservations: number;
-  status: string;
-  payment_status: string;
+  total_sessions?: number;
+  total_remaining_across_all_passes?: number;
+  max_active_reservations?: number;
+  status?: string;
+  payment_status?: string;
+  end_date?: string | null;
+  is_available_for_date?: boolean;
+  unavailable_reason?: string | null;
 }
 
 export interface UserMembershipSubscription {
-  purchase_id: string;
-  name: string;
-  plan_type: "weekly" | "unlimited" | string;
-  plan_category: string;
-  start_date: string;
-  end_date: string;
-  is_unlimited: boolean;
-  remaining_sessions: number;
-  total_sessions: number;
-  sessions_per_week: number;
-  max_active_reservations: number;
-  status: string;
-  payment_status: string;
+  id?: number;
+  subscription_id?: string;
+  purchase_id?: string;
+  name?: string;
+  plan_name?: string;
+  type?: "weekly" | "unlimited" | string;
+  plan_type?: "weekly" | "unlimited" | string;
+  plan_category?: string;
+  start_date?: string;
+  end_date?: string;
+  is_unlimited?: boolean;
+  remaining_sessions?: number;
+  total_sessions?: number;
+  sessions_per_week?: number;
+  max_active_reservations?: number;
+  active_reservations_count?: number;
+  status?: string;
+  payment_status?: string;
   is_available_for_date?: boolean;
   is_available_for_today?: boolean;
   is_available_for_week?: boolean;
   week_bookings_count?: number;
-  unavailable_reason?: string;
+  unavailable_reason?: string | null;
 }
 
 export interface UserMembershipData {
-  is_authenticated: boolean;
-  has_active_pass: boolean;
-  has_active_subscription: boolean;
-  total_available_sessions: number;
-  session_pass: UserMembershipPass | null;
-  subscription: UserMembershipSubscription | null;
+  is_authenticated?: boolean;
+  has_pass?: boolean;
+  has_subscription?: boolean;
+  has_active_pass?: boolean;
+  has_active_subscription?: boolean;
+  total_available_sessions?: number;
+  weekly_subscription?: UserMembershipSubscription | null;
+  unlimited_subscription?: UserMembershipSubscription | null;
+  pass?: UserMembershipPass | null;
+  session_pass?: UserMembershipPass | null;
+  subscription?: UserMembershipSubscription | null;
 }
 
 export interface SaltroomServicesData {
@@ -289,16 +305,19 @@ export interface PackageSlotsResponse {
 }
 
 export interface SaltRoomSlotItem {
+  time?: string;
   start_time: string;
-  end_time: string;
+  end_time?: string;
   buffer_end_time?: string;
   duration_minutes?: number;
   buffer_minutes?: number;
-  max_capacity: number;
-  booked_capacity: number;
-  remaining_capacity: number;
-  is_available: boolean;
-  is_fully_booked: boolean;
+  max_capacity?: number;
+  booked_capacity?: number;
+  remaining_capacity?: number;
+  available_capacity?: number;
+  is_available?: boolean;
+  is_booked?: boolean;
+  is_fully_booked?: boolean;
 }
 
 export interface SaltRoomSlotData {
@@ -523,7 +542,67 @@ export const servicesService = {
   async getServiceSlots(serviceType: string = "sauna", date: string): Promise<ServiceSlotsResponse> {
     const cleanType = (serviceType || "sauna").toLowerCase() === "salt_room" ? "saltroom" : (serviceType || "sauna").toLowerCase();
     
-    // First try query param style /services/slots/?type=saltroom&date=...
+    // 1. For saltroom, try the new GET /services/get_slot/?s_type=saltroom&date=... endpoint first
+    if (cleanType === "saltroom") {
+      try {
+        const getSlotRes = await ApiClient.get<any>(ENDPOINTS.SERVICES.GET_SLOT, {
+          params: { s_type: "saltroom", date },
+        });
+        if (getSlotRes) {
+          // Normalize to ServiceSlotsResponse structure
+          const rawService = getSlotRes.service || {};
+          const rawSlots = Array.isArray(getSlotRes.slots) ? getSlotRes.slots : [];
+          const normalizedSlots: SaltRoomSlotItem[] = rawSlots.map((s: any) => {
+            const timeStr = s.time ? s.time.slice(0, 5) : (s.start_time || "09:00");
+            const durationMins = rawService.duration || 45;
+            // Calculate end time from timeStr + durationMins
+            const [h, m] = timeStr.split(":").map(Number);
+            const totalEndMin = (h * 60 + m) + durationMins;
+            const endH = Math.floor(totalEndMin / 60) % 24;
+            const endM = totalEndMin % 60;
+            const endTimeStr = `${String(endH).padStart(2, "0")}:${String(endM).padStart(2, "0")}`;
+
+            const availCap = typeof s.available_capacity === "number" ? s.available_capacity : (s.remaining_capacity ?? (rawService.max_capacity || 6));
+            const isBooked = Boolean(s.is_booked) || availCap <= 0;
+
+            return {
+              time: s.time || timeStr,
+              start_time: s.start_time || timeStr,
+              end_time: s.end_time || endTimeStr,
+              duration_minutes: durationMins,
+              max_capacity: rawService.max_capacity || 6,
+              remaining_capacity: availCap,
+              available_capacity: availCap,
+              booked_capacity: (rawService.max_capacity || 6) - availCap,
+              is_available: !isBooked,
+              is_booked: isBooked,
+              is_fully_booked: isBooked,
+            };
+          });
+
+          return {
+            success: true,
+            is_blocked: false,
+            date: getSlotRes.date || date,
+            service_type: "saltroom",
+            open_time: rawSlots[0]?.time?.slice(0, 5) || "09:00",
+            close_time: rawSlots[rawSlots.length - 1]?.time?.slice(0, 5) || "21:00",
+            data: {
+              price_per_person: rawService.price || "45.00",
+              max_capacity: rawService.max_capacity || 6,
+              duration_minutes: rawService.duration || 45,
+              slots: normalizedSlots,
+              available_slots: normalizedSlots.filter((s) => !s.is_booked),
+              user_membership: getSlotRes.user_membership,
+            },
+          };
+        }
+      } catch (getSlotErr) {
+        // Fallback to /services/slots/
+      }
+    }
+
+    // 2. Query param style /services/slots/?type=saltroom&date=...
     try {
       const res = await ApiClient.get<ServiceSlotsResponse>("/services/slots/", {
         params: { type: cleanType, date },

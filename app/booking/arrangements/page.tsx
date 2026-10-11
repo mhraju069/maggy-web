@@ -284,43 +284,64 @@ export default function SaltRoomBookingPage() {
     }
   }, [saltOptions, selectedOption]);
 
-  // Subscription date availability check (from GET /api/services/slots/?type=saltroom&date=...)
-  const activeSub = userMembership?.subscription;
-  const isSubAvailableForSelectedDate = activeSub?.is_available_for_date !== false;
-  const subUnavailableReason = activeSub?.unavailable_reason || "Weekly limit reached for this period.";
+  // Resolve membership objects from both new API (weekly_subscription, unlimited_subscription, pass) and existing API
+  const weeklySubObj = userMembership?.weekly_subscription || (
+    (userMembership?.subscription?.plan_type?.toLowerCase() === "weekly" ||
+     userMembership?.subscription?.type?.toLowerCase() === "weekly" ||
+     userMembership?.subscription?.name?.toLowerCase().includes("week"))
+      ? userMembership.subscription
+      : null
+  );
 
-  // If user had selected a subscription plan that is not available for this date, switch them to standard single session
-  useEffect(() => {
-    if (
-      userMembership?.has_active_subscription &&
-      !isSubAvailableForSelectedDate &&
-      (selectedOption === "once_a_week" || selectedOption === "unlimited")
-    ) {
-      setSelectedOption("single");
-    }
-  }, [isSubAvailableForSelectedDate, userMembership, selectedOption]);
+  const unlimitedSubObj = userMembership?.unlimited_subscription || (
+    (userMembership?.subscription?.plan_type?.toLowerCase() === "unlimited" ||
+     userMembership?.subscription?.type?.toLowerCase() === "unlimited" ||
+     userMembership?.subscription?.is_unlimited ||
+     userMembership?.subscription?.name?.toLowerCase().includes("unlimited"))
+      ? userMembership.subscription
+      : null
+  );
+
+  const passObj = userMembership?.pass || userMembership?.session_pass;
+
+  // Availability flags and reasons per date
+  const isWeeklyAvailable = weeklySubObj ? weeklySubObj.is_available_for_date !== false : true;
+  const weeklyUnavailableReason = weeklySubObj?.unavailable_reason || "Weekly session limit already reached for this week.";
+
+  const isUnlimitedAvailable = unlimitedSubObj ? unlimitedSubObj.is_available_for_date !== false : true;
+  const unlimitedUnavailableReason = unlimitedSubObj?.unavailable_reason || "Maximum 10 active reservations reached.";
+
+  const isPassAvailable = passObj ? (passObj.is_available_for_date !== false && (passObj.remaining_sessions ?? 0) > 0) : true;
+  const passUnavailableReason = passObj?.unavailable_reason || "No remaining sessions or pass expired.";
 
   // Coverage helpers: Check if current selection is covered by user's active pass or subscription
   const isPassCovered = Boolean(
-    userMembership?.has_active_pass &&
-    (userMembership?.session_pass?.remaining_sessions ?? 0) > 0
+    (userMembership?.has_pass || userMembership?.has_active_pass || Boolean(passObj)) &&
+    (passObj?.remaining_sessions ?? 0) > 0 &&
+    isPassAvailable
   );
 
   const isWeeklySubscriptionCovered = Boolean(
-    userMembership?.has_active_subscription &&
-    (userMembership?.subscription?.plan_type?.toLowerCase() === "weekly" ||
-      userMembership?.subscription?.name?.toLowerCase().includes("week")) &&
-    ((userMembership?.subscription?.remaining_sessions ?? 0) > 0 || userMembership?.subscription?.is_unlimited) &&
-    isSubAvailableForSelectedDate
+    weeklySubObj &&
+    ((weeklySubObj.remaining_sessions ?? 0) > 0 || weeklySubObj.is_unlimited) &&
+    isWeeklyAvailable
   );
 
   const isUnlimitedSubscriptionCovered = Boolean(
-    userMembership?.has_active_subscription &&
-    (userMembership?.subscription?.is_unlimited ||
-      userMembership?.subscription?.plan_type?.toLowerCase() === "unlimited" ||
-      userMembership?.subscription?.name?.toLowerCase().includes("unlimited")) &&
-    isSubAvailableForSelectedDate
+    unlimitedSubObj &&
+    isUnlimitedAvailable
   );
+
+  // If user has an active weekly or unlimited subscription that is disabled for this date, reset selection to single
+  useEffect(() => {
+    if (selectedOption === "once_a_week" && weeklySubObj && !isWeeklyAvailable) {
+      setSelectedOption("single");
+    } else if (selectedOption === "unlimited" && unlimitedSubObj && !isUnlimitedAvailable) {
+      setSelectedOption("single");
+    } else if (selectedOption === "10_session_pass" && passObj && !isPassAvailable) {
+      setSelectedOption("single");
+    }
+  }, [selectedOption, weeklySubObj, isWeeklyAvailable, unlimitedSubObj, isUnlimitedAvailable, passObj, isPassAvailable]);
 
   // Checks if the chosen option is free via user's active membership.
   // Note: 'single' (Salt Room Session) is always charged at its standard price per person and is never €0 / deducted from passes.
@@ -375,27 +396,28 @@ export default function SaltRoomBookingPage() {
     if (selectedOption === "single") {
       paymentMode = "card";
     } else if (selectedOption === "10_session_pass") {
-      if (isPassCovered && activePass) {
+      if (isPassCovered && passObj) {
         paymentMode = "pass";
-        purchaseId = activePass.purchase_id;
+        purchaseId = passObj.purchase_id || passObj.pass_id;
       } else {
-        paymentMode = "pass"; // Backend flow 2: new pass purchase + booking
+        paymentMode = "card"; // Buying new pass via card payment
         passId = sessionPass?.id;
+        planId = sessionPass?.id;
       }
     } else if (selectedOption === "once_a_week") {
-      if (isWeeklySubscriptionCovered && activeSub) {
-        paymentMode = "subscription";
-        purchaseId = activeSub.purchase_id;
+      if (isWeeklySubscriptionCovered && weeklySubObj) {
+        paymentMode = "weekly_subscription";
+        purchaseId = weeklySubObj.purchase_id || weeklySubObj.subscription_id;
       } else {
-        paymentMode = "weekly_subscription"; // Backend flow 2: new weekly subscription purchase + booking
+        paymentMode = "card"; // Buying new weekly subscription via card payment
         planId = weeklyPlan?.id;
       }
     } else if (selectedOption === "unlimited") {
-      if (isUnlimitedSubscriptionCovered && activeSub) {
-        paymentMode = "subscription";
-        purchaseId = activeSub.purchase_id;
+      if (isUnlimitedSubscriptionCovered && unlimitedSubObj) {
+        paymentMode = "unlimited_subscription";
+        purchaseId = unlimitedSubObj.purchase_id || unlimitedSubObj.subscription_id;
       } else {
-        paymentMode = "unlimited_subscription"; // Backend flow 2: new unlimited subscription purchase + booking
+        paymentMode = "card"; // Buying new unlimited subscription via card payment
         planId = unlimitedPlan?.id;
       }
     }
@@ -633,32 +655,47 @@ export default function SaltRoomBookingPage() {
 
         {/* ── 2. Select Booking Option or Membership ── */}
         <div>
-          <label className="block text-sm font-bold text-[#0F172A] mb-4 uppercase tracking-wider" style={{ fontFamily: "Inter, sans-serif" }}>
-            2. Select Booking Option or Membership
-          </label>
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
+            <label className="block text-sm font-bold text-[#0F172A] uppercase tracking-wider" style={{ fontFamily: "Inter, sans-serif" }}>
+              2. Select Booking Option or Membership
+            </label>
+            {!date && (
+              <span className="text-xs text-amber-700 bg-amber-50 px-3 py-1 rounded-full border border-amber-200 font-semibold flex items-center gap-1.5 self-start sm:self-auto">
+                <BiInfoCircle size={15} /> Please select a reservation date above first
+              </span>
+            )}
+          </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {saltOptions.map((opt) => {
               const isSelected = selectedOption === opt.id;
               
-              // Check if this option is a subscription plan (weekly or unlimited)
-              const isSubscriptionOption = opt.id === "once_a_week" || opt.id === "unlimited";
+              // Check if option is disabled due to user membership limits on this date
+              let isOptionDisabledForDate = false;
+              let unavailableReasonText: string | null = null;
 
-              // If user has an active subscription, but the selected date has reached limit (is_available_for_date: false)
-              const isSubDisabledForDate =
-                isSubscriptionOption &&
-                Boolean(userMembership?.has_active_subscription) &&
-                !isSubAvailableForSelectedDate;
+              if (opt.id === "once_a_week" && weeklySubObj && !isWeeklyAvailable) {
+                isOptionDisabledForDate = true;
+                unavailableReasonText = weeklyUnavailableReason;
+              } else if (opt.id === "unlimited" && unlimitedSubObj && !isUnlimitedAvailable) {
+                isOptionDisabledForDate = true;
+                unavailableReasonText = unlimitedUnavailableReason;
+              } else if (opt.id === "10_session_pass" && passObj && !isPassAvailable) {
+                isOptionDisabledForDate = true;
+                unavailableReasonText = passUnavailableReason;
+              }
 
               // Determine if this specific card is covered by active subscription/pass
               // 'single' (Salt Room Session) is ALWAYS charged at its standard price (€25) and is never €0
               const isCardCovered =
+                Boolean(date) &&
                 opt.id !== "single" &&
                 ((opt.id === "10_session_pass" && isPassCovered) ||
                   (opt.id === "once_a_week" && isWeeklySubscriptionCovered) ||
                   (opt.id === "unlimited" && isUnlimitedSubscriptionCovered));
 
-              const isButtonDisabled = isDateBlocked || isSubDisabledForDate;
+              // Card is disabled if no date is picked, date is blocked, or membership limit is reached for this date
+              const isButtonDisabled = !date || isDateBlocked || isOptionDisabledForDate;
 
               return (
                 <button
@@ -667,9 +704,11 @@ export default function SaltRoomBookingPage() {
                   disabled={isButtonDisabled}
                   onClick={() => !isButtonDisabled && setSelectedOption(opt.id)}
                   className={`p-6 rounded-2xl border transition-all text-left flex flex-col justify-between ${
-                    isDateBlocked
+                    !date
                       ? "opacity-50 cursor-not-allowed bg-gray-50 border-gray-200"
-                      : isSubDisabledForDate
+                      : isDateBlocked
+                      ? "opacity-50 cursor-not-allowed bg-gray-50 border-gray-200"
+                      : isOptionDisabledForDate
                       ? "opacity-60 cursor-not-allowed bg-amber-50/40 border-amber-200"
                       : isSelected
                       ? "bg-[#FCF2E9] border-[#8B7355] shadow-md ring-2 ring-[#8B7355]/20"
@@ -682,7 +721,7 @@ export default function SaltRoomBookingPage() {
                         {opt.badge}
                       </span>
                       <div className="flex items-center gap-2">
-                        {isSubDisabledForDate ? (
+                        {isOptionDisabledForDate ? (
                           <span className="px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider bg-rose-100 text-rose-700 border border-rose-300">
                             Limit Reached
                           </span>
@@ -720,11 +759,11 @@ export default function SaltRoomBookingPage() {
                     </p>
                     <p className="text-xs text-[#64748B] mb-2">{opt.subtitle}</p>
 
-                    {/* Subscription Limit Warning */}
-                    {isSubDisabledForDate && (
+                    {/* Membership / Subscription Limit Warning */}
+                    {isOptionDisabledForDate && (
                       <div className="my-2 p-2.5 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 text-[11px] font-medium flex items-center gap-1.5">
                         <BiInfoCircle size={16} className="text-amber-700 flex-shrink-0" />
-                        <span>{subUnavailableReason}</span>
+                        <span>{unavailableReasonText}</span>
                       </div>
                     )}
 
@@ -759,10 +798,10 @@ export default function SaltRoomBookingPage() {
               <button
                 key={num}
                 type="button"
-                disabled={isDateBlocked}
-                onClick={() => setGuestsCount(num)}
+                disabled={!date || isDateBlocked}
+                onClick={() => (!date || isDateBlocked ? null : setGuestsCount(num))}
                 className={`py-4 rounded-xl border font-bold text-center transition-all ${
-                  isDateBlocked
+                  !date || isDateBlocked
                     ? "opacity-50 cursor-not-allowed bg-gray-50 border-gray-200 text-[#94A3B8]"
                     : guestsCount === num
                     ? "bg-[#8B7355] border-[#8B7355] text-white shadow-md scale-[1.02]"
@@ -890,21 +929,23 @@ export default function SaltRoomBookingPage() {
 
         <button
           type="button"
-          disabled={isDateBlocked}
+          disabled={!date || isDateBlocked}
           onClick={handleContinue}
           className={`px-10 py-4 rounded-xl font-bold text-sm flex items-center gap-3 transition-all ${
-            isDateBlocked
+            !date || isDateBlocked
               ? "bg-[#CBD5E1] text-[#64748B] cursor-not-allowed shadow-none"
               : "bg-[#D1B191] hover:bg-[#C4A484] text-white shadow-lg transform translate-y-[-2px]"
           }`}
           style={{ fontFamily: "Inter, sans-serif" }}
         >
-          {isDateBlocked
+          {!date
+            ? "Please Select a Date to Continue"
+            : isDateBlocked
             ? "Date Blocked — Select Another Date"
             : isSelectedOptionCovered
             ? "Book with Membership / Pass (Free)"
             : "Continue to Choose Time"}
-          {!isDateBlocked && (
+          {date && !isDateBlocked && (
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
               <line x1="5" y1="12" x2="19" y2="12"></line>
               <polyline points="12 5 19 12 12 19"></polyline>
