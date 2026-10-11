@@ -23,6 +23,8 @@ export default function ReviewPage() {
   const celebration = data.celebration;
   const isLunchroom = data.serviceType === "lunchroom" || data.serviceName.toLowerCase().includes("lunchroom");
   const isActivity = data.serviceType === "activity" || Boolean(data.activityDetails);
+  const isPackage = data.serviceType === "package" || data.serviceType === "packages";
+  const pkgSelections = data.packageSelections;
 
   const handleConfirmLunchroom = async () => {
     try {
@@ -107,18 +109,20 @@ export default function ReviewPage() {
                     {data.date ? new Date(data.date).toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric", year: "numeric" }) : "Not selected"}
                   </p>
                 </div>
-                <div>
-                  <span className="text-xs text-[#94A3B8] uppercase block mb-1">
-                    {isActivity ? "Session Time" : isLunchroom ? "Start Time" : "Start Time Slot"}
-                  </span>
-                  <p className="text-lg font-bold text-[#0F172A]">
-                    {isActivity && data.activityDetails?.startTime
-                      ? `${data.activityDetails.startTime} - ${data.activityDetails.endTime}`
-                      : data.timeSlot
-                      ? data.timeSlot
-                      : "Not selected"}
-                  </p>
-                </div>
+                {!isPackage && (
+                  <div>
+                    <span className="text-xs text-[#94A3B8] uppercase block mb-1">
+                      {isActivity ? "Session Time" : isLunchroom ? "Start Time" : "Start Time Slot"}
+                    </span>
+                    <p className="text-lg font-bold text-[#0F172A]">
+                      {isActivity && data.activityDetails?.startTime
+                        ? `${data.activityDetails.startTime} - ${data.activityDetails.endTime}`
+                        : data.timeSlot
+                        ? data.timeSlot
+                        : "Not selected"}
+                    </p>
+                  </div>
+                )}
                 <div>
                   <span className="text-xs text-[#94A3B8] uppercase block mb-1">Number of People</span>
                   <p className="text-lg font-bold text-[#0F172A]">
@@ -127,8 +131,52 @@ export default function ReviewPage() {
                 </div>
               </div>
 
-              {/* Sauna Duration & Buffer (Sauna Only) */}
-              {!isLunchroom && !isActivity && data.durationHours && (
+              {/* Package Sub-Services Schedule Breakdown */}
+              {isPackage && pkgSelections && (
+                <div className="pt-4 border-t border-[#F1F5F9] space-y-3">
+                  <span className="text-xs text-[#94A3B8] uppercase block font-bold tracking-wider">
+                    Scheduled Sub-Services & Times
+                  </span>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+                    {pkgSelections.saunaSlot && (
+                      <div className="p-3.5 bg-[#FAF7F2] rounded-xl border border-[#E8E2DC]">
+                        <span className="text-[10px] uppercase font-bold text-[#8B7355] block">Sauna Session</span>
+                        <p className="font-bold text-[#0F172A] text-sm mt-0.5">
+                          {pkgSelections.saunaSlot.startTime} – {pkgSelections.saunaSlot.endTime}
+                        </p>
+                        <span className="text-[11px] text-[#64748B] capitalize">
+                          {pkgSelections.saunaSlot.type} Sauna
+                        </span>
+                      </div>
+                    )}
+
+                    {pkgSelections.lunchroomTime && (
+                      <div className="p-3.5 bg-[#FAF7F2] rounded-xl border border-[#E8E2DC]">
+                        <span className="text-[10px] uppercase font-bold text-[#8B7355] block">Lunchroom Dining</span>
+                        <p className="font-bold text-[#0F172A] text-sm mt-0.5">
+                          {pkgSelections.lunchroomTime} Arrival
+                        </p>
+                        <span className="text-[11px] text-[#64748B]">Flexible Lunchroom Entry</span>
+                      </div>
+                    )}
+
+                    {pkgSelections.activitySession && (
+                      <div className="p-3.5 bg-[#FAF7F2] rounded-xl border border-[#E8E2DC]">
+                        <span className="text-[10px] uppercase font-bold text-[#8B7355] block">Activity Session</span>
+                        <p className="font-bold text-[#0F172A] text-sm mt-0.5">
+                          {pkgSelections.activitySession.title}
+                        </p>
+                        <span className="text-[11px] text-[#64748B]">
+                          {pkgSelections.activitySession.startTime} – {pkgSelections.activitySession.endTime}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* Sauna Duration & Buffer (Sauna Only, Not Package) */}
+              {!isPackage && !isLunchroom && !isActivity && data.durationHours && (
                 <div className="pt-3 border-t border-[#F1F5F9] grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <span className="text-xs text-[#94A3B8] uppercase block mb-1">Session Duration</span>

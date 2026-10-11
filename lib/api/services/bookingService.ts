@@ -111,6 +111,38 @@ export interface EventBookingResponse {
   message?: string;
 }
 
+export interface PackageBookedServiceItem {
+  [serviceKey: string]: string;
+}
+
+export interface CreatePackageBookingPayload {
+  name: string;
+  email: string;
+  phone: string;
+  date: string;
+  guests: number;
+  total_price?: string;
+  is_custom: boolean;
+  notes?: string | null;
+  booked_services_ids?: PackageBookedServiceItem[];
+  service_names?: string[];
+  [key: string]: any;
+}
+
+export interface CreatePackageBookingResponse {
+  success: boolean;
+  booking_id: string;
+  is_custom: boolean;
+  status?: string;
+  client_secret?: string;
+  payment_intent_id?: string;
+  amount?: string;
+  currency?: string;
+  service_names?: string[];
+  data?: any;
+  message?: string;
+}
+
 export const bookingService = {
   async getBookings(params?: Record<string, string | number>): Promise<PaginatedResponse<Booking> | Booking[]> {
     return ApiClient.get<PaginatedResponse<Booking> | Booking[]>(ENDPOINTS.BOOKINGS.LIST, { params });
@@ -134,6 +166,10 @@ export const bookingService = {
 
   async createEventBooking(payload: EventBookingPayload): Promise<EventBookingResponse> {
     return ApiClient.post<EventBookingResponse>(ENDPOINTS.BOOKINGS.EVENTS_CREATE, payload, { skipAuth: true });
+  },
+
+  async createPackageBooking(payload: CreatePackageBookingPayload): Promise<CreatePackageBookingResponse> {
+    return ApiClient.post<CreatePackageBookingResponse>(ENDPOINTS.BOOKINGS.PACKAGES_CREATE, payload, { skipAuth: true });
   },
 
   async createPaymentIntent(bookingId: string, currency: string = "eur"): Promise<{ success: boolean; client_secret: string; booking_id: string }> {

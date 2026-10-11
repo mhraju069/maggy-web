@@ -36,6 +36,24 @@ export interface ActivityBookingDetails {
   bookedSlots?: number;
 }
 
+export interface PackageSubServiceSelections {
+  includedServices?: string[];
+  saunaSlot?: {
+    type: "private" | "shared";
+    timeSlot?: "3_hours" | "4_hours" | string;
+    startTime: string;
+    endTime: string;
+  };
+  lunchroomTime?: string;
+  activitySession?: {
+    id: number;
+    title: string;
+    startTime: string;
+    endTime: string;
+    host?: string;
+  };
+}
+
 export interface BookingData {
   bookingId?: string;
   serviceId?: number;
@@ -55,6 +73,8 @@ export interface BookingData {
   hasActiveMembership?: boolean;
   membershipType?: "none" | "once_a_week" | "unlimited";
   activityDetails?: ActivityBookingDetails;
+  packageSelections?: PackageSubServiceSelections;
+  isCustomPackage?: boolean;
   selectedExtras?: BookingExtra[];
   totalAmount?: number;
   paymentMethod?: string;
@@ -79,6 +99,7 @@ export const initialBookingData: BookingData = {
   changeoverMinutes: 15,
   isSharedSauna: false,
   isSaltRoom: false,
+  isCustomPackage: false,
   passType: "single",
   remainingPassSessions: 10,
   hasActiveMembership: false,

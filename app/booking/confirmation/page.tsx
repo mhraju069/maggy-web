@@ -75,14 +75,51 @@ export default function ConfirmationPage() {
               <span className="text-[10px] text-[#94A3B8] uppercase tracking-widest block mb-1" style={{ fontFamily: "Inter, sans-serif" }}>
                 Experience
               </span>
-              <h3 className="text-2xl font-bold text-[#0F172A] font-displayPlayFair">{data.serviceName || "Private Sauna Session"}</h3>
+              <h3 className="text-2xl font-bold text-[#0F172A] font-displayPlayFair">{data.serviceName || "Wellness Experience"}</h3>
               <p className="text-base font-medium text-[#475569] mt-1">
                 {data.date
                   ? new Date(data.date).toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric", year: "numeric" })
                   : "Upcoming Date"}{" "}
-                at {data.timeSlot ? data.timeSlot.split(/[-–]/)[0].trim() : "09:00 AM"} • {data.guestsCount} {data.guestsCount === 1 ? "Person" : "People"}
+                • {data.guestsCount} {data.guestsCount === 1 ? "Person" : "People"}
               </p>
             </div>
+
+            {/* Package Sub-Services Schedule Breakdown */}
+            {(data.serviceType === "package" || data.serviceType === "packages") && data.packageSelections && (
+              <div className="pt-2 space-y-2">
+                <span className="text-[10px] text-[#94A3B8] uppercase tracking-widest block font-bold" style={{ fontFamily: "Inter, sans-serif" }}>
+                  Scheduled Package Component Times
+                </span>
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+                  {data.packageSelections.saunaSlot && (
+                    <div className="p-3 bg-[#FAF7F2] rounded-xl border border-[#E8E2DC]">
+                      <span className="text-[10px] uppercase font-bold text-[#8B7355] block">Sauna Session</span>
+                      <p className="font-bold text-[#0F172A] text-xs mt-0.5">
+                        {data.packageSelections.saunaSlot.startTime} – {data.packageSelections.saunaSlot.endTime}
+                      </p>
+                    </div>
+                  )}
+
+                  {data.packageSelections.lunchroomTime && (
+                    <div className="p-3 bg-[#FAF7F2] rounded-xl border border-[#E8E2DC]">
+                      <span className="text-[10px] uppercase font-bold text-[#8B7355] block">Lunchroom Dining</span>
+                      <p className="font-bold text-[#0F172A] text-xs mt-0.5">
+                        {data.packageSelections.lunchroomTime} Arrival
+                      </p>
+                    </div>
+                  )}
+
+                  {data.packageSelections.activitySession && (
+                    <div className="p-3 bg-[#FAF7F2] rounded-xl border border-[#E8E2DC]">
+                      <span className="text-[10px] uppercase font-bold text-[#8B7355] block">Activity Session</span>
+                      <p className="font-bold text-[#0F172A] text-xs mt-0.5">
+                        {data.packageSelections.activitySession.title} ({data.packageSelections.activitySession.startTime} – {data.packageSelections.activitySession.endTime})
+                      </p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Celebration Card If Active (Lunchroom Only) */}

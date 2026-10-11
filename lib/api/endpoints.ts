@@ -33,6 +33,7 @@ export const ENDPOINTS = {
     LUNCHROOM_CREATE: "/bookings/lunchroom/",
     ACTIVITIES_CREATE: "/bookings/activities/",
     EVENTS_CREATE: "/bookings/events/",
+    PACKAGES_CREATE: "/bookings/packages/",
   },
   PAYMENTS: {
     CREATE_INTENT: "/payments/create-intent/",

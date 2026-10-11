@@ -169,7 +169,7 @@ export interface PackageFeature {
 export interface ServicePackage {
   id: number;
   title: string;
-  packages?: string;
+  packages?: string[] | string;
   description: string;
   price: string | number;
   image?: string | null;
@@ -188,13 +188,61 @@ export interface PrivateSaunaSlot {
 export interface SharedSaunaSlot {
   start_time: string;
   end_time: string;
-  buffer_end_time: string;
+  buffer_end_time?: string;
   duration: string;
   max_capacity: number;
   booked_capacity: number;
   remaining_capacity: number;
   is_available: boolean;
   is_fully_booked: boolean;
+}
+
+export interface LunchroomSlotData {
+  is_available: boolean;
+  open_time: string;
+  close_time: string;
+  existing_bookings_count: number;
+  info: string;
+}
+
+export interface ActivitySlotData {
+  id: number;
+  title: string;
+  open_time: string;
+  close_time: string;
+  capacity: number;
+  booked_slots: number;
+  available_slots: number;
+  host: string;
+  is_available: boolean;
+}
+
+export interface PackageSlotsResponseData {
+  sauna?: {
+    private_sauna?: {
+      slots?: {
+        "3_hours"?: PrivateSaunaSlot[];
+        "4_hours"?: PrivateSaunaSlot[];
+      };
+    };
+    shared_sauna?: {
+      max_capacity_per_slot?: number;
+      slots?: SharedSaunaSlot[];
+    };
+  };
+  lunchroom?: LunchroomSlotData;
+  activities?: ActivitySlotData[];
+}
+
+export interface PackageSlotsResponse {
+  success: boolean;
+  is_blocked: boolean;
+  date: string;
+  service_type: string;
+  open_time: string;
+  close_time: string;
+  data?: PackageSlotsResponseData;
+  message?: string;
 }
 
 export interface ServiceSlotsData {
@@ -389,6 +437,15 @@ export const servicesService = {
     return ApiClient.get<ServiceSlotsResponse>(ENDPOINTS.SERVICES.SLOTS(serviceType), {
       skipAuth: true,
       params: { date },
+    });
+  },
+
+  async getPackageSlots(date: string, subType?: string): Promise<PackageSlotsResponse> {
+    const params: Record<string, string> = { type: "package", date };
+    if (subType) params.sub_type = subType;
+    return ApiClient.get<PackageSlotsResponse>("/services/slots/", {
+      skipAuth: true,
+      params,
     });
   },
 };

@@ -134,11 +134,72 @@ export default function StripePaymentForm({
 
       const isLunchroom = bookingData.serviceType === "lunchroom" || bookingData.serviceName?.toLowerCase().includes("lunchroom");
       const isActivity = bookingData.serviceType === "activity" || Boolean(bookingData.activityDetails);
+      const isPackage = bookingData.serviceType === "package" || bookingData.serviceType === "packages";
 
       // Call Combined API: Create Booking & Get Stripe Client Secret
       let clientSecret: string | undefined;
       try {
-        if (isActivity) {
+        if (isPackage) {
+          const pkgSelections = bookingData.packageSelections;
+          const celebration = bookingData.celebration;
+
+          let sauna_booking: any = undefined;
+          if (pkgSelections?.saunaSlot) {
+            sauna_booking = {
+              sauna_type: pkgSelections.saunaSlot.type || "private",
+              booking_time: pkgSelections.saunaSlot.startTime ? `${pkgSelections.saunaSlot.startTime}:00` : "14:00:00",
+              time_slot: timeSlotEnum,
+              capacity: bookingData.guestsCount || 2,
+            };
+          }
+
+          let lunchroom_booking: any = undefined;
+          if (pkgSelections?.lunchroomTime) {
+            lunchroom_booking = {
+              booking_time: `${pkgSelections.lunchroomTime}:00`,
+              capacity: bookingData.guestsCount || 2,
+              ...(celebration?.isCelebrating
+                ? {
+                    celebration_type: celebration.occasion || undefined,
+                    name_of_celebrant: celebration.celebrantName || undefined,
+                    age_of_celebrant: celebration.age ? parseInt(celebration.age, 10) : undefined,
+                    hobbies: celebration.hobbiesInterests || undefined,
+                    celebration_details: celebration.otherDetails || undefined,
+                  }
+                : {}),
+            };
+          }
+
+          let activity_booking: any = undefined;
+          if (pkgSelections?.activitySession) {
+            activity_booking = {
+              activity: pkgSelections.activitySession.id || 1,
+              capacity: bookingData.guestsCount || 2,
+            };
+          }
+
+          const pkgPayload: any = {
+            name: cardName.trim() || bookingData.name || "Guest",
+            email: bookingData.email || "guest@example.com",
+            phone: bookingData.phone || "+31612345678",
+            date: bookingData.date || new Date().toISOString().split("T")[0],
+            guests: bookingData.guestsCount || 2,
+            total_price: numericPrice.toFixed(2),
+            is_custom: false,
+            notes: bookingData.requests || undefined,
+            ...(sauna_booking ? { sauna_booking } : {}),
+            ...(lunchroom_booking ? { lunchroom_booking } : {}),
+            ...(activity_booking ? { activity_booking } : {}),
+          };
+
+          const res = await bookingService.createPackageBooking(pkgPayload);
+          if (res && res.booking_id) {
+            updateStoredBookingData({ bookingId: res.booking_id });
+          }
+          if (res && res.client_secret) {
+            clientSecret = res.client_secret;
+          }
+        } else if (isActivity) {
           const actId = bookingData.activityDetails?.id || 1;
           const parsedActId = typeof actId === "string" && !isNaN(Number(actId)) ? parseInt(actId, 10) : actId;
 
