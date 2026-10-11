@@ -1,12 +1,16 @@
 "use client";
 
 import BookNow from "@/components/shared/BookNow";
+import { authService } from "@/lib/api/services/authService";
+import { clearAuthSession, getStoredToken } from "@/lib/api/token";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 import { Language } from "@/lib/i18n/translations";
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { usePathname, useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { HiArrowRightOnRectangle } from "react-icons/hi2";
+import { LuLayoutDashboard } from "react-icons/lu";
 
 const languageOptions: { label: string; value: Language }[] = [
   { label: "EN", value: "en" },
@@ -16,9 +20,35 @@ const languageOptions: { label: string; value: Language }[] = [
 
 const Navbar = () => {
   const pathname = usePathname();
+  const router = useRouter();
   const { language, setLanguage, t } = useLanguage();
   const [isLanguageOpen, setIsLanguageOpen] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    const checkAuth = () => {
+      const token = getStoredToken();
+      setIsLoggedIn(!!token);
+    };
+
+    checkAuth();
+    window.addEventListener("storage", checkAuth);
+    return () => {
+      window.removeEventListener("storage", checkAuth);
+    };
+  }, [pathname]);
+
+  const handleLogout = async () => {
+    try {
+      await authService.logout();
+    } catch {
+      clearAuthSession();
+    }
+    setIsLoggedIn(false);
+    setIsMenuOpen(false);
+    router.push("/login");
+  };
 
   const navLinks = [
     { href: "/", name: t.navbar.home },
@@ -131,29 +161,49 @@ const Navbar = () => {
           ))}
         </div>
 
-        {/* ── Right: Login + Book Now (Desktop >= 1280px) ── */}
+        {/* ── Right: Auth Actions + Book Now (Desktop >= 1280px) ── */}
         <div className="hidden xl:flex items-center gap-2 2xl:gap-3 shrink-0">
-          <Link
-            href="/login"
-            className="flex items-center gap-2 rounded-md border border-[#CFB9A3] bg-transparent px-4 2xl:px-6 py-2.5 2xl:py-3 text-[14px] 2xl:text-[15px] font-bold font-serif text-[#0F172A] whitespace-nowrap shrink-0 transition-all hover:border-[#C4AD96] hover:text-[#0F172A] active:scale-95"
-          >
-            {t.navbar.login}
-            <svg
-              width="16"
-              height="16"
-              viewBox="0 0 24 24"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
+          {isLoggedIn ? (
+            <>
+              <Link
+                href="/dashboard"
+                className="flex items-center gap-1.5 rounded-md border border-[#CFB9A3] bg-transparent px-3.5 2xl:px-5 py-2.5 2xl:py-3 text-[14px] 2xl:text-[15px] font-bold font-serif text-[#0F172A] whitespace-nowrap shrink-0 transition-all hover:bg-[#F5D8BB]/30 hover:border-[#C4AD96] active:scale-95"
+              >
+                <LuLayoutDashboard size={16} />
+                <span>{t.navbar.dashboard || "Dashboard"}</span>
+              </Link>
+              <button
+                type="button"
+                onClick={handleLogout}
+                className="flex items-center gap-1.5 rounded-md border border-[#E2E8F0] bg-white px-3.5 2xl:px-5 py-2.5 2xl:py-3 text-[14px] 2xl:text-[15px] font-bold font-serif text-[#64748B] hover:text-red-600 hover:border-red-200 hover:bg-red-50/50 whitespace-nowrap shrink-0 transition-all active:scale-95 cursor-pointer shadow-2xs"
+              >
+                <HiArrowRightOnRectangle size={16} />
+                <span>{t.navbar.logout || "Log Out"}</span>
+              </button>
+            </>
+          ) : (
+            <Link
+              href="/login"
+              className="flex items-center gap-2 rounded-md border border-[#CFB9A3] bg-transparent px-4 2xl:px-6 py-2.5 2xl:py-3 text-[14px] 2xl:text-[15px] font-bold font-serif text-[#0F172A] whitespace-nowrap shrink-0 transition-all hover:border-[#C4AD96] hover:text-[#0F172A] active:scale-95"
             >
-              <path
-                d="M5 12H19M19 12L12 5M19 12L12 19"
-                stroke="#0F172A"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-          </Link>
+              {t.navbar.login}
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M5 12H19M19 12L12 5M19 12L12 19"
+                  stroke="#0F172A"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </Link>
+          )}
           <BookNow href="/booking" label={t.navbar.bookNow} />
         </div>
 
@@ -215,27 +265,49 @@ const Navbar = () => {
               ))}
             </div>
             <div className="mt-2 flex flex-col gap-2.5">
-              <Link
-                href="/login"
-                className="flex items-center justify-center gap-3 rounded-md border border-[#CFB9A3] bg-transparent px-8 py-3.5 text-[16px] font-bold font-serif text-[#0F172A] transition-all hover:border-[#C4AD96] hover:text-[#0F172A] active:scale-95"
-              >
-                {t.navbar.login}
-                <svg
-                  width="18"
-                  height="18"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
+              {isLoggedIn ? (
+                <>
+                  <Link
+                    href="/dashboard"
+                    onClick={() => setIsMenuOpen(false)}
+                    className="flex items-center justify-center gap-2.5 rounded-md border border-[#CFB9A3] bg-transparent px-8 py-3.5 text-[16px] font-bold font-serif text-[#0F172A] transition-all hover:bg-[#F5D8BB]/30 active:scale-95"
+                  >
+                    <LuLayoutDashboard size={18} />
+                    <span>{t.navbar.dashboard || "Dashboard"}</span>
+                  </Link>
+                  <button
+                    type="button"
+                    onClick={handleLogout}
+                    className="flex items-center justify-center gap-2.5 rounded-md border border-[#E2E8F0] bg-white px-8 py-3.5 text-[16px] font-bold font-serif text-[#64748B] hover:text-red-600 hover:border-red-200 active:scale-95 cursor-pointer"
+                  >
+                    <HiArrowRightOnRectangle size={18} />
+                    <span>{t.navbar.logout || "Log Out"}</span>
+                  </button>
+                </>
+              ) : (
+                <Link
+                  href="/login"
+                  onClick={() => setIsMenuOpen(false)}
+                  className="flex items-center justify-center gap-3 rounded-md border border-[#CFB9A3] bg-transparent px-8 py-3.5 text-[16px] font-bold font-serif text-[#0F172A] transition-all hover:border-[#C4AD96] hover:text-[#0F172A] active:scale-95"
                 >
-                  <path
-                    d="M5 12H19M19 12L12 5M19 12L12 19"
-                    stroke="#0F172A"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
-              </Link>
+                  {t.navbar.login}
+                  <svg
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M5 12H19M19 12L12 5M19 12L12 19"
+                      stroke="#0F172A"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                </Link>
+              )}
               <BookNow href="/booking" className="w-full justify-center" label={t.navbar.bookNow} />
             </div>
           </div>

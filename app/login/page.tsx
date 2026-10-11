@@ -5,13 +5,16 @@ import Navbar from "@/components/shared/Navbar";
 import { authService, parseApiErrorMessage } from "@/lib/api";
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Suspense, useState } from "react";
 import { HiOutlineLockClosed, HiOutlineMail } from "react-icons/hi";
 import { IoEyeOutline } from "react-icons/io5";
 
-export default function LoginPage() {
+function LoginForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirectUrl = searchParams.get("redirect");
+
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -43,12 +46,16 @@ export default function LoginPage() {
         if (logMsg.toLowerCase().includes("inactive") || logMsg.toLowerCase().includes("otp")) {
           setIsInactive(true);
           setTimeout(() => {
-            router.push(`/verify-otp?email=${encodeURIComponent(email.trim())}`);
+            router.push(`/verify-otp?email=${encodeURIComponent(email.trim())}${redirectUrl ? `&redirect=${encodeURIComponent(redirectUrl)}` : ""}`);
           }, 1500);
         }
       } else if (response.access || response.token || response.status === true) {
-        const targetRoute = response.user?.role === "admin" ? "/admin" : "/dashboard";
-        router.push(targetRoute);
+        if (redirectUrl && redirectUrl.startsWith("/")) {
+          router.push(redirectUrl);
+        } else {
+          const targetRoute = response.user?.role === "admin" ? "/admin" : "/dashboard";
+          router.push(targetRoute);
+        }
       } else {
         setError(response.log || "Login failed. Please check your credentials.");
       }
@@ -206,7 +213,7 @@ export default function LoginPage() {
               <p className="text-center text-xs text-[#64748B] pt-3 border-t border-[#f1f5f9]">
                 Don&apos;t have an account?{" "}
                 <Link
-                  href="/signup"
+                  href={`/signup${redirectUrl ? `?redirect=${encodeURIComponent(redirectUrl)}` : ""}`}
                   className="text-[#CFB9A3] hover:text-[#8b7355] font-semibold ml-0.5 transition-colors"
                 >
                   Sign Up
@@ -219,6 +226,14 @@ export default function LoginPage() {
 
       <Footer />
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-white" />}>
+      <LoginForm />
+    </Suspense>
   );
 }
 

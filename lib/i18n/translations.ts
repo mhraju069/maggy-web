@@ -14,6 +14,8 @@ export const translations = {
       memberships: "Memberships",
       contact: "Contact",
       login: "Log In",
+      logout: "Log Out",
+      dashboard: "Dashboard",
       bookNow: "Reserve Now",
     },
     header: {
@@ -541,6 +543,8 @@ export const translations = {
       memberships: "Lidmaatschappen",
       contact: "Contact",
       login: "Inloggen",
+      logout: "Uitloggen",
+      dashboard: "Dashboard",
       bookNow: "Reserveer hier",
     },
     header: {
@@ -1108,6 +1112,8 @@ export const translations = {
       memberships: "Mitgliedschaften",
       contact: "Kontakt",
       login: "Anmelden",
+      logout: "Abmelden",
+      dashboard: "Dashboard",
       bookNow: "Jetzt buchen",
     },
     header: {

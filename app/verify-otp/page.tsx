@@ -50,8 +50,9 @@ function VerifyOtpContent() {
       } else {
         const msg = response.log || "OTP verified successfully. Please log in to continue.";
         setSuccessMessage(msg);
+        const redirectParam = searchParams.get("redirect");
         setTimeout(() => {
-          router.push("/login");
+          router.push(`/login${redirectParam ? `?redirect=${encodeURIComponent(redirectParam)}` : ""}`);
         }, 1500);
       }
     } catch (err: unknown) {

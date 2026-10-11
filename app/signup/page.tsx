@@ -5,13 +5,16 @@ import Navbar from "@/components/shared/Navbar";
 import { authService, parseApiErrorMessage } from "@/lib/api";
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Suspense, useState } from "react";
 import { FiArrowRight } from "react-icons/fi";
 import { HiOutlineEye, HiOutlineLockClosed, HiOutlineMail, HiOutlineUser } from "react-icons/hi";
 
-export default function SignupPage() {
+function SignupForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirectUrl = searchParams.get("redirect");
+
   const [showPassword, setShowPassword] = useState(false);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -40,7 +43,7 @@ export default function SignupPage() {
 
       if (response.status !== false) {
         // Redirect to OTP verification page with email parameter
-        router.push(`/verify-otp?email=${encodeURIComponent(userEmail)}`);
+        router.push(`/verify-otp?email=${encodeURIComponent(userEmail)}${redirectUrl ? `&redirect=${encodeURIComponent(redirectUrl)}` : ""}`);
       } else {
         setError(parseApiErrorMessage(response) || "Registration failed.");
       }
@@ -186,7 +189,10 @@ export default function SignupPage() {
               <div className="text-center pt-6">
                 <p className="text-[#9d8b7a] text-sm">
                   Already have an account?{" "}
-                  <Link href="/login" className="text-[#d1bc9d] hover:underline font-medium ml-1">
+                  <Link
+                    href={`/login${redirectUrl ? `?redirect=${encodeURIComponent(redirectUrl)}` : ""}`}
+                    className="text-[#d1bc9d] hover:underline font-medium ml-1"
+                  >
                     Log In
                   </Link>
                 </p>
@@ -198,5 +204,13 @@ export default function SignupPage() {
 
       <Footer />
     </div>
+  );
+}
+
+export default function SignupPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-white" />}>
+      <SignupForm />
+    </Suspense>
   );
 }

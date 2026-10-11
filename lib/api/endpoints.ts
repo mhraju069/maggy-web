@@ -37,6 +37,11 @@ export const ENDPOINTS = {
   },
   PAYMENTS: {
     CREATE_INTENT: "/payments/create-intent/",
+    PLANS_AND_PASSES: "/payments/plans-and-passes/",
+    SESSION_PASSES: "/payments/session-passes/",
+    SUBSCRIPTION_PLANS: "/payments/subscription-plans/",
+    PURCHASE: "/payments/purchase/",
+    CONFIRM_PAYMENT: "/payments/confirm-payment/",
   },
   SERVICES: {
     ALL: "/services/",

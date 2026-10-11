@@ -102,6 +102,7 @@ export interface SubscriptionPlanItem {
   plan_type: "weekly" | "unlimited" | string;
   plan_category: "sauna" | "saltroom" | string;
   max_reservations?: number;
+  duration_weeks?: number;
 }
 
 export interface SessionPassFeature {
