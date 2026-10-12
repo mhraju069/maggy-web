@@ -1,25 +1,84 @@
 "use client";
 
 import DecorativeUnderline from "@/components/shared/DecorativeUnderline";
-import { getStoredBookingData } from "@/lib/bookingStore";
+import { getStoredBookingData, BookingData } from "@/lib/bookingStore";
+import { bookingService } from "@/lib/api/services/bookingService";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { FaCheck, FaLock } from "react-icons/fa";
 import { FaCakeCandles } from "react-icons/fa6";
 
 export default function ConfirmationPage() {
-  const [data, setData] = useState(getStoredBookingData());
-  const [bookingRef, setBookingRef] = useState("");
+  const [data, setData] = useState<BookingData | null>(null);
+  const [bookingRef, setBookingRef] = useState<string>("");
+  const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    const current = getStoredBookingData();
-    setData(current);
-    const initialRef = current.bookingId || `${current.isSharedSauna ? "SS" : current.isSaltRoom ? "SR" : "PS"}-${Math.floor(1000 + Math.random() * 9000)}`;
-    setBookingRef(initialRef);
+    const loadConfirmationData = async () => {
+      try {
+        const stored = getStoredBookingData();
+        
+        // If there's an actual booking id from API, try fetching latest booking detail (skip for saltroom SR- references as backend does not have detail endpoint for it)
+        if (stored.bookingId && stored.bookingId !== "") {
+          setBookingRef(stored.bookingId);
+          if (!stored.bookingId.startsWith("SR-")) {
+            try {
+              const apiBooking: any = await bookingService.getBookingDetails(stored.bookingId);
+              if (apiBooking && (apiBooking.booking_id || apiBooking.service_name || apiBooking.id)) {
+                setData({
+                  ...stored,
+                  bookingId: apiBooking.booking_id || stored.bookingId,
+                  serviceName: apiBooking.service_name || apiBooking.service?.name || stored.serviceName,
+                  serviceType: apiBooking.service_type || stored.serviceType,
+                  name: apiBooking.name || apiBooking.guest_name || stored.name,
+                  email: apiBooking.email || apiBooking.guest_email || stored.email,
+                  date: apiBooking.date || apiBooking.booking_date || stored.date,
+                  guestsCount: apiBooking.capacity || apiBooking.guests || stored.guestsCount,
+                  timeSlot: apiBooking.time || apiBooking.start_time || apiBooking.booking_time || stored.timeSlot,
+                });
+                setLoading(false);
+                return;
+              }
+            } catch {
+              // If details API not accessible or 404, use stored booking data
+            }
+          }
+        }
+
+        // Use stored booking data from session
+        if (stored) {
+          setData(stored);
+          const ref = stored.bookingId || `${stored.isSharedSauna ? "SS" : stored.isSaltRoom || stored.serviceType === "salt_room" || stored.serviceType === "saltroom" ? "SR" : "BK"}-${Math.floor(1000 + Math.random() * 9000)}`;
+          setBookingRef(ref);
+        }
+      } finally {
+        // Small delay to ensure smooth transition from payment redirect
+        setTimeout(() => {
+          setLoading(false);
+        }, 300);
+      }
+    };
+
+    loadConfirmationData();
   }, []);
 
+  if (loading || !data) {
+    return (
+      <div className="w-full min-h-[500px] flex flex-col items-center justify-center px-6 py-24">
+        <div className="w-16 h-16 rounded-full border-4 border-[#8B7355] border-t-transparent animate-spin mb-6" />
+        <h3 className="text-xl font-bold font-displayPlayFair text-[#0F172A] mb-2">
+          Retrieving Your Booking Confirmation...
+        </h3>
+        <p className="text-xs text-[#64748B] italic">
+          Please wait while we secure your reservation details.
+        </p>
+      </div>
+    );
+  }
+
   const celebration = data.celebration;
-  const isLunchroom = data.serviceType === "lunchroom" || data.serviceName.toLowerCase().includes("lunchroom");
+  const isLunchroom = data.serviceType === "lunchroom" || (data.serviceName && data.serviceName.toLowerCase().includes("lunchroom"));
+  const isSaltRoom = data.isSaltRoom || data.serviceType === "salt_room" || data.serviceType === "saltroom" || (data.serviceName && data.serviceName.toLowerCase().includes("salt"));
 
   return (
     <div className="w-full px-6 md:px-12">
@@ -137,12 +196,22 @@ export default function ConfirmationPage() {
             </div>
           )}
 
-          {/* Access / Walk-In Note */}
+          {/* Access / Opening Hours Note */}
           <div className="bg-[#8B735B]/90 p-8 rounded-2xl text-white relative overflow-hidden group">
             <div className="relative z-10">
-              <h4 className="text-xl font-bold font-displayPlayFair mb-2">Opening Hours Reminder</h4>
+              <h4 className="text-xl font-bold font-displayPlayFair mb-2">
+                {isSaltRoom
+                  ? "Salt Room Session Reminder"
+                  : isLunchroom
+                  ? "Lunchroom Opening Hours Reminder"
+                  : "Wellness Experience Reminder"}
+              </h4>
               <p className="text-xs opacity-90 leading-relaxed max-w-lg">
-                Wednesday through Sunday (09:00–16:00). Walk-ins are also welcome anytime! Please present your booking reference upon arrival.
+                {isSaltRoom
+                  ? "Please arrive 10 minutes prior to your halotherapy session. Comfortable clothing is recommended. Please present your booking reference upon arrival."
+                  : isLunchroom
+                  ? "Wednesday through Sunday (09:00–16:00). Walk-ins are also welcome anytime! Please present your booking reference upon arrival."
+                  : "Please arrive 15 minutes before your scheduled session. Towels, private facilities, and organic refreshments will be prepared for your visit."}
               </p>
             </div>
           </div>

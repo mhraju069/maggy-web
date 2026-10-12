@@ -42,31 +42,23 @@ export default function PaymentPage() {
           }}
         />
 
-      {/* ── Footer Buttons ── */}
-      <div className="max-w-4xl mx-auto mt-16 flex justify-between items-center bg-[#FBF6F3] p-8 rounded-2xl shadow-sm border border-[#E8E2DC]">
+      {/* ── Footer Navigation Buttons ── */}
+      <div className="max-w-4xl mx-auto mt-12 flex justify-between items-center bg-[#FBF6F3] p-6 rounded-2xl shadow-sm border border-[#E8E2DC]">
         <button
           onClick={() => window.history.back()}
-          className="px-10 py-4 rounded-xl border border-[#CFB9A3] text-[#1d1a17] font-bold text-sm hover:bg-[#CFB9A3] hover:bg-opacity-10 transition-all flex items-center gap-3"
+          className="px-8 py-3.5 rounded-xl border border-[#CFB9A3] text-[#1d1a17] font-bold text-sm hover:bg-[#CFB9A3]/10 transition-all flex items-center gap-3 cursor-pointer"
           style={{ fontFamily: "Inter, sans-serif" }}
         >
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
             <line x1="19" y1="12" x2="5" y2="12"></line>
             <polyline points="12 19 5 12 12 5"></polyline>
           </svg>
-          Back
+          Back to Details
         </button>
 
-        <Link
-          href="/booking/confirmation"
-          className="px-12 py-4 rounded-xl bg-[#D1B191] hover:bg-[#C4A484] text-white font-bold text-sm flex items-center gap-3 transition-all shadow-lg transform translate-y-[-2px]"
-          style={{ fontFamily: "Inter, sans-serif" }}
-        >
-          Payment
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-            <line x1="5" y1="12" x2="19" y2="12"></line>
-            <polyline points="12 5 19 12 12 19"></polyline>
-          </svg>
-        </Link>
+        <span className="text-xs text-[#8B7355] font-semibold italic hidden sm:inline">
+          Authorize and submit payment using the secure form above ↑
+        </span>
       </div>
     </div>
   );

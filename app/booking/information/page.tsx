@@ -617,10 +617,10 @@ export default function InformationPage() {
 
         <Link
           href="/booking/review"
-          className={`px-12 py-4 rounded-xl text-white font-bold text-sm flex items-center gap-3 transition-all shadow-md ${
+          className={`px-12 py-4 rounded-xl font-bold text-sm flex items-center gap-3 transition-all ${
             isFormValid
-              ? "bg-[#D1B191] hover:bg-[#C4A484] shadow-lg transform translate-y-[-2px]"
-              : "bg-[#D1B191] opacity-50 cursor-not-allowed pointer-events-none"
+              ? "bg-[#8B7355] hover:bg-[#786247] text-white shadow-md hover:shadow-lg transform hover:-translate-y-0.5 cursor-pointer"
+              : "bg-[#E2E8F0] text-[#94A3B8] border border-[#CBD5E1] cursor-not-allowed pointer-events-none shadow-none opacity-80"
           }`}
           style={{ fontFamily: "Inter, sans-serif" }}
         >

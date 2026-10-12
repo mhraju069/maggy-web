@@ -195,12 +195,12 @@ export const bookingService = {
     return ApiClient.post<CreateSaltRoomBookingResponse>(
       ENDPOINTS.BOOKINGS.SALTROOM_CREATE,
       payload,
-      isGuestCard ? { skipAuth: false } : { skipAuth: false }
+      { skipAuth: isGuestCard }
     );
   },
 
-  async confirmPayment(payload: { payment_intent_id: string; booking_id?: string; purchase_id?: string }): Promise<any> {
-    return ApiClient.post(ENDPOINTS.PAYMENTS.CONFIRM, payload, { skipAuth: true });
+  async confirmPayment(payload: { payment_intent_id?: string; booking_id?: string; purchase_id?: string }): Promise<any> {
+    return ApiClient.post(ENDPOINTS.PAYMENTS.CONFIRM_PAYMENT, payload, { skipAuth: true });
   },
 
   async createLunchroomBooking(payload: CreateLunchroomBookingPayload): Promise<CreateLunchroomBookingResponse> {

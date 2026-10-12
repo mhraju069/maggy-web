@@ -143,6 +143,12 @@ export default function StripePaymentForm({
       const isActivity = bookingData.serviceType === "activity" || Boolean(bookingData.activityDetails);
       const isPackage = bookingData.serviceType === "package" || bookingData.serviceType === "packages";
 
+      const currentPaymentMode = bookingData.paymentMode || (
+        bookingData.passType === "unlimited" && bookingData.hasActiveMembership ? "unlimited_subscription" :
+        bookingData.passType === "once_a_week" && bookingData.hasActiveMembership ? "weekly_subscription" :
+        bookingData.passType === "10_session_pass" && bookingData.hasActiveMembership ? "pass" : "card"
+      );
+
       // Call Combined API: Create Booking & Get Stripe Client Secret
       let clientSecret: string | undefined;
       try {
@@ -275,32 +281,22 @@ export default function StripePaymentForm({
 
           const isPurchaseFlow = !bookingData.hasActiveMembership && (bookingData.passType === "once_a_week" || bookingData.passType === "unlimited" || bookingData.passType === "10_session_pass");
           const purchasePlanId = isPurchaseFlow ? (bookingData.planId || bookingData.passId) : undefined;
-          const currentPaymentMode = bookingData.paymentMode || (
-            bookingData.passType === "unlimited" && bookingData.hasActiveMembership ? "unlimited_subscription" :
-            bookingData.passType === "once_a_week" && bookingData.hasActiveMembership ? "weekly_subscription" :
-            bookingData.passType === "10_session_pass" && bookingData.hasActiveMembership ? "pass" : "card"
-          );
+
+          // Format salt start_time to HH:MM:SS
+          const formattedStartTime = saltStartTime.length === 5 ? `${saltStartTime}:00` : saltStartTime;
+          const formattedCapacity = Math.min(Math.max(Number(bookingData.guestsCount) || 1, 1), 2);
+          const passIdentifier = bookingData.passId || bookingData.purchaseId;
 
           const saltPayload: any = {
-            guest_name: cardName.trim() || bookingData.name || "Guest",
-            guest_email: bookingData.email || "guest@example.com",
-            guest_phone: bookingData.phone || "+31612345678",
             name: cardName.trim() || bookingData.name || "Guest",
             email: bookingData.email || "guest@example.com",
-            phone: bookingData.phone || "+31612345678",
+            ...(bookingData.phone ? { phone: bookingData.phone } : {}),
             date: bookingData.date || new Date().toISOString().split("T")[0],
-            time: saltStartTime.length === 5 ? `${saltStartTime}:00` : saltStartTime,
-            start_time: saltStartTime,
-            ...(saltEndTime ? { end_time: saltEndTime } : {}),
-            capacity: bookingData.guestsCount || 1,
-            payment_mode: currentPaymentMode,
-            purchase_id: bookingData.purchaseId || undefined,
-            subscription_id: bookingData.purchaseId || undefined,
-            pass_id: bookingData.passId || (currentPaymentMode === "pass" ? bookingData.purchaseId : undefined),
-            ...(purchasePlanId ? { purchase_plan_id: purchasePlanId } : {}),
-            plan_id: bookingData.planId || undefined,
-            notes: bookingData.requests || undefined,
-            special_request: bookingData.requests || null,
+            start_time: formattedStartTime,
+            capacity: formattedCapacity,
+            payment_mode: currentPaymentMode || "card",
+            ...(bookingData.requests ? { special_request: bookingData.requests } : {}),
+            ...(passIdentifier ? { purchase_id: passIdentifier } : {}),
           };
 
           const res = await bookingService.createSaltRoomBooking(saltPayload);
@@ -336,58 +332,48 @@ export default function StripePaymentForm({
             clientSecret = res.client_secret;
           }
         }
+
+        if (!clientSecret && currentPaymentMode === "card") {
+          throw new Error("Unable to initialize payment session with server. Please try again.");
+        }
       } catch (apiErr: any) {
-        console.warn("Booking API notice:", apiErr);
-        // Fallback booking reference if backend is offline/mock
-        const fallbackPrefix = (bookingData.isSaltRoom || bookingData.serviceType === "salt_room" || bookingData.serviceType === "saltroom")
-          ? "SR"
-          : isActivity
-          ? "ACT"
-          : isLunchroom
-          ? "LR"
-          : bookingData.isSharedSauna
-          ? "SS"
-          : "PS";
-        const fallbackRef = `${fallbackPrefix}-${Math.floor(1000 + Math.random() * 9000)}`;
-        updateStoredBookingData({ bookingId: fallbackRef });
+        console.error("Booking API error:", apiErr);
+        // Throw so that the user sees the actual error message in UI
+        throw new Error(apiErr?.message || "Failed to create booking on server. Please check your reservation details and try again.");
       }
 
       // Confirm with Stripe SDK if clientSecret returned and live stripe available
       const stripe = await getStripe();
       if (stripe && clientSecret && clientSecret.startsWith("pi_") && !clientSecret.includes("sample")) {
         // Attempt payment confirmation with Stripe SDK
-        try {
-          const confirmRes = await stripe.confirmCardPayment(clientSecret, {
-            payment_method: {
-              card: {
-                token: "tok_visa", // Test token fallback
-              },
-              billing_details: {
-                name: cardName.trim() || bookingData.name || "Guest",
-                email: bookingData.email || "guest@example.com",
-                phone: bookingData.phone || "+31612345678",
-              },
+        const confirmRes = await stripe.confirmCardPayment(clientSecret, {
+          payment_method: {
+            card: {
+              token: "tok_visa", // Test token fallback
             },
-          });
-          if (confirmRes.error) {
-            console.warn("Stripe card confirmation detail:", confirmRes.error.message);
-          } else if (confirmRes.paymentIntent && confirmRes.paymentIntent.status === "succeeded") {
-            // Confirm payment with backend database
-            const stored = getStoredBookingData();
-            const latestBookingId = stored.bookingId || "";
-            const latestPurchaseId = stored.purchaseId || undefined;
-            try {
-              await bookingService.confirmPayment({
-                payment_intent_id: confirmRes.paymentIntent.id,
-                ...(latestBookingId ? { booking_id: latestBookingId } : {}),
-                ...(latestPurchaseId ? { purchase_id: latestPurchaseId } : {}),
-              });
-            } catch (backendConfirmErr) {
-              console.warn("Backend payment confirm notice:", backendConfirmErr);
-            }
+            billing_details: {
+              name: cardName.trim() || bookingData.name || "Guest",
+              email: bookingData.email || "guest@example.com",
+              phone: bookingData.phone || "+31612345678",
+            },
+          },
+        });
+        if (confirmRes.error) {
+          throw new Error(confirmRes.error.message || "Card confirmation failed. Please check your card.");
+        } else if (confirmRes.paymentIntent && confirmRes.paymentIntent.status === "succeeded") {
+          // Confirm payment with backend database
+          const stored = getStoredBookingData();
+          const latestBookingId = stored.bookingId || "";
+          const latestPurchaseId = stored.purchaseId || undefined;
+          try {
+            await bookingService.confirmPayment({
+              payment_intent_id: confirmRes.paymentIntent.id,
+              ...(latestBookingId ? { booking_id: latestBookingId } : {}),
+              ...(latestPurchaseId ? { purchase_id: latestPurchaseId } : {}),
+            });
+          } catch (backendConfirmErr) {
+            console.warn("Backend payment confirm notice:", backendConfirmErr);
           }
-        } catch (sErr) {
-          console.warn("Stripe confirmation note:", sErr);
         }
       } else {
         // Brief simulated latency for user feedback

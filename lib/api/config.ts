@@ -11,6 +11,7 @@ export const DEFAULT_HEADERS = {
   "Content-Type": "application/json",
   Accept: "application/json",
   "ngrok-skip-browser-warning": "true",
+  "bypass-tunnel-reminder": "true",
 };
 
 /**

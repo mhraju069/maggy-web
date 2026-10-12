@@ -270,10 +270,12 @@ export default function ChooseTimePage() {
 
       let paymentMode: "pass" | "subscription" | "weekly_subscription" | "unlimited_subscription" | "card" | string = storedData.paymentMode || "card";
       let purchaseId = storedData.purchaseId;
+      let passId = storedData.passId;
 
       if (passType === "10_session_pass" && (slotMembership.has_active_pass || slotMembership.has_pass) && activePass) {
         paymentMode = "pass";
         purchaseId = activePass.purchase_id || activePass.pass_id;
+        passId = activePass.pass_id || activePass.id || activePass.purchase_id;
       } else if (passType === "once_a_week" && weeklySub && weeklySub.is_available_for_date !== false) {
         paymentMode = "weekly_subscription";
         purchaseId = weeklySub.purchase_id || weeklySub.subscription_id;
@@ -286,6 +288,7 @@ export default function ChooseTimePage() {
         timeSlot: timeStr,
         paymentMode,
         purchaseId,
+        passId,
         activeMembershipInfo: slotMembership,
       });
       return;
@@ -1228,10 +1231,10 @@ export default function ChooseTimePage() {
 
         <Link
           href="/booking/information"
-          className={`px-12 py-4 rounded-xl text-white font-bold text-sm flex items-center gap-3 transition-all shadow-md ${
+          className={`px-12 py-4 rounded-xl font-bold text-sm flex items-center gap-3 transition-all ${
             isFormValid
-              ? "bg-[#D1B191] hover:bg-[#C4A484] shadow-lg transform translate-y-[-2px]"
-              : "bg-[#D1B191] opacity-50 cursor-not-allowed pointer-events-none"
+              ? "bg-[#8B7355] hover:bg-[#786247] text-white shadow-md hover:shadow-lg transform hover:-translate-y-0.5 cursor-pointer"
+              : "bg-[#E2E8F0] text-[#94A3B8] border border-[#CBD5E1] cursor-not-allowed pointer-events-none shadow-none opacity-80"
           }`}
           style={{ fontFamily: "Inter, sans-serif" }}
         >

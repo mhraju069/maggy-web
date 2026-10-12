@@ -516,7 +516,7 @@ export const servicesService = {
       try {
         res = await ApiClient.get<any>(ENDPOINTS.SERVICES.DETAILS("package"), { skipAuth: true });
       } catch {
-        res = await ApiClient.get<any>("/services/packages/", { skipAuth: true });
+        res = await ApiClient.get<any>("/services/details/packages/", { skipAuth: true });
       }
       if (res?.data && Array.isArray(res.data)) return res.data;
       if (Array.isArray(res)) return res;

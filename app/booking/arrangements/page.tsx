@@ -399,6 +399,7 @@ export default function SaltRoomBookingPage() {
       if (isPassCovered && passObj) {
         paymentMode = "pass";
         purchaseId = passObj.purchase_id || passObj.pass_id;
+        passId = passObj.pass_id || passObj.id || passObj.purchase_id;
       } else {
         paymentMode = "card"; // Buying new pass via card payment
         passId = sessionPass?.id;
@@ -434,14 +435,14 @@ export default function SaltRoomBookingPage() {
       totalAmount: calculatedTotal,
       price: isSelectedOptionCovered ? "€0 (Pass / Membership Deducted)" : `€${calculatedTotal}`,
       hasActiveMembership: isSelectedOptionCovered,
-      remainingPassSessions: userMembership?.session_pass?.remaining_sessions || undefined,
+      remainingPassSessions: passObj?.remaining_sessions || userMembership?.session_pass?.remaining_sessions || undefined,
       paymentMode,
       purchaseId,
       planId,
       passId,
       activeMembershipInfo: userMembership,
     });
-  }, [selectedOption, guestsCount, date, isSelectedOptionCovered, calculatedTotal, saltroomInfo, sessionPass, weeklyPlan, unlimitedPlan, userMembership, isPassCovered, isWeeklySubscriptionCovered, isUnlimitedSubscriptionCovered]);
+  }, [selectedOption, guestsCount, date, isSelectedOptionCovered, calculatedTotal, saltroomInfo, sessionPass, weeklyPlan, unlimitedPlan, userMembership, passObj, weeklySubObj, unlimitedSubObj, isPassCovered, isWeeklySubscriptionCovered, isUnlimitedSubscriptionCovered]);
 
   const handleContinue = () => {
     router.push("/booking/choose-time");
@@ -867,52 +868,6 @@ export default function SaltRoomBookingPage() {
         </div>
       </div>
 
-      {/* ── Combinable with Wellness Packages Section ── */}
-      {packagesList.length > 0 && (
-        <div className="mb-12 bg-gradient-to-r from-[#FCF2E9] to-[#FBF6F3] rounded-3xl p-8 border border-[#E8E2DC]">
-          <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-            <div>
-              <span className="text-xs font-bold uppercase tracking-widest text-[#8B7355] block mb-1">
-                Curated Wellness Combinations
-              </span>
-              <h3 className="text-2xl font-bold font-displayPlayFair text-[#0F172A]">
-                Combine Salt Room with Wellness Packages
-              </h3>
-              <p className="text-sm text-[#475569] mt-1 max-w-xl">
-                Enhance your visit by combining halotherapy with private sauna sanctuaries, organic culinary dining, or relaxing massages.
-              </p>
-            </div>
-
-            <Link
-              href="/booking/packages"
-              className="px-6 py-3.5 rounded-xl bg-[#8B7355] hover:bg-[#725e45] text-white font-bold text-xs uppercase tracking-wider transition-all shadow-md flex-shrink-0"
-            >
-              Explore Wellness Packages
-            </Link>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
-            {packagesList.map((pkg) => (
-              <Link
-                key={pkg.id}
-                href={pkg.link}
-                className="p-5 bg-white rounded-2xl border border-[#E8E2DC] hover:border-[#8B7355] transition-all flex items-center justify-between group"
-              >
-                <div>
-                  <h4 className="font-bold text-[#0F172A] text-sm group-hover:text-[#8B7355] transition-colors">
-                    {pkg.title}
-                  </h4>
-                  <p className="text-xs text-[#64748B] mt-0.5">{pkg.combo}</p>
-                </div>
-                <span className="text-base font-bold font-displayPlayFair text-[#8B7355]">
-                  {pkg.price} &rarr;
-                </span>
-              </Link>
-            ))}
-          </div>
-        </div>
-      )}
-
       {/* ── Footer Navigation Buttons ── */}
       <div className="max-w-6xl mx-auto mb-16 flex justify-between items-center bg-[#FBF6F3] p-8 rounded-2xl shadow-sm border border-[#E8E2DC]">
         <Link
@@ -933,8 +888,8 @@ export default function SaltRoomBookingPage() {
           onClick={handleContinue}
           className={`px-10 py-4 rounded-xl font-bold text-sm flex items-center gap-3 transition-all ${
             !date || isDateBlocked
-              ? "bg-[#CBD5E1] text-[#64748B] cursor-not-allowed shadow-none"
-              : "bg-[#D1B191] hover:bg-[#C4A484] text-white shadow-lg transform translate-y-[-2px]"
+              ? "bg-[#E2E8F0] text-[#94A3B8] border border-[#CBD5E1] cursor-not-allowed shadow-none opacity-80"
+              : "bg-[#8B7355] hover:bg-[#786247] text-white shadow-md hover:shadow-lg transform hover:-translate-y-0.5 cursor-pointer"
           }`}
           style={{ fontFamily: "Inter, sans-serif" }}
         >
