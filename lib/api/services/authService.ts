@@ -89,6 +89,13 @@ export const authService = {
   },
 
   /**
+   * Update current authenticated user profile
+   */
+  async updateProfile(data: Partial<User> & Record<string, any>): Promise<User> {
+    return ApiClient.patch<User>(ENDPOINTS.AUTH.PROFILE, data);
+  },
+
+  /**
    * Refresh JWT Token
    */
   async refreshToken(refreshToken: string): Promise<TokenPair> {

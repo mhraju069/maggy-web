@@ -63,4 +63,7 @@ export const ENDPOINTS = {
   CONTACT: {
     SUBMIT: "/contact/",
   },
+  DASHBOARD: {
+    USER: "/dashboard/user/",
+  },
 } as const;

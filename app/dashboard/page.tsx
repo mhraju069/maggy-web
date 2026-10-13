@@ -2,108 +2,476 @@
 
 import Link from "next/link";
 import { BsCheckCircle } from "react-icons/bs";
-import { HiOutlineCalendar, HiOutlineClock, HiOutlineUsers } from "react-icons/hi";
+import {
+  HiOutlineCalendar,
+  HiOutlineClock,
+  HiOutlineUsers,
+  HiOutlineSparkles,
+  HiOutlineCreditCard,
+  HiOutlineArrowRight,
+  HiOutlineKey,
+  HiOutlineCheckBadge,
+} from "react-icons/hi2";
+import { RiCalendarCheckLine, RiHistoryLine } from "react-icons/ri";
+import { DashboardBookingItem } from "@/lib/api";
+import { useDashboard } from "./DashboardContext";
+import Spinner from "@/components/shared/Spinner";
 
-const BOOKINGS = [
-  {
-    id: 1,
-    title: "Private Sauna",
-    type: "Sauna",
-    date: "15 Feb 2026",
-    time: "10:00 AM",
-    guests: 2,
-    status: "Upcoming",
-  },
-  {
-    id: 2,
-    title: "Lunchroom Reservation",
-    type: "Sauna",
-    date: "20 Feb 2026",
-    time: "1:00 AM",
-    guests: 4,
-    status: "Upcoming",
-  },
-];
+function formatDisplayDate(dateStr: string) {
+  if (!dateStr) return "";
+  try {
+    const d = new Date(dateStr);
+    return d.toLocaleDateString("en-US", {
+      weekday: "short",
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+    });
+  } catch {
+    return dateStr;
+  }
+}
 
-function BookingCard({ booking }: { booking: (typeof BOOKINGS)[0] }) {
+function formatDisplayTime(timeStr: string) {
+  if (!timeStr) return "";
+  try {
+    const [h, m] = timeStr.split(":");
+    const hours = parseInt(h, 10);
+    const period = hours >= 12 ? "PM" : "AM";
+    const h12 = hours % 12 || 12;
+    return `${h12}:${m || "00"} ${period}`;
+  } catch {
+    return timeStr;
+  }
+}
+
+export function cleanServiceName(name?: string): string {
+  if (!name) return "Wellness Experience";
+  // Fix duplicated words like "Private Sauna Sauna" -> "Private Sauna"
+  let cleaned = name.replace(/\b([A-Za-z]+)\s+\1\b/gi, "$1");
+  // Clean repeated "Sauna Sauna" or "Sauna sauna"
+  cleaned = cleaned.replace(/sauna\s+sauna/gi, "Sauna");
+  return cleaned.trim() || "Wellness Experience";
+}
+
+function StatCard({
+  title,
+  value,
+  subtext,
+  icon: Icon,
+  accent = "brand",
+}: {
+  title: string;
+  value: string | number;
+  subtext?: string;
+  icon: any;
+  accent?: "brand" | "emerald" | "amber" | "slate";
+}) {
+  const accentStyles = {
+    brand: "bg-[#FCF2E9] text-[#8B7355] border-[#E8E2DC]",
+    emerald: "bg-emerald-50 text-emerald-700 border-emerald-100",
+    amber: "bg-amber-50 text-amber-700 border-amber-100",
+    slate: "bg-slate-50 text-slate-700 border-slate-100",
+  };
+
   return (
-    <div className="bg-white rounded-xl p-6 mb-4 border border-[#F1EDE8]">
-      <div className="flex items-center justify-between mb-5">
+    <div className="bg-white rounded-2xl p-6 border border-[#F1EDE8] shadow-xs flex items-start justify-between relative overflow-hidden transition-all hover:shadow-md">
+      <div>
+        <p className="text-xs font-semibold uppercase tracking-wider text-[#94A3B8] mb-1">
+          {title}
+        </p>
+        <p className="text-3xl font-bold font-displayPlayFair text-[#1d1a17] leading-tight">
+          {value}
+        </p>
+        {subtext && (
+          <p className="text-xs text-[#64748B] mt-2 font-medium flex items-center gap-1">
+            {subtext}
+          </p>
+        )}
+      </div>
+      <div className={`w-12 h-12 rounded-xl flex items-center justify-center border flex-shrink-0 ${accentStyles[accent]}`}>
+        <Icon className="w-6 h-6" />
+      </div>
+    </div>
+  );
+}
+
+function NextVisitHighlight({ booking }: { booking: DashboardBookingItem }) {
+  return (
+    <div className="bg-gradient-to-br from-[#FAF5F0] via-white to-[#F8EFE6] rounded-3xl p-8 border border-[#E8E2DC] shadow-sm relative overflow-hidden mb-8">
+      <div className="absolute top-0 right-0 -mr-16 -mt-16 w-64 h-64 bg-[#EBDBC9]/40 rounded-full blur-3xl pointer-events-none" />
+
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 relative">
         <div className="flex items-center gap-3">
-          <h3 className="text-lg font-semibold text-[#1d1a17] font-displayPlayFair">
-            {booking.title}
-          </h3>
-          <span className="px-2 py-0.5 text-[11px] bg-[#F3EDE6] text-[#8b7355] rounded-full">
-            {booking.type}
+          <span className="px-3.5 py-1 text-xs bg-[#8B7355] text-white rounded-full font-bold uppercase tracking-wider shadow-xs">
+            Priority • Next Up
           </span>
-          <BsCheckCircle className="text-green-500 w-4 h-4" />
-        </div>
-        <span className="text-xs text-green-600 font-semibold bg-green-50 px-3 py-1 rounded-full">
-          {booking.status}
-        </span>
-      </div>
-
-      <div className="flex items-center gap-8">
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-full bg-[#F3EDE6] flex items-center justify-center">
-            <HiOutlineCalendar className="w-4 h-4 text-[#8b7355]" />
-          </div>
-          <div>
-            <p className="text-[10px] text-[#94A3B8]">Date</p>
-            <p className="text-sm font-semibold text-[#1d1a17]">{booking.date}</p>
-          </div>
+          <span className="px-3 py-1 text-xs bg-white text-[#8B7355] border border-[#E8E2DC] rounded-full font-semibold uppercase tracking-wider">
+            {booking.service_type}
+          </span>
         </div>
         <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-full bg-[#F3EDE6] flex items-center justify-center">
-            <HiOutlineClock className="w-4 h-4 text-[#8b7355]" />
-          </div>
-          <div>
-            <p className="text-[10px] text-[#94A3B8]">Time</p>
-            <p className="text-sm font-semibold text-[#1d1a17]">{booking.time}</p>
-          </div>
-        </div>
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-full bg-[#F3EDE6] flex items-center justify-center">
-            <HiOutlineUsers className="w-4 h-4 text-[#8b7355]" />
-          </div>
-          <div>
-            <p className="text-[10px] text-[#94A3B8]">Guests</p>
-            <p className="text-sm font-semibold text-[#1d1a17]">{booking.guests}</p>
-          </div>
+          <span className="text-xs text-emerald-700 font-bold bg-emerald-50 border border-emerald-200 px-3 py-1 rounded-full flex items-center gap-1.5">
+            <BsCheckCircle className="w-3.5 h-3.5" />
+            Confirmed
+          </span>
+          {booking.access_code && (
+            <Link
+              href="/dashboard/access-codes"
+              className="text-xs font-mono font-bold bg-[#1d1a17] text-white px-3 py-1 rounded-full flex items-center gap-1 hover:bg-[#8B7355] transition-colors"
+            >
+              <HiOutlineKey className="w-3.5 h-3.5" />
+              Code: {booking.access_code}
+            </Link>
+          )}
         </div>
       </div>
 
-      <div className="mt-4 pt-3 border-t border-[#F1EDE8]">
+      <div className="relative mb-6">
+        <h2 className="text-2xl md:text-3xl font-bold font-displayPlayFair text-[#1d1a17] mb-2">
+          {cleanServiceName(booking.service_name)}
+        </h2>
+        <p className="text-xs text-[#64748B]">
+          Booking Reference: <span className="font-mono font-semibold text-[#1d1a17]">{booking.booking_id}</span>
+        </p>
+      </div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-6 border-t border-[#E8E2DC]/80 relative">
+        <div className="flex items-center gap-3 bg-white/80 p-4 rounded-xl border border-[#F1EDE8]">
+          <div className="w-10 h-10 rounded-xl bg-[#FCF2E9] flex items-center justify-center text-[#8B7355] flex-shrink-0">
+            <HiOutlineCalendar className="w-5 h-5" />
+          </div>
+          <div>
+            <p className="text-[10px] uppercase font-bold text-[#94A3B8] tracking-wider">Date</p>
+            <p className="text-sm font-bold text-[#1d1a17]">{formatDisplayDate(booking.date)}</p>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-3 bg-white/80 p-4 rounded-xl border border-[#F1EDE8]">
+          <div className="w-10 h-10 rounded-xl bg-[#FCF2E9] flex items-center justify-center text-[#8B7355] flex-shrink-0">
+            <HiOutlineClock className="w-5 h-5" />
+          </div>
+          <div>
+            <p className="text-[10px] uppercase font-bold text-[#94A3B8] tracking-wider">Arrival Time</p>
+            <p className="text-sm font-bold text-[#1d1a17]">{formatDisplayTime(booking.time)}</p>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-3 bg-white/80 p-4 rounded-xl border border-[#F1EDE8]">
+          <div className="w-10 h-10 rounded-xl bg-[#FCF2E9] flex items-center justify-center text-[#8B7355] flex-shrink-0">
+            <HiOutlineUsers className="w-5 h-5" />
+          </div>
+          <div>
+            <p className="text-[10px] uppercase font-bold text-[#94A3B8] tracking-wider">Party Size</p>
+            <p className="text-sm font-bold text-[#1d1a17]">
+              {booking.guests} {booking.guests === 1 ? "Guest" : "Guests"}
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function SubscriptionsSection() {
+  const { subscriptions } = useDashboard();
+
+  return (
+    <div className="bg-white rounded-3xl p-8 border border-[#F1EDE8] shadow-xs mb-8">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+        <div>
+          <div className="flex items-center gap-2">
+            <h2 className="text-2xl font-bold font-displayPlayFair text-[#1d1a17]">
+              Subscriptions & Passes
+            </h2>
+            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-[#FCF2E9] text-[#8B7355] uppercase tracking-wider">
+              {subscriptions.length} Plan{subscriptions.length === 1 ? "" : "s"}
+            </span>
+          </div>
+          <p className="text-xs text-[#64748B] mt-1">
+            Manage your active wellness passes and recurring memberships
+          </p>
+        </div>
+
+        <Link
+          href="/memberships"
+          className="px-5 py-2.5 rounded-xl bg-[#8B7355] hover:bg-[#786247] text-white text-xs font-bold transition-all shadow-xs flex items-center gap-2 self-start sm:self-auto"
+        >
+          <HiOutlineSparkles className="w-4 h-4" />
+          Browse New Subscriptions
+        </Link>
+      </div>
+
+      {subscriptions.length > 0 ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {subscriptions.map((sub) => {
+            const isActive = sub.status === "active";
+            return (
+              <div
+                key={sub.id}
+                className="p-6 rounded-2xl border border-[#F1EDE8] bg-[#FAF8F5]/50 flex flex-col justify-between hover:border-[#D1B191] transition-all hover:shadow-xs"
+              >
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-[10px] uppercase font-bold text-[#8B7355] tracking-widest">
+                      {sub.billing_period || "Membership"}
+                    </span>
+                    <span
+                      className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full ${
+                        isActive
+                          ? "bg-emerald-100 text-emerald-800"
+                          : "bg-slate-100 text-slate-600"
+                      }`}
+                    >
+                      {sub.status}
+                    </span>
+                  </div>
+
+                  <h3 className="text-lg font-bold font-displayPlayFair text-[#1d1a17] mb-1">
+                    {sub.plan_name}
+                  </h3>
+
+                  {sub.sessions_remaining !== undefined && sub.sessions_remaining !== null && (
+                    <div className="my-3 p-3 bg-white rounded-xl border border-[#E8E2DC] flex items-center justify-between">
+                      <span className="text-xs text-[#64748B] font-medium">Session Balance:</span>
+                      <span className="text-sm font-bold font-displayPlayFair text-[#8B7355]">
+                        {sub.sessions_remaining} {sub.total_sessions ? `/ ${sub.total_sessions}` : ""} Remaining
+                      </span>
+                    </div>
+                  )}
+                </div>
+
+                <div className="pt-4 mt-2 border-t border-[#F1EDE8] flex items-center justify-between text-xs text-[#94A3B8]">
+                  <span>Price: €{sub.price}</span>
+                  {sub.expires_at && (
+                    <span>Valid until: {formatDisplayDate(sub.expires_at)}</span>
+                  )}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      ) : (
+        <div className="p-8 rounded-2xl bg-[#FCF2E9]/40 border border-dashed border-[#E8E2DC] text-center">
+          <div className="w-12 h-12 rounded-full bg-white flex items-center justify-center mx-auto mb-3 shadow-xs text-[#8B7355]">
+            <HiOutlineCheckBadge className="w-6 h-6" />
+          </div>
+          <h3 className="text-base font-bold font-displayPlayFair text-[#1d1a17] mb-1">
+            No Active Subscription Yet
+          </h3>
+          <p className="text-xs text-[#64748B] max-w-md mx-auto mb-4">
+            Enjoy unlimited sessions, discounted sauna admissions, and complimentary towels with our flexible monthly or 10-session passes.
+          </p>
+          <Link
+            href="/memberships"
+            className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-[#8B7355] hover:bg-[#786247] text-white text-xs font-bold transition-all shadow-xs"
+          >
+            Explore Membership Plans &rsaquo;
+          </Link>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function UpcomingVisitsList({ visits }: { visits: DashboardBookingItem[] }) {
+  if (visits.length === 0) return null;
+
+  return (
+    <div className="bg-white rounded-3xl p-8 border border-[#F1EDE8] shadow-xs">
+      <div className="flex items-center justify-between mb-6">
+        <div>
+          <h3 className="text-xl font-bold font-displayPlayFair text-[#1d1a17]">
+            Scheduled Reservations
+          </h3>
+          <p className="text-xs text-[#64748B] mt-0.5">
+            Your other planned visits in chronological order
+          </p>
+        </div>
         <Link
           href="/dashboard/my-booking"
-          className="text-sm text-[#8b7355] hover:text-[#1d1a17] transition-colors"
+          className="text-xs font-bold text-[#8B7355] hover:text-[#1d1a17] transition-colors"
         >
-          View all reservations &rsaquo;
+          View All &rsaquo;
         </Link>
+      </div>
+
+      <div className="space-y-4">
+        {visits.map((booking) => (
+          <div
+            key={booking.id || booking.booking_id}
+            className="p-5 rounded-2xl border border-[#F1EDE8] hover:border-[#E8E2DC] bg-[#FAF8F5]/40 flex flex-col md:flex-row md:items-center justify-between gap-4 transition-all"
+          >
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 rounded-2xl bg-white border border-[#F1EDE8] flex flex-col items-center justify-center text-[#8B7355] flex-shrink-0 shadow-xs">
+                <span className="text-[10px] uppercase font-bold leading-tight">
+                  {new Date(booking.date).toLocaleDateString("en-US", { month: "short" })}
+                </span>
+                <span className="text-base font-bold font-displayPlayFair leading-tight text-[#1d1a17]">
+                  {new Date(booking.date).getDate()}
+                </span>
+              </div>
+              <div>
+                <div className="flex items-center gap-2">
+                  <h4 className="font-bold text-base text-[#1d1a17] font-displayPlayFair">
+                    {cleanServiceName(booking.service_name)}
+                  </h4>
+                  <span className="px-2 py-0.5 text-[9px] bg-white border border-[#E8E2DC] text-[#8B7355] font-semibold uppercase rounded-full">
+                    {booking.service_type}
+                  </span>
+                </div>
+                <p className="text-xs text-[#64748B] mt-0.5">
+                  Arrival at {formatDisplayTime(booking.time)} • {booking.guests} {booking.guests === 1 ? "Guest" : "Guests"}
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-3 self-end md:self-center">
+              <span className="text-xs font-mono font-semibold px-3 py-1 bg-white border border-[#E8E2DC] rounded-xl text-[#475569]">
+                {booking.booking_id}
+              </span>
+              <Link
+                href="/dashboard/my-booking"
+                className="p-2 rounded-xl text-[#8B7355] hover:bg-white hover:shadow-xs transition-all"
+                title="View booking"
+              >
+                <HiOutlineArrowRight className="w-4 h-4" />
+              </Link>
+            </div>
+          </div>
+        ))}
       </div>
     </div>
   );
 }
 
 export default function DashboardHome() {
+  const { dashboardData, subscriptions, loading } = useDashboard();
+
+  const metrics = dashboardData?.home?.metrics;
+
+  const totalBookingsCount = metrics?.total_bookings !== undefined
+    ? metrics.total_bookings
+    : (dashboardData?.my_bookings?.upcoming?.length || 0) + (dashboardData?.my_bookings?.past?.length || 0);
+
+  const upcomingVisitsCount = metrics?.upcoming_bookings !== undefined
+    ? metrics.upcoming_bookings
+    : (dashboardData?.my_bookings?.upcoming?.length || 0);
+
+  const activeSubscriptionsCount = metrics?.active_subscriptions !== undefined
+    ? metrics.active_subscriptions
+    : subscriptions.length;
+
+  const upcomingSaunasCount = metrics?.upcoming_saunas !== undefined
+    ? metrics.upcoming_saunas
+    : (dashboardData?.access_codes?.all_sauna?.length || 0);
+
+  const nextVisit = dashboardData?.home?.next_visit;
+  const otherVisits = dashboardData?.home?.next_visits && dashboardData.home.next_visits.length > 0
+    ? dashboardData.home.next_visits
+    : (dashboardData?.home?.other_upcoming_visits || []);
+
+  const nextBookingDateText = metrics?.upcoming_booking_dates && metrics.upcoming_booking_dates.length > 0
+    ? `Next on ${formatDisplayDate(metrics.upcoming_booking_dates[0])}`
+    : nextVisit
+    ? `Next on ${formatDisplayDate(nextVisit.date)}`
+    : "No visits scheduled";
+
   return (
-    <div>
-      <h1 className="font-displayPlayFair text-3xl font-bold text-[#1d1a17] mb-1">
-        Welcome back.
-      </h1>
-      <p className="text-sm text-[#64748B] mb-8">
-        Your upcoming visits are thoughtfully prepared.
-      </p>
+    <div className="max-w-6xl mx-auto space-y-8">
+      {/* ── Welcome Banner ── */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-2">
+        <div>
+          <h1 className="font-displayPlayFair text-3xl md:text-4xl font-bold text-[#1d1a17] mb-1.5">
+            {dashboardData?.profile?.name ? `Welcome back, ${dashboardData.profile.name}` : "Welcome back"}
+          </h1>
+          <p className="text-sm text-[#64748B]">
+            Here is a summary of your upcoming reservations, wellness subscriptions, and door codes.
+          </p>
+        </div>
 
-      <p className="text-xs font-semibold text-[#94A3B8] uppercase tracking-widest mb-3">
-        Next visit
-      </p>
-      <BookingCard booking={BOOKINGS[0]} />
+        <div className="flex items-center gap-3">
+          <Link
+            href="/services"
+            className="px-5 py-2.5 rounded-xl bg-[#8B7355] hover:bg-[#786247] text-white text-xs font-bold transition-all shadow-xs flex items-center gap-2"
+          >
+            Book New Experience
+          </Link>
+          <Link
+            href="/memberships"
+            className="px-5 py-2.5 rounded-xl bg-white border border-[#CFB9A3] hover:bg-[#FCF2E9] text-[#1d1a17] text-xs font-bold transition-all shadow-xs flex items-center gap-2"
+          >
+            Memberships
+          </Link>
+        </div>
+      </div>
 
-      <p className="text-xs font-semibold text-[#94A3B8] uppercase tracking-widest mb-3 mt-6">
-        Other Upcoming Visits
-      </p>
-      <BookingCard booking={BOOKINGS[1]} />
+      {loading ? (
+        <Spinner message="Loading your wellness dashboard..." />
+      ) : (
+        <>
+          {/* ── Analytics Stats Grid ── */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <StatCard
+              title="Total Bookings"
+              value={totalBookingsCount}
+              subtext="Lifetime reservations"
+              icon={RiHistoryLine}
+              accent="brand"
+            />
+            <StatCard
+              title="Upcoming Visits"
+              value={upcomingVisitsCount}
+              subtext={nextBookingDateText}
+              icon={RiCalendarCheckLine}
+              accent="emerald"
+            />
+            <StatCard
+              title="Active Subscriptions"
+              value={activeSubscriptionsCount}
+              subtext="Memberships & passes"
+              icon={HiOutlineCreditCard}
+              accent="amber"
+            />
+            <StatCard
+              title="Sauna Access Codes"
+              value={upcomingSaunasCount}
+              subtext="Ready for entry"
+              icon={HiOutlineKey}
+              accent="slate"
+            />
+          </div>
+
+          {/* ── Next Visit Hero Highlight ── */}
+          {nextVisit ? (
+            <NextVisitHighlight booking={nextVisit} />
+          ) : (
+            <div className="bg-white rounded-3xl p-10 border border-[#F1EDE8] text-center shadow-xs">
+              <div className="w-16 h-16 rounded-2xl bg-[#FCF2E9] text-[#8B7355] flex items-center justify-center mx-auto mb-4">
+                <HiOutlineCalendar className="w-8 h-8" />
+              </div>
+              <h2 className="text-xl font-bold font-displayPlayFair text-[#1d1a17] mb-2">
+                No Upcoming Visits Scheduled
+              </h2>
+              <p className="text-sm text-[#64748B] max-w-md mx-auto mb-6">
+                Treat yourself to private sauna tranquility, rejuvenating salt therapy, or culinary moments in our lunchroom.
+              </p>
+              <Link
+                href="/services"
+                className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-[#8B7355] hover:bg-[#786247] text-white text-xs font-bold transition-all shadow-xs"
+              >
+                Explore & Reserve &rsaquo;
+              </Link>
+            </div>
+          )}
+
+          {/* ── Subscriptions & Passes Section ── */}
+          <SubscriptionsSection />
+
+          {/* ── Scheduled Reservations List ── */}
+          <UpcomingVisitsList visits={otherVisits} />
+        </>
+      )}
     </div>
   );
 }

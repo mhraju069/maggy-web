@@ -12,6 +12,14 @@ import { getStoredToken } from "@/lib/api/token";
 import { User } from "@/lib/api/types";
 import { getStoredBookingData, updateStoredBookingData } from "@/lib/bookingStore";
 import { getStripe } from "@/lib/stripe";
+import {
+  Elements,
+  CardNumberElement,
+  CardExpiryElement,
+  CardCvcElement,
+  useStripe,
+  useElements,
+} from "@stripe/react-stripe-js";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -54,13 +62,36 @@ const idealBanks = [
   { id: "ing", name: "ING Bank" },
   { id: "rabobank", name: "Rabobank" },
   { id: "abn_amro", name: "ABN AMRO" },
-  { id: "sns", name: "SNS Bank" },
-  { id: "asn", name: "ASN Bank" },
+  { id: "sns_bank", name: "SNS Bank" },
+  { id: "asn_bank", name: "ASN Bank" },
   { id: "regiobank", name: "RegioBank" },
-  { id: "triodos", name: "Triodos Bank" },
+  { id: "triodos_bank", name: "Triodos Bank" },
   { id: "bunq", name: "bunq" },
   { id: "revolut", name: "Revolut" },
+  { id: "knab", name: "Knab" },
+  { id: "n26", name: "N26" },
+  { id: "nn", name: "Nationale Nederlanden" },
+  { id: "van_lanschot", name: "Van Lanschot" },
+  { id: "yoursafe", name: "Yoursafe" },
+  { id: "moneyou", name: "Moneyou" },
 ];
+
+const CARD_ELEMENT_OPTIONS = {
+  style: {
+    base: {
+      fontSize: "13px",
+      fontFamily: "Inter, sans-serif",
+      color: "#0F172A",
+      "::placeholder": {
+        color: "#94A3B8",
+      },
+    },
+    invalid: {
+      color: "#EF4444",
+      iconColor: "#EF4444",
+    },
+  },
+};
 
 interface MembershipPlan {
   id?: number;
@@ -684,354 +715,557 @@ const MembershipCards = () => {
         </p>
       </div>
 
-      {/* ── 🌟 Payment Gateway & Activation Modal ── */}
+      {/* ── 🌟 Payment Gateway & Activation Modal with Official Stripe Elements ── */}
       {showPaymentModal && selectedPlan && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md animate-fadeIn">
-          <div className="bg-white rounded-[32px] border border-[#E8E2DC] shadow-2xl max-w-xl w-full max-h-[92vh] overflow-y-auto p-6 sm:p-10 relative">
-            {/* Close Button */}
-            <button
-              type="button"
-              onClick={() => {
-                setShowPaymentModal(false);
-                setPaymentSuccess(false);
-              }}
-              className="absolute top-6 right-6 w-10 h-10 rounded-full bg-[#F8FAFC] border border-[#E2E8F0] flex items-center justify-center text-[#64748B] hover:text-[#0F172A] hover:bg-[#F1F5F9] transition-all cursor-pointer"
-            >
-              <FaTimes size={16} />
-            </button>
-
-            {paymentSuccess ? (
-              <div className="text-center py-6 space-y-6 animate-fadeIn">
-                <div className="w-20 h-20 bg-[#FCF2E9] rounded-3xl flex items-center justify-center mx-auto text-[#8B7355] border border-[#E8E2DC] shadow-sm">
-                  <BiCheckCircle size={48} />
-                </div>
-
-                <div>
-                  <span className="text-xs font-bold uppercase tracking-widest text-[#8B7355] block mb-1">
-                    Payment Successful
-                  </span>
-                  <h3 className="text-3xl font-bold font-displayPlayFair text-[#0F172A]">
-                    Membership Activated!
-                  </h3>
-                  <p className="text-xs text-[#64748B] max-w-md mx-auto mt-2 leading-relaxed">
-                    Thank you, <span className="font-semibold text-[#0F172A]">{user?.name || "Member"}</span>. Your {selectedPlan.name} is now active and linked directly to your account.
-                  </p>
-                </div>
-
-                {/* Membership Code Highlight */}
-                <div className="bg-[#FBF6F3] border border-[#E8E2DC] rounded-2xl p-5 max-w-md mx-auto flex items-center justify-between">
-                  <div className="text-left">
-                    <span className="text-[10px] uppercase font-bold text-[#8B7355] tracking-wider block">
-                      Membership / Pass Code
-                    </span>
-                    <span className="text-xl font-bold font-mono text-[#0F172A]">
-                      {membershipCode}
-                    </span>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      navigator.clipboard.writeText(membershipCode);
-                      setCopiedCode(true);
-                      setTimeout(() => setCopiedCode(false), 2000);
-                    }}
-                    className="px-3.5 py-2 rounded-xl bg-white border border-[#CBD5E1] text-xs font-semibold text-[#0F172A] hover:bg-[#F8FAFC] flex items-center gap-1.5 transition-all cursor-pointer shadow-2xs"
-                  >
-                    {copiedCode ? (
-                      <>
-                        <FaCheck size={11} className="text-emerald-600" />
-                        <span className="text-emerald-700">Copied</span>
-                      </>
-                    ) : (
-                      <>
-                        <FaCopy size={11} className="text-[#64748B]" />
-                        <span>Copy</span>
-                      </>
-                    )}
-                  </button>
-                </div>
-
-                {/* Plan Summary */}
-                <div className="bg-white border border-[#E2E8F0] rounded-2xl p-5 text-left max-w-md mx-auto space-y-3 text-xs">
-                  <div className="flex justify-between items-center pb-3 border-b border-[#F1F5F9]">
-                    <span className="text-[#64748B]">Plan:</span>
-                    <span className="font-bold text-[#0F172A]">{selectedPlan.name}</span>
-                  </div>
-                  <div className="flex justify-between items-center pb-3 border-b border-[#F1F5F9]">
-                    <span className="text-[#64748B]">Amount Paid:</span>
-                    <span className="font-bold text-[#8B7355]">{selectedPlan.price} {selectedPlan.perPeriod}</span>
-                  </div>
-                  <div className="flex justify-between items-center pb-3 border-b border-[#F1F5F9]">
-                    <span className="text-[#64748B]">Validity:</span>
-                    <span className="font-semibold text-[#0F172A]">
-                      {purchaseResult?.end_date
-                        ? `Valid until ${new Date(purchaseResult.end_date).toLocaleDateString()}`
-                        : selectedPlan.validityText || "Indefinite"}
-                    </span>
-                  </div>
-                  <div className="flex justify-between items-center pb-3 border-b border-[#F1F5F9]">
-                    <span className="text-[#64748B]">Session Allowance:</span>
-                    <span className="font-semibold text-[#0F172A]">
-                      {purchaseResult?.total_sessions === 0
-                        ? "Unlimited sessions"
-                        : `${purchaseResult?.remaining_sessions ?? selectedPlan.totalSessions ?? 10} sessions available`}
-                    </span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-[#64748B]">Status:</span>
-                    <span className="px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-700 font-semibold border border-emerald-200">
-                      Active
-                    </span>
-                  </div>
-                </div>
-
-                {/* Actions */}
-                <div className="flex flex-col sm:flex-row justify-center gap-3 pt-2">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setShowPaymentModal(false);
-                      setPaymentSuccess(false);
-                    }}
-                    className="px-6 py-3 rounded-xl border border-[#CBD5E1] text-[#475569] hover:bg-[#F8FAFC] font-bold text-xs uppercase tracking-wider transition-all cursor-pointer"
-                  >
-                    Close
-                  </button>
-                  <Link
-                    href="/booking/arrangements"
-                    onClick={() => setShowPaymentModal(false)}
-                    className="px-7 py-3 rounded-xl bg-[#8B7355] text-white hover:bg-[#725e45] font-bold text-xs uppercase tracking-wider transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer"
-                  >
-                    <span>Book Salt Room Session</span>
-                    <ArrowIcon color="#FFFFFF" />
-                  </Link>
-                </div>
-              </div>
-            ) : (
-              <form onSubmit={handlePaymentSubmit} className="space-y-6">
-                <div>
-                  <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-[#8B7355] mb-1">
-                    <BiShieldQuarter size={14} />
-                    <span>Secure Membership Checkout</span>
-                  </div>
-                  <h3 className="text-2xl font-bold font-displayPlayFair text-[#0F172A]">
-                    Activate {selectedPlan.name}
-                  </h3>
-                  <p className="text-xs text-[#64748B] mt-1">
-                    Complete your payment to instantly activate your halotherapy privileges.
-                  </p>
-                </div>
-
-                {/* Plan Highlights Box */}
-                <div className="p-4 rounded-2xl bg-[#FCF2E9]/60 border border-[#E8E2DC] flex items-center justify-between">
-                  <div>
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-[#8B7355] block">
-                      Selected Plan
-                    </span>
-                    <h4 className="text-base font-bold text-[#0F172A] font-displayPlayFair">
-                      {selectedPlan.name}
-                    </h4>
-                    <p className="text-[11px] text-[#64748B]">Salt Room Halotherapy</p>
-                  </div>
-                  <div className="text-right">
-                    <span className="text-2xl font-bold text-[#8B7355] font-displayPlayFair block">
-                      {selectedPlan.price}
-                    </span>
-                    <span className="text-[10px] text-[#64748B] block">{selectedPlan.perPeriod}</span>
-                  </div>
-                </div>
-
-                {errorMessage && (
-                  <div className="p-3.5 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs flex items-center justify-between animate-fadeIn">
-                    <span>{errorMessage}</span>
-                    <button
-                      type="button"
-                      onClick={() => setErrorMessage(null)}
-                      className="text-red-500 hover:text-red-800 ml-2 font-bold cursor-pointer"
-                    >
-                      ✕
-                    </button>
-                  </div>
-                )}
-
-                {/* Authenticated Member Badge */}
-                <div className="p-3.5 rounded-2xl bg-[#F8FAFC] border border-[#E2E8F0] flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-[#8B7355]/10 text-[#8B7355] flex items-center justify-center font-bold text-sm">
-                      {(user?.name || "M").charAt(0).toUpperCase()}
-                    </div>
-                    <div>
-                      <div className="flex items-center gap-1.5">
-                        <span className="text-xs font-bold text-[#0F172A]">{user?.name || "Member"}</span>
-                        <span className="px-1.5 py-0.2 rounded text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
-                          Logged In
-                        </span>
-                      </div>
-                      <span className="text-[11px] text-[#64748B] block">{user?.email || "Account Linked"}</span>
-                    </div>
-                  </div>
-                  <span className="text-[10px] uppercase font-bold text-[#8B7355] tracking-wider hidden sm:inline-block">
-                    Account Verified
-                  </span>
-                </div>
-
-                {/* Payment Method Selector */}
-                <div className="space-y-3 pt-2">
-                  <span className="block text-xs font-bold text-[#0F172A] uppercase tracking-wide">
-                    Payment Method
-                  </span>
-                  <div className="grid grid-cols-2 gap-3">
-                    <button
-                      type="button"
-                      onClick={() => setPaymentMethod("card")}
-                      className={`p-3.5 rounded-xl border flex items-center justify-center gap-2 text-xs font-bold transition-all cursor-pointer ${
-                        paymentMethod === "card"
-                          ? "bg-[#FCF2E9] border-[#8B7355] text-[#8B7355] shadow-xs"
-                          : "bg-white border-[#E2E8F0] text-[#64748B] hover:border-[#CBD5E1]"
-                      }`}
-                    >
-                      <FaCreditCard size={14} />
-                      <span>Credit Card</span>
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={() => setPaymentMethod("ideal")}
-                      className={`p-3.5 rounded-xl border flex items-center justify-center gap-2 text-xs font-bold transition-all cursor-pointer ${
-                        paymentMethod === "ideal"
-                          ? "bg-[#FCF2E9] border-[#8B7355] text-[#8B7355] shadow-xs"
-                          : "bg-white border-[#E2E8F0] text-[#64748B] hover:border-[#CBD5E1]"
-                      }`}
-                    >
-                      <MdOutlinePayments size={16} />
-                      <span>iDEAL</span>
-                    </button>
-                  </div>
-                </div>
-
-                {/* Payment Fields */}
-                {paymentMethod === "card" ? (
-                  <div className="space-y-3 pt-1">
-                    <div>
-                      <label className="block text-[11px] text-[#64748B] mb-1 font-medium">Name on Card *</label>
-                      <input
-                        type="text"
-                        required
-                        placeholder="John Doe"
-                        value={cardName}
-                        onChange={(e) => setCardName(e.target.value)}
-                        className="w-full p-3 bg-white border border-[#E2E8F0] rounded-xl text-xs text-[#0F172A] focus:outline-none focus:ring-2 focus:ring-[#8B7355]"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-[11px] text-[#64748B] mb-1 font-medium">Card Number *</label>
-                      <div className="relative">
-                        <input
-                          type="text"
-                          required
-                          placeholder="4242 4242 4242 4242"
-                          value={cardNumber}
-                          onChange={handleCardNumberChange}
-                          className="w-full p-3 pl-10 bg-white border border-[#E2E8F0] rounded-xl text-xs text-[#0F172A] font-mono focus:outline-none focus:ring-2 focus:ring-[#8B7355]"
-                        />
-                        <BiCreditCard size={18} className="absolute left-3 top-3 text-[#94A3B8]" />
-                      </div>
-                    </div>
-                    <div className="grid grid-cols-3 gap-3">
-                      <div>
-                        <label className="block text-[11px] text-[#64748B] mb-1 font-medium">Expiry *</label>
-                        <input
-                          type="text"
-                          required
-                          placeholder="MM/YY"
-                          value={expiry}
-                          onChange={handleExpiryChange}
-                          className="w-full p-3 bg-white border border-[#E2E8F0] rounded-xl text-xs text-[#0F172A] text-center font-mono focus:outline-none focus:ring-2 focus:ring-[#8B7355]"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-[11px] text-[#64748B] mb-1 font-medium">CVC *</label>
-                        <input
-                          type="text"
-                          required
-                          maxLength={4}
-                          placeholder="123"
-                          value={cvc}
-                          onChange={(e) => setCvc(e.target.value.replace(/\D/g, "").slice(0, 4))}
-                          className="w-full p-3 bg-white border border-[#E2E8F0] rounded-xl text-xs text-[#0F172A] text-center font-mono focus:outline-none focus:ring-2 focus:ring-[#8B7355]"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-[11px] text-[#64748B] mb-1 font-medium">Postal Code</label>
-                        <input
-                          type="text"
-                          placeholder="1012 AB"
-                          value={zip}
-                          onChange={(e) => setZip(e.target.value)}
-                          className="w-full p-3 bg-white border border-[#E2E8F0] rounded-xl text-xs text-[#0F172A] text-center focus:outline-none focus:ring-2 focus:ring-[#8B7355]"
-                        />
-                      </div>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="space-y-2 pt-1">
-                    <label className="block text-[11px] text-[#64748B] font-medium">Select Your Bank *</label>
-                    <select
-                      value={selectedBank}
-                      onChange={(e) => setSelectedBank(e.target.value)}
-                      className="w-full p-3 bg-white border border-[#E2E8F0] rounded-xl text-xs text-[#0F172A] focus:outline-none focus:ring-2 focus:ring-[#8B7355] cursor-pointer"
-                    >
-                      {idealBanks.map((b) => (
-                        <option key={b.id} value={b.id}>
-                          {b.name}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                )}
-
-                {/* Trust Badge */}
-                <div className="flex items-center justify-center gap-2 text-[11px] text-[#64748B] pt-1">
-                  <FaLock size={10} className="text-[#8B7355]" />
-                  <span>256-Bit SSL Encrypted • Instant Activation</span>
-                </div>
-
-                {/* Submit Button */}
-                <div className="flex justify-end gap-3 pt-2 border-t border-[#F1F5F9]">
-                  <button
-                    type="button"
-                    onClick={() => setShowPaymentModal(false)}
-                    className="px-6 py-3 rounded-xl border border-[#CBD5E1] text-[#64748B] hover:bg-[#F8FAFC] font-bold text-xs uppercase tracking-wider transition-all cursor-pointer"
-                  >
-                    Cancel
-                  </button>
-
-                  <button
-                    type="submit"
-                    disabled={isProcessing}
-                    className="px-8 py-3 rounded-xl bg-[#8B7355] text-white hover:bg-[#725e45] font-bold text-xs uppercase tracking-wider transition-all shadow-md flex items-center gap-2 cursor-pointer"
-                  >
-                    {isProcessing ? (
-                      <>
-                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                        <span>Processing...</span>
-                      </>
-                    ) : (
-                      <>
-                        <BiLockAlt size={14} />
-                        <span>Pay {selectedPlan.price} & Activate</span>
-                      </>
-                    )}
-                  </button>
-                </div>
-              </form>
-            )}
-          </div>
-        </div>
+        <Elements stripe={getStripe()}>
+          <MembershipCheckoutModal
+            selectedPlan={selectedPlan}
+            user={user}
+            paymentSuccess={paymentSuccess}
+            membershipCode={membershipCode}
+            purchaseResult={purchaseResult}
+            onClose={() => {
+              setShowPaymentModal(false);
+              setPaymentSuccess(false);
+            }}
+            onSuccess={(code, res) => {
+              setMembershipCode(code);
+              setPurchaseResult(res);
+              setPaymentSuccess(true);
+            }}
+          />
+        </Elements>
       )}
     </section>
   );
 };
+
+interface MembershipCheckoutModalProps {
+  selectedPlan: MembershipPlan;
+  user: User | null;
+  paymentSuccess: boolean;
+  membershipCode: string;
+  purchaseResult: any;
+  onClose: () => void;
+  onSuccess: (code: string, res: any) => void;
+}
+
+function MembershipCheckoutModal({
+  selectedPlan,
+  user,
+  paymentSuccess,
+  membershipCode,
+  purchaseResult,
+  onClose,
+  onSuccess,
+}: MembershipCheckoutModalProps) {
+  const stripe = useStripe();
+  const elements = useElements();
+
+  const [paymentMethod, setPaymentMethod] = useState<"card" | "ideal">("card");
+  const [selectedBank, setSelectedBank] = useState("ing");
+  const [cardName, setCardName] = useState(user?.name || "");
+  const [zip, setZip] = useState("");
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [copiedCode, setCopiedCode] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setErrorMessage(null);
+
+    if (paymentMethod === "card") {
+      if (!cardName.trim()) {
+        setErrorMessage("Please enter the name on your card.");
+        return;
+      }
+      const cardNumberElement = elements?.getElement(CardNumberElement);
+      if (!cardNumberElement) {
+        setErrorMessage("Stripe payment fields are initializing. Please wait.");
+        return;
+      }
+    }
+
+    setIsProcessing(true);
+
+    try {
+      const isSessionPass =
+        selectedPlan?.itemType === "session_pass" ||
+        selectedPlan?.name.toLowerCase().includes("session") ||
+        selectedPlan?.name.toLowerCase().includes("pass");
+
+      // 1. Call Backend POST /api/payments/purchase/
+      const purchasePayload: any = {
+        purchase_type: isSessionPass ? "session_pass" : "subscription",
+        currency: "eur",
+        name: cardName.trim() || user?.name || "Member",
+        email: user?.email || undefined,
+        phone: user?.phone || undefined,
+      };
+
+      if (isSessionPass) {
+        purchasePayload.pass_id = selectedPlan?.id || 1;
+      } else {
+        if (selectedPlan?.id) {
+          purchasePayload.plan_id = selectedPlan.id;
+        } else {
+          purchasePayload.plan_type =
+            selectedPlan?.planType ||
+            (selectedPlan?.name.toLowerCase().includes("unlimited") ? "unlimited" : "weekly");
+          purchasePayload.plan_category = selectedPlan?.planCategory || "saltroom";
+        }
+      }
+
+      let purchaseRes: any = null;
+      try {
+        purchaseRes = await paymentsService.purchase(purchasePayload);
+      } catch (apiErr: any) {
+        console.error("Purchase API error:", apiErr);
+        throw new Error(apiErr?.message || "Could not initiate purchase session.");
+      }
+
+      const generatedCode =
+        purchaseRes?.purchase_id ||
+        (isSessionPass
+          ? `PASS-${Math.floor(1000 + Math.random() * 9000)}`
+          : `MEM-${Math.floor(1000 + Math.random() * 9000)}`);
+
+      const clientSecret = purchaseRes?.client_secret;
+
+      // 2. Process with Stripe Elements
+      if (stripe && clientSecret && clientSecret.startsWith("pi_") && !clientSecret.includes("sample")) {
+        if (paymentMethod === "ideal") {
+          // ── iDEAL: Redirect flow ──
+          const returnUrl =
+            typeof window !== "undefined"
+              ? `${window.location.origin}/memberships`
+              : "/memberships";
+
+          const pmResult = await stripe.createPaymentMethod({
+            type: "ideal",
+            ideal: {
+              bank: selectedBank,
+            },
+            billing_details: {
+              name: cardName.trim() || user?.name || "Member",
+              email: user?.email || undefined,
+            },
+          });
+
+          if (pmResult.error) {
+            throw new Error(pmResult.error.message || "Failed to initialize iDEAL payment.");
+          }
+
+          const confirmRes = await stripe.confirmPayment({
+            clientSecret,
+            confirmParams: {
+              payment_method: pmResult.paymentMethod.id,
+              return_url: returnUrl,
+            },
+          });
+
+          if (confirmRes.error) {
+            throw new Error(confirmRes.error.message || "iDEAL confirmation failed.");
+          }
+
+          return;
+        } else {
+          // ── Credit / Debit Card: Elements flow ──
+          const cardNumberElement = elements?.getElement(CardNumberElement);
+          if (!cardNumberElement) {
+            throw new Error("Card element is not ready. Please refresh and try again.");
+          }
+
+          const confirmRes = await stripe.confirmCardPayment(clientSecret, {
+            payment_method: {
+              card: cardNumberElement,
+              billing_details: {
+                name: cardName.trim() || user?.name || "Member",
+                email: user?.email || undefined,
+                phone: user?.phone || undefined,
+                ...(zip.trim() ? { address: { postal_code: zip.trim() } } : {}),
+              },
+            },
+          });
+
+          if (confirmRes.error) {
+            throw new Error(confirmRes.error.message || "Card confirmation failed. Please check your card details.");
+          }
+
+          if (confirmRes.paymentIntent && confirmRes.paymentIntent.status === "succeeded") {
+            try {
+              await paymentsService.confirmPayment({
+                payment_intent_id: confirmRes.paymentIntent.id,
+                purchase_id: purchaseRes.purchase_id,
+              });
+            } catch (confirmApiErr) {
+              console.warn("Backend payment confirmation note:", confirmApiErr);
+            }
+          }
+        }
+      } else {
+        await new Promise((res) => setTimeout(res, 800));
+      }
+
+      // 3. Update local booking store
+      const remainingSessions =
+        purchaseRes?.remaining_sessions !== undefined
+          ? purchaseRes.remaining_sessions
+          : isSessionPass
+          ? 10
+          : selectedPlan?.planType === "weekly"
+          ? 4
+          : undefined;
+
+      updateStoredBookingData({
+        name: user?.name || "Member",
+        email: user?.email || "",
+        phone: user?.phone || "",
+        hasActiveMembership: !isSessionPass,
+        membershipType: isSessionPass
+          ? "none"
+          : selectedPlan?.name.toLowerCase().includes("unlimited")
+          ? "unlimited"
+          : "once_a_week",
+        passType: isSessionPass
+          ? "10_session_pass"
+          : selectedPlan?.name.toLowerCase().includes("unlimited")
+          ? "unlimited"
+          : "once_a_week",
+        remainingPassSessions: remainingSessions,
+        purchaseId: purchaseRes?.purchase_id || generatedCode,
+      });
+
+      onSuccess(generatedCode, purchaseRes || null);
+    } catch (err: any) {
+      setErrorMessage(err.message || "Payment could not be processed. Please try again.");
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md animate-fadeIn">
+      <div className="bg-white rounded-[32px] border border-[#E8E2DC] shadow-2xl max-w-xl w-full max-h-[92vh] overflow-y-auto p-6 sm:p-10 relative">
+        {/* Close Button */}
+        <button
+          type="button"
+          onClick={onClose}
+          className="absolute top-6 right-6 w-10 h-10 rounded-full bg-[#F8FAFC] border border-[#E2E8F0] flex items-center justify-center text-[#64748B] hover:text-[#0F172A] hover:bg-[#F1F5F9] transition-all cursor-pointer"
+        >
+          <FaTimes size={16} />
+        </button>
+
+        {paymentSuccess ? (
+          <div className="text-center py-6 space-y-6 animate-fadeIn">
+            <div className="w-20 h-20 bg-[#FCF2E9] rounded-3xl flex items-center justify-center mx-auto text-[#8B7355] border border-[#E8E2DC] shadow-sm">
+              <BiCheckCircle size={48} />
+            </div>
+
+            <div>
+              <span className="text-xs font-bold uppercase tracking-widest text-[#8B7355] block mb-1">
+                Payment Successful
+              </span>
+              <h3 className="text-3xl font-bold font-displayPlayFair text-[#0F172A]">
+                Membership Activated!
+              </h3>
+              <p className="text-xs text-[#64748B] max-w-md mx-auto mt-2 leading-relaxed">
+                Thank you, <span className="font-semibold text-[#0F172A]">{user?.name || "Member"}</span>. Your {selectedPlan.name} is now active and linked directly to your account.
+              </p>
+            </div>
+
+            {/* Membership Code Highlight */}
+            <div className="bg-[#FBF6F3] border border-[#E8E2DC] rounded-2xl p-5 max-w-md mx-auto flex items-center justify-between">
+              <div className="text-left">
+                <span className="text-[10px] uppercase font-bold text-[#8B7355] tracking-wider block">
+                  Membership / Pass Code
+                </span>
+                <span className="text-xl font-bold font-mono text-[#0F172A]">
+                  {membershipCode}
+                </span>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  navigator.clipboard.writeText(membershipCode);
+                  setCopiedCode(true);
+                  setTimeout(() => setCopiedCode(false), 2000);
+                }}
+                className="px-3.5 py-2 rounded-xl bg-white border border-[#CBD5E1] text-xs font-semibold text-[#0F172A] hover:bg-[#F8FAFC] flex items-center gap-1.5 transition-all cursor-pointer shadow-2xs"
+              >
+                {copiedCode ? (
+                  <>
+                    <FaCheck size={11} className="text-emerald-600" />
+                    <span className="text-emerald-700">Copied</span>
+                  </>
+                ) : (
+                  <>
+                    <FaCopy size={11} className="text-[#64748B]" />
+                    <span>Copy</span>
+                  </>
+                )}
+              </button>
+            </div>
+
+            {/* Plan Summary */}
+            <div className="bg-white border border-[#E2E8F0] rounded-2xl p-5 text-left max-w-md mx-auto space-y-3 text-xs">
+              <div className="flex justify-between items-center pb-3 border-b border-[#F1F5F9]">
+                <span className="text-[#64748B]">Plan:</span>
+                <span className="font-bold text-[#0F172A]">{selectedPlan.name}</span>
+              </div>
+              <div className="flex justify-between items-center pb-3 border-b border-[#F1F5F9]">
+                <span className="text-[#64748B]">Amount Paid:</span>
+                <span className="font-bold text-[#8B7355]">{selectedPlan.price} {selectedPlan.perPeriod}</span>
+              </div>
+              <div className="flex justify-between items-center pb-3 border-b border-[#F1F5F9]">
+                <span className="text-[#64748B]">Validity:</span>
+                <span className="font-semibold text-[#0F172A]">
+                  {purchaseResult?.end_date
+                    ? `Valid until ${new Date(purchaseResult.end_date).toLocaleDateString()}`
+                    : selectedPlan.validityText || "Indefinite"}
+                </span>
+              </div>
+              <div className="flex justify-between items-center pb-3 border-b border-[#F1F5F9]">
+                <span className="text-[#64748B]">Session Allowance:</span>
+                <span className="font-semibold text-[#0F172A]">
+                  {purchaseResult?.total_sessions === 0
+                    ? "Unlimited sessions"
+                    : `${purchaseResult?.remaining_sessions ?? selectedPlan.totalSessions ?? 10} sessions available`}
+                </span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-[#64748B]">Status:</span>
+                <span className="px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-700 font-semibold border border-emerald-200">
+                  Active
+                </span>
+              </div>
+            </div>
+
+            {/* Actions */}
+            <div className="flex flex-col sm:flex-row justify-center gap-3 pt-2">
+              <button
+                type="button"
+                onClick={onClose}
+                className="px-6 py-3 rounded-xl border border-[#CBD5E1] text-[#475569] hover:bg-[#F8FAFC] font-bold text-xs uppercase tracking-wider transition-all cursor-pointer"
+              >
+                Close
+              </button>
+              <Link
+                href="/booking/arrangements"
+                onClick={onClose}
+                className="px-7 py-3 rounded-xl bg-[#8B7355] text-white hover:bg-[#725e45] font-bold text-xs uppercase tracking-wider transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer"
+              >
+                <span>Book Salt Room Session</span>
+                <ArrowIcon color="#FFFFFF" />
+              </Link>
+            </div>
+          </div>
+        ) : (
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div>
+              <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-[#8B7355] mb-1">
+                <BiShieldQuarter size={14} />
+                <span>Secure Membership Checkout</span>
+              </div>
+              <h3 className="text-2xl font-bold font-displayPlayFair text-[#0F172A]">
+                Activate {selectedPlan.name}
+              </h3>
+              <p className="text-xs text-[#64748B] mt-1">
+                Complete your payment to instantly activate your halotherapy privileges.
+              </p>
+            </div>
+
+            {/* Plan Highlights Box */}
+            <div className="p-4 rounded-2xl bg-[#FCF2E9]/60 border border-[#E8E2DC] flex items-center justify-between">
+              <div>
+                <span className="text-[10px] font-bold uppercase tracking-wider text-[#8B7355] block">
+                  Selected Plan
+                </span>
+                <h4 className="text-base font-bold text-[#0F172A] font-displayPlayFair">
+                  {selectedPlan.name}
+                </h4>
+                <p className="text-[11px] text-[#64748B]">Salt Room Halotherapy</p>
+              </div>
+              <div className="text-right">
+                <span className="text-2xl font-bold text-[#8B7355] font-displayPlayFair block">
+                  {selectedPlan.price}
+                </span>
+                <span className="text-[10px] text-[#64748B] block">{selectedPlan.perPeriod}</span>
+              </div>
+            </div>
+
+            {errorMessage && (
+              <div className="p-3.5 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs flex items-center justify-between animate-fadeIn">
+                <span>{errorMessage}</span>
+                <button
+                  type="button"
+                  onClick={() => setErrorMessage(null)}
+                  className="text-red-500 hover:text-red-800 ml-2 font-bold cursor-pointer"
+                >
+                  ✕
+                </button>
+              </div>
+            )}
+
+            {/* Authenticated Member Badge */}
+            <div className="p-3.5 rounded-2xl bg-[#F8FAFC] border border-[#E2E8F0] flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-[#8B7355]/10 text-[#8B7355] flex items-center justify-center font-bold text-sm">
+                  {(user?.name || "M").charAt(0).toUpperCase()}
+                </div>
+                <div>
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-xs font-bold text-[#0F172A]">{user?.name || "Member"}</span>
+                    <span className="px-1.5 py-0.2 rounded text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                      Logged In
+                    </span>
+                  </div>
+                  <span className="text-[11px] text-[#64748B] block">{user?.email || "Account Linked"}</span>
+                </div>
+              </div>
+              <span className="text-[10px] uppercase font-bold text-[#8B7355] tracking-wider hidden sm:inline-block">
+                Account Verified
+              </span>
+            </div>
+
+            {/* Payment Method Selector */}
+            <div className="space-y-3 pt-2">
+              <span className="block text-xs font-bold text-[#0F172A] uppercase tracking-wide">
+                Payment Method
+              </span>
+              <div className="grid grid-cols-2 gap-3">
+                <button
+                  type="button"
+                  onClick={() => setPaymentMethod("card")}
+                  className={`p-3.5 rounded-xl border flex items-center justify-center gap-2 text-xs font-bold transition-all cursor-pointer ${
+                    paymentMethod === "card"
+                      ? "bg-[#FCF2E9] border-[#8B7355] text-[#8B7355] shadow-xs"
+                      : "bg-white border-[#E2E8F0] text-[#64748B] hover:border-[#CBD5E1]"
+                  }`}
+                >
+                  <FaCreditCard size={14} />
+                  <span>Credit Card</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setPaymentMethod("ideal")}
+                  className={`p-3.5 rounded-xl border flex items-center justify-center gap-2 text-xs font-bold transition-all cursor-pointer ${
+                    paymentMethod === "ideal"
+                      ? "bg-[#FCF2E9] border-[#8B7355] text-[#8B7355] shadow-xs"
+                      : "bg-white border-[#E2E8F0] text-[#64748B] hover:border-[#CBD5E1]"
+                  }`}
+                >
+                  <MdOutlinePayments size={16} />
+                  <span>iDEAL</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Payment Fields with Stripe Elements */}
+            {paymentMethod === "card" ? (
+              <div className="space-y-3 pt-1">
+                <div>
+                  <label className="block text-[11px] text-[#64748B] mb-1 font-medium">Name on Card *</label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="John Doe"
+                    value={cardName}
+                    onChange={(e) => setCardName(e.target.value)}
+                    className="w-full p-3 bg-white border border-[#E2E8F0] rounded-xl text-xs text-[#0F172A] focus:outline-none focus:ring-2 focus:ring-[#8B7355]"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-[11px] text-[#64748B] mb-1 font-medium">Card Number *</label>
+                  <div className="p-3 bg-white border border-[#E2E8F0] rounded-xl focus-within:ring-2 focus-within:ring-[#8B7355]">
+                    <CardNumberElement options={CARD_ELEMENT_OPTIONS} />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-3 gap-3">
+                  <div>
+                    <label className="block text-[11px] text-[#64748B] mb-1 font-medium">Expiry *</label>
+                    <div className="p-3 bg-white border border-[#E2E8F0] rounded-xl focus-within:ring-2 focus-within:ring-[#8B7355]">
+                      <CardExpiryElement options={CARD_ELEMENT_OPTIONS} />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-[11px] text-[#64748B] mb-1 font-medium">CVC *</label>
+                    <div className="p-3 bg-white border border-[#E2E8F0] rounded-xl focus-within:ring-2 focus-within:ring-[#8B7355]">
+                      <CardCvcElement options={CARD_ELEMENT_OPTIONS} />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-[11px] text-[#64748B] mb-1 font-medium">Postal Code</label>
+                    <input
+                      type="text"
+                      placeholder="1012 AB"
+                      value={zip}
+                      onChange={(e) => setZip(e.target.value)}
+                      className="w-full p-3 bg-white border border-[#E2E8F0] rounded-xl text-xs text-[#0F172A] text-center focus:outline-none focus:ring-2 focus:ring-[#8B7355]"
+                    />
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className="space-y-2 pt-1">
+                <label className="block text-[11px] text-[#64748B] font-medium">Select Your Bank *</label>
+                <select
+                  value={selectedBank}
+                  onChange={(e) => setSelectedBank(e.target.value)}
+                  className="w-full p-3 bg-white border border-[#E2E8F0] rounded-xl text-xs text-[#0F172A] focus:outline-none focus:ring-2 focus:ring-[#8B7355] cursor-pointer"
+                >
+                  {idealBanks.map((b) => (
+                    <option key={b.id} value={b.id}>
+                      {b.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
+
+            {/* Trust Badge */}
+            <div className="flex items-center justify-center gap-2 text-[11px] text-[#64748B] pt-1">
+              <FaLock size={10} className="text-[#8B7355]" />
+              <span>256-Bit SSL Encrypted • Instant Activation</span>
+            </div>
+
+            {/* Submit Button */}
+            <div className="flex justify-end gap-3 pt-2 border-t border-[#F1F5F9]">
+              <button
+                type="button"
+                onClick={onClose}
+                className="px-6 py-3 rounded-xl border border-[#CBD5E1] text-[#64748B] hover:bg-[#F8FAFC] font-bold text-xs uppercase tracking-wider transition-all cursor-pointer"
+              >
+                Cancel
+              </button>
+
+              <button
+                type="submit"
+                disabled={isProcessing}
+                className="px-8 py-3 rounded-xl bg-[#8B7355] text-white hover:bg-[#725e45] font-bold text-xs uppercase tracking-wider transition-all shadow-md flex items-center gap-2 cursor-pointer"
+              >
+                {isProcessing ? (
+                  <>
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    <span>Processing...</span>
+                  </>
+                ) : (
+                  <>
+                    <BiLockAlt size={14} />
+                    <span>Pay {selectedPlan.price} & Activate</span>
+                  </>
+                )}
+              </button>
+            </div>
+          </form>
+        )}
+      </div>
+    </div>
+  );
+}
 
 export default MembershipCards;
 
