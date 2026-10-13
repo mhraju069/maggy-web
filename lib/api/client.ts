@@ -50,6 +50,11 @@ export class ApiClient {
     const timeoutId = setTimeout(() => controller.abort(), timeout);
 
     // Prepare RequestInit
+    const isFormData = typeof FormData !== "undefined" && data instanceof FormData;
+    if (isFormData) {
+      delete headers["Content-Type"];
+    }
+
     const options: RequestInit = {
       method,
       headers,
@@ -58,7 +63,7 @@ export class ApiClient {
     };
 
     if (data !== undefined && data !== null && method !== "GET") {
-      options.body = JSON.stringify(data);
+      options.body = isFormData ? data : JSON.stringify(data);
     }
 
     try {

@@ -89,10 +89,11 @@ export const authService = {
   },
 
   /**
-   * Update current authenticated user profile
+   * Update current authenticated user profile (supports JSON or FormData for image)
+   * Endpoint: /api/auth/user/ (PATCH)
    */
-  async updateProfile(data: Partial<User> & Record<string, any>): Promise<User> {
-    return ApiClient.patch<User>(ENDPOINTS.AUTH.PROFILE, data);
+  async updateProfile(data: (Partial<User> & Record<string, any>) | FormData): Promise<User> {
+    return ApiClient.patch<User>(ENDPOINTS.AUTH.USER, data);
   },
 
   /**

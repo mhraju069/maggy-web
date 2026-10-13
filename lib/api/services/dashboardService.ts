@@ -97,7 +97,9 @@ export interface DashboardUserProfile {
   id: number;
   name: string;
   email: string;
+  uid?: string | null;
   phone: string;
+  bio?: string | null;
   image: string | null;
   language: string;
   role: string;
