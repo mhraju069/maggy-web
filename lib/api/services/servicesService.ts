@@ -258,10 +258,11 @@ export interface SharedSaunaSlot {
 
 export interface LunchroomSlotData {
   is_available: boolean;
+  is_closed?: boolean;
   open_time: string;
   close_time: string;
-  existing_bookings_count: number;
-  info: string;
+  existing_bookings_count?: number;
+  info?: string;
 }
 
 export interface ActivitySlotData {
@@ -278,24 +279,54 @@ export interface ActivitySlotData {
 
 export interface PackageSlotsResponseData {
   sauna?: {
+    is_available?: boolean;
+    is_closed?: boolean;
+    open_time?: string;
+    close_time?: string;
     private_sauna?: {
+      open_time?: string;
+      close_time?: string;
+      is_closed?: boolean;
       slots?: {
         "3_hours"?: PrivateSaunaSlot[];
         "4_hours"?: PrivateSaunaSlot[];
       };
     };
     shared_sauna?: {
+      open_time?: string;
+      close_time?: string;
+      is_closed?: boolean;
       max_capacity_per_slot?: number;
       slots?: SharedSaunaSlot[];
     };
   };
   lunchroom?: LunchroomSlotData;
-  activities?: ActivitySlotData[];
+  activities?: {
+    is_available?: boolean;
+    is_closed?: boolean;
+    open_time?: string;
+    close_time?: string;
+    activities?: ActivitySlotData[];
+  } | ActivitySlotData[];
+  saltroom?: {
+    is_available?: boolean;
+    is_closed?: boolean;
+    open_time?: string;
+    close_time?: string;
+    duration_minutes?: number;
+    buffer_minutes?: number;
+    max_capacity?: number;
+    price_per_person?: string;
+    slots?: any[];
+    available_slots?: any[];
+    user_membership?: any;
+  };
 }
 
 export interface PackageSlotsResponse {
   success: boolean;
   is_blocked: boolean;
+  is_closed?: boolean;
   date: string;
   service_type: string;
   open_time: string;
@@ -361,6 +392,7 @@ export interface ServiceSlotsData {
   slots?: SaltRoomSlotItem[];
   available_slots?: SaltRoomSlotItem[];
   is_available?: boolean;
+  is_closed?: boolean;
   open_time?: string;
   close_time?: string;
   price_per_person?: string | number;
@@ -372,6 +404,7 @@ export interface ServiceSlotsResponse {
   success: boolean;
   service_type?: string;
   is_blocked?: boolean;
+  is_closed?: boolean;
   date?: string;
   open_time?: string;
   close_time?: string;
@@ -607,7 +640,7 @@ export const servicesService = {
       const res = await ApiClient.get<ServiceSlotsResponse>("/services/slots/", {
         params: { type: cleanType, date },
       });
-      if (res && (res.success || res.data)) return res;
+      if (res && (res.success !== undefined || res.is_blocked !== undefined || res.is_closed !== undefined || res.data)) return res;
     } catch {
       // Fallback to path style /services/slots/:type/?date=...
     }

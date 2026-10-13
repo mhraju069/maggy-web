@@ -4,7 +4,7 @@ import DecorativeUnderline from "@/components/shared/DecorativeUnderline";
 import { servicesService, ServiceSlotsResponse } from "@/lib/api";
 import { getStoredBookingData, updateStoredBookingData } from "@/lib/bookingStore";
 import Link from "next/link";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { BiCheckCircle, BiInfoCircle, BiTimeFive } from "react-icons/bi";
 import { FaSpa, FaWalking } from "react-icons/fa";
 
@@ -12,6 +12,25 @@ const defaultTimeSlots = [
   "9:00 AM", "10:00 AM", "11:00 AM",
   "12:00 PM", "1:00 PM", "2:00 PM", "3:00 PM", "4:00 PM"
 ];
+
+function generateTimeSlotsBetween(openTime?: string, closeTime?: string, intervalMinutes: number = 60): string[] {
+  if (!openTime || !closeTime) return defaultTimeSlots;
+  const [startH, startM] = openTime.split(":").map(Number);
+  const [endH, endM] = closeTime.split(":").map(Number);
+  if (isNaN(startH) || isNaN(endH)) return defaultTimeSlots;
+
+  const startMinutes = startH * 60 + (startM || 0);
+  const endMinutes = endH * 60 + (endM || 0);
+  if (startMinutes >= endMinutes) return defaultTimeSlots;
+
+  const slots: string[] = [];
+  for (let m = startMinutes; m <= endMinutes; m += intervalMinutes) {
+    const hh = String(Math.floor(m / 60)).padStart(2, "0");
+    const mm = String(m % 60).padStart(2, "0");
+    slots.push(`${hh}:${mm}`);
+  }
+  return slots.length > 0 ? slots : defaultTimeSlots;
+}
 
 export interface SessionSlotInfo {
   slot: string;
@@ -111,11 +130,63 @@ export default function ChooseTimePage() {
   const [packageSlots, setPackageSlots] = useState<any | null>(null);
   const [loadingApiSlots, setLoadingApiSlots] = useState<boolean>(false);
 
+  // Package sub-service inclusion breakdown
+  const includedServices: string[] = storedData.packageSelections?.includedServices || [];
+  const normalizedServices = includedServices.map((s) => s.toLowerCase().replace(/[\s_-]+/g, ""));
+
+  const hasPrivateSauna = normalizedServices.some((s) => s.includes("privatesauna") || (s.includes("private") && s.includes("sauna")));
+  const hasSharedSauna = normalizedServices.some((s) => s.includes("sharedsauna") || (s.includes("shared") && s.includes("sauna")));
+  const hasGenericSauna = normalizedServices.some((s) => s === "sauna") || (!hasPrivateSauna && !hasSharedSauna && includedServices.length === 0);
+  const packageIncludesSauna = isPackage && (hasPrivateSauna || hasSharedSauna || hasGenericSauna || !includedServices.length);
+
+  const packageIncludesLunchroom = isPackage && (
+    normalizedServices.some((s) => s.includes("lunchroom") || s.includes("lunch")) ||
+    serviceNameLower.includes("lunchroom") ||
+    !includedServices.length
+  );
+
+  const packageIncludesActivity = isPackage && (
+    normalizedServices.some((s) => s.includes("activity") || s.includes("activities")) ||
+    serviceNameLower.includes("activity") ||
+    !includedServices.length
+  );
+
+  const packageIncludesSaltRoom = isPackage && (
+    normalizedServices.some((s) => s.includes("salt") || s.includes("saltroom")) ||
+    serviceNameLower.includes("salt") ||
+    Boolean(packageSlots?.data?.saltroom?.slots?.length)
+  );
+
   // Package Sub-service choices state
-  const [pkgSaunaSlot, setPkgSaunaSlot] = useState<string | null>(storedData.packageSelections?.saunaSlot ? `${storedData.packageSelections.saunaSlot.startTime} - ${storedData.packageSelections.saunaSlot.endTime}` : null);
-  const [pkgSaunaType, setPkgSaunaType] = useState<"private" | "shared">(storedData.packageSelections?.saunaSlot?.type || "private");
+  const [pkgSaunaSlot, setPkgSaunaSlot] = useState<string | null>(
+    storedData.packageSelections?.saunaSlot
+      ? `${storedData.packageSelections.saunaSlot.startTime} - ${storedData.packageSelections.saunaSlot.endTime}`
+      : null
+  );
+  const [pkgSaunaType, setPkgSaunaType] = useState<"private" | "shared">(
+    hasSharedSauna && !hasPrivateSauna
+      ? "shared"
+      : (storedData.packageSelections?.saunaSlot?.type || "private")
+  );
   const [pkgLunchTime, setPkgLunchTime] = useState<string>(storedData.packageSelections?.lunchroomTime || "12:30");
   const [pkgSelectedActivityId, setPkgSelectedActivityId] = useState<number | null>(storedData.packageSelections?.activitySession?.id || null);
+  const [pkgSaltRoomSlot, setPkgSaltRoomSlot] = useState<string | null>(
+    storedData.packageSelections?.saltRoomSlot
+      ? `${storedData.packageSelections.saltRoomSlot.startTime} - ${storedData.packageSelections.saltRoomSlot.endTime}`
+      : null
+  );
+  const [saltRoomSlotsList, setSaltRoomSlotsList] = useState<any[]>([]);
+  const [loadingSaltSlots, setLoadingSaltSlots] = useState<boolean>(false);
+
+  useEffect(() => {
+    if (isPackage) {
+      if (hasSharedSauna && !hasPrivateSauna) {
+        setPkgSaunaType("shared");
+      } else if (hasPrivateSauna && !hasSharedSauna) {
+        setPkgSaunaType("private");
+      }
+    }
+  }, [isPackage, hasSharedSauna, hasPrivateSauna]);
 
   const [slotMembership, setSlotMembership] = useState<any | null>(null);
   const [saltRoomSlotData, setSaltRoomSlotData] = useState<{
@@ -126,21 +197,74 @@ export default function ChooseTimePage() {
     isAvailable?: boolean;
   }>({});
 
+  const fetchingRef = useRef<boolean>(false);
+  const lastFetchedKeyRef = useRef<string>("");
+
   const fetchSlots = useCallback(async (dateVal: string, typeVal: string) => {
     if (!dateVal) {
       setApiSlots(null);
       setPackageSlots(null);
+      setSaltRoomSlotsList([]);
       return;
     }
+
+    const currentKey = `${typeVal}_${dateVal}`;
+    if (fetchingRef.current && lastFetchedKeyRef.current === currentKey) {
+      return;
+    }
+    fetchingRef.current = true;
+    lastFetchedKeyRef.current = currentKey;
     setLoadingApiSlots(true);
+
     try {
-      if (typeVal === "package" || isPackage) {
-        const res = await servicesService.getPackageSlots(dateVal);
-        setPackageSlots(res);
+      const isPkg = (typeVal || "").toLowerCase().includes("package");
+      if (isPkg) {
+        const currentStored = getStoredBookingData();
+        const inc = currentStored.packageSelections?.includedServices || [];
+        const norm = inc.map((s) => s.toLowerCase().replace(/[\s_-]+/g, ""));
+        const shouldGetSalt = norm.some((s) => s.includes("salt")) || (currentStored.serviceName || "").toLowerCase().includes("salt");
+
+        const [pkgRes, saltRes] = await Promise.all([
+          servicesService.getPackageSlots(dateVal).catch((err) => {
+            console.error("Error fetching package slots:", err);
+            return null;
+          }),
+          shouldGetSalt
+            ? servicesService.getServiceSlots("saltroom", dateVal).catch((err) => {
+                console.error("Error fetching salt room slots:", err);
+                return null;
+              })
+            : Promise.resolve(null),
+        ]);
+
+        if (pkgRes) {
+          setPackageSlots(pkgRes);
+          if (pkgRes.is_closed) {
+            setDayError(pkgRes.message || "Package reservations are closed on this date.");
+          } else {
+            setDayError(null);
+          }
+        }
+
+        let slots: any[] = [];
+        if (pkgRes?.data?.saltroom?.slots && Array.isArray(pkgRes.data.saltroom.slots)) {
+          slots = pkgRes.data.saltroom.slots;
+        } else if (saltRes) {
+          const raw = (saltRes?.data as any)?.slots || (saltRes as any)?.slots || [];
+          if (Array.isArray(raw)) slots = raw;
+        }
+        setSaltRoomSlotsList(slots);
       } else {
-        const queryType = isSaltRoom || typeVal === "salt_room" || typeVal === "saltroom" ? "saltroom" : (typeVal || "sauna");
+        const isSalt = typeVal === "salt_room" || typeVal === "saltroom";
+        const queryType = isSalt ? "saltroom" : (typeVal || "sauna");
         const res = await servicesService.getServiceSlots(queryType, dateVal);
         setApiSlots(res);
+
+        if (res?.is_closed || (res?.data as any)?.is_closed) {
+          setDayError((res?.data as any)?.info || res?.message || "This service is closed on this date.");
+        } else {
+          setDayError(null);
+        }
 
         // Check if saltroom slots response returned user_membership or saltroom slot info
         const memberInfo = (res?.data as any)?.user_membership || (res as any)?.user_membership;
@@ -166,8 +290,9 @@ export default function ChooseTimePage() {
       setPackageSlots(null);
     } finally {
       setLoadingApiSlots(false);
+      fetchingRef.current = false;
     }
-  }, [isPackage, isSaltRoom]);
+  }, []);
 
   useEffect(() => {
     const data = getStoredBookingData();
@@ -179,33 +304,21 @@ export default function ChooseTimePage() {
     if (data.timeSlot) setSelectedTime(data.timeSlot);
     if (data.guestsCount) {
       setGuests(String(data.guestsCount));
-    } else if (isPrivateSauna) {
-      setGuests("2");
     }
-  }, [fetchSlots, isPrivateSauna]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleDateChange = (newDate: string) => {
     setDate(newDate);
     setSelectedTime(null);
     setPkgSaunaSlot(null);
+    setPkgSaltRoomSlot(null);
     setPkgSelectedActivityId(null);
-
-    const isLunchroomOrPackageLunch = isLunchroom || (isPackage && storedData.packageSelections?.includedServices?.includes("lunchroom"));
-
-    if (isLunchroomOrPackageLunch && newDate) {
-      const selected = new Date(newDate);
-      const dayOfWeek = selected.getUTCDay();
-      if (dayOfWeek === 1 || dayOfWeek === 2) {
-        setDayError("The Lunchroom is closed on Mondays & Tuesdays. Please pick a date between Wednesday and Sunday.");
-      } else {
-        setDayError(null);
-      }
-    } else {
-      setDayError(null);
-    }
+    setDayError(null);
 
     updateStoredBookingData({ date: newDate, timeSlot: "" });
     if (newDate) {
+      lastFetchedKeyRef.current = "";
       fetchSlots(newDate, storedData.serviceType || "sauna");
     }
   };
@@ -374,28 +487,38 @@ export default function ChooseTimePage() {
         (_, i) => minSelectableGuests + i
       );
 
+  const packageActivitiesList: any[] = Array.isArray(packageSlots?.data?.activities)
+    ? packageSlots.data.activities
+    : (packageSlots?.data?.activities as any)?.activities || [];
+  const isPackageActivitiesClosed = Boolean((packageSlots?.data?.activities as any)?.is_closed);
+
   const isPackageFormValid = isPackage
-    ? Boolean(date && (!packageSlots || !packageSlots.is_blocked) && (
-        !packageSlots?.data?.sauna || pkgSaunaSlot
-      ) && (
-        !packageSlots?.data?.activities || packageSlots.data.activities.length === 0 || pkgSelectedActivityId
-      ))
+    ? Boolean(
+        date &&
+        (!packageSlots || (!packageSlots.is_blocked && !packageSlots.is_closed)) &&
+        (!packageIncludesSauna || !packageSlots?.data?.sauna || packageSlots.data.sauna.is_closed || pkgSaunaSlot) &&
+        (!packageIncludesSaltRoom || saltRoomSlotsList.length === 0 || packageSlots?.data?.saltroom?.is_closed || pkgSaltRoomSlot) &&
+        (!packageIncludesActivity || packageActivitiesList.length === 0 || isPackageActivitiesClosed || pkgSelectedActivityId)
+      )
     : false;
 
+  const isSingleServiceClosed = Boolean(apiSlots?.is_closed || (apiSlots?.data as any)?.is_closed || (apiSlots?.data as any)?.is_available === false);
   const isFormValid = isPackage
     ? isPackageFormValid
-    : date && selectedTime && (!isLunchroom || !dayError);
+    : Boolean(date && selectedTime && !isSingleServiceClosed && !apiSlots?.is_blocked);
 
   const savePackageSelections = (
     updatedSaunaSlot?: string | null,
     updatedSaunaType?: "private" | "shared",
     updatedLunchTime?: string,
-    updatedActivityId?: number | null
+    updatedActivityId?: number | null,
+    updatedSaltRoomSlot?: string | null
   ) => {
     const sSlot = updatedSaunaSlot !== undefined ? updatedSaunaSlot : pkgSaunaSlot;
     const sType = updatedSaunaType !== undefined ? updatedSaunaType : pkgSaunaType;
     const lTime = updatedLunchTime !== undefined ? updatedLunchTime : pkgLunchTime;
     const actId = updatedActivityId !== undefined ? updatedActivityId : pkgSelectedActivityId;
+    const srSlot = updatedSaltRoomSlot !== undefined ? updatedSaltRoomSlot : pkgSaltRoomSlot;
 
     let saunaSlotData: any = undefined;
     if (sSlot) {
@@ -407,9 +530,18 @@ export default function ChooseTimePage() {
       };
     }
 
+    let saltRoomSlotData: any = undefined;
+    if (srSlot) {
+      const parts = srSlot.split(" - ");
+      saltRoomSlotData = {
+        startTime: parts[0] || "",
+        endTime: parts[1] || "",
+      };
+    }
+
     let activitySessionData: any = undefined;
-    if (actId && packageSlots?.data?.activities) {
-      const foundAct = packageSlots.data.activities.find((a: any) => a.id === actId);
+    if (actId && packageActivitiesList.length > 0) {
+      const foundAct = packageActivitiesList.find((a: any) => a.id === actId);
       if (foundAct) {
         activitySessionData = {
           id: foundAct.id,
@@ -422,15 +554,23 @@ export default function ChooseTimePage() {
     }
 
     updateStoredBookingData({
-      timeSlot: sSlot || lTime || "Package Scheduled",
+      timeSlot: sSlot || srSlot || lTime || "Package Scheduled",
       packageSelections: {
         ...storedData.packageSelections,
         saunaSlot: saunaSlotData,
+        saltRoomSlot: saltRoomSlotData,
         lunchroomTime: lTime,
         activitySession: activitySessionData,
       },
     });
   };
+
+  // Dynamic Sequential Step Numbering
+  let stepIndex = 0;
+  const saunaStepNumber = packageIncludesSauna && packageSlots?.data?.sauna ? ++stepIndex : 0;
+  const lunchStepNumber = packageIncludesLunchroom ? ++stepIndex : 0;
+  const saltRoomStepNumber = packageIncludesSaltRoom ? ++stepIndex : 0;
+  const activityStepNumber = packageIncludesActivity ? ++stepIndex : 0;
 
   return (
     <div className="w-full px-6 md:px-12">
@@ -469,13 +609,19 @@ export default function ChooseTimePage() {
       {!isPackage && isLunchroom && (
         <div className="max-w-4xl mx-auto mb-8 bg-white rounded-2xl p-6 border border-[#E8E2DC] shadow-xs flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-[#FCF2E9] flex items-center justify-center text-[#8B7355] flex-shrink-0">
+            <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${
+              isSingleServiceClosed ? "bg-rose-100 text-rose-700" : "bg-[#FCF2E9] text-[#8B7355]"
+            }`}>
               <BiTimeFive size={20} />
             </div>
             <div>
               <h4 className="font-bold text-[#0F172A] text-sm">Lunchroom Opening Hours</h4>
-              <p className="text-xs text-[#8B7355] font-medium">
-                Wednesday through Sunday • 09:00–16:00 (Mon & Tue Closed)
+              <p className={`text-xs font-medium ${isSingleServiceClosed ? "text-rose-600 font-bold" : "text-[#8B7355]"}`}>
+                {isSingleServiceClosed
+                  ? "Closed on this selected day"
+                  : apiSlots?.open_time && apiSlots?.close_time
+                  ? `Hours for selected date: ${apiSlots.open_time} – ${apiSlots.close_time}`
+                  : "Flexible dining during opening hours"}
               </p>
             </div>
           </div>
@@ -616,48 +762,63 @@ export default function ChooseTimePage() {
                 </div>
               )}
 
-              {!loadingApiSlots && !packageSlots?.is_blocked && date && (
+              {!loadingApiSlots && !packageSlots?.is_blocked && packageSlots?.is_closed && (
+                <div className="p-6 rounded-2xl bg-amber-50 border border-amber-200 text-amber-900 text-sm font-semibold flex items-start gap-3">
+                  <BiInfoCircle size={22} className="text-amber-700 flex-shrink-0 mt-0.5" />
+                  <div>
+                    <h5 className="font-bold text-base text-amber-950">Package Closed on this Date</h5>
+                    <p className="text-xs text-amber-800 mt-1">{packageSlots.message || "Packages are closed on this date. Please pick another date."}</p>
+                  </div>
+                </div>
+              )}
+
+              {!loadingApiSlots && !packageSlots?.is_blocked && !packageSlots?.is_closed && date && (
                 <>
-                  {/* 1. Sauna Sub-Service Slots (If included in package API or selected) */}
-                  {packageSlots?.data?.sauna && (
+                  {/* 1. Sauna Sub-Service Slots (If included in package) */}
+                  {packageIncludesSauna && packageSlots?.data?.sauna && (
                     <div className="bg-[#FAF7F2] rounded-2xl p-6 border border-[#E8E2DC]">
                       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
                         <div className="flex items-center gap-2">
-                          <span className="w-8 h-8 rounded-lg bg-[#8B7355] text-white flex items-center justify-center font-bold text-sm">1</span>
+                          <span className={`w-8 h-8 rounded-lg ${packageSlots.data.sauna.is_closed ? "bg-gray-400" : "bg-[#8B7355]"} text-white flex items-center justify-center font-bold text-sm`}>
+                            {saunaStepNumber}
+                          </span>
                           <h4 className="font-bold text-[#0F172A] text-base font-displayPlayFair">
-                            Sauna Session Time Slot
+                            {pkgSaunaType === "shared" ? "Shared Sauna Session Time Slot" : "Private Sauna Session Time Slot"}
                           </h4>
                         </div>
-                        {packageSlots.data.sauna.private_sauna && packageSlots.data.sauna.shared_sauna && (
-                          <div className="flex bg-white rounded-lg p-1 border border-[#E8E2DC] text-xs font-semibold">
-                            <button
-                              type="button"
-                              onClick={() => {
-                                setPkgSaunaType("private");
-                                setPkgSaunaSlot(null);
-                                savePackageSelections(null, "private");
-                              }}
-                              className={`px-3 py-1 rounded-md transition-all ${
-                                pkgSaunaType === "private" ? "bg-[#8B7355] text-white shadow-xs" : "text-[#64748B]"
-                              }`}
-                            >
-                              Private Sauna
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => {
-                                setPkgSaunaType("shared");
-                                setPkgSaunaSlot(null);
-                                savePackageSelections(null, "shared");
-                              }}
-                              className={`px-3 py-1 rounded-md transition-all ${
-                                pkgSaunaType === "shared" ? "bg-[#8B7355] text-white shadow-xs" : "text-[#64748B]"
-                              }`}
-                            >
-                              Shared Sauna
-                            </button>
-                          </div>
-                        )}
+                        {!packageSlots.data.sauna.is_closed &&
+                          packageSlots.data.sauna.private_sauna &&
+                          packageSlots.data.sauna.shared_sauna &&
+                          ((hasPrivateSauna && hasSharedSauna) || hasGenericSauna) && (
+                            <div className="flex bg-white rounded-lg p-1 border border-[#E8E2DC] text-xs font-semibold">
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setPkgSaunaType("private");
+                                  setPkgSaunaSlot(null);
+                                  savePackageSelections(null, "private");
+                                }}
+                                className={`px-3 py-1 rounded-md transition-all ${
+                                  pkgSaunaType === "private" ? "bg-[#8B7355] text-white shadow-xs" : "text-[#64748B]"
+                                }`}
+                              >
+                                Private Sauna
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setPkgSaunaType("shared");
+                                  setPkgSaunaSlot(null);
+                                  savePackageSelections(null, "shared");
+                                }}
+                                className={`px-3 py-1 rounded-md transition-all ${
+                                  pkgSaunaType === "shared" ? "bg-[#8B7355] text-white shadow-xs" : "text-[#64748B]"
+                                }`}
+                              >
+                                Shared Sauna
+                              </button>
+                            </div>
+                          )}
                       </div>
 
                       {/* Private Sauna Slots */}
@@ -754,61 +915,166 @@ export default function ChooseTimePage() {
                   )}
 
                   {/* 2. Lunchroom Timing (If included) */}
-                  {packageSlots?.data?.lunchroom?.is_available && (
+                  {packageIncludesLunchroom && (
                     <div className="bg-[#FAF7F2] rounded-2xl p-6 border border-[#E8E2DC]">
                       <div className="flex items-center gap-2 mb-3">
-                        <span className="w-8 h-8 rounded-lg bg-[#8B7355] text-white flex items-center justify-center font-bold text-sm">2</span>
+                        <span className={`w-8 h-8 rounded-lg ${packageSlots?.data?.lunchroom?.is_closed ? "bg-gray-400" : "bg-[#8B7355]"} text-white flex items-center justify-center font-bold text-sm`}>
+                          {lunchStepNumber}
+                        </span>
                         <h4 className="font-bold text-[#0F172A] text-base font-displayPlayFair">
                           Lunchroom Preferred Dining Arrival
                         </h4>
                       </div>
-                      <p className="text-xs text-[#64748B] mb-4">
-                        {packageSlots.data.lunchroom.info || "Lunchroom accommodates flexible dining during opening hours."} (Hours: 09:00 – 16:00)
-                      </p>
-                      {dayError ? (
-                        <div className="p-4 bg-rose-50 border border-rose-200 rounded-xl text-xs text-rose-700 font-semibold flex items-center gap-2">
-                          <BiInfoCircle size={18} className="flex-shrink-0" />
-                          <span>{dayError}</span>
+                      {packageSlots?.data?.lunchroom?.is_closed ? (
+                        <div className="p-4 bg-amber-50 border border-amber-200 rounded-xl text-xs text-amber-900 font-semibold flex items-center gap-2">
+                          <BiInfoCircle size={18} className="text-amber-700 flex-shrink-0" />
+                          <span>{packageSlots?.data?.lunchroom?.info || "Lunchroom is closed on this day. You can continue with your other package options or pick another date."}</span>
                         </div>
                       ) : (
-                        <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-4 gap-3">
-                          {["09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00"].map((timeStr) => {
-                            const isSel = pkgLunchTime === timeStr;
+                        <>
+                          <p className="text-xs text-[#64748B] mb-4">
+                            {packageSlots?.data?.lunchroom?.info || "Lunchroom accommodates flexible dining during opening hours."}
+                            {packageSlots?.data?.lunchroom?.open_time && packageSlots?.data?.lunchroom?.close_time
+                              ? ` (Hours: ${packageSlots.data.lunchroom.open_time} – ${packageSlots.data.lunchroom.close_time})`
+                              : " (Hours: 09:00 – 16:00)"}
+                          </p>
+                          <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-4 gap-3">
+                            {generateTimeSlotsBetween(
+                              packageSlots?.data?.lunchroom?.open_time,
+                              packageSlots?.data?.lunchroom?.close_time,
+                              60
+                            ).map((timeStr) => {
+                              const isSel = pkgLunchTime === timeStr;
+                              return (
+                                <button
+                                  key={timeStr}
+                                  type="button"
+                                  onClick={() => {
+                                    setPkgLunchTime(timeStr);
+                                    savePackageSelections(undefined, undefined, timeStr);
+                                  }}
+                                  className={`py-3 px-4 rounded-xl border font-bold text-sm transition-all ${
+                                    isSel
+                                      ? "bg-[#8B7355] text-white border-[#8B7355] shadow-xs"
+                                      : "bg-white border-[#E2E8F0] text-[#475569] hover:border-[#D1B191]"
+                                  }`}
+                                >
+                                  {timeStr}
+                                </button>
+                              );
+                            })}
+                          </div>
+                        </>
+                      )}
+                    </div>
+                  )}
+
+                  {/* 3. Salt Room Timing (If included in package) */}
+                  {packageIncludesSaltRoom && (
+                    <div className="bg-[#FAF7F2] rounded-2xl p-6 border border-[#E8E2DC]">
+                      <div className="flex items-center gap-2 mb-4">
+                        <span className={`w-8 h-8 rounded-lg ${packageSlots?.data?.saltroom?.is_closed ? "bg-gray-400" : "bg-[#8B7355]"} text-white flex items-center justify-center font-bold text-sm`}>
+                          {saltRoomStepNumber}
+                        </span>
+                        <h4 className="font-bold text-[#0F172A] text-base font-displayPlayFair">
+                          Salt Room Session Time Slot
+                        </h4>
+                      </div>
+
+                      {packageSlots?.data?.saltroom?.is_closed ? (
+                        <div className="p-4 bg-amber-50 border border-amber-200 rounded-xl text-xs text-amber-900 font-semibold flex items-center gap-2">
+                          <BiInfoCircle size={18} className="text-amber-700 flex-shrink-0" />
+                          <span>Salt Room is closed on this date. You can choose another date or proceed with your remaining package options.</span>
+                        </div>
+                      ) : loadingSaltSlots ? (
+                        <div className="py-6 flex justify-center items-center gap-2 text-xs text-[#8B7355]">
+                          <span className="animate-spin rounded-full h-4 w-4 border-2 border-[#8B7355] border-t-transparent" />
+                          Loading salt room slots...
+                        </div>
+                      ) : saltRoomSlotsList.length > 0 ? (
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-3">
+                          {saltRoomSlotsList.map((slot: any, idx: number) => {
+                            const rawStart = (slot.start_time || slot.time || "").slice(0, 5);
+                            const rawEnd = (slot.end_time || "").slice(0, 5);
+                            const label = rawEnd ? `${rawStart} - ${rawEnd}` : rawStart;
+                            const isSel = pkgSaltRoomSlot === label;
+                            const remainingCap = typeof slot.remaining_capacity === "number"
+                              ? slot.remaining_capacity
+                              : typeof slot.available_capacity === "number"
+                              ? slot.available_capacity
+                              : 2;
+                            const isSoldOut = slot.is_fully_booked || !slot.is_available || slot.is_booked || remainingCap <= 0;
+
                             return (
                               <button
-                                key={timeStr}
+                                key={idx}
                                 type="button"
+                                disabled={isSoldOut}
                                 onClick={() => {
-                                  setPkgLunchTime(timeStr);
-                                  savePackageSelections(undefined, undefined, timeStr);
+                                  setPkgSaltRoomSlot(label);
+                                  savePackageSelections(undefined, undefined, undefined, undefined, label);
                                 }}
-                                className={`py-3 px-4 rounded-xl border font-bold text-sm transition-all ${
+                                className={`p-3.5 rounded-xl border text-left transition-all flex items-center justify-between ${
                                   isSel
-                                    ? "bg-[#8B7355] text-white border-[#8B7355] shadow-xs"
-                                    : "bg-white border-[#E2E8F0] text-[#475569] hover:border-[#D1B191]"
+                                    ? "bg-[#FCF2E9] border-[#8B7355] shadow-sm ring-2 ring-[#8B7355]/20"
+                                    : isSoldOut
+                                    ? "bg-gray-50 border-gray-200 opacity-60 cursor-not-allowed"
+                                    : "bg-white border-[#E2E8F0] hover:border-[#D1B191]"
                                 }`}
                               >
-                                {timeStr}
+                                <div>
+                                  <span className="text-sm font-bold text-[#0F172A] block">{label}</span>
+                                  <span className="text-[10px] text-[#64748B]">
+                                    {slot.duration_minutes ? `${slot.duration_minutes}-minute` : "45-minute"} salt room session
+                                  </span>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                  {isSoldOut ? (
+                                    <span className="px-2 py-0.5 bg-rose-100 text-rose-700 text-[10px] font-bold rounded-full">
+                                      Sold Out
+                                    </span>
+                                  ) : (
+                                    <span className="px-2 py-0.5 bg-emerald-50 text-emerald-700 border border-emerald-300 text-[10px] font-bold rounded-full">
+                                      {remainingCap} left
+                                    </span>
+                                  )}
+                                  {isSel && <BiCheckCircle className="text-[#8B7355]" size={20} />}
+                                </div>
                               </button>
                             );
                           })}
+                        </div>
+                      ) : (
+                        <div className="p-4 bg-amber-50/80 border border-amber-200/80 rounded-xl text-xs text-amber-900 flex items-start gap-2.5">
+                          <BiInfoCircle className="text-amber-700 flex-shrink-0 mt-0.5" size={18} />
+                          <div>
+                            <span className="font-bold block text-sm text-amber-950 mb-0.5">No Salt Room Session Found</span>
+                            <span>No scheduled salt room sessions are available on {date}. Please pick another date or proceed with your remaining package options.</span>
+                          </div>
                         </div>
                       )}
                     </div>
                   )}
 
-                  {/* 3. Activities on this date (If included in package) */}
-                  {storedData.packageSelections?.includedServices?.includes("activity") && (
+                  {/* 4. Activities on this date (If included in package) */}
+                  {packageIncludesActivity && (
                     <div className="bg-[#FAF7F2] rounded-2xl p-6 border border-[#E8E2DC]">
                       <div className="flex items-center gap-2 mb-3">
-                        <span className="w-8 h-8 rounded-lg bg-[#8B7355] text-white flex items-center justify-center font-bold text-sm">3</span>
+                        <span className={`w-8 h-8 rounded-lg ${isPackageActivitiesClosed ? "bg-gray-400" : "bg-[#8B7355]"} text-white flex items-center justify-center font-bold text-sm`}>
+                          {activityStepNumber}
+                        </span>
                         <h4 className="font-bold text-[#0F172A] text-base font-displayPlayFair">
                           Activity Session on {date}
                         </h4>
                       </div>
-                      {packageSlots?.data?.activities && packageSlots.data.activities.length > 0 ? (
+                      {isPackageActivitiesClosed ? (
+                        <div className="p-4 bg-amber-50 border border-amber-200 rounded-xl text-xs text-amber-900 font-semibold flex items-center gap-2">
+                          <BiInfoCircle size={18} className="text-amber-700 flex-shrink-0" />
+                          <span>Activities are closed on this date.</span>
+                        </div>
+                      ) : packageActivitiesList.length > 0 ? (
                         <div className="space-y-3">
-                          {packageSlots.data.activities.map((act: any) => {
+                          {packageActivitiesList.map((act: any) => {
                             const isSel = pkgSelectedActivityId === act.id;
                             const isSoldOut = act.available_slots === 0;
                             return (
@@ -875,7 +1141,11 @@ export default function ChooseTimePage() {
                     : "Time Slot"}
                 </label>
                 {isLunchroom && (
-                  <span className="text-xs text-[#64748B]">Operating hours: 09:00 – 16:00</span>
+                  <span className="text-xs text-[#64748B]">
+                    {isSingleServiceClosed
+                      ? "Closed on this date"
+                      : `Operating hours: ${apiSlots?.open_time || (apiSlots?.data as any)?.open_time || "09:00"} – ${apiSlots?.close_time || (apiSlots?.data as any)?.close_time || "16:00"}`}
+                  </span>
                 )}
               </div>
 
@@ -896,7 +1166,19 @@ export default function ChooseTimePage() {
                 </div>
               )}
 
-              {!loadingApiSlots && !apiSlots?.is_blocked && isSaltRoom ? (
+              {!loadingApiSlots && !apiSlots?.is_blocked && isSingleServiceClosed && (
+                <div className="p-6 rounded-2xl bg-amber-50 border border-amber-200 text-amber-900 text-sm font-semibold flex items-start gap-3">
+                  <BiInfoCircle size={22} className="text-amber-700 flex-shrink-0 mt-0.5" />
+                  <div>
+                    <h5 className="font-bold text-base text-amber-950">Service Closed on this Date</h5>
+                    <p className="text-xs text-amber-800 mt-1">
+                      {(apiSlots?.data as any)?.info || apiSlots?.message || `${storedData.serviceName || "This service"} is closed on ${date}. Please select another date.`}
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              {!loadingApiSlots && !apiSlots?.is_blocked && !isSingleServiceClosed && isSaltRoom ? (
                 /* Salt Room Calculated Slots from API (with fallback) */
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                   {(() => {
@@ -1158,10 +1440,17 @@ export default function ChooseTimePage() {
                     });
                   })()}
                 </div>
-              ) : !loadingApiSlots && !apiSlots?.is_blocked ? (
+              ) : !loadingApiSlots && !apiSlots?.is_blocked && !isSingleServiceClosed ? (
                 /* Standard Time Slots Grid */
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  {defaultTimeSlots.map((time) => (
+                  {(isLunchroom && (apiSlots?.open_time || (apiSlots?.data as any)?.open_time)
+                    ? generateTimeSlotsBetween(
+                        apiSlots?.open_time || (apiSlots?.data as any)?.open_time,
+                        apiSlots?.close_time || (apiSlots?.data as any)?.close_time,
+                        60
+                      )
+                    : defaultTimeSlots
+                  ).map((time) => (
                     <button
                       key={time}
                       type="button"

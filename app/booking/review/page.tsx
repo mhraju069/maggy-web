@@ -159,6 +159,16 @@ export default function ReviewPage() {
                       </div>
                     )}
 
+                    {pkgSelections.saltRoomSlot && (
+                      <div className="p-3.5 bg-[#FAF7F2] rounded-xl border border-[#E8E2DC]">
+                        <span className="text-[10px] uppercase font-bold text-[#8B7355] block">Salt Room Session</span>
+                        <p className="font-bold text-[#0F172A] text-sm mt-0.5">
+                          {pkgSelections.saltRoomSlot.startTime} – {pkgSelections.saltRoomSlot.endTime}
+                        </p>
+                        <span className="text-[11px] text-[#64748B]">Halotherapy Session</span>
+                      </div>
+                    )}
+
                     {pkgSelections.activitySession && (
                       <div className="p-3.5 bg-[#FAF7F2] rounded-xl border border-[#E8E2DC]">
                         <span className="text-[10px] uppercase font-bold text-[#8B7355] block">Activity Session</span>

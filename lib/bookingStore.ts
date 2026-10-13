@@ -44,6 +44,11 @@ export interface PackageSubServiceSelections {
     startTime: string;
     endTime: string;
   };
+  saltRoomSlot?: {
+    startTime: string;
+    endTime: string;
+    duration?: number;
+  };
   lunchroomTime?: string;
   activitySession?: {
     id: number;

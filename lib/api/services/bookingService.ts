@@ -121,11 +121,32 @@ export interface CreatePackageBookingPayload {
   phone: string;
   date: string;
   guests: number;
-  total_price?: string;
+  total_price?: string | number;
   is_custom: boolean;
   notes?: string | null;
   booked_services_ids?: PackageBookedServiceItem[];
   service_names?: string[];
+  sauna_booking?: {
+    sauna_type: string;
+    booking_time: string;
+    time_slot?: string;
+    capacity?: number;
+  };
+  saltroom_booking?: {
+    start_time: string;
+    end_time?: string;
+    capacity?: number;
+    time?: string;
+  };
+  lunchroom_booking?: {
+    booking_time: string;
+    capacity?: number;
+    [key: string]: any;
+  };
+  activity_booking?: {
+    activity: number;
+    capacity?: number;
+  };
   [key: string]: any;
 }
 

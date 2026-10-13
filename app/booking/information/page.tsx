@@ -2,11 +2,37 @@
 
 import DecorativeUnderline from "@/components/shared/DecorativeUnderline";
 import { CelebrationData, getStoredBookingData, updateStoredBookingData } from "@/lib/bookingStore";
+import { servicesService } from "@/lib/api";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { BiTimeFive } from "react-icons/bi";
 import { FaWalking } from "react-icons/fa";
 import { FaCakeCandles, FaGift, FaHeart } from "react-icons/fa6";
+
+function generateTimeSlots(openTime?: string, closeTime?: string, intervalMinutes = 60): string[] {
+  if (!openTime || !closeTime) return ["09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00"];
+  const [startH, startM] = openTime.split(":").map(Number);
+  const [endH, endM] = closeTime.split(":").map(Number);
+  if (isNaN(startH) || isNaN(endH)) return ["09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00"];
+  const startMinutes = startH * 60 + (startM || 0);
+  const endMinutes = endH * 60 + (endM || 0);
+  const slots: string[] = [];
+  for (let m = startMinutes; m <= endMinutes; m += intervalMinutes) {
+    const hh = String(Math.floor(m / 60)).padStart(2, "0");
+    const mm = String(m % 60).padStart(2, "0");
+    slots.push(`${hh}:${mm}`);
+  }
+  return slots.length > 0 ? slots : ["09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00"];
+}
+
+function formatTime12h(time24: string): string {
+  const [hStr, mStr] = time24.split(":");
+  const h = parseInt(hStr, 10);
+  const m = parseInt(mStr || "0", 10);
+  const period = h >= 12 ? "PM" : "AM";
+  const h12 = h % 12 === 0 ? 12 : h % 12;
+  return `${String(h12).padStart(2, "0")}:${String(m).padStart(2, "0")} ${period}`;
+}
 
 const occasionOptions = [
   "Birthday",
@@ -39,11 +65,28 @@ export default function InformationPage() {
   const [storedData, setStoredData] = useState(getStoredBookingData());
   const isLunchroom = storedData.serviceType === "lunchroom" || storedData.serviceName.toLowerCase().includes("lunchroom");
   const isActivity = storedData.serviceType === "activity" || Boolean(storedData.activityDetails);
+  const isPackage = storedData.serviceType === "package";
+  const hasPackageLunchroom = isPackage && (
+    storedData.packageSelections?.includedServices?.some((s) =>
+      s.toLowerCase().includes("lunchroom")
+    ) ?? true // if includedServices not set, assume lunchroom included in package
+  );
 
   const [date, setDate] = useState("");
   const [timeSlot, setTimeSlot] = useState("12:00");
   const [guestsCount, setGuestsCount] = useState(1);
   const [dayError, setDayError] = useState<string | null>(null);
+
+  // Lunchroom dynamic slot state (shared for both standalone & package lunchroom)
+  const [lunchroomOpenTime, setLunchroomOpenTime] = useState<string | undefined>(undefined);
+  const [lunchroomCloseTime, setLunchroomCloseTime] = useState<string | undefined>(undefined);
+  const [lunchroomIsClosed, setLunchroomIsClosed] = useState<boolean>(false);
+  const [lunchroomIsBlocked, setLunchroomIsBlocked] = useState<boolean>(false);
+  const [lunchroomBlockMessage, setLunchroomBlockMessage] = useState<string>("");
+  const [loadingSlots, setLoadingSlots] = useState(false);
+
+  // Package lunchroom arrival time (stored in packageSelections.lunchroomTime)
+  const [pkgLunchroomTime, setPkgLunchroomTime] = useState<string>("");
 
   useEffect(() => {
     const data = getStoredBookingData();
@@ -60,22 +103,88 @@ export default function InformationPage() {
     if (data.celebration) {
       setCelebration(data.celebration);
     }
+    // Fetch lunchroom slots on mount if date already selected
+    const isLunch = data.serviceType === "lunchroom" || data.serviceName?.toLowerCase().includes("lunchroom");
+    const isPkg = data.serviceType === "package";
+    if ((isLunch || isPkg) && data.date) {
+      fetchLunchroomSlots(data.date);
+    }
+    // Restore package lunchroom time
+    if (isPkg && data.packageSelections?.lunchroomTime) {
+      setPkgLunchroomTime(data.packageSelections.lunchroomTime);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const fetchLunchroomSlots = useCallback(async (selectedDate: string) => {
+    if (!selectedDate) return;
+    setLoadingSlots(true);
+    setDayError(null);
+    setLunchroomIsBlocked(false);
+    setLunchroomBlockMessage("");
+    try {
+      const res = await servicesService.getServiceSlots("lunchroom", selectedDate);
+      const isBlocked = Boolean(res?.is_blocked || (res?.data as any)?.is_blocked);
+      const isClosed = Boolean(res?.is_closed || (res?.data as any)?.is_closed);
+      const openT = res?.open_time || (res?.data as any)?.open_time;
+      const closeT = res?.close_time || (res?.data as any)?.close_time;
+
+      setLunchroomIsBlocked(isBlocked);
+      setLunchroomIsClosed(isClosed);
+      setLunchroomOpenTime(openT);
+      setLunchroomCloseTime(closeT);
+
+      if (isBlocked) {
+        const blockMsg = res?.message || (res?.data as any)?.message || "No slots available. This date is blocked.";
+        setLunchroomBlockMessage(blockMsg);
+        setDayError(blockMsg);
+        setTimeSlot("");
+        setPkgLunchroomTime("");
+        updateStoredBookingData({ timeSlot: "" });
+      } else if (isClosed) {
+        const info = (res?.data as any)?.info || res?.message || "Lunchroom is closed on this day.";
+        setDayError(info);
+        setTimeSlot("");
+        setPkgLunchroomTime("");
+        updateStoredBookingData({ timeSlot: "" });
+      } else {
+        setDayError(null);
+        // Default to open_time if current slot is outside range
+        if (openT) {
+          setTimeSlot((prev) => {
+            const slots = generateTimeSlots(openT, closeT);
+            if (!slots.includes(prev)) {
+              updateStoredBookingData({ timeSlot: slots[0] });
+              return slots[0];
+            }
+            return prev;
+          });
+        }
+      }
+    } catch {
+      setDayError(null);
+    } finally {
+      setLoadingSlots(false);
+    }
   }, []);
 
   const handleDateChange = (newDate: string) => {
     setDate(newDate);
-    if (isLunchroom && newDate) {
-      const selected = new Date(newDate);
-      const dayOfWeek = selected.getUTCDay();
-      if (dayOfWeek === 1 || dayOfWeek === 2) {
-        setDayError("The Lunchroom is closed on Mondays & Tuesdays. Please pick Wednesday through Sunday (09:00–16:00).");
-      } else {
-        setDayError(null);
-      }
-    } else {
-      setDayError(null);
-    }
     updateStoredBookingData({ date: newDate });
+    if ((isLunchroom || isPackage) && newDate) {
+      fetchLunchroomSlots(newDate);
+    }
+  };
+
+  const handlePkgLunchroomTimeChange = (newTime: string) => {
+    setPkgLunchroomTime(newTime);
+    const current = getStoredBookingData();
+    updateStoredBookingData({
+      packageSelections: {
+        ...current.packageSelections,
+        lunchroomTime: newTime,
+      },
+    });
   };
 
   const handleTimeChange = (newTime: string) => {
@@ -131,7 +240,9 @@ export default function InformationPage() {
   };
 
   const isFormValid = isLunchroom
-    ? Boolean(formData.name && formData.email && formData.phone && date && timeSlot && !dayError)
+    ? Boolean(formData.name && formData.email && formData.phone && date && timeSlot && !lunchroomIsClosed && !lunchroomIsBlocked && !loadingSlots)
+    : isPackage && hasPackageLunchroom
+    ? Boolean(formData.name && formData.email && formData.phone && pkgLunchroomTime && !lunchroomIsClosed && !lunchroomIsBlocked && !loadingSlots)
     : Boolean(formData.name && formData.email && formData.phone);
 
   return (
@@ -160,22 +271,34 @@ export default function InformationPage() {
             </h2>
 
             {/* Opening Hours Banner */}
-            <div className="mb-6 p-4 rounded-2xl bg-[#FCF2E9]/70 border border-[#E8E2DC]/80 flex flex-col md:flex-row md:items-center justify-between gap-3 text-xs text-[#8B7355]">
+            <div className={`mb-6 p-4 rounded-2xl border flex flex-col md:flex-row md:items-center justify-between gap-3 text-xs ${
+              lunchroomIsBlocked || lunchroomIsClosed
+                ? "bg-red-50 border-red-200 text-red-900"
+                : "bg-[#FCF2E9]/70 border-[#E8E2DC]/80 text-[#8B7355]"
+            }`}>
               <div className="flex items-center gap-2">
-                <BiTimeFive className="text-lg flex-shrink-0" />
-                <span><strong>Lunchroom Opening Hours:</strong> Wednesday through Sunday • 09:00–16:00 [Mon & Tue Closed]</span>
+                <BiTimeFive className={`text-lg flex-shrink-0 ${lunchroomIsBlocked || lunchroomIsClosed ? "text-red-700" : ""}`} />
+                {loadingSlots ? (
+                  <span className="italic text-[#94A3B8]">Checking hours for selected date...</span>
+                ) : lunchroomIsBlocked ? (
+                  <span><strong>Lunchroom:</strong> {lunchroomBlockMessage || "This date is blocked. No slots available."}</span>
+                ) : lunchroomIsClosed ? (
+                  <span><strong>Lunchroom:</strong> Closed on this date — please select another date</span>
+                ) : lunchroomOpenTime && lunchroomCloseTime ? (
+                  <span>
+                    <strong>Lunchroom Opening Hours:</strong> {lunchroomOpenTime} – {lunchroomCloseTime}
+                  </span>
+                ) : (
+                  <span><strong>Lunchroom Opening Hours:</strong> Select a date to see hours</span>
+                )}
               </div>
-              <div className="flex items-center gap-1.5 font-semibold bg-white/80 px-3 py-1.5 rounded-xl border border-[#E8E2DC] self-start md:self-auto">
-                <FaWalking />
-                <span>Walk-ins welcome anytime!</span>
-              </div>
+              {!lunchroomIsClosed && !lunchroomIsBlocked && (
+                <div className="flex items-center gap-1.5 font-semibold bg-white/80 px-3 py-1.5 rounded-xl border border-[#E8E2DC] self-start md:self-auto">
+                  <FaWalking />
+                  <span>Walk-ins welcome anytime!</span>
+                </div>
+              )}
             </div>
-
-            {dayError && (
-              <div className="mb-6 p-4 rounded-xl bg-red-50 border border-red-200 text-xs font-semibold text-red-700">
-                {dayError}
-              </div>
-            )}
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {/* Date */}
@@ -205,23 +328,16 @@ export default function InformationPage() {
                 <select
                   value={timeSlot}
                   onChange={(e) => handleTimeChange(e.target.value)}
-                  className="w-full p-4 border border-[#E2E8F0] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#D1B191] text-[#475569] font-medium bg-white cursor-pointer"
+                  disabled={lunchroomIsClosed || lunchroomIsBlocked || loadingSlots}
+                  className="w-full p-4 border border-[#E2E8F0] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#D1B191] text-[#475569] font-medium bg-white cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  <option value="09:00">09:00 AM</option>
-                  <option value="09:30">09:30 AM</option>
-                  <option value="10:00">10:00 AM</option>
-                  <option value="10:30">10:30 AM</option>
-                  <option value="11:00">11:00 AM</option>
-                  <option value="11:30">11:30 AM</option>
-                  <option value="12:00">12:00 PM</option>
-                  <option value="12:30">12:30 PM</option>
-                  <option value="13:00">01:00 PM</option>
-                  <option value="13:30">01:30 PM</option>
-                  <option value="14:00">02:00 PM</option>
-                  <option value="14:30">02:30 PM</option>
-                  <option value="15:00">03:00 PM</option>
-                  <option value="15:30">03:30 PM</option>
-                  <option value="16:00">04:00 PM</option>
+                  {lunchroomIsBlocked ? (
+                    <option value="" disabled>Date Blocked - No Slots</option>
+                  ) : (
+                    generateTimeSlots(lunchroomOpenTime, lunchroomCloseTime, 60).map((t) => (
+                      <option key={t} value={t}>{formatTime12h(t)}</option>
+                    ))
+                  )}
                 </select>
               </div>
 
@@ -249,7 +365,71 @@ export default function InformationPage() {
           </div>
         )}
 
-        {/* Activity Session Summary & Participants Card (Activity Only) */}
+        {/* Package Lunchroom Arrival Time Card */}
+        {isPackage && hasPackageLunchroom && (
+          <div className="bg-white rounded-[32px] p-10 shadow-sm border border-[#E8E2DC]">
+            <h2
+              className="text-xs font-bold text-[#64748B] uppercase tracking-[0.2em] mb-6"
+              style={{ fontFamily: "Inter, sans-serif" }}
+            >
+              Lunchroom — Preferred Arrival Time
+            </h2>
+
+            {/* Opening Hours Banner */}
+            <div className={`mb-6 p-4 rounded-2xl border flex flex-col md:flex-row md:items-center justify-between gap-3 text-xs ${
+              lunchroomIsBlocked || lunchroomIsClosed
+                ? "bg-red-50 border-red-200 text-red-900"
+                : "bg-[#FCF2E9]/70 border-[#E8E2DC]/80 text-[#8B7355]"
+            }`}>
+              <div className="flex items-center gap-2">
+                <BiTimeFive className={`text-lg flex-shrink-0 ${lunchroomIsBlocked || lunchroomIsClosed ? "text-red-700" : ""}`} />
+                {loadingSlots ? (
+                  <span className="italic text-[#94A3B8]">Checking lunchroom hours for your booking date...</span>
+                ) : lunchroomIsBlocked ? (
+                  <span><strong>Lunchroom:</strong> {lunchroomBlockMessage || "This date is blocked. No slots available."}</span>
+                ) : lunchroomIsClosed ? (
+                  <span><strong>Lunchroom:</strong> Closed on your selected date — please change the booking date</span>
+                ) : lunchroomOpenTime && lunchroomCloseTime ? (
+                  <span>
+                    <strong>Lunchroom Opening Hours:</strong> {lunchroomOpenTime} – {lunchroomCloseTime}
+                  </span>
+                ) : (
+                  <span><strong>Lunchroom Opening Hours:</strong> Based on your package date</span>
+                )}
+              </div>
+              {!lunchroomIsClosed && !lunchroomIsBlocked && (
+                <div className="flex items-center gap-1.5 font-semibold bg-white/80 px-3 py-1.5 rounded-xl border border-[#E8E2DC] self-start md:self-auto">
+                  <FaWalking />
+                  <span>Walk-ins welcome anytime!</span>
+                </div>
+              )}
+            </div>
+
+            <div className="max-w-xs">
+              <label
+                className="block text-xs font-bold text-[#0F172A] mb-2 uppercase tracking-wider"
+                style={{ fontFamily: "Inter, sans-serif" }}
+              >
+                Preferred Lunchroom Arrival *
+              </label>
+              <select
+                value={pkgLunchroomTime}
+                onChange={(e) => handlePkgLunchroomTimeChange(e.target.value)}
+                disabled={lunchroomIsClosed || lunchroomIsBlocked || loadingSlots}
+                className="w-full p-4 border border-[#E2E8F0] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#D1B191] text-[#475569] font-medium bg-white cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <option value="" disabled>Select arrival time...</option>
+                {!lunchroomIsBlocked && generateTimeSlots(lunchroomOpenTime, lunchroomCloseTime, 60).map((t) => (
+                  <option key={t} value={t}>{formatTime12h(t)}</option>
+                ))}
+              </select>
+              <p className="text-[11px] text-[#64748B] mt-2">
+                Your lunchroom visit is included in your package — just pick your preferred arrival window.
+              </p>
+            </div>
+          </div>
+        )}
+
         {isActivity && storedData.activityDetails && (
           <div className="bg-white rounded-[32px] p-10 shadow-sm border border-[#E8E2DC]">
             <h2

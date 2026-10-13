@@ -193,6 +193,18 @@ function InnerPaymentForm({
             };
           }
 
+          let saltroom_booking: any = undefined;
+          if (pkgSelections?.saltRoomSlot) {
+            const rawStart = pkgSelections.saltRoomSlot.startTime || "10:00";
+            const formattedStart = rawStart.length === 5 ? `${rawStart}:00` : rawStart;
+            const rawEnd = pkgSelections.saltRoomSlot.endTime;
+            const formattedEnd = rawEnd ? (rawEnd.length === 5 ? `${rawEnd}:00` : rawEnd) : undefined;
+            saltroom_booking = {
+              start_time: formattedStart,
+              ...(formattedEnd ? { end_time: formattedEnd } : {}),
+            };
+          }
+
           const pkgPayload: any = {
             name: cardName.trim() || bookingData.name || "Guest",
             email: bookingData.email || "guest@example.com",
@@ -205,6 +217,7 @@ function InnerPaymentForm({
             ...(sauna_booking ? { sauna_booking } : {}),
             ...(lunchroom_booking ? { lunchroom_booking } : {}),
             ...(activity_booking ? { activity_booking } : {}),
+            ...(saltroom_booking ? { saltroom_booking } : {}),
           };
 
           const res = await bookingService.createPackageBooking(pkgPayload);
@@ -463,7 +476,7 @@ function InnerPaymentForm({
       </div>
 
       {/* Form Fields */}
-      <form onSubmit={handleSubmit} className="space-y-6">
+      <form onSubmit={handleSubmit} className="space-y-6" autoComplete="off">
         {isZeroPayment ? (
           <div className="p-6 rounded-2xl bg-gradient-to-r from-[#FCF2E9] to-[#FBF6F3] border border-[#E8E2DC] space-y-3">
             <div className="flex items-center gap-3">

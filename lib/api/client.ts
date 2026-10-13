@@ -62,7 +62,22 @@ export class ApiClient {
     }
 
     try {
-      const response = await fetch(url, options);
+      let response: Response;
+      try {
+        response = await fetch(url, options);
+      } catch (netErr: any) {
+        // If tunnel host is down or rejected, attempt direct localhost backend
+        if (url.includes("loca.lt") || url.includes("ngrok")) {
+          const fallbackUrl = url.replace(/https?:\/\/[^/]+\/api/, "http://127.0.0.1:8000/api");
+          try {
+            response = await fetch(fallbackUrl, options);
+          } catch {
+            throw netErr;
+          }
+        } else {
+          throw netErr;
+        }
+      }
       clearTimeout(timeoutId);
 
       // Handle HTTP Error status codes

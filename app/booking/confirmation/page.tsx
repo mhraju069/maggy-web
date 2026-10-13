@@ -168,6 +168,15 @@ export default function ConfirmationPage() {
                     </div>
                   )}
 
+                  {data.packageSelections.saltRoomSlot && (
+                    <div className="p-3 bg-[#FAF7F2] rounded-xl border border-[#E8E2DC]">
+                      <span className="text-[10px] uppercase font-bold text-[#8B7355] block">Salt Room Session</span>
+                      <p className="font-bold text-[#0F172A] text-xs mt-0.5">
+                        {data.packageSelections.saltRoomSlot.startTime} – {data.packageSelections.saltRoomSlot.endTime}
+                      </p>
+                    </div>
+                  )}
+
                   {data.packageSelections.activitySession && (
                     <div className="p-3 bg-[#FAF7F2] rounded-xl border border-[#E8E2DC]">
                       <span className="text-[10px] uppercase font-bold text-[#8B7355] block">Activity Session</span>
