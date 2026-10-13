@@ -1,12 +1,19 @@
 "use client";
 
+import React, { useEffect, useState } from "react";
+import {
+  Elements,
+  CardNumberElement,
+  CardExpiryElement,
+  CardCvcElement,
+  useStripe,
+  useElements,
+} from "@stripe/react-stripe-js";
+import { getStripe } from "@/lib/stripe";
 import { bookingService } from "@/lib/api/services/bookingService";
 import { getStoredBookingData, updateStoredBookingData } from "@/lib/bookingStore";
-import { getStripe } from "@/lib/stripe";
 import { useRouter } from "next/navigation";
-import React, { useEffect, useState } from "react";
 import { BiCheckCircle as BiCheckIcon, BiCreditCard, BiLockAlt, BiShieldQuarter } from "react-icons/bi";
-import { FaCreditCard, FaLock } from "react-icons/fa";
 import { MdOutlinePayments } from "react-icons/md";
 
 interface StripePaymentFormProps {
@@ -19,28 +26,50 @@ const idealBanks = [
   { id: "ing", name: "ING Bank" },
   { id: "rabobank", name: "Rabobank" },
   { id: "abn_amro", name: "ABN AMRO" },
-  { id: "sns", name: "SNS Bank" },
-  { id: "asn", name: "ASN Bank" },
+  { id: "sns_bank", name: "SNS Bank" },
+  { id: "asn_bank", name: "ASN Bank" },
   { id: "regiobank", name: "RegioBank" },
-  { id: "triodos", name: "Triodos Bank" },
+  { id: "triodos_bank", name: "Triodos Bank" },
   { id: "bunq", name: "bunq" },
   { id: "revolut", name: "Revolut" },
+  { id: "knab", name: "Knab" },
+  { id: "n26", name: "N26" },
+  { id: "nn", name: "Nationale Nederlanden" },
+  { id: "van_lanschot", name: "Van Lanschot" },
+  { id: "yoursafe", name: "Yoursafe" },
+  { id: "moneyou", name: "Moneyou" },
 ];
 
-export default function StripePaymentForm({
+const CARD_ELEMENT_OPTIONS = {
+  style: {
+    base: {
+      fontSize: "14px",
+      fontFamily: "Inter, sans-serif",
+      color: "#0F172A",
+      "::placeholder": {
+        color: "#94A3B8",
+      },
+    },
+    invalid: {
+      color: "#EF4444",
+      iconColor: "#EF4444",
+    },
+  },
+};
+
+function InnerPaymentForm({
   totalAmount = 250,
   serviceName = "Sauna Experience",
   onSuccess,
 }: StripePaymentFormProps) {
   const router = useRouter();
+  const stripe = useStripe();
+  const elements = useElements();
+
   const [paymentMethod, setPaymentMethod] = useState<"card" | "ideal">("card");
   const [selectedBank, setSelectedBank] = useState<string>("ing");
 
-  // Card Form State
   const [cardName, setCardName] = useState("");
-  const [cardNumber, setCardNumber] = useState("");
-  const [expiry, setExpiry] = useState("");
-  const [cvc, setCvc] = useState("");
   const [zip, setZip] = useState("");
 
   const [processing, setProcessing] = useState(false);
@@ -53,24 +82,6 @@ export default function StripePaymentForm({
       ? totalAmount
       : `€${totalAmount}`;
 
-  // Format Card Number input with spaces
-  const handleCardNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const raw = e.target.value.replace(/\D/g, "").slice(0, 16);
-    const formatted = raw.replace(/(.{4})/g, "$1 ").trim();
-    setCardNumber(formatted);
-  };
-
-  // Format Expiry MM/YY
-  const handleExpiryChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const raw = e.target.value.replace(/\D/g, "").slice(0, 4);
-    if (raw.length >= 3) {
-      setExpiry(`${raw.slice(0, 2)}/${raw.slice(2)}`);
-    } else {
-      setExpiry(raw);
-    }
-  };
-
-  // Pre-fill card name from stored booking data if available
   useEffect(() => {
     const data = getStoredBookingData();
     if (data.name && !cardName) {
@@ -88,22 +99,13 @@ export default function StripePaymentForm({
     e.preventDefault();
     setErrorMsg(null);
 
-    // Only validate card fields if payment is required (> €0)
-    if (!isZeroPayment && paymentMethod === "card") {
+    if (!isZeroPayment) {
       if (!cardName.trim()) {
-        setErrorMsg("Please enter the name on your card.");
+        setErrorMsg("Please enter your name.");
         return;
       }
-      if (cardNumber.replace(/\s/g, "").length < 15) {
-        setErrorMsg("Please enter a valid card number.");
-        return;
-      }
-      if (expiry.length < 5) {
-        setErrorMsg("Please enter a valid expiry date (MM/YY).");
-        return;
-      }
-      if (cvc.length < 3) {
-        setErrorMsg("Please enter a valid 3 or 4-digit CVC code.");
+      if (!stripe || !elements) {
+        setErrorMsg("Stripe payment gateway is still loading. Please wait a moment.");
         return;
       }
     }
@@ -149,7 +151,7 @@ export default function StripePaymentForm({
         bookingData.passType === "10_session_pass" && bookingData.hasActiveMembership ? "pass" : "card"
       );
 
-      // Call Combined API: Create Booking & Get Stripe Client Secret
+      // Call Backend API to create booking and get Stripe client_secret
       let clientSecret: string | undefined;
       try {
         if (isPackage) {
@@ -265,14 +267,11 @@ export default function StripePaymentForm({
           }
         } else if (bookingData.isSaltRoom || bookingData.serviceType === "salt_room" || bookingData.serviceType === "saltroom" || bookingData.serviceName?.toLowerCase().includes("salt")) {
           let saltStartTime = "06:00";
-          let saltEndTime: string | undefined = undefined;
 
           if (bookingData.timeSlot) {
-            // Check if format is "06:00–07:00" or "06:00 - 07:00"
             const rangeMatch = bookingData.timeSlot.match(/(\d{1,2}:\d{2})\s*[-–—]\s*(\d{1,2}:\d{2})/);
             if (rangeMatch) {
               saltStartTime = rangeMatch[1];
-              saltEndTime = rangeMatch[2];
             } else {
               const singleMatch = bookingData.timeSlot.match(/(\d{1,2}:\d{2})/);
               if (singleMatch) saltStartTime = singleMatch[1];
@@ -287,6 +286,9 @@ export default function StripePaymentForm({
           const formattedCapacity = Math.min(Math.max(Number(bookingData.guestsCount) || 1, 1), 2);
           const passIdentifier = bookingData.passId || bookingData.purchaseId;
 
+          // If user picked iDEAL on the payment page, override payment_mode
+          const saltPaymentMode = paymentMethod === "ideal" ? "ideal" : (currentPaymentMode || "card");
+
           const saltPayload: any = {
             name: cardName.trim() || bookingData.name || "Guest",
             email: bookingData.email || "guest@example.com",
@@ -294,7 +296,7 @@ export default function StripePaymentForm({
             date: bookingData.date || new Date().toISOString().split("T")[0],
             start_time: formattedStartTime,
             capacity: formattedCapacity,
-            payment_mode: currentPaymentMode || "card",
+            payment_mode: saltPaymentMode,
             ...(bookingData.requests ? { special_request: bookingData.requests } : {}),
             ...(passIdentifier ? { purchase_id: passIdentifier } : {}),
           };
@@ -338,45 +340,89 @@ export default function StripePaymentForm({
         }
       } catch (apiErr: any) {
         console.error("Booking API error:", apiErr);
-        // Throw so that the user sees the actual error message in UI
         throw new Error(apiErr?.message || "Failed to create booking on server. Please check your reservation details and try again.");
       }
 
-      // Confirm with Stripe SDK if clientSecret returned and live stripe available
-      const stripe = await getStripe();
+      // Confirm with Stripe Elements
       if (stripe && clientSecret && clientSecret.startsWith("pi_") && !clientSecret.includes("sample")) {
-        // Attempt payment confirmation with Stripe SDK
-        const confirmRes = await stripe.confirmCardPayment(clientSecret, {
-          payment_method: {
-            card: {
-              token: "tok_visa", // Test token fallback
+        if (paymentMethod === "ideal") {
+          // ── iDEAL: redirect-based flow ──
+          const returnUrl =
+            typeof window !== "undefined"
+              ? `${window.location.origin}/booking/confirmation`
+              : "/booking/confirmation";
+
+          console.log("[iDEAL] Step 1: Creating payment method for bank:", selectedBank);
+          const pmResult = await stripe.createPaymentMethod({
+            type: "ideal",
+            ideal: {
+              bank: selectedBank,
             },
             billing_details: {
               name: cardName.trim() || bookingData.name || "Guest",
               email: bookingData.email || "guest@example.com",
-              phone: bookingData.phone || "+31612345678",
             },
-          },
-        });
-        if (confirmRes.error) {
-          throw new Error(confirmRes.error.message || "Card confirmation failed. Please check your card.");
-        } else if (confirmRes.paymentIntent && confirmRes.paymentIntent.status === "succeeded") {
-          // Confirm payment with backend database
-          const stored = getStoredBookingData();
-          const latestBookingId = stored.bookingId || "";
-          const latestPurchaseId = stored.purchaseId || undefined;
-          try {
-            await bookingService.confirmPayment({
-              payment_intent_id: confirmRes.paymentIntent.id,
-              ...(latestBookingId ? { booking_id: latestBookingId } : {}),
-              ...(latestPurchaseId ? { purchase_id: latestPurchaseId } : {}),
-            });
-          } catch (backendConfirmErr) {
-            console.warn("Backend payment confirm notice:", backendConfirmErr);
+          });
+
+          if (pmResult.error) {
+            console.error("[iDEAL] Failed to create payment method:", pmResult.error);
+            throw new Error(pmResult.error.message || "Failed to initialize iDEAL bank payment.");
+          }
+
+          console.log("[iDEAL] Step 2: Confirming payment with PM ID:", pmResult.paymentMethod.id);
+          const confirmRes = await stripe.confirmPayment({
+            clientSecret,
+            confirmParams: {
+              payment_method: pmResult.paymentMethod.id,
+              return_url: returnUrl,
+            },
+          });
+
+          if (confirmRes.error) {
+            console.error("[iDEAL] confirmPayment error:", confirmRes.error);
+            throw new Error(confirmRes.error.message || "iDEAL payment confirmation failed.");
+          }
+
+          // Stripe automatically performs the redirect to the bank test authorization page.
+          return;
+        } else {
+          // ── Card: standard Elements flow ──
+          const cardNumberElement = elements?.getElement(CardNumberElement);
+          if (!cardNumberElement) {
+            throw new Error("Payment card form is not initialized. Please refresh the page.");
+          }
+
+          const confirmRes = await stripe.confirmCardPayment(clientSecret, {
+            payment_method: {
+              card: cardNumberElement,
+              billing_details: {
+                name: cardName.trim() || bookingData.name || "Guest",
+                email: bookingData.email || "guest@example.com",
+                phone: bookingData.phone || "+31612345678",
+                ...(zip.trim() ? { address: { postal_code: zip.trim() } } : {}),
+              },
+            },
+          });
+
+          if (confirmRes.error) {
+            throw new Error(confirmRes.error.message || "Card confirmation failed. Please check your card.");
+          } else if (confirmRes.paymentIntent && confirmRes.paymentIntent.status === "succeeded") {
+            // Confirm payment with backend database
+            const stored = getStoredBookingData();
+            const latestBookingId = stored.bookingId || "";
+            const latestPurchaseId = stored.purchaseId || undefined;
+            try {
+              await bookingService.confirmPayment({
+                payment_intent_id: confirmRes.paymentIntent.id,
+                ...(latestBookingId ? { booking_id: latestBookingId } : {}),
+                ...(latestPurchaseId ? { purchase_id: latestPurchaseId } : {}),
+              });
+            } catch (backendConfirmErr) {
+              console.warn("Backend payment confirm notice:", backendConfirmErr);
+            }
           }
         }
       } else {
-        // Brief simulated latency for user feedback
         await new Promise((resolve) => setTimeout(resolve, 800));
       }
 
@@ -398,21 +444,21 @@ export default function StripePaymentForm({
       <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 pb-6 border-b border-[#E8E2DC]/80">
         <div className="flex items-center gap-4">
           <div className="w-12 h-12 rounded-2xl bg-[#FCF2E9] border border-[#E8E2DC] flex items-center justify-center text-[#8B7355]">
-            <FaLock size={20} />
+            <BiLockAlt size={20} />
           </div>
           <div>
             <span className="text-[10px] font-bold uppercase tracking-widest text-[#8B7355] block">
-              Stripe Payment Gateway
+              Stripe Official Elements
             </span>
             <h3 className="text-xl font-bold font-displayPlayFair text-[#0F172A]">
-              Secure Payment Checkout
+              Secure Card Checkout
             </h3>
           </div>
         </div>
 
         <div className="flex items-center gap-2 bg-[#F8FAFC] px-4 py-2 rounded-xl border border-[#E2E8F0] text-xs font-semibold text-[#64748B]">
           <BiShieldQuarter className="text-[#8B7355]" size={18} />
-          <span>256-Bit SSL Encrypted</span>
+          <span>PCI-DSS Certified 256-Bit SSL</span>
         </div>
       </div>
 
@@ -446,10 +492,10 @@ export default function StripePaymentForm({
                 <button
                   type="button"
                   onClick={() => setPaymentMethod("card")}
-                  className={`p-5 rounded-2xl border transition-all text-left flex items-center justify-between ${
+                  className={`p-4 rounded-2xl border text-left flex items-center justify-between transition-all cursor-pointer ${
                     paymentMethod === "card"
-                      ? "bg-[#FCF2E9] border-[#8B7355] shadow-sm ring-2 ring-[#8B7355]/20"
-                      : "bg-white border-[#E2E8F0] hover:border-[#D1B191]"
+                      ? "border-[#8B7355] bg-[#FCF2E9]/40 shadow-sm"
+                      : "border-[#E8E2DC] bg-white hover:border-[#8B7355]/50"
                   }`}
                 >
                   <div className="flex items-center gap-3">
@@ -458,7 +504,7 @@ export default function StripePaymentForm({
                         paymentMethod === "card" ? "bg-[#8B7355] text-white" : "bg-[#F1F5F9] text-[#64748B]"
                       }`}
                     >
-                      <FaCreditCard size={18} />
+                      <BiCreditCard size={22} />
                     </div>
                     <div>
                       <span className="font-bold text-sm text-[#0F172A] block">Credit / Debit Card</span>
@@ -478,10 +524,10 @@ export default function StripePaymentForm({
                 <button
                   type="button"
                   onClick={() => setPaymentMethod("ideal")}
-                  className={`p-5 rounded-2xl border transition-all text-left flex items-center justify-between ${
+                  className={`p-4 rounded-2xl border text-left flex items-center justify-between transition-all cursor-pointer ${
                     paymentMethod === "ideal"
-                      ? "bg-[#FCF2E9] border-[#8B7355] shadow-sm ring-2 ring-[#8B7355]/20"
-                      : "bg-white border-[#E2E8F0] hover:border-[#D1B191]"
+                      ? "border-[#8B7355] bg-[#FCF2E9]/40 shadow-sm"
+                      : "border-[#E8E2DC] bg-white hover:border-[#8B7355]/50"
                   }`}
                 >
                   <div className="flex items-center gap-3">
@@ -525,52 +571,34 @@ export default function StripePaymentForm({
                   />
                 </div>
 
-                {/* Card Number */}
+                {/* Stripe Elements: Card Number */}
                 <div>
                   <label className="block text-xs font-bold text-[#0F172A] mb-1.5 uppercase tracking-wide">
                     Card Number
                   </label>
-                  <div className="relative">
-                    <input
-                      type="text"
-                      placeholder="4111 1111 1111 1111"
-                      value={cardNumber}
-                      onChange={handleCardNumberChange}
-                      maxLength={19}
-                      className="w-full p-3.5 pl-11 bg-white border border-[#E2E8F0] rounded-xl text-sm font-mono text-[#0F172A] focus:outline-none focus:ring-2 focus:ring-[#8B7355]"
-                    />
-                    <BiCreditCard className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#94A3B8]" size={20} />
+                  <div className="p-3.5 bg-white border border-[#E2E8F0] rounded-xl focus-within:ring-2 focus-within:ring-[#8B7355]">
+                    <CardNumberElement options={CARD_ELEMENT_OPTIONS} />
                   </div>
                 </div>
 
-                {/* Expiry, CVC & Zip */}
-                <div className="grid grid-cols-3 gap-3">
+                {/* Stripe Elements: Expiry, CVC & Zip */}
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                   <div>
                     <label className="block text-[11px] font-bold text-[#0F172A] mb-1 uppercase tracking-wide">
                       Expires (MM/YY)
                     </label>
-                    <input
-                      type="text"
-                      placeholder="MM/YY"
-                      value={expiry}
-                      onChange={handleExpiryChange}
-                      maxLength={5}
-                      className="w-full p-3.5 bg-white border border-[#E2E8F0] rounded-xl text-sm font-mono text-center text-[#0F172A] focus:outline-none focus:ring-2 focus:ring-[#8B7355]"
-                    />
+                    <div className="p-3.5 bg-white border border-[#E2E8F0] rounded-xl focus-within:ring-2 focus-within:ring-[#8B7355]">
+                      <CardExpiryElement options={CARD_ELEMENT_OPTIONS} />
+                    </div>
                   </div>
 
                   <div>
                     <label className="block text-[11px] font-bold text-[#0F172A] mb-1 uppercase tracking-wide">
                       CVC / CVV
                     </label>
-                    <input
-                      type="password"
-                      placeholder="123"
-                      value={cvc}
-                      onChange={(e) => setCvc(e.target.value.replace(/\D/g, "").slice(0, 4))}
-                      maxLength={4}
-                      className="w-full p-3.5 bg-white border border-[#E2E8F0] rounded-xl text-sm font-mono text-center text-[#0F172A] focus:outline-none focus:ring-2 focus:ring-[#8B7355]"
-                    />
+                    <div className="p-3.5 bg-white border border-[#E2E8F0] rounded-xl focus-within:ring-2 focus-within:ring-[#8B7355]">
+                      <CardCvcElement options={CARD_ELEMENT_OPTIONS} />
+                    </div>
                   </div>
 
                   <div>
@@ -582,13 +610,13 @@ export default function StripePaymentForm({
                       placeholder="1011 AB"
                       value={zip}
                       onChange={(e) => setZip(e.target.value)}
-                      className="w-full p-3.5 bg-white border border-[#E2E8F0] rounded-xl text-sm text-center text-[#0F172A] focus:outline-none focus:ring-2 focus:ring-[#8B7355]"
+                      className="w-full p-3.5 bg-white border border-[#E2E8F0] rounded-xl text-sm text-[#0F172A] focus:outline-none focus:ring-2 focus:ring-[#8B7355]"
                     />
                   </div>
                 </div>
               </div>
             ) : (
-              /* iDEAL Bank Selector */
+              /* iDEAL — Bank Selector */
               <div className="p-6 rounded-2xl bg-[#FBF6F3] border border-[#E8E2DC] space-y-4">
                 <label className="block text-xs font-bold text-[#0F172A] uppercase tracking-wide">
                   Select your Dutch Bank
@@ -605,7 +633,7 @@ export default function StripePaymentForm({
                   ))}
                 </select>
                 <p className="text-xs text-[#64748B] italic">
-                  You will be redirected securely to your bank app to authorize the iDEAL transaction.
+                  You will be redirected securely to your bank to authorize the iDEAL transaction.
                 </p>
               </div>
             )}
@@ -657,5 +685,15 @@ export default function StripePaymentForm({
         </div>
       </form>
     </div>
+  );
+}
+
+export default function StripePaymentForm(props: StripePaymentFormProps) {
+  const stripePromise = getStripe();
+
+  return (
+    <Elements stripe={stripePromise}>
+      <InnerPaymentForm {...props} />
+    </Elements>
   );
 }
