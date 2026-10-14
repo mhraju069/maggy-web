@@ -22,7 +22,7 @@ const NAV = [
   { href: "/admin/reservations",   label: "Reservations",          Icon: MdEventNote },
   { href: "/admin/availability",   label: "Availability & Capacity", Icon: MdTune },
   { href: "/admin/services",       label: "Services",              Icon: MdMiscellaneousServices },
-  { href: "/admin/activities",     label: "Activities & Events",   Icon: FaChalkboardTeacher },
+  // { href: "/admin/activities",     label: "Activities & Events",   Icon: FaChalkboardTeacher },
   { href: "/admin/payments",       label: "Payments",              Icon: MdPayment },
   { href: "/admin/access-codes",   label: "Access Codes",          Icon: MdVpnKey },
   { href: "/admin/exceptions",     label: "Exceptions",            Icon: MdWarning },

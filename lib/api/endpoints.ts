@@ -78,6 +78,25 @@ export const ENDPOINTS = {
   CONTACT: {
     SUBMIT: "/contact/",
   },
+  ACCESS_CODES: {
+    ADMIN: {
+      LIST: "/dashboard/admin/access-codes/",
+      DETAIL: (code: string | number) => `/dashboard/admin/access-codes/${code}/`,
+    },
+  },
+  DATES: {
+    ADMIN: {
+      OVERVIEW: "/dashboard/admin/dates/",
+      BLOCKED: {
+        LIST: "/dashboard/admin/dates/blocked/",
+        DETAIL: (id: string | number) => `/dashboard/admin/dates/blocked/${id}/`,
+      },
+      SPECIAL_OPENINGS: {
+        LIST: "/dashboard/admin/dates/special-openings/",
+        DETAIL: (id: string | number) => `/dashboard/admin/dates/special-openings/${id}/`,
+      },
+    },
+  },
   DASHBOARD: {
     USER: "/dashboard/user/",
   },
