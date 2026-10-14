@@ -78,6 +78,8 @@ export default function AdminEditServicePage({ params }: PageProps) {
   const [isSavingDetails, setIsSavingDetails] = useState(false);
   const [detailsSuccessMsg, setDetailsSuccessMsg] = useState<string | null>(null);
   const [detailsErrorMsg, setDetailsErrorMsg] = useState<string | null>(null);
+  const [deleteServiceDialogOpen, setDeleteServiceDialogOpen] = useState(false);
+  const [isDeletingCurrentService, setIsDeletingCurrentService] = useState(false);
 
   // ═════════════════════════════════════════════════════════════════════
   // SECTION 2: Opening Hours (ServiceSettings)
@@ -111,6 +113,41 @@ export default function AdminEditServicePage({ params }: PageProps) {
   const [isSavingSettings, setIsSavingSettings] = useState(false);
   const [settingsSuccessMsg, setSettingsSuccessMsg] = useState<string | null>(null);
   const [settingsErrorMsg, setSettingsErrorMsg] = useState<string | null>(null);
+
+  // ═════════════════════════════════════════════════════════════════════
+  // SERVICE FEATURES STATE: Private Sauna, Shared Sauna & Salt Room
+  // ═════════════════════════════════════════════════════════════════════
+  const [privateSaunaFeatures, setPrivateSaunaFeatures] = useState<any[]>([]);
+  const [sharedSaunaFeatures, setSharedSaunaFeatures] = useState<any[]>([]);
+  const [saltroomFeatures, setSaltroomFeatures] = useState<any[]>([]);
+
+  // Feature Add / Edit Modal state
+  interface FeatureModalTarget {
+    service_type: "sauna" | "saltroom";
+    sub_type?: "private" | "shared";
+    sectionName: string;
+  }
+  const [featureModalOpen, setFeatureModalOpen] = useState(false);
+  const [featureModalTarget, setFeatureModalTarget] = useState<FeatureModalTarget | null>(null);
+  const [editingFeature, setEditingFeature] = useState<any | null>(null);
+  const [featureForm, setFeatureForm] = useState({
+    feature_en: "",
+    feature_nl: "",
+    feature_de: "",
+    price: "0.00",
+  });
+  const [isSavingFeature, setIsSavingFeature] = useState(false);
+  const [featureModalError, setFeatureModalError] = useState<string | null>(null);
+  const [featureSuccessToast, setFeatureSuccessToast] = useState<string | null>(null);
+
+  // Feature Delete Confirmation
+  const [featureToDelete, setFeatureToDelete] = useState<{
+    id: number;
+    title: string;
+    service_type: "sauna" | "saltroom";
+    sub_type?: "private" | "shared";
+  } | null>(null);
+  const [isDeletingFeature, setIsDeletingFeature] = useState(false);
 
   // ═════════════════════════════════════════════════════════════════════
   // MULTI-ITEMS STATE: Activities & Packages
@@ -192,6 +229,33 @@ export default function AdminEditServicePage({ params }: PageProps) {
         setDetailsData(res.details || {});
 
         const det = res.details || {};
+
+        if (s.type === "sauna") {
+          const priv = Array.isArray(det.private_sauna) ? det.private_sauna[0] : (det.private_sauna || {});
+          const shared = Array.isArray(det.shared_sauna) ? det.shared_sauna[0] : (det.shared_sauna || {});
+          setSaunaSettings({
+            base_price_3hrs: priv.base_price_3hrs || "75.00",
+            base_price_4hrs: priv.base_price_4hrs || "100.00",
+            max_person: priv.max_person ?? 6,
+            extra_person_price: priv.extra_person_price || "15.00",
+            is_available_private: priv.is_available ?? true,
+            price_per_person: shared.price_per_person || "15.00",
+            max_person_shared: shared.max_person ?? 6,
+            is_available_shared: shared.is_available ?? true,
+          });
+          setPrivateSaunaFeatures(Array.isArray(priv.features) ? priv.features : []);
+          setSharedSaunaFeatures(Array.isArray(shared.features) ? shared.features : []);
+        } else if (s.type === "saltroom") {
+          const sr = Array.isArray(det.saltroom) ? det.saltroom[0] : (det.saltroom || {});
+          setSaltroomSettings({
+            max_capacity: sr.max_capacity ?? 2,
+            price_per_person: sr.price_per_person || "25.00",
+            duration_minutes: sr.duration_minutes ?? 60,
+            buffer_minutes: sr.buffer_minutes ?? 10,
+          });
+          setSaltroomFeatures(Array.isArray(sr.features) ? sr.features : []);
+        }
+
         if (Array.isArray(det.activities)) {
           setActivitiesList(det.activities);
         }
@@ -251,11 +315,11 @@ export default function AdminEditServicePage({ params }: PageProps) {
           });
           setPreviewImage(s.image || null);
 
-          // Populate Service Settings according to type
+          // Populate Service Settings & Features according to type
           const det = res.details || {};
           if (s.type === "sauna") {
-            const priv = det.private_sauna?.[0] || {};
-            const shared = det.shared_sauna?.[0] || {};
+            const priv = Array.isArray(det.private_sauna) ? det.private_sauna[0] : (det.private_sauna || {});
+            const shared = Array.isArray(det.shared_sauna) ? det.shared_sauna[0] : (det.shared_sauna || {});
             setSaunaSettings({
               base_price_3hrs: priv.base_price_3hrs || "75.00",
               base_price_4hrs: priv.base_price_4hrs || "100.00",
@@ -266,14 +330,17 @@ export default function AdminEditServicePage({ params }: PageProps) {
               max_person_shared: shared.max_person ?? 6,
               is_available_shared: shared.is_available ?? true,
             });
+            setPrivateSaunaFeatures(Array.isArray(priv.features) ? priv.features : []);
+            setSharedSaunaFeatures(Array.isArray(shared.features) ? shared.features : []);
           } else if (s.type === "saltroom") {
-            const sr = det.saltroom?.[0] || {};
+            const sr = Array.isArray(det.saltroom) ? det.saltroom[0] : (det.saltroom || {});
             setSaltroomSettings({
               max_capacity: sr.max_capacity ?? 2,
               price_per_person: sr.price_per_person || "25.00",
               duration_minutes: sr.duration_minutes ?? 60,
               buffer_minutes: sr.buffer_minutes ?? 10,
             });
+            setSaltroomFeatures(Array.isArray(sr.features) ? sr.features : []);
           }
 
           // Populate Activity List
@@ -342,7 +409,11 @@ export default function AdminEditServicePage({ params }: PageProps) {
         payload.append("image", selectedImageFile);
       }
 
-      await servicesService.updateAdminService(detailsForm.type || serviceIdOrType, payload);
+      try {
+        await servicesService.updateService(serviceData?.id || serviceIdOrType, payload);
+      } catch {
+        await servicesService.updateAdminService(detailsForm.type || serviceIdOrType, payload);
+      }
       setDetailsSuccessMsg("Service Details saved successfully!");
       setDetailsModalOpen(false);
       setTimeout(() => setDetailsSuccessMsg(null), 3000);
@@ -351,6 +422,22 @@ export default function AdminEditServicePage({ params }: PageProps) {
       setDetailsErrorMsg(err?.message || "Failed to update service details.");
     } finally {
       setIsSavingDetails(false);
+    }
+  };
+
+  const handleConfirmDeleteCurrentService = async () => {
+    setIsDeletingCurrentService(true);
+    setDetailsErrorMsg(null);
+    try {
+      await servicesService.deleteService(serviceData?.id || serviceIdOrType);
+      setDeleteServiceDialogOpen(false);
+      setDetailsModalOpen(false);
+      router.push("/admin/services");
+    } catch (err: any) {
+      setDetailsErrorMsg(err?.message || "Failed to delete service.");
+      setDeleteServiceDialogOpen(false);
+    } finally {
+      setIsDeletingCurrentService(false);
     }
   };
 
@@ -383,7 +470,17 @@ export default function AdminEditServicePage({ params }: PageProps) {
     ]);
   };
 
-  const handleRemoveOpeningHours = (index: number) => {
+  const handleRemoveOpeningHours = async (index: number) => {
+    const item = openingHoursList[index];
+    if (item && item.id) {
+      try {
+        await servicesService.deleteOperatingHours(item.id);
+        setHoursSuccessMsg("Schedule block deleted.");
+        setTimeout(() => setHoursSuccessMsg(null), 3000);
+      } catch (delErr) {
+        console.warn("Delete operating hours API note:", delErr);
+      }
+    }
     setOpeningHoursList((prev) => prev.filter((_, i) => i !== index));
   };
 
@@ -418,18 +515,45 @@ export default function AdminEditServicePage({ params }: PageProps) {
     setHoursErrorMsg(null);
     setHoursSuccessMsg(null);
 
-    try {
-      const payload = {
-        section: "opening_hours",
-        id: serviceData?.id || serviceIdOrType,
-        type: serviceData?.type || detailsForm.type,
-        settings: openingHoursList,
-      };
+    const s_type = serviceData?.type || detailsForm.type || serviceIdOrType;
+    const s_id = serviceData?.id;
 
-      await servicesService.updateAdminService(
-        serviceData?.type || serviceIdOrType,
-        payload
-      );
+    try {
+      // 1. Process each row using the new Opening Hours API
+      const promises = openingHoursList.map(async (row) => {
+        if (row.id) {
+          // Update: PATCH /api/dashboard/admin/services/settings/<id>/
+          return servicesService.updateOperatingHours(row.id, {
+            week_days: row.week_days,
+            open_time: row.open_time,
+            close_time: row.close_time,
+            is_closed: row.is_closed,
+          });
+        } else {
+          // Create: POST /api/dashboard/admin/services/settings/
+          return servicesService.createOperatingHours({
+            service_type: s_type,
+            ...(s_id ? { service_id: s_id } : {}),
+            week_days: row.week_days,
+            open_time: row.open_time,
+            close_time: row.close_time,
+            is_closed: row.is_closed,
+          });
+        }
+      });
+
+      try {
+        await Promise.all(promises);
+      } catch {
+        // Fallback to batch updateAdminService
+        await servicesService.updateAdminService(s_type, {
+          section: "opening_hours",
+          id: s_id || serviceIdOrType,
+          type: s_type,
+          settings: openingHoursList,
+        });
+      }
+
       setHoursSuccessMsg("Opening Hours saved successfully!");
       setTimeout(() => setHoursSuccessMsg(null), 3000);
       await reloadData();
@@ -460,31 +584,139 @@ export default function AdminEditServicePage({ params }: PageProps) {
       if (s_type === "sauna") {
         payload = {
           ...payload,
-          base_price_3hrs: saunaSettings.base_price_3hrs,
-          base_price_4hrs: saunaSettings.base_price_4hrs,
-          max_person: saunaSettings.max_person,
-          extra_person_price: saunaSettings.extra_person_price,
+          base_price_3hrs: parseFloat(String(saunaSettings.base_price_3hrs)) || 75.0,
+          base_price_4hrs: parseFloat(String(saunaSettings.base_price_4hrs)) || 100.0,
+          max_person: Number(saunaSettings.max_person) || 6,
+          extra_person_price: parseFloat(String(saunaSettings.extra_person_price)) || 15.0,
           is_available: saunaSettings.is_available_private,
-          price_per_person: saunaSettings.price_per_person,
+          price_per_person: parseFloat(String(saunaSettings.price_per_person)) || 15.0,
+          max_person_shared: Number(saunaSettings.max_person_shared) || 6,
+          is_available_shared: saunaSettings.is_available_shared,
         };
       } else if (s_type === "saltroom") {
         payload = {
           ...payload,
-          max_capacity: saltroomSettings.max_capacity,
-          price_per_person: saltroomSettings.price_per_person,
-          duration_minutes: saltroomSettings.duration_minutes,
-          buffer_minutes: saltroomSettings.buffer_minutes,
+          max_capacity: Number(saltroomSettings.max_capacity) || 2,
+          price_per_person: parseFloat(String(saltroomSettings.price_per_person)) || 25.0,
+          duration_minutes: Number(saltroomSettings.duration_minutes) || 60,
+          buffer_minutes: Number(saltroomSettings.buffer_minutes) || 10,
         };
       }
 
       await servicesService.updateAdminService(s_type || serviceIdOrType, payload);
-      setSettingsSuccessMsg("Service Settings saved successfully!");
+      setSettingsSuccessMsg("Service Configuration saved successfully!");
       setTimeout(() => setSettingsSuccessMsg(null), 3000);
       await reloadData();
     } catch (err: any) {
       setSettingsErrorMsg(err?.message || "Failed to update service settings.");
     } finally {
       setIsSavingSettings(false);
+    }
+  };
+
+  // ═════════════════════════════════════════════════════════════════════
+  // SERVICE FEATURES HANDLERS (Modal & CRUD)
+  // ═════════════════════════════════════════════════════════════════════
+  const handleOpenAddFeature = (
+    service_type: "sauna" | "saltroom",
+    sub_type?: "private" | "shared",
+    sectionName = ""
+  ) => {
+    setFeatureModalTarget({ service_type, sub_type, sectionName });
+    setEditingFeature(null);
+    setFeatureForm({
+      feature_en: "",
+      feature_nl: "",
+      feature_de: "",
+      price: "0.00",
+    });
+    setFeatureModalError(null);
+    setFeatureModalOpen(true);
+  };
+
+  const handleOpenEditFeature = (
+    feature: any,
+    service_type: "sauna" | "saltroom",
+    sub_type?: "private" | "shared",
+    sectionName = ""
+  ) => {
+    setFeatureModalTarget({ service_type, sub_type, sectionName });
+    setEditingFeature(feature);
+    setFeatureForm({
+      feature_en: feature.feature_en || feature.feature || "",
+      feature_nl: feature.feature_nl || "",
+      feature_de: feature.feature_de || "",
+      price: feature.price !== undefined && feature.price !== null ? String(feature.price) : "0.00",
+    });
+    setFeatureModalError(null);
+    setFeatureModalOpen(true);
+  };
+
+  const handleSaveFeatureModal = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!featureForm.feature_en.trim()) {
+      setFeatureModalError("Feature name in English is required.");
+      return;
+    }
+
+    setIsSavingFeature(true);
+    setFeatureModalError(null);
+
+    try {
+      if (editingFeature && editingFeature.id) {
+        // UPDATE existing feature
+        await servicesService.updateFeature(editingFeature.id, {
+          feature: featureForm.feature_en.trim(),
+          feature_en: featureForm.feature_en.trim(),
+          feature_nl: featureForm.feature_nl.trim() || featureForm.feature_en.trim(),
+          feature_de: featureForm.feature_de.trim() || featureForm.feature_en.trim(),
+          price: featureModalTarget?.service_type === "sauna" ? (featureForm.price || "0.00") : undefined,
+        });
+      } else if (featureModalTarget) {
+        // CREATE new feature
+        await servicesService.createFeature({
+          service_type: featureModalTarget.service_type,
+          sub_type: featureModalTarget.sub_type,
+          feature: featureForm.feature_en.trim(),
+          feature_en: featureForm.feature_en.trim(),
+          feature_nl: featureForm.feature_nl.trim() || featureForm.feature_en.trim(),
+          feature_de: featureForm.feature_de.trim() || featureForm.feature_en.trim(),
+          price: featureModalTarget.service_type === "sauna" ? (featureForm.price || "0.00") : undefined,
+        });
+      }
+
+      setFeatureModalOpen(false);
+      setFeatureSuccessToast(
+        editingFeature ? "Feature updated successfully!" : "Feature created successfully!"
+      );
+      setTimeout(() => setFeatureSuccessToast(null), 4000);
+      await reloadData();
+    } catch (err: any) {
+      console.error("Save feature error:", err);
+      setFeatureModalError(err?.message || "Failed to save feature.");
+    } finally {
+      setIsSavingFeature(false);
+    }
+  };
+
+  const handleConfirmDeleteFeature = async () => {
+    if (!featureToDelete) return;
+    setIsDeletingFeature(true);
+    try {
+      await servicesService.deleteFeature(
+        featureToDelete.id,
+        featureToDelete.service_type,
+        featureToDelete.sub_type
+      );
+      setFeatureToDelete(null);
+      setFeatureSuccessToast("Feature deleted successfully!");
+      setTimeout(() => setFeatureSuccessToast(null), 4000);
+      await reloadData();
+    } catch (err: any) {
+      console.error("Delete feature error:", err);
+      alert(err?.message || "Failed to delete feature.");
+    } finally {
+      setIsDeletingFeature(false);
     }
   };
 
@@ -836,7 +1068,7 @@ export default function AdminEditServicePage({ params }: PageProps) {
             </div>
             <div>
               <h2 className="text-lg font-bold font-displayPlayFair text-[#1d1a17]">
-                Section 1: Service Details
+              Service Details
               </h2>
               <p className="text-xs text-[#64748B]">
                 Title, Subtitle, Description in English, Dutch & German, and Banner image
@@ -969,7 +1201,7 @@ export default function AdminEditServicePage({ params }: PageProps) {
             </div>
             <div>
               <h2 className="text-lg font-bold font-displayPlayFair text-[#1d1a17]">
-                Section 2: Opening Hours & Schedule
+              Opening Hours & Schedule
               </h2>
               <p className="text-xs text-[#64748B]">
                 Define open/close times by week days. Days assigned to one row cannot be selected in another.
@@ -1161,7 +1393,7 @@ export default function AdminEditServicePage({ params }: PageProps) {
             </div>
             <div>
               <h2 className="text-lg font-bold font-displayPlayFair text-[#1d1a17]">
-                Section 3: {s_type === "activity" ? "Activity Sessions" : s_type === "package" ? "Service Packages" : `Service Settings (${serviceData.title})`}
+              {s_type === "activity" ? "Activity Sessions" : s_type === "package" ? "Service Packages" : `Service Configuration (${serviceData.title})`}
               </h2>
               <p className="text-xs text-[#64748B]">
                 {s_type === "activity"
@@ -1216,7 +1448,7 @@ export default function AdminEditServicePage({ params }: PageProps) {
             {/* Private Sauna */}
             <div className="p-5 rounded-2xl bg-[#FAF8F5]/50 border border-[#F1EDE8] space-y-4">
               <h3 className="text-xs font-bold text-[#8B7355] uppercase tracking-wider flex items-center gap-2">
-                <span>🧖</span> Private Sauna Configuration
+                <span>🧖</span> Private Sauna
               </h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
                 <div>
@@ -1275,12 +1507,112 @@ export default function AdminEditServicePage({ params }: PageProps) {
                   />
                 </div>
               </div>
+
+              {/* Private Sauna Features & Amenities */}
+              <div className="pt-4 border-t border-[#F1EDE8]">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
+                  <div>
+                    <h4 className="text-xs font-bold text-[#1d1a17] flex items-center gap-1.5">
+                      <HiOutlineSparkles className="w-4 h-4 text-[#8B7355]" />
+                      Private Sauna Features & Inclusions ({privateSaunaFeatures.length})
+                    </h4>
+                    <p className="text-[11px] text-[#64748B] mt-0.5">
+                      Multilingual amenities (EN, NL, DE) and optional add-on prices
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => handleOpenAddFeature("sauna", "private", "Private Sauna")}
+                    className="px-3 py-1.5 rounded-lg bg-[#8B7355] hover:bg-[#705b41] text-white text-[11px] font-bold flex items-center gap-1.5 transition-all shadow-xs self-start sm:self-auto cursor-pointer"
+                  >
+                    <HiOutlinePlus className="w-3.5 h-3.5" />
+                    <span>Add Feature</span>
+                  </button>
+                </div>
+
+                {privateSaunaFeatures.length === 0 ? (
+                  <div className="p-4 rounded-xl bg-white border border-dashed border-[#E2E8F0] text-center">
+                    <p className="text-xs text-[#94A3B8]">No features added yet to Private Sauna.</p>
+                    <button
+                      type="button"
+                      onClick={() => handleOpenAddFeature("sauna", "private", "Private Sauna")}
+                      className="mt-1.5 text-xs font-semibold text-[#8B7355] hover:underline cursor-pointer"
+                    >
+                      + Add first feature
+                    </button>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                    {privateSaunaFeatures.map((feat: any) => (
+                      <div
+                        key={feat.id || feat.feature}
+                        className="p-3.5 rounded-xl bg-white border border-[#E8E2DC] hover:border-[#8B7355]/40 transition-all flex flex-col justify-between group shadow-xs"
+                      >
+                        <div className="space-y-2">
+                          <div className="flex items-start justify-between gap-2">
+                            <span className="text-xs font-bold text-[#1d1a17] line-clamp-1">
+                              {feat.feature_en || feat.feature}
+                            </span>
+                            {feat.price !== undefined && feat.price !== null && (
+                              <span className="shrink-0 px-2 py-0.5 rounded-md text-[10px] font-bold bg-[#FAF8F5] text-[#8B7355] border border-[#E8E2DC]">
+                                {Number(feat.price) > 0 ? `€${Number(feat.price).toFixed(2)}` : "Included"}
+                              </span>
+                            )}
+                          </div>
+
+                          <div className="space-y-1 bg-[#FAF8F5] p-2 rounded-lg border border-[#F1EDE8] text-[11px]">
+                            <div className="flex items-center gap-1.5 text-[#475569]">
+                              <span className="px-1 py-0.2 rounded bg-white text-[9px] font-extrabold text-[#8B7355] border border-[#E8E2DC]">EN</span>
+                              <span className="truncate">{feat.feature_en || feat.feature || "—"}</span>
+                            </div>
+                            <div className="flex items-center gap-1.5 text-[#475569]">
+                              <span className="px-1 py-0.2 rounded bg-white text-[9px] font-extrabold text-[#8B7355] border border-[#E8E2DC]">NL</span>
+                              <span className="truncate">{feat.feature_nl || "—"}</span>
+                            </div>
+                            <div className="flex items-center gap-1.5 text-[#475569]">
+                              <span className="px-1 py-0.2 rounded bg-white text-[9px] font-extrabold text-[#8B7355] border border-[#E8E2DC]">DE</span>
+                              <span className="truncate">{feat.feature_de || "—"}</span>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center justify-end gap-1.5 pt-2 mt-2 border-t border-[#F8F6F3]">
+                          <button
+                            type="button"
+                            onClick={() => handleOpenEditFeature(feat, "sauna", "private", "Private Sauna")}
+                            className="p-1.5 rounded-lg hover:bg-[#F3EFEA] text-[#8B7355] transition-colors cursor-pointer flex items-center gap-1 text-[11px] font-medium"
+                            title="Edit feature"
+                          >
+                            <HiOutlinePencil className="w-3.5 h-3.5" />
+                            <span>Edit</span>
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() =>
+                              setFeatureToDelete({
+                                id: feat.id,
+                                title: feat.feature_en || feat.feature,
+                                service_type: "sauna",
+                                sub_type: "private",
+                              })
+                            }
+                            className="p-1.5 rounded-lg hover:bg-red-50 text-red-500 transition-colors cursor-pointer"
+                            title="Delete feature"
+                          >
+                            <HiOutlineTrash className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
 
             {/* Shared Sauna */}
             <div className="p-5 rounded-2xl bg-[#FAF8F5]/50 border border-[#F1EDE8] space-y-4">
               <h3 className="text-xs font-bold text-[#8B7355] uppercase tracking-wider flex items-center gap-2">
-                <span>👥</span> Shared Sauna Configuration
+                <span>👥</span> Shared Sauna
               </h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                 <div>
@@ -1310,20 +1642,106 @@ export default function AdminEditServicePage({ params }: PageProps) {
                     className="w-full px-3.5 py-2.5 rounded-xl text-xs text-[#1d1a17] border border-[#E2E8F0] bg-white"
                   />
                 </div>
-                <div className="flex items-center gap-3 pt-6">
-                  <input
-                    type="checkbox"
-                    id="shared_avail"
-                    checked={saunaSettings.is_available_shared}
-                    onChange={(e) =>
-                      setSaunaSettings((s) => ({ ...s, is_available_shared: e.target.checked }))
-                    }
-                    className="w-4 h-4 rounded text-[#8B7355] focus:ring-[#8B7355]"
-                  />
-                  <label htmlFor="shared_avail" className="text-xs font-semibold text-[#1d1a17] cursor-pointer">
-                    Available for booking
-                  </label>
+              </div>
+
+              {/* Shared Sauna Features & Amenities */}
+              <div className="pt-4 border-t border-[#F1EDE8]">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
+                  <div>
+                    <h4 className="text-xs font-bold text-[#1d1a17] flex items-center gap-1.5">
+                      <HiOutlineSparkles className="w-4 h-4 text-[#8B7355]" />
+                      Shared Sauna Features & Inclusions ({sharedSaunaFeatures.length})
+                    </h4>
+                    <p className="text-[11px] text-[#64748B] mt-0.5">
+                      Multilingual amenities (EN, NL, DE) and optional add-on prices
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => handleOpenAddFeature("sauna", "shared", "Shared Sauna")}
+                    className="px-3 py-1.5 rounded-lg bg-[#8B7355] hover:bg-[#705b41] text-white text-[11px] font-bold flex items-center gap-1.5 transition-all shadow-xs self-start sm:self-auto cursor-pointer"
+                  >
+                    <HiOutlinePlus className="w-3.5 h-3.5" />
+                    <span>Add Feature</span>
+                  </button>
                 </div>
+
+                {sharedSaunaFeatures.length === 0 ? (
+                  <div className="p-4 rounded-xl bg-white border border-dashed border-[#E2E8F0] text-center">
+                    <p className="text-xs text-[#94A3B8]">No features added yet to Shared Sauna.</p>
+                    <button
+                      type="button"
+                      onClick={() => handleOpenAddFeature("sauna", "shared", "Shared Sauna")}
+                      className="mt-1.5 text-xs font-semibold text-[#8B7355] hover:underline cursor-pointer"
+                    >
+                      + Add first feature
+                    </button>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                    {sharedSaunaFeatures.map((feat: any) => (
+                      <div
+                        key={feat.id || feat.feature}
+                        className="p-3.5 rounded-xl bg-white border border-[#E8E2DC] hover:border-[#8B7355]/40 transition-all flex flex-col justify-between group shadow-xs"
+                      >
+                        <div className="space-y-2">
+                          <div className="flex items-start justify-between gap-2">
+                            <span className="text-xs font-bold text-[#1d1a17] line-clamp-1">
+                              {feat.feature_en || feat.feature}
+                            </span>
+                            {feat.price !== undefined && feat.price !== null && (
+                              <span className="shrink-0 px-2 py-0.5 rounded-md text-[10px] font-bold bg-[#FAF8F5] text-[#8B7355] border border-[#E8E2DC]">
+                                {Number(feat.price) > 0 ? `€${Number(feat.price).toFixed(2)}` : "Included"}
+                              </span>
+                            )}
+                          </div>
+
+                          <div className="space-y-1 bg-[#FAF8F5] p-2 rounded-lg border border-[#F1EDE8] text-[11px]">
+                            <div className="flex items-center gap-1.5 text-[#475569]">
+                              <span className="px-1 py-0.2 rounded bg-white text-[9px] font-extrabold text-[#8B7355] border border-[#E8E2DC]">EN</span>
+                              <span className="truncate">{feat.feature_en || feat.feature || "—"}</span>
+                            </div>
+                            <div className="flex items-center gap-1.5 text-[#475569]">
+                              <span className="px-1 py-0.2 rounded bg-white text-[9px] font-extrabold text-[#8B7355] border border-[#E8E2DC]">NL</span>
+                              <span className="truncate">{feat.feature_nl || "—"}</span>
+                            </div>
+                            <div className="flex items-center gap-1.5 text-[#475569]">
+                              <span className="px-1 py-0.2 rounded bg-white text-[9px] font-extrabold text-[#8B7355] border border-[#E8E2DC]">DE</span>
+                              <span className="truncate">{feat.feature_de || "—"}</span>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center justify-end gap-1.5 pt-2 mt-2 border-t border-[#F8F6F3]">
+                          <button
+                            type="button"
+                            onClick={() => handleOpenEditFeature(feat, "sauna", "shared", "Shared Sauna")}
+                            className="p-1.5 rounded-lg hover:bg-[#F3EFEA] text-[#8B7355] transition-colors cursor-pointer flex items-center gap-1 text-[11px] font-medium"
+                            title="Edit feature"
+                          >
+                            <HiOutlinePencil className="w-3.5 h-3.5" />
+                            <span>Edit</span>
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() =>
+                              setFeatureToDelete({
+                                id: feat.id,
+                                title: feat.feature_en || feat.feature,
+                                service_type: "sauna",
+                                sub_type: "shared",
+                              })
+                            }
+                            className="p-1.5 rounded-lg hover:bg-red-50 text-red-500 transition-colors cursor-pointer"
+                            title="Delete feature"
+                          >
+                            <HiOutlineTrash className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
 
@@ -1336,10 +1754,10 @@ export default function AdminEditServicePage({ params }: PageProps) {
                 {isSavingSettings ? (
                   <>
                     <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                    <span>Saving Settings...</span>
+                    <span>Saving Configuration...</span>
                   </>
                 ) : (
-                  <span>Save Service Settings</span>
+                  <span>Save Configuration</span>
                 )}
               </button>
             </div>
@@ -1407,6 +1825,105 @@ export default function AdminEditServicePage({ params }: PageProps) {
                     className="w-full px-3.5 py-2.5 rounded-xl text-xs text-[#1d1a17] border border-[#E2E8F0] bg-white"
                   />
                 </div>
+              </div>
+
+              {/* Salt Room Features & Amenities */}
+              <div className="pt-4 border-t border-[#F1EDE8]">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
+                  <div>
+                    <h4 className="text-xs font-bold text-[#1d1a17] flex items-center gap-1.5">
+                      <HiOutlineSparkles className="w-4 h-4 text-[#8B7355]" />
+                      Salt Room Features & Amenities ({saltroomFeatures.length})
+                    </h4>
+                    <p className="text-[11px] text-[#64748B] mt-0.5">
+                      Multilingual room amenities and features (EN, NL, DE)
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => handleOpenAddFeature("saltroom", undefined, "Salt Room")}
+                    className="px-3 py-1.5 rounded-lg bg-[#8B7355] hover:bg-[#705b41] text-white text-[11px] font-bold flex items-center gap-1.5 transition-all shadow-xs self-start sm:self-auto cursor-pointer"
+                  >
+                    <HiOutlinePlus className="w-3.5 h-3.5" />
+                    <span>Add Feature</span>
+                  </button>
+                </div>
+
+                {saltroomFeatures.length === 0 ? (
+                  <div className="p-4 rounded-xl bg-white border border-dashed border-[#E2E8F0] text-center">
+                    <p className="text-xs text-[#94A3B8]">No features added yet to Salt Room.</p>
+                    <button
+                      type="button"
+                      onClick={() => handleOpenAddFeature("saltroom", undefined, "Salt Room")}
+                      className="mt-1.5 text-xs font-semibold text-[#8B7355] hover:underline cursor-pointer"
+                    >
+                      + Add first feature
+                    </button>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                    {saltroomFeatures.map((feat: any) => (
+                      <div
+                        key={feat.id || feat.feature}
+                        className="p-3.5 rounded-xl bg-white border border-[#E8E2DC] hover:border-[#8B7355]/40 transition-all flex flex-col justify-between group shadow-xs"
+                      >
+                        <div className="space-y-2">
+                          <div className="flex items-start justify-between gap-2">
+                            <span className="text-xs font-bold text-[#1d1a17] line-clamp-1">
+                              {feat.feature_en || feat.feature}
+                            </span>
+                            {feat.price !== undefined && feat.price !== null && Number(feat.price) > 0 && (
+                              <span className="shrink-0 px-2 py-0.5 rounded-md text-[10px] font-bold bg-[#FAF8F5] text-[#8B7355] border border-[#E8E2DC]">
+                                €{Number(feat.price).toFixed(2)}
+                              </span>
+                            )}
+                          </div>
+
+                          <div className="space-y-1 bg-[#FAF8F5] p-2 rounded-lg border border-[#F1EDE8] text-[11px]">
+                            <div className="flex items-center gap-1.5 text-[#475569]">
+                              <span className="px-1 py-0.2 rounded bg-white text-[9px] font-extrabold text-[#8B7355] border border-[#E8E2DC]">EN</span>
+                              <span className="truncate">{feat.feature_en || feat.feature || "—"}</span>
+                            </div>
+                            <div className="flex items-center gap-1.5 text-[#475569]">
+                              <span className="px-1 py-0.2 rounded bg-white text-[9px] font-extrabold text-[#8B7355] border border-[#E8E2DC]">NL</span>
+                              <span className="truncate">{feat.feature_nl || "—"}</span>
+                            </div>
+                            <div className="flex items-center gap-1.5 text-[#475569]">
+                              <span className="px-1 py-0.2 rounded bg-white text-[9px] font-extrabold text-[#8B7355] border border-[#E8E2DC]">DE</span>
+                              <span className="truncate">{feat.feature_de || "—"}</span>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center justify-end gap-1.5 pt-2 mt-2 border-t border-[#F8F6F3]">
+                          <button
+                            type="button"
+                            onClick={() => handleOpenEditFeature(feat, "saltroom", undefined, "Salt Room")}
+                            className="p-1.5 rounded-lg hover:bg-[#F3EFEA] text-[#8B7355] transition-colors cursor-pointer flex items-center gap-1 text-[11px] font-medium"
+                            title="Edit feature"
+                          >
+                            <HiOutlinePencil className="w-3.5 h-3.5" />
+                            <span>Edit</span>
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() =>
+                              setFeatureToDelete({
+                                id: feat.id,
+                                title: feat.feature_en || feat.feature,
+                                service_type: "saltroom",
+                              })
+                            }
+                            className="p-1.5 rounded-lg hover:bg-red-50 text-red-500 transition-colors cursor-pointer"
+                            title="Delete feature"
+                          >
+                            <HiOutlineTrash className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
 
@@ -2084,30 +2601,96 @@ export default function AdminEditServicePage({ params }: PageProps) {
               </div>
 
               {/* Modal Footer */}
-              <div className="flex items-center justify-end gap-3 pt-4 border-t border-[#F1EDE8]">
+              <div className="flex items-center justify-between gap-3 pt-4 border-t border-[#F1EDE8]">
                 <button
                   type="button"
-                  onClick={() => setDetailsModalOpen(false)}
-                  className="px-5 py-2.5 rounded-xl border border-gray-300 text-gray-700 hover:bg-gray-50 text-xs font-semibold cursor-pointer"
+                  onClick={() => setDeleteServiceDialogOpen(true)}
+                  disabled={isSavingDetails || isDeletingCurrentService}
+                  className="px-4 py-2.5 rounded-xl border border-red-200 bg-red-50 hover:bg-red-100 text-red-600 text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
+                  title="Permanently delete this service"
                 >
-                  Cancel
+                  <HiOutlineTrash className="w-4 h-4" />
+                  <span>Delete Service</span>
                 </button>
-                <button
-                  type="submit"
-                  disabled={isSavingDetails}
-                  className="px-6 py-2.5 rounded-xl bg-[#8B7355] hover:bg-[#705b41] text-white text-xs font-bold uppercase tracking-wider transition-all shadow-md flex items-center gap-2 cursor-pointer disabled:opacity-50"
-                >
-                  {isSavingDetails ? (
-                    <>
-                      <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                      <span>Saving Service Details...</span>
-                    </>
-                  ) : (
-                    <span>Save Service Details</span>
-                  )}
-                </button>
+                <div className="flex items-center gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setDetailsModalOpen(false)}
+                    className="px-5 py-2.5 rounded-xl border border-gray-300 text-gray-700 hover:bg-gray-50 text-xs font-semibold cursor-pointer"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={isSavingDetails}
+                    className="px-6 py-2.5 rounded-xl bg-[#8B7355] hover:bg-[#705b41] text-white text-xs font-bold uppercase tracking-wider transition-all shadow-md flex items-center gap-2 cursor-pointer disabled:opacity-50"
+                  >
+                    {isSavingDetails ? (
+                      <>
+                        <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                        <span>Saving Service Details...</span>
+                      </>
+                    ) : (
+                      <span>Save Service Details</span>
+                    )}
+                  </button>
+                </div>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* ═════════════════════════════════════════════════════════════════════ */}
+      {/* DELETE ENTIRE SERVICE CONFIRMATION DIALOG                             */}
+      {/* ═════════════════════════════════════════════════════════════════════ */}
+      {deleteServiceDialogOpen && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in duration-200">
+          <div className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-[#E8E2DC] space-y-4">
+            <div className="w-12 h-12 rounded-2xl bg-red-50 text-red-600 flex items-center justify-center">
+              <HiOutlineTrash className="w-6 h-6" />
+            </div>
+            <div>
+              <h3 className="text-base font-bold text-[#1d1a17]">
+                Delete Entire Service?
+              </h3>
+              <p className="text-xs text-[#64748B] mt-1 leading-relaxed">
+                Are you sure you want to permanently delete{" "}
+                <span className="font-semibold text-gray-800">
+                  &quot;{detailsForm.title_en || serviceData?.title || serviceIdOrType}&quot;
+                </span>{" "}
+                (type: <span className="font-semibold text-[#8B7355]">{detailsForm.type || serviceIdOrType}</span>)?
+                All settings, schedules, and configurations for this service will be permanently deleted. This action cannot be undone.
+              </p>
+            </div>
+            <div className="flex items-center justify-end gap-3 pt-3 border-t border-[#F1EDE8]">
+              <button
+                type="button"
+                disabled={isDeletingCurrentService}
+                onClick={() => setDeleteServiceDialogOpen(false)}
+                className="px-4 py-2 rounded-xl border border-gray-300 text-gray-700 hover:bg-gray-50 text-xs font-semibold cursor-pointer"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                disabled={isDeletingCurrentService}
+                onClick={handleConfirmDeleteCurrentService}
+                className="px-5 py-2 rounded-xl bg-red-600 hover:bg-red-700 text-white text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
+              >
+                {isDeletingCurrentService ? (
+                  <>
+                    <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    <span>Deleting Service...</span>
+                  </>
+                ) : (
+                  <>
+                    <HiOutlineTrash className="w-4 h-4" />
+                    <span>Confirm Delete</span>
+                  </>
+                )}
+              </button>
+            </div>
           </div>
         </div>
       )}
@@ -2756,6 +3339,237 @@ export default function AdminEditServicePage({ params }: PageProps) {
               </button>
             </div>
           </div>
+        </div>
+      )}
+
+      {/* ═════════════════════════════════════════════════════════════════════ */}
+      {/* MODAL: SERVICE FEATURE (ADD / EDIT)                                 */}
+      {/* ═════════════════════════════════════════════════════════════════════ */}
+      {featureModalOpen && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in duration-200">
+          <div className="bg-white rounded-3xl max-w-lg w-full max-h-[90vh] flex flex-col shadow-2xl border border-[#E8E2DC] overflow-hidden">
+            {/* Modal Header */}
+            <div className="flex items-center justify-between p-6 border-b border-[#F1EDE8]">
+              <div>
+                <h2 className="text-lg font-bold font-displayPlayFair text-[#1d1a17]">
+                  {editingFeature ? "Edit Feature" : "Add New Feature"}
+                  {featureModalTarget?.sectionName && (
+                    <span className="text-[#8B7355] ml-2 text-xs font-sans font-bold uppercase tracking-wider">
+                      • {featureModalTarget.sectionName}
+                    </span>
+                  )}
+                </h2>
+                <p className="text-xs text-[#64748B] mt-0.5">
+                  Configure feature title in 3 languages (EN, NL, DE) and pricing
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setFeatureModalOpen(false)}
+                className="p-2 rounded-xl text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors cursor-pointer"
+              >
+                <HiOutlineX className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Error banner */}
+            {featureModalError && (
+              <div className="mx-6 mt-4 p-3 rounded-xl bg-red-50 text-red-600 text-xs border border-red-100">
+                {featureModalError}
+              </div>
+            )}
+
+            {/* Modal Form */}
+            <form onSubmit={handleSaveFeatureModal} className="flex-grow overflow-y-auto p-6 space-y-5">
+              {/* Multilingual Titles */}
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold text-[#8B7355] uppercase tracking-wider">
+                    Feature Name Translations
+                  </span>
+                  <span className="text-[10px] text-gray-400">English is required</span>
+                </div>
+
+                {/* English */}
+                <div>
+                  <label className="block text-xs font-semibold text-[#1d1a17] mb-1.5 flex items-center gap-1.5">
+                    <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-[#FAF8F5] text-[#8B7355] border border-[#E8E2DC]">
+                      EN
+                    </span>
+                    English Title <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="e.g. Heated Towels"
+                    value={featureForm.feature_en}
+                    onChange={(e) => setFeatureForm((f) => ({ ...f, feature_en: e.target.value }))}
+                    className="w-full px-3.5 py-2.5 rounded-xl text-xs text-[#1d1a17] border border-[#E2E8F0] focus:border-[#8B7355] focus:outline-hidden bg-white"
+                  />
+                </div>
+
+                {/* Dutch */}
+                <div>
+                  <label className="block text-xs font-semibold text-[#1d1a17] mb-1.5 flex items-center gap-1.5">
+                    <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-[#FAF8F5] text-[#8B7355] border border-[#E8E2DC]">
+                      NL
+                    </span>
+                    Dutch Title (Nederlands)
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="e.g. Verwarmde Handdoeken"
+                    value={featureForm.feature_nl}
+                    onChange={(e) => setFeatureForm((f) => ({ ...f, feature_nl: e.target.value }))}
+                    className="w-full px-3.5 py-2.5 rounded-xl text-xs text-[#1d1a17] border border-[#E2E8F0] focus:border-[#8B7355] focus:outline-hidden bg-white"
+                  />
+                </div>
+
+                {/* German */}
+                <div>
+                  <label className="block text-xs font-semibold text-[#1d1a17] mb-1.5 flex items-center gap-1.5">
+                    <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-[#FAF8F5] text-[#8B7355] border border-[#E8E2DC]">
+                      DE
+                    </span>
+                    German Title (Deutsch)
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="e.g. Beheizte Handtücher"
+                    value={featureForm.feature_de}
+                    onChange={(e) => setFeatureForm((f) => ({ ...f, feature_de: e.target.value }))}
+                    className="w-full px-3.5 py-2.5 rounded-xl text-xs text-[#1d1a17] border border-[#E2E8F0] focus:border-[#8B7355] focus:outline-hidden bg-white"
+                  />
+                </div>
+              </div>
+
+              {/* Price Field */}
+              <div className="pt-3 border-t border-[#F1EDE8]">
+                <label className="block text-xs font-semibold text-[#1d1a17] mb-1.5">
+                  Price € (Optional / Add-on Price)
+                </label>
+                <div className="relative">
+                  <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 text-xs">€</span>
+                  <input
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    placeholder="0.00"
+                    value={featureForm.price}
+                    onChange={(e) => setFeatureForm((f) => ({ ...f, price: e.target.value }))}
+                    className="w-full pl-8 pr-3.5 py-2.5 rounded-xl text-xs text-[#1d1a17] border border-[#E2E8F0] focus:border-[#8B7355] focus:outline-hidden bg-white"
+                  />
+                </div>
+                <p className="text-[11px] text-gray-500 mt-1">
+                  Enter 0.00 if this feature is included for free in the session.
+                </p>
+              </div>
+
+              {/* Modal Footer */}
+              <div className="flex items-center justify-between pt-5 border-t border-[#F1EDE8]">
+                {editingFeature ? (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const f = editingFeature;
+                      setFeatureModalOpen(false);
+                      setFeatureToDelete({
+                        id: f.id,
+                        title: f.feature_en || f.feature,
+                        service_type: featureModalTarget?.service_type || "sauna",
+                        sub_type: featureModalTarget?.sub_type,
+                      });
+                    }}
+                    className="px-3.5 py-2 rounded-xl text-red-600 hover:bg-red-50 text-xs font-semibold transition-colors flex items-center gap-1.5 cursor-pointer"
+                  >
+                    <HiOutlineTrash className="w-4 h-4" />
+                    <span>Delete Feature</span>
+                  </button>
+                ) : (
+                  <div />
+                )}
+
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    disabled={isSavingFeature}
+                    onClick={() => setFeatureModalOpen(false)}
+                    className="px-4 py-2 rounded-xl border border-gray-300 text-gray-700 hover:bg-gray-50 text-xs font-semibold cursor-pointer"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={isSavingFeature}
+                    className="px-6 py-2.5 rounded-xl bg-[#8B7355] hover:bg-[#705b41] text-white text-xs font-bold uppercase tracking-wider transition-all shadow-md flex items-center gap-2 cursor-pointer disabled:opacity-50"
+                  >
+                    {isSavingFeature ? (
+                      <>
+                        <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                        <span>Saving...</span>
+                      </>
+                    ) : (
+                      <span>{editingFeature ? "Update Feature" : "Add Feature"}</span>
+                    )}
+                  </button>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ═════════════════════════════════════════════════════════════════════ */}
+      {/* MODAL: FEATURE DELETE CONFIRMATION                                  */}
+      {/* ═════════════════════════════════════════════════════════════════════ */}
+      {featureToDelete && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in duration-200">
+          <div className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-[#E8E2DC] space-y-4">
+            <div className="w-12 h-12 rounded-2xl bg-red-50 text-red-600 flex items-center justify-center">
+              <HiOutlineTrash className="w-6 h-6" />
+            </div>
+            <div>
+              <h3 className="text-base font-bold text-[#1d1a17]">Delete Feature?</h3>
+              <p className="text-xs text-[#64748B] mt-1">
+                Are you sure you want to permanently delete feature &ldquo;{featureToDelete.title}&rdquo;? This action cannot be undone.
+              </p>
+            </div>
+            <div className="flex items-center justify-end gap-3 pt-3 border-t border-[#F1EDE8]">
+              <button
+                type="button"
+                disabled={isDeletingFeature}
+                onClick={() => setFeatureToDelete(null)}
+                className="px-4 py-2 rounded-xl border border-gray-300 text-gray-700 hover:bg-gray-50 text-xs font-semibold cursor-pointer"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                disabled={isDeletingFeature}
+                onClick={handleConfirmDeleteFeature}
+                className="px-5 py-2 rounded-xl bg-red-600 hover:bg-red-700 text-white text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
+              >
+                {isDeletingFeature ? (
+                  <>
+                    <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    <span>Deleting...</span>
+                  </>
+                ) : (
+                  <span>Delete Permanently</span>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Floating Success Toast */}
+      {featureSuccessToast && (
+        <div className="fixed bottom-6 right-6 z-50 bg-[#1d1a17] text-white px-4 py-3 rounded-2xl shadow-xl flex items-center gap-3 border border-white/10 animate-in slide-in-from-bottom-3 duration-200">
+          <div className="w-6 h-6 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center">
+            <HiOutlineCheck className="w-4 h-4" />
+          </div>
+          <span className="text-xs font-medium">{featureSuccessToast}</span>
         </div>
       )}
     </div>

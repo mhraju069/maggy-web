@@ -60,6 +60,12 @@ export const ENDPOINTS = {
     SCHEDULES: "/services/schedules/",
     GET_SLOT: "/services/get_slot/",
     SLOTS: (serviceType?: string) => serviceType ? `/services/slots/${serviceType}/` : "/services/slots/",
+    ADMIN: {
+      MANAGE: "/dashboard/admin/services/manage/",
+      SETTINGS: "/dashboard/admin/services/settings/",
+      FEATURES: "/dashboard/admin/services/features/",
+      DETAIL: (serviceType: string) => `/dashboard/admin/services/${serviceType}/`,
+    },
   },
   CONTACT: {
     SUBMIT: "/contact/",

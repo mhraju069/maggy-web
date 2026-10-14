@@ -10,6 +10,9 @@ import { ServiceItem } from "../types";
 export interface SaunaFeature {
   id: number;
   feature: string;
+  feature_en?: string;
+  feature_nl?: string;
+  feature_de?: string;
   price?: string | number;
 }
 
@@ -77,6 +80,10 @@ export interface ActivityApiItem {
 export interface SaltroomFeature {
   id: number;
   feature: string;
+  feature_en?: string;
+  feature_nl?: string;
+  feature_de?: string;
+  price?: string | number;
 }
 
 export interface SaltroomItem {
@@ -454,12 +461,15 @@ export const servicesService = {
   async getAllServices(serviceType?: string): Promise<any[]> {
     try {
       const params = serviceType ? { type: serviceType } : undefined;
-      // Try /dashboard/admin/services/ as documented, fallback to /services/
       let res: any;
       try {
-        res = await ApiClient.get<any>("/dashboard/admin/services/", { params, skipAuth: true });
+        res = await ApiClient.get<any>("/dashboard/admin/services/manage/", { params, skipAuth: true });
       } catch {
-        res = await ApiClient.get<any>(ENDPOINTS.SERVICES.ALL, { params, skipAuth: true });
+        try {
+          res = await ApiClient.get<any>("/dashboard/admin/services/", { params, skipAuth: true });
+        } catch {
+          res = await ApiClient.get<any>(ENDPOINTS.SERVICES.ALL, { params, skipAuth: true });
+        }
       }
 
       if (res?.data && Array.isArray(res.data)) return res.data;
@@ -667,12 +677,57 @@ export const servicesService = {
     });
   },
 
-  async updateService(
-    id: number | string,
+  async createService(
     data: FormData | Record<string, any>
   ): Promise<any> {
-    // Attempt updating via /services/:id/ or fallback
-    return ApiClient.patch(`/services/${id}/`, data);
+    try {
+      return await ApiClient.post("/dashboard/admin/services/manage/", data);
+    } catch {
+      try {
+        return await ApiClient.post("/dashboard/admin/services/", data);
+      } catch {
+        return ApiClient.post("/services/", data);
+      }
+    }
+  },
+
+  async updateService(
+    idOrType: number | string,
+    data: FormData | Record<string, any>
+  ): Promise<any> {
+    const isId = typeof idOrType === "number" || /^\d+$/.test(String(idOrType));
+    const endpoint = isId
+      ? `/dashboard/admin/services/manage/${idOrType}/`
+      : `/dashboard/admin/services/manage/?type=${encodeURIComponent(String(idOrType))}`;
+
+    try {
+      return await ApiClient.patch(endpoint, data);
+    } catch {
+      try {
+        return await ApiClient.patch(`/dashboard/admin/services/${idOrType}/`, data);
+      } catch {
+        return ApiClient.patch(`/services/${idOrType}/`, data);
+      }
+    }
+  },
+
+  async deleteService(
+    idOrType: number | string
+  ): Promise<any> {
+    const isId = typeof idOrType === "number" || /^\d+$/.test(String(idOrType));
+    const endpoint = isId
+      ? `/dashboard/admin/services/manage/${idOrType}/`
+      : `/dashboard/admin/services/manage/?type=${encodeURIComponent(String(idOrType))}`;
+
+    try {
+      return await ApiClient.delete(endpoint);
+    } catch {
+      try {
+        return await ApiClient.delete(`/dashboard/admin/services/${idOrType}/`);
+      } catch {
+        return ApiClient.delete(`/services/${idOrType}/`);
+      }
+    }
   },
 
   async getAdminServiceDetail(serviceTypeOrId: string | number): Promise<any> {
@@ -721,6 +776,99 @@ export const servicesService = {
       return await ApiClient.patch(`/dashboard/admin/services/${pathSegment}/`, data);
     } catch {
       return ApiClient.patch(`/dashboards/admin/services/${pathSegment}/`, data);
+    }
+  },
+
+  // ══════════════════════════════════════════════════════════════════════
+  // 1. OPENING HOURS / SERVICE SETTINGS CRUD
+  // ══════════════════════════════════════════════════════════════════════
+  async getOperatingHours(params?: {
+    service_id?: number | string;
+    service_type?: string;
+    id?: number | string;
+  }): Promise<any> {
+    return ApiClient.get("/dashboard/admin/services/settings/", { params });
+  },
+
+  async createOperatingHours(data: {
+    service_type?: string;
+    service_id?: number | string;
+    week_days: string[];
+    open_time: string;
+    close_time: string;
+    is_closed?: boolean;
+  }): Promise<any> {
+    return ApiClient.post("/dashboard/admin/services/settings/", data);
+  },
+
+  async updateOperatingHours(
+    settingId: number | string,
+    data: Partial<{
+      week_days: string[];
+      open_time: string;
+      close_time: string;
+      is_closed: boolean;
+    }>
+  ): Promise<any> {
+    return ApiClient.patch(`/dashboard/admin/services/settings/${settingId}/`, data);
+  },
+
+  async deleteOperatingHours(settingId: number | string): Promise<any> {
+    return ApiClient.delete(`/dashboard/admin/services/settings/${settingId}/`);
+  },
+
+  // ══════════════════════════════════════════════════════════════════════
+  // 2. SERVICE FEATURES MANAGEMENT CRUD
+  // ══════════════════════════════════════════════════════════════════════
+  async getFeatures(params?: {
+    service_type?: string;
+    sub_type?: string;
+    feature_id?: number | string;
+  }): Promise<any> {
+    return ApiClient.get("/dashboard/admin/services/features/", { params });
+  },
+
+  async createFeature(data: {
+    service_type: string;
+    sub_type?: string;
+    feature: string;
+    feature_en?: string;
+    feature_nl?: string;
+    feature_de?: string;
+    price?: number | string;
+  }): Promise<any> {
+    return ApiClient.post("/dashboard/admin/services/features/", data);
+  },
+
+  async updateFeature(
+    featureId: number | string,
+    data: Partial<{
+      feature: string;
+      feature_en: string;
+      feature_nl: string;
+      feature_de: string;
+      price: number | string;
+    }>
+  ): Promise<any> {
+    return ApiClient.patch(`/dashboard/admin/services/features/${featureId}/`, data);
+  },
+
+  async deleteFeature(
+    featureId: number | string,
+    serviceType?: string,
+    subType?: string
+  ): Promise<any> {
+    try {
+      return await ApiClient.delete(`/dashboard/admin/services/features/${featureId}/`);
+    } catch (err) {
+      if (serviceType) {
+        return ApiClient.patch(`/dashboard/admin/services/${serviceType}/`, {
+          action: "delete_feature",
+          feature_id: featureId,
+          ...(subType ? { sub_type: subType } : {}),
+        });
+      }
+      throw err;
     }
   },
 };
