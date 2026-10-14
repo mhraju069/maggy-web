@@ -91,6 +91,12 @@ function DashboardHeader() {
 
 function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const router = useRouter();
+
+  const handleLogout = () => {
+    document.cookie = "role=; path=/; max-age=0";
+    router.push("/login");
+  };
 
   return (
     <div className="min-h-screen flex font-cambria bg-white">
@@ -108,7 +114,7 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
         </div>
 
         {/* Primary nav */}
-        <nav className="flex flex-col gap-1 flex-1">
+        <nav className="flex flex-col gap-1">
           {NAV.map(({ href, label, Icon }) => {
             const active =
               href === "/dashboard"
@@ -129,6 +135,24 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
               </Link>
             );
           })}
+
+          {/* Divider right below Profile */}
+          <hr className="border-t border-[#E8E2DC] my-2" />
+
+          <Link
+            href="/"
+            className="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium text-[#64748B] hover:bg-[#F8F4F0] hover:text-[#1d1a17] transition-colors"
+          >
+            <HiOutlineGlobe className="w-4 h-4 flex-shrink-0" />
+            View Website
+          </Link>
+          <button
+            onClick={handleLogout}
+            className="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium text-red-500 hover:bg-red-50 transition-colors w-full text-left cursor-pointer"
+          >
+            <HiArrowRightOnRectangle className="w-4 h-4 flex-shrink-0" />
+            Log Out
+          </button>
         </nav>
       </aside>
 

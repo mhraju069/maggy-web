@@ -123,4 +123,89 @@ export const paymentsService = {
   }): Promise<{ success: boolean; message?: string; data?: any }> {
     return ApiClient.post(ENDPOINTS.PAYMENTS.CONFIRM_PAYMENT, payload);
   },
+
+  /**
+   * Admin Payments: Overview, Monthly Breakdown, and Searchable Booking Payments List
+   */
+  async getAdminPayments(params?: AdminPaymentsQueryParams): Promise<AdminPaymentsResponse> {
+    return ApiClient.get<AdminPaymentsResponse>(ENDPOINTS.PAYMENTS.ADMIN.LIST, { params });
+  },
 };
+
+export interface ServicePaymentBreakdownItem {
+  service_type: string;
+  service_name: string;
+  revenue: string;
+  transactions_count: number;
+}
+
+export interface MonthlyPaymentsSummary {
+  month_name: string;
+  year: number;
+  month: number;
+  total_revenue: string;
+  total_transactions: number;
+  currency: string;
+  services: ServicePaymentBreakdownItem[];
+}
+
+export interface AdminPaymentItem {
+  id: number;
+  booking_id: string;
+  service_type: string;
+  service_name: string;
+  client_name: string;
+  client_email: string;
+  client_phone: string;
+  user_id?: number | null;
+  amount: string;
+  currency: string;
+  payment_status: "paid" | "paid_with_package" | "pending" | string;
+  booking_status: string;
+  date: string;
+  time: string;
+  guests: number;
+  transaction_id?: string | null;
+  payment_date?: string | null;
+  created_at?: string | null;
+  details?: Record<string, any>;
+}
+
+export interface AdminPaymentsResponse {
+  success: boolean;
+  monthly_summary: MonthlyPaymentsSummary;
+  count: number;
+  total_pages: number;
+  current_page: number;
+  page_size: number;
+  has_next: boolean;
+  has_previous: boolean;
+  next_page: number | null;
+  previous_page: number | null;
+  results: AdminPaymentItem[];
+  data?: AdminPaymentItem[];
+}
+
+export interface AdminPaymentsQueryParams extends Record<string, string | number | boolean | null | undefined> {
+  month?: number;
+  year?: number;
+  search?: string;
+  q?: string;
+  service_type?: string;
+  payment_status?: string;
+  booking_status?: string;
+  date?: string;
+  start_date?: string;
+  date_from?: string;
+  end_date?: string;
+  date_to?: string;
+  booking_id?: string;
+  client_name?: string;
+  email?: string;
+  ordering?: string;
+  page?: number;
+  page_size?: number;
+  limit?: number;
+}
+
+export default paymentsService;

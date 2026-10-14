@@ -55,7 +55,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         </div>
 
         {/* Primary nav */}
-        <nav className="flex flex-col gap-0.5 flex-1">
+        <nav className="flex flex-col gap-0.5">
           {NAV.map(({ href, label, Icon }) => {
             const active = href === "/admin" ? pathname === "/admin" : pathname.startsWith(href);
             return (
@@ -73,11 +73,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               </Link>
             );
           })}
-        </nav>
 
-        {/* Secondary nav */}
-        <div className="flex flex-col gap-0.5 mt-4">
-          <hr className="border-t border-[#E2E8F0] mb-2" />
+          {/* Divider right below Profile */}
+          <hr className="border-t border-[#E8E2DC] my-2" />
+
           <Link
             href="/"
             className="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium text-[#64748B] hover:bg-[#F8F4F0] hover:text-[#1d1a17] transition-colors"
@@ -87,12 +86,12 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           </Link>
           <button
             onClick={logout}
-            className="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium text-red-500 hover:bg-red-50 transition-colors w-full text-left"
+            className="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium text-red-500 hover:bg-red-50 transition-colors w-full text-left cursor-pointer"
           >
             <HiArrowRightOnRectangle className="w-4 h-4 flex-shrink-0" />
             Log Out
           </button>
-        </div>
+        </nav>
       </aside>
 
       {/* ── MAIN ── */}

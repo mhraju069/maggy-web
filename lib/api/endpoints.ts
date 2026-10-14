@@ -50,6 +50,9 @@ export const ENDPOINTS = {
     PURCHASE: "/payments/purchase/",
     CONFIRM: "/payments/confirm/",
     CONFIRM_PAYMENT: "/payments/confirm-payment/",
+    ADMIN: {
+      LIST: "/dashboard/admin/payments/",
+    },
   },
   SERVICES: {
     ALL: "/services/",
