@@ -36,6 +36,11 @@ export const ENDPOINTS = {
     SALTROOM_CREATE: "/bookings/saltroom/",
     EVENTS_CREATE: "/bookings/events/",
     PACKAGES_CREATE: "/bookings/packages/",
+    ADMIN: {
+      LIST: "/dashboard/admin/bookings/",
+      DETAIL: (id: string | number) => `/dashboard/admin/bookings/${id}/`,
+      UPDATE: (id: string | number) => `/dashboard/admin/bookings/${id}/`,
+    },
   },
   PAYMENTS: {
     CREATE_INTENT: "/payments/create-intent/",

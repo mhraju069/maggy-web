@@ -267,6 +267,120 @@ export const bookingService = {
   async getUserSessionPasses(): Promise<any> {
     return ApiClient.get(ENDPOINTS.BOOKINGS.USER_SESSION_PASSES);
   },
+
+  // ══════════════════════════════════════════════════════════════════════
+  // ADMIN BOOKINGS MANAGEMENT
+  // ══════════════════════════════════════════════════════════════════════
+  async getAdminBookings(params?: AdminBookingsQueryParams): Promise<AdminBookingsResponse> {
+    return ApiClient.get<AdminBookingsResponse>(ENDPOINTS.BOOKINGS.ADMIN.LIST, { params });
+  },
+
+  async getAdminBookingDetail(bookingId: string | number): Promise<{ success: boolean; data: AdminBookingItem }> {
+    return ApiClient.get<{ success: boolean; data: AdminBookingItem }>(
+      ENDPOINTS.BOOKINGS.ADMIN.DETAIL(bookingId)
+    );
+  },
+
+  async updateAdminBookingStatus(
+    bookingId: string | number,
+    payload: AdminUpdateBookingPayload
+  ): Promise<{ success: boolean; message: string; data: AdminBookingItem }> {
+    return ApiClient.patch<{ success: boolean; message: string; data: AdminBookingItem }>(
+      ENDPOINTS.BOOKINGS.ADMIN.UPDATE(bookingId),
+      payload
+    );
+  },
 };
+
+export interface AdminBookingItem {
+  id: number;
+  booking_id: string;
+  service_type: "sauna" | "lunchroom" | "activity" | "saltroom" | "package" | "event" | string;
+  service_name: string;
+  client_name: string;
+  client_email: string;
+  client_phone: string;
+  user_id?: number | null;
+  date: string;
+  time: string;
+  end_time?: string | null;
+  guests: number;
+  status: "pending" | "confirmed" | "cancelled" | string;
+  payment_status: "pending" | "paid" | "paid_with_package" | string;
+  total_price: string;
+  special_request?: string;
+  created_at?: string;
+  access_code?: string;
+  details?: {
+    // Sauna
+    sauna_type?: string;
+    time_slot?: string;
+    selected_features?: any[];
+    // Lunchroom
+    celebration_type?: string;
+    celebration_date?: string | null;
+    name_of_celebrant?: string;
+    age_of_celebrant?: number | null;
+    hobbies?: string;
+    celebration_details?: string;
+    // Activity
+    activity_id?: number;
+    activity_title?: string;
+    // Salt room
+    used_pass?: boolean;
+    used_subscription?: boolean;
+    is_paid?: boolean;
+    // Package
+    is_custom?: boolean;
+    service_names?: string[];
+    booked_services_ids?: (Record<string, string> | any)[];
+    // Event
+    food_preference?: string;
+    drink_preference?: string;
+    music_preference?: string;
+    notes?: string;
+    special_request?: string;
+    [key: string]: any;
+  };
+}
+
+export interface AdminBookingsQueryParams extends Record<string, string | number | boolean | null | undefined> {
+  search?: string;
+  q?: string;
+  service_type?: string;
+  date?: string;
+  start_date?: string;
+  date_from?: string;
+  end_date?: string;
+  date_to?: string;
+  status?: string;
+  payment_status?: string;
+  booking_id?: string;
+  client_name?: string;
+  email?: string;
+  ordering?: string;
+  page?: number;
+  page_size?: number;
+  limit?: number;
+}
+
+export interface AdminBookingsResponse {
+  success: boolean;
+  count: number;
+  total_pages: number;
+  current_page: number;
+  page_size: number;
+  has_next: boolean;
+  has_previous: boolean;
+  next_page: number | null;
+  previous_page: number | null;
+  results: AdminBookingItem[];
+  data?: AdminBookingItem[];
+}
+
+export interface AdminUpdateBookingPayload {
+  status?: "pending" | "confirmed" | "cancelled" | string;
+  payment_status?: "pending" | "paid" | "paid_with_package" | string;
+}
 
 export default bookingService;
