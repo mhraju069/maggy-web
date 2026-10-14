@@ -451,9 +451,17 @@ export const servicesService = {
     return items;
   },
 
-  async getAllServices(): Promise<any[]> {
+  async getAllServices(serviceType?: string): Promise<any[]> {
     try {
-      const res = await ApiClient.get<any>(ENDPOINTS.SERVICES.ALL, { skipAuth: true });
+      const params = serviceType ? { type: serviceType } : undefined;
+      // Try /dashboard/admin/services/ as documented, fallback to /services/
+      let res: any;
+      try {
+        res = await ApiClient.get<any>("/dashboard/admin/services/", { params, skipAuth: true });
+      } catch {
+        res = await ApiClient.get<any>(ENDPOINTS.SERVICES.ALL, { params, skipAuth: true });
+      }
+
       if (res?.data && Array.isArray(res.data)) return res.data;
       if (Array.isArray(res)) return res;
       if (res?.results && Array.isArray(res.results)) return res.results;
@@ -657,6 +665,63 @@ export const servicesService = {
       skipAuth: true,
       params,
     });
+  },
+
+  async updateService(
+    id: number | string,
+    data: FormData | Record<string, any>
+  ): Promise<any> {
+    // Attempt updating via /services/:id/ or fallback
+    return ApiClient.patch(`/services/${id}/`, data);
+  },
+
+  async getAdminServiceDetail(serviceTypeOrId: string | number): Promise<any> {
+    const isId = typeof serviceTypeOrId === "number" || /^\d+$/.test(String(serviceTypeOrId));
+    const pathSegment = String(serviceTypeOrId).trim().toLowerCase();
+
+    // 1. Try standard dashboard path
+    try {
+      const res = await ApiClient.get<any>(`/dashboard/admin/services/${pathSegment}/`, {
+        params: isId ? { id: serviceTypeOrId } : { type: pathSegment },
+      });
+      if (res && res.success) return res;
+    } catch {
+      // Fallback
+    }
+
+    // 2. Try plural dashboards path
+    try {
+      const res = await ApiClient.get<any>(`/dashboards/admin/services/${pathSegment}/`, {
+        params: isId ? { id: serviceTypeOrId } : { type: pathSegment },
+      });
+      if (res && res.success) return res;
+    } catch {
+      // Fallback
+    }
+
+    // 3. Try details query parameter
+    try {
+      const res = await ApiClient.get<any>(`/dashboard/admin/services/details/`, {
+        params: isId ? { id: serviceTypeOrId } : { type: pathSegment },
+      });
+      if (res && res.success) return res;
+    } catch {
+      // Final fallback
+    }
+
+    return ApiClient.get(`/dashboard/admin/services/${pathSegment}/`);
+  },
+
+  async updateAdminService(
+    serviceTypeOrId: string | number,
+    data: FormData | Record<string, any>
+  ): Promise<any> {
+    const pathSegment = String(serviceTypeOrId).trim().toLowerCase();
+    try {
+      return await ApiClient.patch(`/dashboard/admin/services/${pathSegment}/`, data);
+    } catch {
+      return ApiClient.patch(`/dashboards/admin/services/${pathSegment}/`, data);
+    }
   },
 };
 
