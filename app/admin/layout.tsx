@@ -6,32 +6,32 @@ import { usePathname, useRouter } from "next/navigation";
 import { HiOutlineBell, HiOutlineGlobe } from "react-icons/hi";
 import { HiArrowRightOnRectangle } from "react-icons/hi2";
 import {
-    MdDashboard, MdEventNote,
-    MdMiscellaneousServices,
-    MdPayment,
-    MdPerson,
-    MdSettings,
-    MdTune,
-    MdVpnKey, MdWarning,
-    MdOutlineSupportAgent,
-    MdCardMembership,
+  MdDashboard, MdEventNote,
+  MdMiscellaneousServices,
+  MdPayment,
+  MdPerson,
+  MdSettings,
+  MdTune,
+  MdVpnKey, MdWarning,
+  MdOutlineSupportAgent,
+  MdCardMembership,
 } from "react-icons/md";
 
 import { FaChalkboardTeacher } from "react-icons/fa";
 
 const NAV = [
   // { href: "/admin",                label: "Dashboard",             Icon: MdDashboard },
-  { href: "/admin/reservations",   label: "Reservations",          Icon: MdEventNote },
-  { href: "/admin/availability",   label: "Availability & Capacity", Icon: MdTune },
-  { href: "/admin/services",       label: "Services",              Icon: MdMiscellaneousServices },
-  { href: "/admin/subscriptions",  label: "Subscriptions",         Icon: MdCardMembership },
+  { href: "/admin/reservations", label: "Reservations", Icon: MdEventNote },
+  { href: "/admin/availability", label: "Availability & Capacity", Icon: MdTune },
+  { href: "/admin/services", label: "Services", Icon: MdMiscellaneousServices },
+  { href: "/admin/subscriptions", label: "Subscriptions", Icon: MdCardMembership },
   // { href: "/admin/activities",     label: "Activities & Events",   Icon: FaChalkboardTeacher },
-  { href: "/admin/payments",       label: "Payments",              Icon: MdPayment },
-  { href: "/admin/access-codes",   label: "Access Codes",          Icon: MdVpnKey },
-  { href: "/admin/exceptions",     label: "Exceptions",            Icon: MdWarning },
-  { href: "/admin/support-messages", label: "Support Messages",    Icon: MdOutlineSupportAgent },
-  { href: "/admin/settings",       label: "Settings",              Icon: MdSettings },
-  { href: "/admin/profile",        label: "Profile",               Icon: MdPerson },
+  { href: "/admin/payments", label: "Payments", Icon: MdPayment },
+  { href: "/admin/access-codes", label: "Access Codes", Icon: MdVpnKey },
+  { href: "/admin/exceptions", label: "Exceptions", Icon: MdWarning },
+  { href: "/admin/support-messages", label: "Support Messages", Icon: MdOutlineSupportAgent },
+  { href: "/admin/settings", label: "Settings", Icon: MdSettings },
+  { href: "/admin/profile", label: "Profile", Icon: MdPerson },
 ];
 
 import { useState, useEffect } from "react";
@@ -110,11 +110,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               <Link
                 key={href}
                 href={href}
-                className={`flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-colors ${
-                  active
-                    ? "bg-[#CFB9A3] text-white"
-                    : "text-[#64748B] hover:bg-[#F8F4F0] hover:text-[#1d1a17]"
-                }`}
+                className={`flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-colors ${active
+                  ? "bg-[#CFB9A3] text-white"
+                  : "text-[#64748B] hover:bg-[#F8F4F0] hover:text-[#1d1a17]"
+                  }`}
               >
                 <Icon className="w-4 h-4 flex-shrink-0" />
                 {label}
@@ -146,10 +145,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       <div className="flex-1 flex flex-col bg-[#FCF2E9] min-h-screen">
         {/* Top bar */}
         <header className="flex items-center justify-end gap-4 px-8 py-4 bg-white border-b border-[#F1EDE8]">
-          <button className="relative text-[#94A3B8] hover:text-[#8b7355] transition-colors">
+          {/* <button className="relative text-[#94A3B8] hover:text-[#8b7355] transition-colors">
             <HiOutlineBell className="w-6 h-6" />
             <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full text-white text-[9px] flex items-center justify-center font-bold">3</span>
-          </button>
+          </button> */}
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 rounded-full bg-[#CFB9A3] flex items-center justify-center text-white font-bold text-sm shadow-xs uppercase overflow-hidden border border-[#E8E2DC]">
               {adminUser.image ? (
