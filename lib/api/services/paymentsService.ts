@@ -95,6 +95,40 @@ export const paymentsService = {
   },
 
   /**
+   * Create new Session Pass (Admin)
+   */
+  async createSessionPass(payload: {
+    name: string;
+    price: string | number;
+    entry_limit: number;
+    feature_list?: string[];
+  }): Promise<SessionPassItem> {
+    return ApiClient.post<SessionPassItem>(ENDPOINTS.PAYMENTS.SESSION_PASSES, payload);
+  },
+
+  /**
+   * Update Session Pass (Admin)
+   */
+  async updateSessionPass(
+    id: number | string,
+    payload: {
+      name?: string;
+      price?: string | number;
+      entry_limit?: number;
+      feature_list?: string[];
+    }
+  ): Promise<SessionPassItem> {
+    return ApiClient.patch<SessionPassItem>(ENDPOINTS.PAYMENTS.SESSION_PASS_DETAIL(id), payload);
+  },
+
+  /**
+   * Delete Session Pass (Admin)
+   */
+  async deleteSessionPass(id: number | string): Promise<any> {
+    return ApiClient.delete(ENDPOINTS.PAYMENTS.SESSION_PASS_DETAIL(id));
+  },
+
+  /**
    * Fetch subscription plans only (optional filters)
    */
   async getSubscriptionPlans(params?: {
@@ -105,6 +139,46 @@ export const paymentsService = {
       params,
       skipAuth: true,
     });
+  },
+
+  /**
+   * Create new Subscription Plan (Admin)
+   */
+  async createSubscriptionPlan(payload: {
+    name: string;
+    price: string | number;
+    plan_type: "weekly" | "unlimited" | string;
+    plan_category: "saltroom" | "sauna" | string;
+    max_reservations?: number;
+    duration_weeks?: number;
+    feature_list?: string[];
+  }): Promise<SubscriptionPlanItem> {
+    return ApiClient.post<SubscriptionPlanItem>(ENDPOINTS.PAYMENTS.SUBSCRIPTION_PLANS, payload);
+  },
+
+  /**
+   * Update Subscription Plan (Admin)
+   */
+  async updateSubscriptionPlan(
+    id: number | string,
+    payload: {
+      name?: string;
+      price?: string | number;
+      plan_type?: string;
+      plan_category?: string;
+      max_reservations?: number;
+      duration_weeks?: number;
+      feature_list?: string[];
+    }
+  ): Promise<SubscriptionPlanItem> {
+    return ApiClient.patch<SubscriptionPlanItem>(ENDPOINTS.PAYMENTS.SUBSCRIPTION_PLAN_DETAIL(id), payload);
+  },
+
+  /**
+   * Delete Subscription Plan (Admin)
+   */
+  async deleteSubscriptionPlan(id: number | string): Promise<any> {
+    return ApiClient.delete(ENDPOINTS.PAYMENTS.SUBSCRIPTION_PLAN_DETAIL(id));
   },
 
   /**

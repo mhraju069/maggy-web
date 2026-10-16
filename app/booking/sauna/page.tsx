@@ -558,8 +558,7 @@ export default function SaunaBookingPage() {
             </div>
           </div>
 
-          {/* Memberships Card Highlight */}
-          <div className="p-6 rounded-2xl bg-gradient-to-r from-[#FCF2E9] to-[#FBF6F3] border border-[#E8E2DC] space-y-4">
+          {/* <div className="p-6 rounded-2xl bg-gradient-to-r from-[#FCF2E9] to-[#FBF6F3] border border-[#E8E2DC] space-y-4">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-[#E8E2DC]/80 pb-4">
               <div>
                 <span className="text-[10px] font-bold uppercase tracking-widest text-[#8B7355] block mb-1">
@@ -581,7 +580,7 @@ export default function SaunaBookingPage() {
               </Link>
             </div>
 
-            {/* Shared Sauna Membership Plans Quick Info */}
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
               <div className="p-4 rounded-xl bg-white border border-[#E8E2DC]">
                 <h5 className="font-bold text-[#0F172A] mb-1">Once a Week Membership</h5>
@@ -595,7 +594,7 @@ export default function SaunaBookingPage() {
                 <p className="text-[#64748B] mt-1">Unlimited sessions (max 10 future active reservations).</p>
               </div>
             </div>
-          </div>
+          </div>  */}
 
           {/* Price Calculation Summary */}
           <div className="p-6 rounded-2xl bg-[#FBF6F3] border border-[#E8E2DC] flex justify-between items-center">
