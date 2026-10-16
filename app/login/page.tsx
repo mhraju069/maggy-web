@@ -3,10 +3,11 @@
 import Footer from "@/components/shared/Footer";
 import Navbar from "@/components/shared/Navbar";
 import { authService, parseApiErrorMessage } from "@/lib/api";
+import { getStoredRole, getStoredToken } from "@/lib/api/token";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Suspense, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { HiOutlineLockClosed, HiOutlineMail } from "react-icons/hi";
 import { IoEyeOutline } from "react-icons/io5";
 
@@ -21,6 +22,19 @@ function LoginForm() {
   const [error, setError] = useState<string | null>(null);
   const [isInactive, setIsInactive] = useState(false);
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const token = getStoredToken();
+    if (token) {
+      if (redirectUrl && redirectUrl.startsWith("/")) {
+        router.replace(redirectUrl);
+      } else {
+        const role = getStoredRole();
+        const target = role === "admin" ? "/admin" : "/dashboard";
+        router.replace(target);
+      }
+    }
+  }, [redirectUrl, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

@@ -13,6 +13,7 @@ import {
     MdSettings,
     MdTune,
     MdVpnKey, MdWarning,
+    MdOutlineSupportAgent,
 } from "react-icons/md";
 
 import { FaChalkboardTeacher } from "react-icons/fa";
@@ -26,6 +27,7 @@ const NAV = [
   { href: "/admin/payments",       label: "Payments",              Icon: MdPayment },
   { href: "/admin/access-codes",   label: "Access Codes",          Icon: MdVpnKey },
   { href: "/admin/exceptions",     label: "Exceptions",            Icon: MdWarning },
+  { href: "/admin/support-messages", label: "Support Messages",    Icon: MdOutlineSupportAgent },
   { href: "/admin/settings",       label: "Settings",              Icon: MdSettings },
   { href: "/admin/profile",        label: "Profile",               Icon: MdPerson },
 ];

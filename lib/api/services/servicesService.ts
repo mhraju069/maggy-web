@@ -593,64 +593,76 @@ export const servicesService = {
   async getServiceSlots(serviceType: string = "sauna", date: string): Promise<ServiceSlotsResponse> {
     const cleanType = (serviceType || "sauna").toLowerCase() === "salt_room" ? "saltroom" : (serviceType || "sauna").toLowerCase();
     
-    // 1. For saltroom, try the new GET /services/get_slot/?s_type=saltroom&date=... endpoint first
-    if (cleanType === "saltroom") {
-      try {
-        const getSlotRes = await ApiClient.get<any>(ENDPOINTS.SERVICES.GET_SLOT, {
-          params: { s_type: "saltroom", date },
-        });
-        if (getSlotRes) {
-          // Normalize to ServiceSlotsResponse structure
-          const rawService = getSlotRes.service || {};
-          const rawSlots = Array.isArray(getSlotRes.slots) ? getSlotRes.slots : [];
-          const normalizedSlots: SaltRoomSlotItem[] = rawSlots.map((s: any) => {
-            const timeStr = s.time ? s.time.slice(0, 5) : (s.start_time || "09:00");
-            const durationMins = rawService.duration || 45;
-            // Calculate end time from timeStr + durationMins
-            const [h, m] = timeStr.split(":").map(Number);
-            const totalEndMin = (h * 60 + m) + durationMins;
-            const endH = Math.floor(totalEndMin / 60) % 24;
-            const endM = totalEndMin % 60;
-            const endTimeStr = `${String(endH).padStart(2, "0")}:${String(endM).padStart(2, "0")}`;
-
-            const availCap = typeof s.available_capacity === "number" ? s.available_capacity : (s.remaining_capacity ?? (rawService.max_capacity || 6));
-            const isBooked = Boolean(s.is_booked) || availCap <= 0;
-
-            return {
-              time: s.time || timeStr,
-              start_time: s.start_time || timeStr,
-              end_time: s.end_time || endTimeStr,
-              duration_minutes: durationMins,
-              max_capacity: rawService.max_capacity || 6,
-              remaining_capacity: availCap,
-              available_capacity: availCap,
-              booked_capacity: (rawService.max_capacity || 6) - availCap,
-              is_available: !isBooked,
-              is_booked: isBooked,
-              is_fully_booked: isBooked,
-            };
-          });
-
+    // 1. Try GET /services/get_slot/?type=...&date=... endpoint first
+    try {
+      const getSlotRes = await ApiClient.get<any>(ENDPOINTS.SERVICES.GET_SLOT, {
+        params: { type: cleanType, date },
+      });
+      if (getSlotRes) {
+        // If the response is already formatted as ServiceSlotsResponse (e.g. has data.private_sauna or data.shared_sauna or data.slots or data.saltroom)
+        if (getSlotRes.data) {
           return {
-            success: true,
-            is_blocked: false,
+            success: getSlotRes.success ?? true,
+            is_blocked: getSlotRes.is_blocked || false,
+            is_closed: getSlotRes.is_closed || false,
             date: getSlotRes.date || date,
-            service_type: "saltroom",
-            open_time: rawSlots[0]?.time?.slice(0, 5) || "09:00",
-            close_time: rawSlots[rawSlots.length - 1]?.time?.slice(0, 5) || "21:00",
-            data: {
-              price_per_person: rawService.price || "45.00",
-              max_capacity: rawService.max_capacity || 6,
-              duration_minutes: rawService.duration || 45,
-              slots: normalizedSlots,
-              available_slots: normalizedSlots.filter((s) => !s.is_booked),
-              user_membership: getSlotRes.user_membership,
-            },
+            service_type: getSlotRes.service_type || cleanType,
+            open_time: getSlotRes.open_time,
+            close_time: getSlotRes.close_time,
+            data: getSlotRes.data,
+            message: getSlotRes.message,
           };
         }
-      } catch (getSlotErr) {
-        // Fallback to /services/slots/
+
+        const rawService = getSlotRes.service || {};
+        const rawSlots = Array.isArray(getSlotRes.slots) ? getSlotRes.slots : [];
+        const normalizedSlots: SaltRoomSlotItem[] = rawSlots.map((s: any) => {
+          const timeStr = s.time ? s.time.slice(0, 5) : (s.start_time || "09:00");
+          const durationMins = rawService.duration || 45;
+          const [h, m] = timeStr.split(":").map(Number);
+          const totalEndMin = (h * 60 + m) + durationMins;
+          const endH = Math.floor(totalEndMin / 60) % 24;
+          const endM = totalEndMin % 60;
+          const endTimeStr = `${String(endH).padStart(2, "0")}:${String(endM).padStart(2, "0")}`;
+
+          const availCap = typeof s.available_capacity === "number" ? s.available_capacity : (s.remaining_capacity ?? (rawService.max_capacity || 6));
+          const isBooked = Boolean(s.is_booked) || availCap <= 0;
+
+          return {
+            time: s.time || timeStr,
+            start_time: s.start_time || timeStr,
+            end_time: s.end_time || endTimeStr,
+            duration_minutes: durationMins,
+            max_capacity: rawService.max_capacity || 6,
+            remaining_capacity: availCap,
+            available_capacity: availCap,
+            booked_capacity: (rawService.max_capacity || 6) - availCap,
+            is_available: !isBooked,
+            is_booked: isBooked,
+            is_fully_booked: isBooked,
+          };
+        });
+
+        return {
+          success: true,
+          is_blocked: getSlotRes.is_blocked || false,
+          is_closed: getSlotRes.is_closed || false,
+          date: getSlotRes.date || date,
+          service_type: cleanType,
+          open_time: rawSlots[0]?.time?.slice(0, 5) || "09:00",
+          close_time: rawSlots[rawSlots.length - 1]?.time?.slice(0, 5) || "21:00",
+          data: {
+            price_per_person: rawService.price || "45.00",
+            max_capacity: rawService.max_capacity || 6,
+            duration_minutes: rawService.duration || 45,
+            slots: normalizedSlots,
+            available_slots: normalizedSlots.filter((s) => !s.is_booked),
+            user_membership: getSlotRes.user_membership,
+          },
+        };
       }
+    } catch (getSlotErr) {
+      // Fallback to /services/slots/
     }
 
     // 2. Query param style /services/slots/?type=saltroom&date=...

@@ -2,7 +2,7 @@
 
 import BookNow from "@/components/shared/BookNow";
 import { authService } from "@/lib/api/services/authService";
-import { clearAuthSession, getStoredToken } from "@/lib/api/token";
+import { clearAuthSession, getStoredRole, getStoredToken } from "@/lib/api/token";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 import { Language } from "@/lib/i18n/translations";
 import Image from "next/image";
@@ -25,11 +25,14 @@ const Navbar = () => {
   const [isLanguageOpen, setIsLanguageOpen] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [dashboardPath, setDashboardPath] = useState("/dashboard");
 
   useEffect(() => {
     const checkAuth = () => {
       const token = getStoredToken();
       setIsLoggedIn(!!token);
+      const role = getStoredRole();
+      setDashboardPath(role === "admin" ? "/admin" : "/dashboard");
     };
 
     checkAuth();
@@ -166,7 +169,7 @@ const Navbar = () => {
           {isLoggedIn ? (
             <>
               <Link
-                href="/dashboard"
+                href={dashboardPath}
                 className="flex items-center gap-1.5 rounded-md border border-[#CFB9A3] bg-transparent px-3.5 2xl:px-5 py-2.5 2xl:py-3 text-[14px] 2xl:text-[15px] font-bold font-serif text-[#0F172A] whitespace-nowrap shrink-0 transition-all hover:bg-[#F5D8BB]/30 hover:border-[#C4AD96] active:scale-95"
               >
                 <LuLayoutDashboard size={16} />
@@ -268,7 +271,7 @@ const Navbar = () => {
               {isLoggedIn ? (
                 <>
                   <Link
-                    href="/dashboard"
+                    href={dashboardPath}
                     onClick={() => setIsMenuOpen(false)}
                     className="flex items-center justify-center gap-2.5 rounded-md border border-[#CFB9A3] bg-transparent px-8 py-3.5 text-[16px] font-bold font-serif text-[#0F172A] transition-all hover:bg-[#F5D8BB]/30 active:scale-95"
                   >

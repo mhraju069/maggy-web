@@ -1,10 +1,64 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 import Image from "next/image";
+import { othersService, PrivacyPolicy, TermsAndConditions, ContactInfo } from "@/lib/api/services";
 
 export default function Footer() {
   const { t } = useLanguage();
+
+  const [modalOpen, setModalOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState<"privacy" | "terms">("privacy");
+  const [privacyData, setPrivacyData] = useState<PrivacyPolicy | null>(null);
+  const [termsData, setTermsData] = useState<TermsAndConditions | null>(null);
+  const [contactInfo, setContactInfo] = useState<ContactInfo | null>(null);
+  const [loadingPolicy, setLoadingPolicy] = useState(false);
+
+  useEffect(() => {
+    const fetchContact = async () => {
+      try {
+        const res = await othersService.getContactInfo();
+        setContactInfo(res?.data || null);
+      } catch (err) {
+        console.error("Failed to load contact info in footer:", err);
+      }
+    };
+    fetchContact();
+  }, []);
+
+  const fetchPolicy = async (tab: "privacy" | "terms") => {
+    setLoadingPolicy(true);
+    try {
+      if (tab === "privacy") {
+        const res = await othersService.getPrivacyPolicy();
+        setPrivacyData(res?.data || null);
+      } else {
+        const res = await othersService.getTermsAndConditions();
+        setTermsData(res?.data || null);
+      }
+    } catch (err) {
+      console.error("Failed to fetch policy:", err);
+    } finally {
+      setLoadingPolicy(false);
+    }
+  };
+
+  const openPolicyModal = (tab: "privacy" | "terms") => {
+    setActiveTab(tab);
+    setModalOpen(true);
+    fetchPolicy(tab);
+  };
+
+  const switchTab = (tab: "privacy" | "terms") => {
+    setActiveTab(tab);
+    if (tab === "privacy" && !privacyData) {
+      fetchPolicy("privacy");
+    } else if (tab === "terms" && !termsData) {
+      fetchPolicy("terms");
+    }
+  };
+
 
   return (
     <footer className="bg-[#0F172A] text-white">
@@ -119,11 +173,11 @@ export default function Footer() {
                   color: "rgba(255, 255, 255, 0.80)",
                 }}
               >
-                {t.footer.contact.address}
+                {contactInfo?.address || t.footer.contact.address}
               </p>
               <p className="mt-2">
                 <a
-                  href={`tel:${t.footer.contact.phone}`}
+                  href={`tel:${contactInfo?.phone || t.footer.contact.phone}`}
                   style={{
                     fontSize: "16px",
                     fontFamily: "var(--font-geist-sans), Cambria",
@@ -132,7 +186,7 @@ export default function Footer() {
                   }}
                   className="hover:text-[#9B7C56] transition-colors inline-block"
                 >
-                  {t.footer.contact.phone}
+                  {contactInfo?.phone || t.footer.contact.phone}
                 </a>
               </p>
             </div>
@@ -186,21 +240,211 @@ export default function Footer() {
           </div>
         </div>
 
-        {/* Copyright */}
-        <div className="mt-12 pt-8 border-t border-white/10">
+        {/* Copyright & Legal Links */}
+        <div className="mt-12 pt-8 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4">
           <p
             style={{
               fontSize: "14px",
               fontFamily: "var(--font-geist-sans), Cambria",
               fontWeight: "400",
-              textAlign: "center",
               color: "rgba(255, 255, 255, 0.60)",
             }}
           >
             {t.footer.copyright}
           </p>
+
+          <div className="flex items-center gap-6 text-sm text-white/70">
+            <button
+              type="button"
+              onClick={() => openPolicyModal("privacy")}
+              className="hover:text-[#9B7C56] transition-colors underline-offset-4 hover:underline cursor-pointer"
+            >
+              Privacy Policy
+            </button>
+            <span className="text-white/30">•</span>
+            <button
+              type="button"
+              onClick={() => openPolicyModal("terms")}
+              className="hover:text-[#9B7C56] transition-colors underline-offset-4 hover:underline cursor-pointer"
+            >
+              Terms & Conditions
+            </button>
+          </div>
         </div>
       </div>
+
+      {/* ── Policy Modal (Privacy Policy & Terms) ── */}
+      {modalOpen && (
+        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-xs flex items-center justify-center p-4 text-[#1d1a17] animate-in fade-in duration-200">
+          <div className="bg-[#FAF8F5] rounded-3xl max-w-2xl w-full max-h-[85vh] flex flex-col shadow-2xl border border-[#E8E2DC] overflow-hidden">
+            {/* Modal Header with Tabs */}
+            <div className="flex items-center justify-between p-5 border-b border-[#E8E2DC] bg-white">
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => switchTab("privacy")}
+                  className={`px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                    activeTab === "privacy"
+                      ? "bg-[#8B7355] text-white shadow-2xs"
+                      : "bg-[#FAF8F5] text-[#64748B] hover:text-[#1d1a17] hover:bg-[#F1EDE8]"
+                  }`}
+                >
+                  Privacy Policy
+                </button>
+                <button
+                  type="button"
+                  onClick={() => switchTab("terms")}
+                  className={`px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                    activeTab === "terms"
+                      ? "bg-[#8B7355] text-white shadow-2xs"
+                      : "bg-[#FAF8F5] text-[#64748B] hover:text-[#1d1a17] hover:bg-[#F1EDE8]"
+                  }`}
+                >
+                  Terms & Conditions
+                </button>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setModalOpen(false)}
+                className="p-2 rounded-xl text-gray-400 hover:text-gray-800 hover:bg-gray-100 transition-colors cursor-pointer"
+              >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M18 6L6 18M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            {/* Modal Body */}
+            <div className="p-6 overflow-y-auto space-y-5 text-sm leading-relaxed font-cambria">
+              {loadingPolicy ? (
+                <div className="py-16 text-center space-y-3">
+                  <div className="w-6 h-6 border-2 border-[#8B7355] border-t-transparent rounded-full animate-spin mx-auto" />
+                  <p className="text-xs text-[#64748B]">Loading policy details...</p>
+                </div>
+              ) : activeTab === "privacy" ? (
+                <div className="space-y-5">
+                  <div className="flex items-center justify-between pb-3 border-b border-[#E8E2DC]">
+                    <h2 className="text-xl font-bold font-displayPlayFair text-[#1d1a17]">
+                      Privacy Policy
+                    </h2>
+                    {privacyData?.effective_date && (
+                      <span className="text-xs text-[#8B7355] bg-white px-3 py-1 rounded-full border border-[#E8E2DC] font-medium">
+                        Effective: {privacyData.effective_date}
+                      </span>
+                    )}
+                  </div>
+
+                  <div className="space-y-4 text-[#334155]">
+                    {privacyData?.info_we_collect && (
+                      <div className="bg-white p-4 rounded-2xl border border-[#E8E2DC]">
+                        <h3 className="font-bold text-sm text-[#1d1a17] mb-1.5">1. Information We Collect</h3>
+                        <p className="whitespace-pre-line text-xs text-[#475569]">{privacyData.info_we_collect}</p>
+                      </div>
+                    )}
+
+                    {privacyData?.how_we_use_data && (
+                      <div className="bg-white p-4 rounded-2xl border border-[#E8E2DC]">
+                        <h3 className="font-bold text-sm text-[#1d1a17] mb-1.5">2. How We Use Your Information</h3>
+                        <p className="whitespace-pre-line text-xs text-[#475569]">{privacyData.how_we_use_data}</p>
+                      </div>
+                    )}
+
+                    {privacyData?.child_safety && (
+                      <div className="bg-white p-4 rounded-2xl border border-[#E8E2DC]">
+                        <h3 className="font-bold text-sm text-[#1d1a17] mb-1.5">3. Child & Minor Safety</h3>
+                        <p className="whitespace-pre-line text-xs text-[#475569]">{privacyData.child_safety}</p>
+                      </div>
+                    )}
+
+                    {privacyData?.user_rights && (
+                      <div className="bg-white p-4 rounded-2xl border border-[#E8E2DC]">
+                        <h3 className="font-bold text-sm text-[#1d1a17] mb-1.5">4. Your Data Protection Rights</h3>
+                        <p className="whitespace-pre-line text-xs text-[#475569]">{privacyData.user_rights}</p>
+                      </div>
+                    )}
+
+                    {privacyData?.security && (
+                      <div className="bg-white p-4 rounded-2xl border border-[#E8E2DC]">
+                        <h3 className="font-bold text-sm text-[#1d1a17] mb-1.5">5. Data Security</h3>
+                        <p className="whitespace-pre-line text-xs text-[#475569]">{privacyData.security}</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ) : (
+                <div className="space-y-5">
+                  <div className="flex items-center justify-between pb-3 border-b border-[#E8E2DC]">
+                    <h2 className="text-xl font-bold font-displayPlayFair text-[#1d1a17]">
+                      Terms & Conditions
+                    </h2>
+                    {termsData?.effective_date && (
+                      <span className="text-xs text-[#8B7355] bg-white px-3 py-1 rounded-full border border-[#E8E2DC] font-medium">
+                        Effective: {termsData.effective_date}
+                      </span>
+                    )}
+                  </div>
+
+                  <div className="space-y-4 text-[#334155]">
+                    {termsData?.acceptance_of_terms && (
+                      <div className="bg-white p-4 rounded-2xl border border-[#E8E2DC]">
+                        <h3 className="font-bold text-sm text-[#1d1a17] mb-1.5">1. Acceptance of Terms</h3>
+                        <p className="whitespace-pre-line text-xs text-[#475569]">{termsData.acceptance_of_terms}</p>
+                      </div>
+                    )}
+
+                    {termsData?.user_responsibilities && (
+                      <div className="bg-white p-4 rounded-2xl border border-[#E8E2DC]">
+                        <h3 className="font-bold text-sm text-[#1d1a17] mb-1.5">2. Guest Responsibilities & Conduct</h3>
+                        <p className="whitespace-pre-line text-xs text-[#475569]">{termsData.user_responsibilities}</p>
+                      </div>
+                    )}
+
+                    {termsData?.ticket_purchase && (
+                      <div className="bg-white p-4 rounded-2xl border border-[#E8E2DC]">
+                        <h3 className="font-bold text-sm text-[#1d1a17] mb-1.5">3. Bookings, Passes & Payments</h3>
+                        <p className="whitespace-pre-line text-xs text-[#475569]">{termsData.ticket_purchase}</p>
+                      </div>
+                    )}
+
+                    {termsData?.refund_policy && (
+                      <div className="bg-white p-4 rounded-2xl border border-[#E8E2DC]">
+                        <h3 className="font-bold text-sm text-[#1d1a17] mb-1.5">4. Cancellation & Refund Policy</h3>
+                        <p className="whitespace-pre-line text-xs text-[#475569]">{termsData.refund_policy}</p>
+                      </div>
+                    )}
+
+                    {termsData?.limitation_of_liability && (
+                      <div className="bg-white p-4 rounded-2xl border border-[#E8E2DC]">
+                        <h3 className="font-bold text-sm text-[#1d1a17] mb-1.5">5. Limitation of Liability</h3>
+                        <p className="whitespace-pre-line text-xs text-[#475569]">{termsData.limitation_of_liability}</p>
+                      </div>
+                    )}
+
+                    {termsData?.changes_to_terms && (
+                      <div className="bg-white p-4 rounded-2xl border border-[#E8E2DC]">
+                        <h3 className="font-bold text-sm text-[#1d1a17] mb-1.5">6. Modifications to Terms</h3>
+                        <p className="whitespace-pre-line text-xs text-[#475569]">{termsData.changes_to_terms}</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Modal Footer */}
+            <div className="p-4 border-t border-[#E8E2DC] bg-white flex justify-end">
+              <button
+                type="button"
+                onClick={() => setModalOpen(false)}
+                className="px-5 py-2 rounded-xl bg-[#8B7355] hover:bg-[#705b41] text-white text-xs font-bold transition-all cursor-pointer"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </footer>
   );
 }

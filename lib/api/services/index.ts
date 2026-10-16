@@ -37,5 +37,16 @@ export type {
   AdminDatesOverviewParams,
   AdminDateActionResponse,
 } from "./adminDatesService";
+export { default as othersService } from "./othersService";
+export type {
+  ContactInfo,
+  UpdateContactInfoPayload,
+  PrivacyPolicy,
+  TermsAndConditions,
+  SupportMessage,
+  CreateSupportMessagePayload,
+  SupportMessagesListResponse,
+} from "./othersService";
+
 
 

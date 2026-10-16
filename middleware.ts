@@ -55,10 +55,10 @@ export default function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // if (pathname.startsWith("/login") && role) {
-  //   const target = role === "admin" ? "/admin" : "/dashboard";
-  //   return NextResponse.redirect(new URL(target, request.url));
-  // }
+  if (pathname.startsWith("/login") && role) {
+    const target = role === "admin" ? "/admin" : "/dashboard";
+    return NextResponse.redirect(new URL(target, request.url));
+  }
 
   if (!isPublicPath(pathname) && !role) {
     return NextResponse.redirect(new URL("/login", request.url));

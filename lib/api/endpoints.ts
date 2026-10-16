@@ -100,4 +100,13 @@ export const ENDPOINTS = {
   DASHBOARD: {
     USER: "/dashboard/user/",
   },
+  OTHERS: {
+    CONTACT_INFO: "/others/contact-info/",
+    PRIVACY_POLICY: "/others/privacy-policy/",
+    TERMS_AND_CONDITIONS: "/others/terms-and-conditions/",
+    SUPPORT_MESSAGES: {
+      LIST: "/others/support-messages/",
+      DETAIL: (id: string | number) => `/others/support-messages/${id}/`,
+    },
+  },
 } as const;
