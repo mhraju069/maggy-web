@@ -85,6 +85,16 @@ export default function SeminarsSection() {
                 </li>
               ))}
             </ul>
+
+            {/* Footer / note */}
+            {(t.eventspacePage?.seminarsSection as any)?.footer && (
+              <p
+                className="text-[#6B5D54] text-base md:text-lg mt-6 font-semibold"
+                style={{ fontFamily: "Cambria, Georgia, serif" }}
+              >
+                {(t.eventspacePage?.seminarsSection as any).footer}
+              </p>
+            )}
           </div>
         </div>
       </div>

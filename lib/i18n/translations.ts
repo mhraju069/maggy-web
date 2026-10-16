@@ -7,7 +7,7 @@ export const translations = {
       philosophy: "About us",
       restaurant: "Restaurant",
       menu: "Menu",
-      events: "Event Space",
+      events: "Events",
       wellness: "Wellness",
       arrangements: "Arrangements",
       activities: "Activities",
@@ -330,37 +330,41 @@ export const translations = {
     },
     eventspacePage: {
       hero: {
-        title: "Event Space (150 m²)",
-        subtitle: "A 150 m² versatile venue for life's meaningful moments.",
+        title: "De 7de Hemel | Events",
+        subtitle:
+          "From a special wedding or festive celebration to a seminar, corporate event, retreat, or gathering. De 7de Hemel is a versatile 150 m² space that can be suitably arranged for every occasion.",
       },
       intro: {
-        text: "We offer a 150 m² atmospheric, flexible space for rent for celebrations, weddings, business meetings, and coaching sessions. Our multifunctional venue combines natural light, peaceful acoustics, and premium amenities tailored to your vision.",
+        text: "From a special wedding or festive celebration to a seminar, corporate event, retreat, or gathering. De 7de Hemel is a versatile 150 m² space that can be suitably arranged for every occasion.",
       },
       seminarsSection: {
         badge: "Coaching & Workshops",
         title: "Coaching, Seminars & Workshops",
         description:
-          "Our 150 m² space is designed for focused coaching, seminars, and creative collaboration. Abundant natural daylight, calm acoustics, and flexible layouts create the ideal setting.",
-        subtitle: "Inspire your group in a tranquil, distraction-free environment.",
+          "Our 150 m² De 7de Hemel | Events space provides ample room for seminars, workshops, training sessions, coaching, and corporate gatherings. Thanks to the flexible layout, the room can be completely customized to your meeting.",
+        subtitle:
+          "From an inspiring workshop to a seminar, presentation, or corporate event: we collaborate on the complete experience.",
         items: [
-          "Flexible seating & workshop setups",
-          "High-quality audio/visual equipment",
-          "Peaceful atmosphere & natural daylight",
-          "Full catering, coffee & tea packages",
+          "Flexible seating, workshop, and presentation setups",
+          "Sound and presentation equipment available",
+          "Special decoration and styling tailored to your event",
+          "Coffee, tea, lunch, drinks, and catering options available",
         ],
+        footer: "Various arrangements and customized packages available.",
       },
       weddingsSection: {
-        badge: "Celebration",
+        badge: "Weddings & Celebrations",
         title: "Weddings & Celebrations",
         description:
-          "Celebrate life's most precious moments in a 150 m² setting that feels both intimate and grand. Perfect for weddings, receptions, anniversaries, and private parties.",
+          "Celebrate the moments that matter at De 7de Hemel. An atmospheric 150 m² event space for weddings, birthdays, anniversaries, baby showers, receptions, and other special occasions.",
         subtitle:
-          "From informal ceremonies to joyous receptions, we craft an ambiance that honors your unique story.",
+          "From an intimate celebration to a complete party: together, we create a setting that matches your wishes, with options for catering, beverage packages, music, and personalized styling.",
         items: [
-          "150 m² elegant & neutral decor",
-          "Indoor and outdoor venue access",
-          "Complete catering coordination",
-          "Guest wellness integration options",
+          "Flexible layout for various party sizes",
+          "Personalized styling & custom decor options",
+          "Catering, appetizers, dinner, and beverage packages",
+          "Options for DJ, music, and entertainment",
+          "Fully customized arrangements",
         ],
       },
       corporateSection: {
@@ -378,31 +382,31 @@ export const translations = {
         ],
       },
       spaceSuitable: {
-        title: "What Makes This 150 m² Space Unique",
-        subtitle: "Designed to adapt effortlessly to your needs",
+        title: "What Makes Our Space Unique",
+        subtitle: "An atmospheric and versatile location, fully customizable to your occasion.",
         features: [
           {
-            title: "150 m² Flexible Layout",
+            title: "Flexible Layout",
             description:
-              "Adaptable floorplan to suit any event type, from 1-on-1 coaching to large celebrations.",
+              "From weddings and birthdays to baby showers, company parties, and seminars. We tailor the space to the occasion and your wishes.",
           },
           {
-            title: "Serene & Natural Atmosphere",
+            title: "Custom Ambiance & Decor",
             description:
-              "Thoughtful acoustics, natural materials, and abundant daylight for a relaxed experience.",
+              "From romantic and festive to stylish and professional. We are happy to collaborate on setup, decoration, and bespoke styling.",
           },
           {
-            title: "Holistic Wellness Integration",
+            title: "Everything Under One Roof",
             description:
-              "Combine your event with sauna sessions, healthy dining, or spa services for a unique event.",
+              "Catering, beverage packages, music, and various extra options to make your event complete.",
           },
         ],
       },
       cta: {
-        title: "Rent Our 150 m² Event Space",
+        title: "Celebrate Your Moment at De 7de Hemel",
         subtitle:
-          "Share your vision with us. We'll help create an event that feels uniquely yours.",
-        button: "Get In Touch",
+          "From weddings and birthdays to corporate parties or special gatherings. Together, we create a setting that perfectly matches your moment.",
+        button: "Discover the Possibilities",
       },
     },
     arrangementsPage: {
@@ -427,7 +431,7 @@ export const translations = {
       hero: {
         title: "Sauna & Salt Room Membership",
         subtitle:
-          "Thoughtfully designed memberships for guests who value consistency, care, and calm.",
+          "",
       },
       cards: {
         applyNow: "Apply Now",
@@ -527,6 +531,35 @@ export const translations = {
         subtitle:
           "We’re happy to answer your questions and help you explore the possibilities.",
       },
+      getInTouch: {
+        title: "Get in Touch",
+        subtitle:
+          "For general questions, special requests, or corporate inquiries, our team is happy to assist you. We aim to respond personally and promptly.",
+        personalInfo: "Personal Information",
+        name: "Name",
+        namePlaceholder: "Your full name",
+        phone: "Phone Number",
+        phonePlaceholder: "+1 (555) 000-0000",
+        email: "Email Address",
+        emailPlaceholder: "your@email.com",
+        subject: "Subject",
+        subjectPlaceholder: "Subject of your message",
+        message: "Message",
+        messagePlaceholder: "Write here...",
+        send: "Send",
+        sending: "Sending...",
+        securityNote: "Your information is secure and will never be shared with third parties",
+        address: "Address",
+        phoneLabel: "Phone",
+        emailLabel: "Email",
+        successMessage: "Your message has been sent successfully. We will get back to you shortly.",
+        errorEnterName: "Please enter your name.",
+        errorEnterPhone: "Please enter your phone number.",
+        errorEnterEmail: "Please enter your email address.",
+        errorEnterSubject: "Please enter a subject.",
+        errorEnterMessage: "Please enter your message.",
+        errorGeneral: "Failed to send message. Please try again.",
+      },
     },
   },
 
@@ -536,7 +569,7 @@ export const translations = {
       philosophy: "Over ons",
       restaurant: "Restaurant",
       menu: "Menukaart",
-      events: "Event Space",
+      events: "Zaalverhuur",
       wellness: "Wellness",
       arrangements: "Arrangementen",
       activities: "Activiteiten",
@@ -860,37 +893,41 @@ export const translations = {
     },
     eventspacePage: {
       hero: {
-        title: "Event Space (150 m²)",
-        subtitle: "Een multifunctionele 150 m² ruimte voor bijzondere momenten.",
+        title: "De 7de Hemel | Events",
+        subtitle:
+          "Van een bijzondere bruiloft of feestelijke viering tot een seminar, bedrijfsevent, retraite of bijeenkomst. De 7de Hemel is een multifunctionele ruimte van 150 m² die voor iedere gelegenheid passend kan worden ingericht.",
       },
       intro: {
-        text: "Wij bieden 150 m² aan sfeervolle, flexibele ruimte te huur voor feesten, bruiloften, zakelijke bijeenkomsten en coaching- of workshopsessies. Onze multifunctionele zaal combineert natuurlijk daglicht, rustige akoestiek en uitstekende voorzieningen op maat van jouw visie.",
+        text: "Van een bijzondere bruiloft of feestelijke viering tot een seminar, bedrijfsevent, retraite of bijeenkomst. De 7de Hemel is een multifunctionele ruimte van 150 m² die voor iedere gelegenheid passend kan worden ingericht.",
       },
       seminarsSection: {
         badge: "Coaching & Workshops",
         title: "Coaching, Seminars & Workshops",
         description:
-          "Onze 150 m² ruimte is ontworpen voor gefocust leren, coaching en creatieve samenwerking. Natuurlijk daglicht, rustige akoestiek en flexibele opstellingen creëren de ideale omgeving.",
-        subtitle: "Inspireer jouw groep in een rustige, afleidingsvrije omgeving.",
+          "Onze De 7de Hemel | Events ruimte van 150 m² biedt alle ruimte voor seminars, workshops, trainingen, coaching en zakelijke bijeenkomsten. Dankzij de flexibele indeling kan de ruimte volledig worden afgestemd op jouw bijeenkomst.",
+        subtitle:
+          "Van een inspirerende workshop tot een seminar, presentatie of bedrijfsevent: wij denken mee over de complete invulling.",
         items: [
-          "Flexibele zit- en workshopopstellingen",
-          "Hoogwaardige geluids- en presentatieapparatuur",
-          "Natuurlijk daglicht en rustgevende sfeer",
-          "Catering, koffie & thee arrangements beschikbaar",
+          "Flexibele zit-, workshop- en presentatieopstellingen",
+          "Geluids- en presentatieapparatuur beschikbaar",
+          "Speciale aankleding en styling afgestemd op jouw event",
+          "Koffie, thee, lunch, borrel en catering mogelijk",
         ],
+        footer: "Verschillende arrangementen en maatwerk mogelijk.",
       },
       weddingsSection: {
-        badge: "Feest",
-        title: "Bruiloften & Feesten",
+        badge: "Bruiloften & Vieringen",
+        title: "Bruiloften & Vieringen",
         description:
-          "Vier de mooiste momenten van het leven in een ruimtelijke 150 m² omgeving die zowel intiem als sfeervol aanvoelt. Perfect voor feesten, jubilea, recepties en bruiloften.",
+          "Vier de momenten die ertoe doen in De 7de Hemel. Een sfeervolle eventruimte van 150 m² voor bruiloften, verjaardagen, jubilea, babyshowers, recepties en andere bijzondere gelegenheden.",
         subtitle:
-          "Van informele ceremonies tot vrolijke recepties – wij creëren een sfeer die uw unieke verhaal eert.",
+          "Van een intieme viering tot een compleet feest: samen creëren we een setting die past bij jouw wensen, met mogelijkheden voor catering, drankarrangementen, muziek en persoonlijke aankleding.",
         items: [
-          "150 m² sfeervol & neutraal interieur",
-          "Toegang tot binnen- en buitenruimtes",
-          "Volledige catering-coördinatie",
-          "Wellnesspakketten voor gasten",
+          "Flexibele indeling voor verschillende gezelschappen",
+          "Persoonlijke styling & speciale aankleding mogelijk",
+          "Catering, hapjes, diner en drankarrangementen",
+          "Mogelijkheden voor DJ, muziek en entertainment",
+          "Arrangementen volledig op maat",
         ],
       },
       corporateSection: {
@@ -908,31 +945,31 @@ export const translations = {
         ],
       },
       spaceSuitable: {
-        title: "Wat onze 150 m² ruimte uniek maakt",
-        subtitle: "Ontworpen om zich moeiteloos aan te passen aan jouw wensen",
+        title: "Wat onze ruimte uniek maakt",
+        subtitle: "Een sfeervolle en veelzijdige locatie, helemaal aan te passen aan jouw gelegenheid.",
         features: [
           {
-            title: "150 m² Flexibele Indeling",
+            title: "Flexibel in te delen",
             description:
-              "Aanpasbare zaalopstelling voor elk type evenement, van 1-op-1 coaching tot grote feesten.",
+              "Van bruiloften en verjaardagen tot babyshowers, bedrijfsfeesten en seminars. De ruimte passen we aan de gelegenheid en jouw wensen aan.",
           },
           {
-            title: "Rustgevende & Natuurlijke Sfeer",
+            title: "Sfeer & aankleding op maat",
             description:
-              "Doordachte akoestiek, natuurlijke materialen en veel daglicht voor een ontspannen ervaring.",
+              "Van romantisch en feestelijk tot stijlvol en zakelijk. We denken graag mee over de opstelling, decoratie en speciale aankleding.",
           },
           {
-            title: "Wellness & Catering Integratie",
+            title: "Alles onder één dak",
             description:
-              "Combineer je evenement met saunasessies, gezonde catering of spa-diensten voor een bijzonder moment.",
+              "Catering, drankarrangementen, muziek en verschillende extra mogelijkheden om jouw evenement compleet te maken.",
           },
         ],
       },
       cta: {
-        title: "Huur Onze 150 m² Event Space",
+        title: "Vier jouw moment in De 7de Hemel",
         subtitle:
-          "Deel jouw visie met ons. Wij helpen je een evenement te creëren dat uniek en onvergetelijk is.",
-        button: "Neem contact op",
+          "Van bruiloft en verjaardag tot bedrijfsfeest of bijzondere bijeenkomst. Samen creëren we een setting die helemaal past bij jouw moment.",
+        button: "Ontdek de mogelijkheden",
       },
     },
     arrangementsPage: {
@@ -1096,6 +1133,35 @@ export const translations = {
         subtitle:
           "We beantwoorden graag je vragen en denken met je mee over de mogelijkheden.",
       },
+      getInTouch: {
+        title: "Neem contact op",
+        subtitle:
+          "Voor algemene vragen, speciale verzoeken of zakelijke aanvragen staat ons team klaar om u te helpen. Wij streven ernaar persoonlijk en snel te reageren.",
+        personalInfo: "Persoonlijke gegevens",
+        name: "Naam",
+        namePlaceholder: "Uw volledige naam",
+        phone: "Telefoonnummer",
+        phonePlaceholder: "+31 (0) 6 12345678",
+        email: "E-mailadres",
+        emailPlaceholder: "uw@email.com",
+        subject: "Onderwerp",
+        subjectPlaceholder: "Onderwerp van uw bericht",
+        message: "Bericht",
+        messagePlaceholder: "Schrijf hier...",
+        send: "Verzenden",
+        sending: "Verzenden...",
+        securityNote: "Uw gegevens zijn veilig en worden nooit met derden gedeeld",
+        address: "Adres",
+        phoneLabel: "Telefoon",
+        emailLabel: "E-mail",
+        successMessage: "Uw bericht is succesvol verzonden. Wij nemen zo snel mogelijk contact met u op.",
+        errorEnterName: "Vul alstublieft uw naam in.",
+        errorEnterPhone: "Vul alstublieft uw telefoonnummer in.",
+        errorEnterEmail: "Vul alstublieft uw e-mailadres in.",
+        errorEnterSubject: "Vul alstublieft een onderwerp in.",
+        errorEnterMessage: "Vul alstublieft uw bericht in.",
+        errorGeneral: "Bericht verzenden mislukt. Probeer het opnieuw.",
+      },
     },
   },
 
@@ -1105,7 +1171,7 @@ export const translations = {
       philosophy: "Über uns",
       restaurant: "Restaurant",
       menu: "Speisekarte",
-      events: "Event Space",
+      events: "Zaalverhuur",
       wellness: "Wellness",
       arrangements: "Arrangements",
       activities: "Aktivitäten",
@@ -1429,38 +1495,41 @@ export const translations = {
     },
     eventspacePage: {
       hero: {
-        title: "Multifunktionaler Raum",
+        title: "De 7de Hemel | Events",
         subtitle:
-          "Ein ruhiger Rahmen für die bedeutungsvollen Momente des Lebens.",
+          "Von einer besonderen Hochzeit oder festlichen Feier bis hin zu Seminaren, Firmenveranstaltungen, Retreats oder Tagungen. De 7de Hemel ist ein multifunktionaler Raum von 150 m², der für jeden Anlass passend eingerichtet werden kann.",
       },
       intro: {
-        text: "Unser multifunktionaler Raum verbindet Flexibilität mit Atmosphäre. Ob Seminar, Hochzeitsfeier oder Unternehmensklausur – dieser Raum passt sich an, um Ihre Vision zu verwirklichen.",
+        text: "Von einer besonderen Hochzeit oder festlichen Feier bis hin zu Seminaren, Firmenveranstaltungen, Retreats oder Tagungen. De 7de Hemel ist ein multifunktionaler Raum von 150 m², der für jeden Anlass passend eingerichtet werden kann.",
       },
       seminarsSection: {
-        badge: "Lernen",
-        title: "Seminare & Workshops",
+        badge: "Coaching & Workshops",
+        title: "Coaching, Seminare & Workshops",
         description:
-          "Ein Raum für konzentriertes Lernen und kreative Zusammenarbeit. Natürliches Licht, ruhige Akustik und flexible Bestuhlung schaffen das ideale Umfeld für Workshops und Seminare.",
-        subtitle: "",
+          "Unsere De 7de Hemel | Events Räumlichkeiten von 150 m² bieten reichlich Platz für Seminare, Workshops, Schulungen, Coaching und geschäftliche Tagungen. Dank des flexiblen Grundrisses kann der Raum ganz auf Ihr Treffen abgestimmt werden.",
+        subtitle:
+          "Von einem inspirierenden Workshop bis hin zu einem Seminar, einer Präsentation oder einem Firmenevent: Wir denken gerne über die komplette Gestaltung mit.",
         items: [
-          "Flexible Sitzanordnungen",
-          "Hochwertige Audio/Video-Ausstattung",
-          "Natürliches Licht und ruhige Atmosphäre",
-          "Catering-Optionen verfügbar",
+          "Flexible Bestuhlung, Workshop- und Präsentationsaufbauten",
+          "Ton- und Präsentationstechnik verfügbar",
+          "Besondere Dekoration und Styling, abgestimmt auf Ihr Event",
+          "Kaffee, Tee, Mittagessen, Umtrunk und Catering möglich",
         ],
+        footer: "Verschiedene Arrangements und maßgeschneiderte Optionen verfügbar.",
       },
       weddingsSection: {
-        badge: "Feier",
+        badge: "Hochzeiten & Feiern",
         title: "Hochzeiten & Feiern",
         description:
-          "Feiern Sie die kostbarsten Momente des Lebens in einem Rahmen, der sowohl intim als auch weitläufig wirkt. Der Raum bietet die perfekte Balance aus Eleganz und Wärme.",
+          "Feiern Sie die Momente, auf die es ankommt, in De 7de Hemel. Ein stimmungsvoller Veranstaltungsraum von 150 m² für Hochzeiten, Geburtstage, Jubiläen, Babypartys, Empfänge und andere besondere Anlässe.",
         subtitle:
-          "Von schlichten Zeremonien bis hin zu festlichen Empfängen schaffen wir eine Atmosphäre, die Ihre Geschichte ehrt.",
+          "Von einer intimen Feier bis hin zum großen Fest: Gemeinsam schaffen wir den passenden Rahmen nach Ihren Wünschen, mit Optionen für Catering, Getränkearrangements, Musik und persönliche Dekoration.",
         items: [
-          "Elegantes, neutrales Dekor",
-          "Innen- und Außenbereich",
-          "Vollständige Catering-Koordination",
-          "Wellness-Pakete für Gäste",
+          "Flexible Raumaufteilung für verschiedene Gruppengrößen",
+          "Persönliches Styling & besondere Dekoration möglich",
+          "Catering, Snacks, Abendessen und Getränkearrangements",
+          "Möglichkeiten für DJ, Musik und Unterhaltung",
+          "Vollständig maßgeschneiderte Arrangements",
         ],
       },
       corporateSection: {
@@ -1478,31 +1547,31 @@ export const translations = {
         ],
       },
       spaceSuitable: {
-        title: "Was diesen Raum besonders macht",
-        subtitle: "Vier einfache Schritte zu Ihrem Moment der Ruhe",
+        title: "Was unsere Räumlichkeiten einzigartig macht",
+        subtitle: "Ein stimmungsvoller und vielseitiger Ort, ganz individuell an Ihren Anlass anpassbar.",
         features: [
           {
-            title: "Flexibles Layout",
+            title: "Flexibel aufteilbar",
             description:
-              "Anpassbare Konfigurationen für jeden Veranstaltungstyp, von kleinen Zusammenkünften bis hin zu großen Feiern.",
+              "Von Hochzeiten und Geburtstagen bis hin zu Babypartys, Firmenfeiern und Seminaren. Wir passen den Raum an den Anlass und Ihre Wünsche an.",
           },
           {
-            title: "Ruhige Umgebung",
+            title: "Atmosphäre & Dekoration nach Maß",
             description:
-              "Natürliche Materialien, durchdachte Akustik und unsere charakteristische Wellness-Atmosphäre.",
+              "Von romantisch und festlich bis stilvoll und geschäftlich. Wir beraten Sie gerne bezüglich Aufteilung, Dekoration und besonderer Ausstattung.",
           },
           {
-            title: "Wellness-Verbindung",
+            title: "Alles unter einem Dach",
             description:
-              "Integrieren Sie Saunasitzungen, Yoga oder Spa-Dienste für ein ganzheitliches Event.",
+              "Catering, Getränke-Arrangements, Musik und verschiedene Zusatzoptionen, um Ihre Veranstaltung perfekt abzurunden.",
           },
         ],
       },
       cta: {
-        title: "Informationen anfordern",
+        title: "Feiern Sie Ihren Moment in De 7de Hemel",
         subtitle:
-          "Teilen Sie uns Ihre Vision mit. Wir helfen Ihnen, ein Erlebnis zu schaffen, das einzigartig für Sie ist.",
-        button: "Kontakt aufnehmen",
+          "Von Hochzeiten und Geburtstagen bis hin zu Firmenfeiern oder besonderen Anlässen. Gemeinsam schaffen wir den perfekten Rahmen für Ihren Moment.",
+        button: "Möglichkeiten entdecken",
       },
     },
     arrangementsPage: {
@@ -1667,6 +1736,35 @@ export const translations = {
         title: "Nimm Kontakt mit uns auf",
         subtitle:
           "Wir beantworten gerne deine Fragen und denken gemeinsam mit dir über die Möglichkeiten nach.",
+      },
+      getInTouch: {
+        title: "Kontaktieren Sie uns",
+        subtitle:
+          "Für allgemeine Fragen, Sonderwünsche oder Firmenanfragen steht Ihnen unser Team gerne zur Verfügung. Wir bemühen uns, persönlich und zeitnah zu antworten.",
+        personalInfo: "Persönliche Daten",
+        name: "Name",
+        namePlaceholder: "Ihr vollständiger Name",
+        phone: "Telefonnummer",
+        phonePlaceholder: "+49 (0) 123 456789",
+        email: "E-Mail-Adresse",
+        emailPlaceholder: "ihre@email.com",
+        subject: "Betreff",
+        subjectPlaceholder: "Betreff Ihrer Nachricht",
+        message: "Nachricht",
+        messagePlaceholder: "Hier schreiben...",
+        send: "Senden",
+        sending: "Wird gesendet...",
+        securityNote: "Ihre Daten sind sicher und werden niemals an Dritte weitergegeben",
+        address: "Adresse",
+        phoneLabel: "Telefon",
+        emailLabel: "E-Mail",
+        successMessage: "Ihre Nachricht wurde erfolgreich gesendet. Wir werden uns in Kürze bei Ihnen melden.",
+        errorEnterName: "Bitte geben Sie Ihren Namen ein.",
+        errorEnterPhone: "Bitte geben Sie Ihre Telefonnummer ein.",
+        errorEnterEmail: "Bitte geben Sie Ihre E-Mail-Adresse ein.",
+        errorEnterSubject: "Bitte geben Sie einen Betreff ein.",
+        errorEnterMessage: "Bitte geben Sie Ihre Nachricht ein.",
+        errorGeneral: "Nachricht konnte nicht gesendet werden. Bitte versuchen Sie es erneut.",
       },
     },
   },

@@ -170,7 +170,7 @@ const MembershipCards = () => {
           const parsed = JSON.parse(storedUser);
           setUser(parsed);
           setCardName(parsed.name || "");
-        } catch {}
+        } catch { }
       }
 
       authService.getProfile().then((profile) => {
@@ -179,7 +179,7 @@ const MembershipCards = () => {
           setCardName(profile.name || "");
           localStorage.setItem("user_info", JSON.stringify(profile));
         }
-      }).catch(() => {});
+      }).catch(() => { });
 
       // Auto-open payment modal if user was redirected back after logging in
       const pendingPlanStr = sessionStorage.getItem("maggy_pending_membership_plan");
@@ -230,10 +230,10 @@ const MembershipCards = () => {
       features: sessionPass.features?.length
         ? sessionPass.features.map((f) => f.feature.replace(/^[✓✔\s]+/, ""))
         : [
-            "10-session salt pass (€20 per session)",
-            "Linked directly to customer account",
-            "Valid for 1 full year after purchase",
-          ],
+          "10-session salt pass (€20 per session)",
+          "Linked directly to customer account",
+          "Valid for 1 full year after purchase",
+        ],
     });
   }
   if (saltWeekly) {
@@ -256,9 +256,9 @@ const MembershipCards = () => {
       features: saltWeekly.features?.length
         ? saltWeekly.features.map((f) => f.feature.replace(/^[✓✔\s]+/, ""))
         : [
-            "1 Salt Room session per week included",
-            "Maximum 4 included sessions per 4-week period",
-          ],
+          "1 Salt Room session per week included",
+          "Maximum 4 included sessions per 4-week period",
+        ],
     });
   }
   if (saltUnlimited) {
@@ -281,9 +281,9 @@ const MembershipCards = () => {
       features: saltUnlimited.features?.length
         ? saltUnlimited.features.map((f) => f.feature.replace(/^[✓✔\s]+/, ""))
         : [
-            "Unlimited use within available capacity",
-            "1-hour Salt Room halotherapy access",
-          ],
+          "Unlimited use within available capacity",
+          "1-hour Salt Room halotherapy access",
+        ],
     });
   }
 
@@ -440,10 +440,10 @@ const MembershipCards = () => {
         purchaseRes?.remaining_sessions !== undefined
           ? purchaseRes.remaining_sessions
           : isSessionPass
-          ? 10
-          : selectedPlan?.planType === "weekly"
-          ? 4
-          : undefined;
+            ? 10
+            : selectedPlan?.planType === "weekly"
+              ? 4
+              : undefined;
 
       updateStoredBookingData({
         name: user?.name || "Member",
@@ -453,13 +453,13 @@ const MembershipCards = () => {
         membershipType: isSessionPass
           ? "none"
           : selectedPlan?.name.toLowerCase().includes("unlimited")
-          ? "unlimited"
-          : "once_a_week",
+            ? "unlimited"
+            : "once_a_week",
         passType: isSessionPass
           ? "10_session_pass"
           : selectedPlan?.name.toLowerCase().includes("unlimited")
-          ? "unlimited"
-          : "once_a_week",
+            ? "unlimited"
+            : "once_a_week",
         remainingPassSessions: remainingSessions,
       });
 
@@ -543,22 +543,20 @@ const MembershipCards = () => {
                       <div className="flex flex-wrap items-center gap-2">
                         {plan.badge && (
                           <span
-                            className={`px-3 py-1 rounded-full text-[11px] font-bold tracking-wider uppercase ${
-                              isDark
+                            className={`px-3 py-1 rounded-full text-[11px] font-bold tracking-wider uppercase ${isDark
                                 ? "bg-amber-400/20 text-amber-300 border border-amber-400/30"
                                 : "bg-[#8B7355]/10 text-[#8B7355] border border-[#8B7355]/20"
-                            }`}
+                              }`}
                           >
                             {plan.badge}
                           </span>
                         )}
                         {plan.validityText && (
                           <span
-                            className={`px-2.5 py-0.5 rounded-md text-[10px] font-semibold ${
-                              isDark
+                            className={`px-2.5 py-0.5 rounded-md text-[10px] font-semibold ${isDark
                                 ? "bg-white/10 text-white/70"
                                 : "bg-slate-100 text-slate-600 border border-slate-200"
-                            }`}
+                              }`}
                           >
                             ⏱️ {plan.validityText}
                           </span>
@@ -649,9 +647,8 @@ const MembershipCards = () => {
                       </div>
                       {plan.reservationRule && (
                         <p
-                          className={`text-[11px] mt-1 italic font-medium ${
-                            isDark ? "text-amber-200/70" : "text-[#8B7355]"
-                          }`}
+                          className={`text-[11px] mt-1 italic font-medium ${isDark ? "text-amber-200/70" : "text-[#8B7355]"
+                            }`}
                         >
                           ✦ {plan.reservationRule}
                         </p>
@@ -700,19 +697,6 @@ const MembershipCards = () => {
         )}
 
         {/* Bottom subtitle */}
-        <p
-          className="text-center"
-          style={{
-            fontFamily: "Cambria, Georgia, serif",
-            fontSize: 20,
-            fontWeight: 400,
-            color: "#6B5D54",
-            lineHeight: "150%",
-            maxWidth: 812,
-          }}
-        >
-          All passes and memberships are automatically linked to your customer account and allow effortless advance online session booking.
-        </p>
       </div>
 
       {/* ── 🌟 Payment Gateway & Activation Modal with Official Stripe Elements ── */}
@@ -912,10 +896,10 @@ function MembershipCheckoutModal({
         purchaseRes?.remaining_sessions !== undefined
           ? purchaseRes.remaining_sessions
           : isSessionPass
-          ? 10
-          : selectedPlan?.planType === "weekly"
-          ? 4
-          : undefined;
+            ? 10
+            : selectedPlan?.planType === "weekly"
+              ? 4
+              : undefined;
 
       updateStoredBookingData({
         name: user?.name || "Member",
@@ -925,13 +909,13 @@ function MembershipCheckoutModal({
         membershipType: isSessionPass
           ? "none"
           : selectedPlan?.name.toLowerCase().includes("unlimited")
-          ? "unlimited"
-          : "once_a_week",
+            ? "unlimited"
+            : "once_a_week",
         passType: isSessionPass
           ? "10_session_pass"
           : selectedPlan?.name.toLowerCase().includes("unlimited")
-          ? "unlimited"
-          : "once_a_week",
+            ? "unlimited"
+            : "once_a_week",
         remainingPassSessions: remainingSessions,
         purchaseId: purchaseRes?.purchase_id || generatedCode,
       });
@@ -1137,11 +1121,10 @@ function MembershipCheckoutModal({
                 <button
                   type="button"
                   onClick={() => setPaymentMethod("card")}
-                  className={`p-3.5 rounded-xl border flex items-center justify-center gap-2 text-xs font-bold transition-all cursor-pointer ${
-                    paymentMethod === "card"
+                  className={`p-3.5 rounded-xl border flex items-center justify-center gap-2 text-xs font-bold transition-all cursor-pointer ${paymentMethod === "card"
                       ? "bg-[#FCF2E9] border-[#8B7355] text-[#8B7355] shadow-xs"
                       : "bg-white border-[#E2E8F0] text-[#64748B] hover:border-[#CBD5E1]"
-                  }`}
+                    }`}
                 >
                   <FaCreditCard size={14} />
                   <span>Credit Card</span>
@@ -1150,11 +1133,10 @@ function MembershipCheckoutModal({
                 <button
                   type="button"
                   onClick={() => setPaymentMethod("ideal")}
-                  className={`p-3.5 rounded-xl border flex items-center justify-center gap-2 text-xs font-bold transition-all cursor-pointer ${
-                    paymentMethod === "ideal"
+                  className={`p-3.5 rounded-xl border flex items-center justify-center gap-2 text-xs font-bold transition-all cursor-pointer ${paymentMethod === "ideal"
                       ? "bg-[#FCF2E9] border-[#8B7355] text-[#8B7355] shadow-xs"
                       : "bg-white border-[#E2E8F0] text-[#64748B] hover:border-[#CBD5E1]"
-                  }`}
+                    }`}
                 >
                   <MdOutlinePayments size={16} />
                   <span>iDEAL</span>

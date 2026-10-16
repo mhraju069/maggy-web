@@ -59,7 +59,7 @@ const Navbar = () => {
     { href: "/lunchroom", name: t.navbar.restaurant },
     { href: "/menu", name: t.navbar.menu },
     { href: "/wellness", name: t.navbar.wellness },
-    { href: "/eventspace", name: t.navbar.events || "Event Space" },
+    { href: "/eventspace", name: t.navbar.events || "Events" },
     { href: "/arrangements", name: t.navbar.arrangements },
     { href: "/activities", name: t.navbar.activities },
     { href: "/memberships", name: t.navbar.memberships },
@@ -106,11 +106,10 @@ const Navbar = () => {
                 viewBox="0 0 12 8"
                 fill="none"
                 xmlns="http://www.w3.org/2000/svg"
-                className={`transition-transform ${
-                  isLanguageOpen
-                    ? "translate-y-0.5 rotate-180"
-                    : "group-hover:translate-y-0.5"
-                }`}
+                className={`transition-transform ${isLanguageOpen
+                  ? "translate-y-0.5 rotate-180"
+                  : "group-hover:translate-y-0.5"
+                  }`}
               >
                 <path
                   d="M1 1.5L6 6.5L11 1.5"
@@ -131,11 +130,10 @@ const Navbar = () => {
                       setLanguage(option.value as Language);
                       setIsLanguageOpen(false);
                     }}
-                    className={`w-full px-3 py-1.5 text-left text-[14px] font-semibold font-serif transition-colors hover:text-[#CA7521] ${
-                      language === option.value
-                        ? "text-[#CA7521]"
-                        : "text-[#1A1A1A]"
-                    }`}
+                    className={`w-full px-3 py-1.5 text-left text-[14px] font-semibold font-serif transition-colors hover:text-[#CA7521] ${language === option.value
+                      ? "text-[#CA7521]"
+                      : "text-[#1A1A1A]"
+                      }`}
                     role="option"
                     aria-selected={language === option.value}
                   >
@@ -148,16 +146,15 @@ const Navbar = () => {
         </div>
 
         {/* ── Center: Nav Links (Desktop >= 1280px) ── */}
-        <div className="hidden xl:flex flex-1 items-center justify-center gap-0.5 xl:gap-1 2xl:gap-2 px-2 mx-auto">
+        <div className="hidden xl:flex flex-1 items-center justify-center gap-0.5 2xl:gap-1.5 px-1 2xl:px-2 mx-auto">
           {navLinks.map((link) => (
             <Link
               key={link.href}
               href={link.href}
-              className={`rounded-md px-1.5 xl:px-2.5 2xl:px-3.5 py-2 text-[13px] xl:text-[14px] 2xl:text-[15px] font-medium font-serif whitespace-nowrap transition-colors ${
-                pathname === link.href
-                  ? "bg-[#F5D8BB] text-[#0F172A]"
-                  : "text-[#2D2D2D] hover:text-[#CA7521]"
-              }`}
+              className={`rounded-md px-1.5 2xl:px-2.5 py-1.5 text-[12.5px] 2xl:text-[14px] font-medium font-serif whitespace-nowrap transition-colors ${pathname === link.href
+                ? "bg-[#F5D8BB] text-[#0F172A]"
+                : "text-[#2D2D2D] hover:text-[#CA7521]"
+                }`}
             >
               {link.name}
             </Link>
@@ -166,48 +163,92 @@ const Navbar = () => {
 
         {/* ── Right: Auth Actions + Book Now (Desktop >= 1280px) ── */}
         <div className="hidden xl:flex items-center gap-2 2xl:gap-3 shrink-0">
-          {isLoggedIn ? (
-            <>
-              <Link
-                href={dashboardPath}
-                className="flex items-center gap-1.5 rounded-md border border-[#CFB9A3] bg-transparent px-3.5 2xl:px-5 py-2.5 2xl:py-3 text-[14px] 2xl:text-[15px] font-bold font-serif text-[#0F172A] whitespace-nowrap shrink-0 transition-all hover:bg-[#F5D8BB]/30 hover:border-[#C4AD96] active:scale-95"
-              >
-                <LuLayoutDashboard size={16} />
-                <span>{t.navbar.dashboard || "Dashboard"}</span>
-              </Link>
-              <button
-                type="button"
-                onClick={handleLogout}
-                className="flex items-center gap-1.5 rounded-md border border-[#E2E8F0] bg-white px-3.5 2xl:px-5 py-2.5 2xl:py-3 text-[14px] 2xl:text-[15px] font-bold font-serif text-[#64748B] hover:text-red-600 hover:border-red-200 hover:bg-red-50/50 whitespace-nowrap shrink-0 transition-all active:scale-95 cursor-pointer shadow-2xs"
-              >
-                <HiArrowRightOnRectangle size={16} />
-                <span>{t.navbar.logout || "Log Out"}</span>
-              </button>
-            </>
-          ) : (
-            <Link
-              href="/login"
-              className="flex items-center gap-2 rounded-md border border-[#CFB9A3] bg-transparent px-4 2xl:px-6 py-2.5 2xl:py-3 text-[14px] 2xl:text-[15px] font-bold font-serif text-[#0F172A] whitespace-nowrap shrink-0 transition-all hover:border-[#C4AD96] hover:text-[#0F172A] active:scale-95"
+          {/* Account Dropdown (Hoverable / Clickable) */}
+          <div className="relative group">
+            <button
+              type="button"
+              className="flex items-center gap-1.5 rounded-md border border-[#CFB9A3] bg-transparent px-2.5 2xl:px-3.5 py-2 text-[12.5px] 2xl:text-[14px] font-bold font-serif text-[#0F172A] whitespace-nowrap shrink-0 transition-all hover:bg-[#F5D8BB]/30 hover:border-[#C4AD96] cursor-pointer"
             >
-              {t.navbar.login}
+              {isLoggedIn ? (
+                <>
+                  <LuLayoutDashboard size={15} />
+                  <span>{t.navbar.dashboard || "Account"}</span>
+                </>
+              ) : (
+                <>
+                  <svg
+                    width="15"
+                    height="15"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                    <circle cx="12" cy="7" r="4" />
+                  </svg>
+                  <span>{t.navbar.login || "Log In"}</span>
+                </>
+              )}
               <svg
-                width="16"
-                height="16"
-                viewBox="0 0 24 24"
+                width="10"
+                height="6"
+                viewBox="0 0 10 6"
                 fill="none"
                 xmlns="http://www.w3.org/2000/svg"
+                className="transition-transform group-hover:rotate-180"
               >
                 <path
-                  d="M5 12H19M19 12L12 5M19 12L12 19"
+                  d="M1 1L5 5L9 1"
                   stroke="#0F172A"
-                  strokeWidth="2"
+                  strokeWidth="1.5"
                   strokeLinecap="round"
                   strokeLinejoin="round"
                 />
               </svg>
-            </Link>
-          )}
-          <BookNow href="/booking" label={t.navbar.bookNow} />
+            </button>
+
+            {/* Dropdown Menu */}
+            <div className="absolute right-0 top-full pt-1.5 hidden group-hover:block hover:block z-50 min-w-[170px]">
+              <div className="rounded-xl border border-[#E5D6C7] bg-white p-1.5 shadow-xl">
+                {isLoggedIn ? (
+                  <>
+                    <Link
+                      href={dashboardPath}
+                      className="flex items-center gap-2 rounded-lg px-3 py-2 text-[13px] font-serif font-medium text-[#0F172A] hover:bg-[#FCF2E9] hover:text-[#CA7521] transition-colors"
+                    >
+                      <LuLayoutDashboard size={15} />
+                      <span>{t.navbar.dashboard || "Dashboard"}</span>
+                    </Link>
+                    <button
+                      type="button"
+                      onClick={handleLogout}
+                      className="w-full flex items-center gap-2 rounded-lg px-3 py-2 text-[13px] font-serif font-medium text-[#64748B] hover:bg-red-50 hover:text-red-600 transition-colors cursor-pointer"
+                    >
+                      <HiArrowRightOnRectangle size={15} />
+                      <span>{t.navbar.logout || "Log Out"}</span>
+                    </button>
+                  </>
+                ) : (
+                  <Link
+                    href="/login"
+                    className="flex items-center gap-2 rounded-lg px-3 py-2 text-[13px] font-serif font-medium text-[#0F172A] hover:bg-[#FCF2E9] hover:text-[#CA7521] transition-colors"
+                  >
+                    <HiArrowRightOnRectangle size={15} />
+                    <span>{t.navbar.login}</span>
+                  </Link>
+                )}
+              </div>
+            </div>
+          </div>
+
+          <BookNow
+            href="/booking"
+            label={t.navbar.bookNow}
+            className="!px-4 2xl:!px-6 !py-2 2xl:!py-2.5 !text-[13px] 2xl:!text-[14px]"
+          />
         </div>
 
         {/* ── Mobile & Tablet Hamburger Button (< 1280px) ── */}
@@ -238,11 +279,10 @@ const Navbar = () => {
                 key={link.href}
                 href={link.href}
                 onClick={() => setIsMenuOpen(false)}
-                className={`rounded-md px-4 py-2.5 text-[16px] font-medium font-serif transition-colors ${
-                  pathname === link.href
-                    ? "bg-[#F5D8BB] text-[#0F172A]"
-                    : "text-[#2D2D2D] hover:text-[#CA7521]"
-                }`}
+                className={`rounded-md px-4 py-2.5 text-[16px] font-medium font-serif transition-colors ${pathname === link.href
+                  ? "bg-[#F5D8BB] text-[#0F172A]"
+                  : "text-[#2D2D2D] hover:text-[#CA7521]"
+                  }`}
               >
                 {link.name}
               </Link>
@@ -257,11 +297,10 @@ const Navbar = () => {
                     setLanguage(option.value as Language);
                     setIsMenuOpen(false);
                   }}
-                  className={`px-3 py-1.5 rounded-md text-[14px] font-semibold font-serif border transition-colors ${
-                    language === option.value
-                      ? "bg-[#CFB9A3] text-[#0F172A] border-[#CFB9A3]"
-                      : "bg-transparent text-[#1A1A1A] border-[#E5D6C7] hover:border-[#CFB9A3]"
-                  }`}
+                  className={`px-3 py-1.5 rounded-md text-[14px] font-semibold font-serif border transition-colors ${language === option.value
+                    ? "bg-[#CFB9A3] text-[#0F172A] border-[#CFB9A3]"
+                    : "bg-transparent text-[#1A1A1A] border-[#E5D6C7] hover:border-[#CFB9A3]"
+                    }`}
                 >
                   {option.label}
                 </button>

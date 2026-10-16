@@ -15,28 +15,13 @@ const EventSpacePage = () => {
     <div className="min-h-screen bg-white">
       {/* Hero Section */}
       <PageHero
-        backgroundImage="/images/eventspace/hero/eventhero.png"
+        backgroundImage="/images/eventspace/hero/eventsHero.jpeg"
         title={t.eventspacePage?.hero?.title || "Multifunctional Space"}
         subtitle={
           t.eventspacePage?.hero?.subtitle ||
           "A calm setting for life's meaningful moments."
         }
       />
-
-      {/* Intro Section */}
-      <section className="py-16 md:py-20 bg-[#FCF2E9]">
-        <div className="container mx-auto px-6">
-          <div className="max-w-[800px] mx-auto text-center">
-            <p
-              className="text-[#475569] text-lg md:text-xl leading-relaxed"
-              style={{ fontFamily: "Cambria, Georgia, serif" }}
-            >
-              {t.eventspacePage?.intro?.text ||
-                "Our multifunctional space combines flexibility with atmosphere. Whether hosting a seminar, celebrating a wedding, or gathering for a corporate retreat, this space adapts to honor your vision."}
-            </p>
-          </div>
-        </div>
-      </section>
 
       {/* Seminars & Workshops */}
       <SeminarsSection />

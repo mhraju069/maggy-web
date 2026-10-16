@@ -4,8 +4,12 @@ import { useState, useEffect } from "react";
 import Image from "next/image";
 import DecorativeUnderline from "@/components/shared/DecorativeUnderline";
 import { othersService, ContactInfo } from "@/lib/api/services";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
 
 export default function GetInTouchSection() {
+  const { t } = useLanguage();
+  const tTouch = (t.contactPage as any)?.getInTouch;
+
   const [form, setForm] = useState({
     name: "",
     phone: "",
@@ -40,23 +44,23 @@ export default function GetInTouchSection() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!form.name.trim()) {
-      setSubmitError("Please enter your name.");
+      setSubmitError(tTouch?.errorEnterName || "Please enter your name.");
       return;
     }
     if (!form.phone.trim()) {
-      setSubmitError("Please enter your phone number.");
+      setSubmitError(tTouch?.errorEnterPhone || "Please enter your phone number.");
       return;
     }
     if (!form.email.trim()) {
-      setSubmitError("Please enter your email address.");
+      setSubmitError(tTouch?.errorEnterEmail || "Please enter your email address.");
       return;
     }
     if (!form.subject.trim()) {
-      setSubmitError("Please enter a subject.");
+      setSubmitError(tTouch?.errorEnterSubject || "Please enter a subject.");
       return;
     }
     if (!form.message.trim()) {
-      setSubmitError("Please enter your message.");
+      setSubmitError(tTouch?.errorEnterMessage || "Please enter your message.");
       return;
     }
 
@@ -73,12 +77,19 @@ export default function GetInTouchSection() {
         message: form.message.trim(),
       });
 
-      setSubmitSuccess(res.message || "Your message has been sent successfully. We will get back to you shortly.");
+      setSubmitSuccess(
+        res.message ||
+        tTouch?.successMessage ||
+        "Your message has been sent successfully. We will get back to you shortly."
+      );
       setForm({ name: "", phone: "", email: "", subject: "", message: "" });
     } catch (err: any) {
       console.error("Failed to send message:", err);
       setSubmitError(
-        err?.response?.data?.message || err?.message || "Failed to send message. Please try again."
+        err?.response?.data?.message ||
+        err?.message ||
+        tTouch?.errorGeneral ||
+        "Failed to send message. Please try again."
       );
     } finally {
       setSubmitting(false);
@@ -102,7 +113,7 @@ export default function GetInTouchSection() {
               textAlign: "center",
             }}
           >
-            Get in Touch
+            {tTouch?.title || "Get in Touch"}
           </h2>
           <DecorativeUnderline />
         </div>
@@ -117,10 +128,8 @@ export default function GetInTouchSection() {
             maxWidth: "600px",
           }}
         >
-          For general questions, special requests, or corporate inquiries, our
-          team is happy to assist you.{" "}
-          <br className="hidden sm:block" />
-          We aim to respond personally and promptly.
+          {tTouch?.subtitle ||
+            "For general questions, special requests, or corporate inquiries, our team is happy to assist you. We aim to respond personally and promptly."}
         </p>
       </div>
 
@@ -173,7 +182,7 @@ export default function GetInTouchSection() {
                   letterSpacing: "0.5px",
                 }}
               >
-                Personal Information
+                {tTouch?.personalInfo || "Personal Information"}
               </p>
 
               <form onSubmit={handleSubmit} className="flex flex-col gap-5">
@@ -200,14 +209,14 @@ export default function GetInTouchSection() {
                       lineHeight: "142%",
                     }}
                   >
-                    Name <span className="text-[#CFB9A3]">*</span>
+                    {tTouch?.name || "Name"} <span className="text-[#CFB9A3]">*</span>
                   </label>
                   <input
                     id="name"
                     name="name"
                     type="text"
                     required
-                    placeholder="Your full name"
+                    placeholder={tTouch?.namePlaceholder || "Your full name"}
                     value={form.name}
                     onChange={handleChange}
                     style={{
@@ -238,7 +247,7 @@ export default function GetInTouchSection() {
                       lineHeight: "142%",
                     }}
                   >
-                    Phone Number <span className="text-[#CFB9A3]">*</span>
+                    {tTouch?.phone || "Phone Number"} <span className="text-[#CFB9A3]">*</span>
                   </label>
                   <div
                     style={{
@@ -269,7 +278,7 @@ export default function GetInTouchSection() {
                       name="phone"
                       type="tel"
                       required
-                      placeholder="+1 (555) 000-0000"
+                      placeholder={tTouch?.phonePlaceholder || "+1 (555) 000-0000"}
                       value={form.phone}
                       onChange={handleChange}
                       style={{
@@ -299,7 +308,7 @@ export default function GetInTouchSection() {
                       lineHeight: "142%",
                     }}
                   >
-                    Email Address <span className="text-[#CFB9A3]">*</span>
+                    {tTouch?.email || "Email Address"} <span className="text-[#CFB9A3]">*</span>
                   </label>
                   <div
                     style={{
@@ -330,7 +339,7 @@ export default function GetInTouchSection() {
                       name="email"
                       type="email"
                       required
-                      placeholder="your@email.com"
+                      placeholder={tTouch?.emailPlaceholder || "your@email.com"}
                       value={form.email}
                       onChange={handleChange}
                       style={{
@@ -360,14 +369,14 @@ export default function GetInTouchSection() {
                       lineHeight: "142%",
                     }}
                   >
-                    Subject <span className="text-[#CFB9A3]">*</span>
+                    {tTouch?.subject || "Subject"} <span className="text-[#CFB9A3]">*</span>
                   </label>
                   <input
                     id="subject"
                     name="subject"
                     type="text"
                     required
-                    placeholder="Subject of your message"
+                    placeholder={tTouch?.subjectPlaceholder || "Subject of your message"}
                     value={form.subject}
                     onChange={handleChange}
                     style={{
@@ -398,14 +407,14 @@ export default function GetInTouchSection() {
                       lineHeight: "142%",
                     }}
                   >
-                    Message <span className="text-[#CFB9A3]">*</span>
+                    {tTouch?.message || "Message"} <span className="text-[#CFB9A3]">*</span>
                   </label>
                   <textarea
                     id="message"
                     name="message"
                     rows={4}
                     required
-                    placeholder="Write here..."
+                    placeholder={tTouch?.messagePlaceholder || "Write here..."}
                     value={form.message}
                     onChange={handleChange}
                     style={{
@@ -448,7 +457,7 @@ export default function GetInTouchSection() {
                       lineHeight: "150%",
                     }}
                   >
-                    {submitting ? "Sending..." : "Send"}
+                    {submitting ? (tTouch?.sending || "Sending...") : (tTouch?.send || "Send")}
                   </span>
                   {!submitting && (
                     <svg
@@ -480,8 +489,8 @@ export default function GetInTouchSection() {
                     textAlign: "center",
                   }}
                 >
-                  Your information is secure and will never be shared with third
-                  parties
+                  {tTouch?.securityNote ||
+                    "Your information is secure and will never be shared with third parties"}
                 </p>
               </form>
             </div>
@@ -522,7 +531,7 @@ export default function GetInTouchSection() {
                 lineHeight: "150%",
               }}
             >
-              Address
+              {tTouch?.address || "Address"}
             </p>
             <div className="flex flex-col">
               <p
@@ -569,7 +578,7 @@ export default function GetInTouchSection() {
                 lineHeight: "150%",
               }}
             >
-              Phone
+              {tTouch?.phoneLabel || "Phone"}
             </p>
             <div className="flex flex-col">
               <a
@@ -618,7 +627,7 @@ export default function GetInTouchSection() {
                 lineHeight: "150%",
               }}
             >
-              Email
+              {tTouch?.emailLabel || "Email"}
             </p>
             <div className="flex flex-col">
               <a
