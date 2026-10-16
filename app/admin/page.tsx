@@ -1,5 +1,7 @@
+import { redirect } from "next/navigation";
 import Link from "next/link";
 
+/*
 const stats = [
   { label: "Today's Total", value: "0", sub: "Reservations", color: "text-[#CFB9A3]" },
   { label: "Upcoming", value: "2", sub: "Confirmed bookings", color: "text-green-500" },
@@ -17,8 +19,13 @@ const schedule = [
 ];
 
 const services = ["Private Sauna", "Shared Sauna", "Lunchroom Reservation", "Yoga Class"];
+*/
 
 export default function AdminDashboard() {
+  // Redirect to reservations while dashboard overview is commented out
+  redirect("/admin/reservations");
+
+  /*
   return (
     <div>
       <div className="flex items-center justify-between mb-1">
@@ -26,7 +33,7 @@ export default function AdminDashboard() {
       </div>
       <p className="text-xs text-gray-400 mb-5">Your operational overview</p>
 
-      {/* Stats */}
+      {/!* Stats *!/}
       <div className="grid grid-cols-4 gap-3 mb-5">
         {stats.map((s) => (
           <div key={s.label} className="bg-white rounded-xl p-4 border border-[#E8E2DC]">
@@ -37,7 +44,7 @@ export default function AdminDashboard() {
         ))}
       </div>
 
-      {/* Quick Actions */}
+      {/!* Quick Actions *!/}
       <div className="grid grid-cols-3 gap-3 mb-5">
         <Link href="/admin/reservations" className="rounded-xl p-4 bg-gradient-to-br from-[#CFB9A3] to-[#8b7355] text-white text-sm font-semibold flex items-center gap-2">
           📋 View All Reservations
@@ -50,9 +57,9 @@ export default function AdminDashboard() {
         </Link>
       </div>
 
-      {/* Bottom */}
+      {/!* Bottom *!/}
       <div className="grid grid-cols-2 gap-4">
-        {/* Schedule */}
+        {/!* Schedule *!/}
         <div className="bg-white rounded-xl border border-[#E8E2DC] overflow-hidden">
           <p className="px-5 py-3 text-sm font-semibold text-[#1d1a17] border-b border-[#E8E2DC]">Today&apos;s Schedule</p>
           {schedule.map((s, i) => (
@@ -70,7 +77,7 @@ export default function AdminDashboard() {
           ))}
         </div>
 
-        {/* Services */}
+        {/!* Services *!/}
         <div className="bg-white rounded-xl border border-[#E8E2DC] overflow-hidden">
           <p className="px-5 py-3 text-sm font-semibold text-[#1d1a17] border-b border-[#E8E2DC]">Services Active Today</p>
           {services.map((s) => (
@@ -83,4 +90,5 @@ export default function AdminDashboard() {
       </div>
     </div>
   );
+  */
 }

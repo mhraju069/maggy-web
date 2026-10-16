@@ -49,6 +49,24 @@ export const setAuthToken = (token: string, refreshToken?: string, role?: string
   }
 };
 
+export const getStoredUser = (): any | null => {
+  if (typeof window === "undefined") return null;
+  const raw = localStorage.getItem(USER_KEY);
+  if (!raw) return null;
+  try {
+    return JSON.parse(raw);
+  } catch {
+    return null;
+  }
+};
+
+export const setStoredUser = (user: any): void => {
+  if (typeof window === "undefined") return;
+  localStorage.setItem(USER_KEY, JSON.stringify(user));
+  // Dispatch a custom event so other components (like navbar/sidebar) can reactively update
+  window.dispatchEvent(new Event("user_profile_updated"));
+};
+
 export const clearAuthSession = (): void => {
   if (typeof window === "undefined") return;
 

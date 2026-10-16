@@ -20,7 +20,7 @@ import {
 import { FaChalkboardTeacher } from "react-icons/fa";
 
 const NAV = [
-  { href: "/admin",                label: "Dashboard",             Icon: MdDashboard },
+  // { href: "/admin",                label: "Dashboard",             Icon: MdDashboard },
   { href: "/admin/reservations",   label: "Reservations",          Icon: MdEventNote },
   { href: "/admin/availability",   label: "Availability & Capacity", Icon: MdTune },
   { href: "/admin/services",       label: "Services",              Icon: MdMiscellaneousServices },
@@ -34,10 +34,54 @@ const NAV = [
   { href: "/admin/profile",        label: "Profile",               Icon: MdPerson },
 ];
 
+import { useState, useEffect } from "react";
+import { authService } from "@/lib/api/services/authService";
+import { getStoredUser, setStoredUser } from "@/lib/api/token";
+import { formatImageUrl } from "@/lib/api/config";
+
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
   const logout = () => { document.cookie = "role=; path=/; max-age=0"; router.push("/login"); };
+
+  const [adminUser, setAdminUser] = useState<{ name: string; email: string; image: string | null }>({
+    name: "Admin User",
+    email: "admin@haven.com",
+    image: null,
+  });
+
+  useEffect(() => {
+    const syncProfile = () => {
+      const cached = getStoredUser();
+      if (cached) {
+        setAdminUser({
+          name: cached.name || cached.username || "Admin User",
+          email: cached.email || "admin@haven.com",
+          image: cached.image || null,
+        });
+      }
+    };
+
+    syncProfile();
+
+    // Fetch latest from API
+    authService.getProfile()
+      .then((user) => {
+        if (user) {
+          const updated = {
+            name: user.name || user.username || "Admin User",
+            email: user.email || "admin@haven.com",
+            image: user.image || null,
+          };
+          setAdminUser(updated);
+          setStoredUser(user);
+        }
+      })
+      .catch((err) => console.warn("Admin header profile fetch:", err));
+
+    window.addEventListener("user_profile_updated", syncProfile);
+    return () => window.removeEventListener("user_profile_updated", syncProfile);
+  }, []);
 
   return (
     <div className="min-h-screen flex font-cambria bg-white">
@@ -107,10 +151,20 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full text-white text-[9px] flex items-center justify-center font-bold">3</span>
           </button>
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-full bg-[#CFB9A3] flex items-center justify-center text-white font-bold text-sm">A</div>
+            <div className="w-9 h-9 rounded-full bg-[#CFB9A3] flex items-center justify-center text-white font-bold text-sm shadow-xs uppercase overflow-hidden border border-[#E8E2DC]">
+              {adminUser.image ? (
+                <img
+                  src={formatImageUrl(adminUser.image)}
+                  alt={adminUser.name}
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <span>{(adminUser.name || "A").charAt(0)}</span>
+              )}
+            </div>
             <div>
-              <p className="text-sm font-semibold text-[#1d1a17] leading-none">Admin User</p>
-              <p className="text-xs text-[#94A3B8] mt-0.5">admin@haven.com</p>
+              <p className="text-sm font-semibold text-[#1d1a17] leading-none">{adminUser.name}</p>
+              <p className="text-xs text-[#94A3B8] mt-0.5">{adminUser.email}</p>
             </div>
           </div>
         </header>
