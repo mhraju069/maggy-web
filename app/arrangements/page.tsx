@@ -3,13 +3,139 @@
 import Footer from "@/components/shared/Footer";
 import PageHero from "@/components/shared/PageHero";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
+import { servicesService, SaltroomServicesData, SaltRoomSlotItem } from "@/lib/api/services/servicesService";
+import { paymentsService, PlansAndPassesResponse, SessionPassItem, SubscriptionPlanItem } from "@/lib/api/services/paymentsService";
 import Link from "next/link";
+import { useEffect, useState, useMemo } from "react";
 import { BiCheckCircle, BiCreditCard, BiInfoCircle, BiTimeFive } from "react-icons/bi";
-import { FaBoxes, FaCalendarAlt, FaInfinity, FaSpa, FaUsers } from "react-icons/fa";
+import { FaBoxes, FaCalendarAlt, FaInfinity, FaUsers } from "react-icons/fa";
 import CreateYourOwn from "./components/CreateYourOwn";
 
 export default function ArrangementsPage() {
   const { t } = useLanguage();
+
+  const [saltServices, setSaltServices] = useState<SaltroomServicesData | null>(null);
+  const [plansData, setPlansData] = useState<PlansAndPassesResponse | null>(null);
+  const [slotsList, setSlotsList] = useState<SaltRoomSlotItem[]>([]);
+  const [slotsOpenTime, setSlotsOpenTime] = useState<string>("06:00 AM");
+  const [slotsCloseTime, setSlotsCloseTime] = useState<string>("23:20");
+  const [loading, setLoading] = useState<boolean>(true);
+
+  useEffect(() => {
+    const todayStr = new Date().toISOString().split("T")[0];
+
+    Promise.all([
+      servicesService.getSaltRoomServices().catch((err) => {
+        console.warn("Error fetching saltroom services:", err);
+        return null;
+      }),
+      servicesService.getServiceSlots("saltroom", todayStr).catch((err) => {
+        console.warn("Error fetching saltroom slots:", err);
+        return null;
+      }),
+      paymentsService.getPlansAndPasses().catch((err) => {
+        console.warn("Error fetching plans and passes:", err);
+        return null;
+      }),
+    ])
+      .then(([saltRes, slotsRes, plansRes]) => {
+        if (saltRes) setSaltServices(saltRes);
+        if (plansRes) setPlansData(plansRes);
+
+        if (slotsRes) {
+          const dataObj: any = slotsRes.data || slotsRes;
+          const rawSlots: SaltRoomSlotItem[] =
+            dataObj?.slots || dataObj?.saltroom?.slots || dataObj?.available_slots || [];
+          if (rawSlots.length > 0) {
+            setSlotsList(rawSlots);
+            const firstTime = rawSlots[0].start_time || rawSlots[0].time || "06:00";
+            const lastTime = rawSlots[rawSlots.length - 1].end_time || rawSlots[rawSlots.length - 1].time || "23:20";
+            setSlotsOpenTime(firstTime);
+            setSlotsCloseTime(lastTime);
+          }
+        }
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  }, []);
+
+  // Primary Salt Room item
+  const primarySaltItem = saltServices?.saltroom?.[0];
+
+  const dynamicCapacity = (primarySaltItem as any)?.max_capacity || (primarySaltItem as any)?.capacity || 2;
+  const dynamicPrice = primarySaltItem?.price_per_person
+    ? `€${parseFloat(String(primarySaltItem.price_per_person)).toFixed(0)} / Person`
+    : "€25 / Person";
+
+  // Parse duration from API or features
+  const dynamicDuration = useMemo(() => {
+    if ((primarySaltItem as any)?.duration_minutes || (primarySaltItem as any)?.duration) {
+      return `${(primarySaltItem as any)?.duration_minutes || (primarySaltItem as any)?.duration} Mins`;
+    }
+    if (primarySaltItem?.features && primarySaltItem.features.length > 0) {
+      for (const f of primarySaltItem.features) {
+        const text = (f as any).feature || (f as any).feature_en || "";
+        const match = text.match(/(\d+(?:\.\d+)?)\s*[- ]*(hour|hr|minute|min)/i);
+        if (match) {
+          const val = match[1];
+          const unit = match[2].toLowerCase().startsWith("h") ? "Hour" : "Mins";
+          return `${val} ${unit}`;
+        }
+      }
+    }
+    return "1 Hour";
+  }, [primarySaltItem]);
+
+  // Dynamic Plans from paymentsService or servicesService fallback
+  const sessionPass = useMemo(() => {
+    return plansData?.session_passes?.[0] || saltServices?.session_pass?.[0] || null;
+  }, [plansData, saltServices]);
+
+  const saltWeekly = useMemo(() => {
+    const list = plansData?.subscription_plans || saltServices?.subscription_plans || [];
+    return list.find((p) => p.plan_type?.toLowerCase() === "weekly") || null;
+  }, [plansData, saltServices]);
+
+  const saltUnlimited = useMemo(() => {
+    const list = plansData?.subscription_plans || saltServices?.subscription_plans || [];
+    return list.find((p) => p.plan_type?.toLowerCase() === "unlimited") || null;
+  }, [plansData, saltServices]);
+
+  // Default fallback timetable slots if API returns empty
+  const displayTimetableSlots = useMemo(() => {
+    if (slotsList.length > 0) {
+      return slotsList.map((s, idx) => {
+        const start = s.start_time || s.time || "06:00";
+        const end = s.end_time || "07:00";
+        return {
+          timeRange: `${start.slice(0, 5)}–${end.slice(0, 5)}`,
+          isFinal: idx === slotsList.length - 1,
+        };
+      });
+    }
+
+    return [
+      "06:00–07:00",
+      "07:10–08:10",
+      "08:20–09:20",
+      "09:30–10:30",
+      "10:40–11:40",
+      "11:50–12:50",
+      "13:00–14:00",
+      "14:10–15:10",
+      "15:20–16:20",
+      "16:30–17:30",
+      "17:40–18:40",
+      "18:50–19:50",
+      "20:00–21:00",
+      "21:10–22:10",
+      "22:20–23:20",
+    ].map((slot, idx, arr) => ({
+      timeRange: slot,
+      isFinal: idx === arr.length - 1,
+    }));
+  }, [slotsList]);
 
   return (
     <div className="min-h-screen bg-white">
@@ -38,14 +164,14 @@ export default function ArrangementsPage() {
             </p>
           </div>
 
-          {/* Quick Info Grid */}
+          {/* Quick Info Grid (Dynamically Populated from API) */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
             <div className="bg-white p-6 rounded-2xl border border-[#E8E2DC] shadow-xs text-center">
               <div className="w-12 h-12 rounded-2xl bg-[#FCF2E9] text-[#8B7355] flex items-center justify-center mx-auto mb-4">
                 <FaUsers size={22} />
               </div>
               <h3 className="font-bold text-[#0F172A] text-lg font-displayPlayFair mb-1">Capacity</h3>
-              <p className="text-sm font-semibold text-[#8B7355]">Max 2 People / Session</p>
+              <p className="text-sm font-semibold text-[#8B7355]">Max {dynamicCapacity} People / Session</p>
               <p className="text-xs text-[#64748B] mt-1">Intimate, tranquil setting</p>
             </div>
 
@@ -54,7 +180,7 @@ export default function ArrangementsPage() {
                 <BiTimeFive size={24} />
               </div>
               <h3 className="font-bold text-[#0F172A] text-lg font-displayPlayFair mb-1">Duration</h3>
-              <p className="text-sm font-semibold text-[#8B7355]">1 Hour Session</p>
+              <p className="text-sm font-semibold text-[#8B7355]">{dynamicDuration} Session</p>
               <p className="text-xs text-[#64748B] mt-1">+10 Mins changeover buffer</p>
             </div>
 
@@ -63,7 +189,7 @@ export default function ArrangementsPage() {
                 <BiCreditCard size={24} />
               </div>
               <h3 className="font-bold text-[#0F172A] text-lg font-displayPlayFair mb-1">Single Session</h3>
-              <p className="text-sm font-semibold text-[#8B7355]">€25 / Person</p>
+              <p className="text-sm font-semibold text-[#8B7355]">{dynamicPrice}</p>
               <p className="text-xs text-[#64748B] mt-1">Per hour session</p>
             </div>
 
@@ -72,8 +198,8 @@ export default function ArrangementsPage() {
                 <BiInfoCircle size={24} />
               </div>
               <h3 className="font-bold text-[#0F172A] text-lg font-displayPlayFair mb-1">First Start Time</h3>
-              <p className="text-sm font-semibold text-[#8B7355]">06:00 AM</p>
-              <p className="text-xs text-[#64748B] mt-1">Sessions until 23:20</p>
+              <p className="text-sm font-semibold text-[#8B7355]">{slotsOpenTime}</p>
+              <p className="text-xs text-[#64748B] mt-1">Sessions until {slotsCloseTime}</p>
             </div>
           </div>
         </div>
@@ -103,33 +229,18 @@ export default function ArrangementsPage() {
             </Link>
           </div>
 
+          {/* All Slots Rendered from Start to End Time */}
           <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-            {[
-              "06:00–07:00",
-              "07:10–08:10",
-              "08:20–09:20",
-              "09:30–10:30",
-              "10:40–11:40",
-              "11:50–12:50",
-              "13:00–14:00",
-              "14:10–15:10",
-              "15:20–16:20",
-              "16:30–17:30",
-              "17:40–18:40",
-              "18:50–19:50",
-              "20:00–21:00",
-              "21:10–22:10",
-              "22:20–23:20",
-            ].map((slot, idx) => (
+            {displayTimetableSlots.map((slot, idx) => (
               <div
                 key={idx}
-                className="p-4 rounded-xl bg-[#FBF6F3] border border-[#E8E2DC] text-center"
+                className="p-4 rounded-xl bg-[#FBF6F3] border border-[#E8E2DC] text-center transition-all hover:border-[#8B7355]/40"
               >
                 <span className="text-sm font-bold text-[#0F172A] font-displayPlayFair block">
-                  {slot}
+                  {slot.timeRange}
                 </span>
                 <span className="text-[10px] text-[#8B7355] font-mono block mt-1">
-                  {idx === 14 ? "Final Session" : "10m changeover buffer"}
+                  {slot.isFinal ? "Final Session" : "10m changeover buffer"}
                 </span>
               </div>
             ))}
@@ -137,7 +248,7 @@ export default function ArrangementsPage() {
         </div>
       </section>
 
-      {/* ── Passes & Memberships Section ── */}
+      {/* ── Passes & Memberships Section (Dynamic API + Redirect to /memberships) ── */}
       <section className="py-20 bg-[#FBF6F3]">
         <div className="container mx-auto px-6 max-w-6xl">
           <div className="text-center max-w-2xl mx-auto mb-16">
@@ -163,36 +274,55 @@ export default function ArrangementsPage() {
                   Session Pass
                 </span>
                 <h3 className="text-2xl font-bold font-displayPlayFair text-[#0F172A] mb-2">
-                  10-Session Pass
+                  {sessionPass?.name || "10-Session Pass"}
                 </h3>
                 <div className="flex items-baseline gap-2 mb-4">
-                  <span className="text-3xl font-bold text-[#8B7355] font-displayPlayFair">€200</span>
-                  <span className="text-xs text-[#64748B]">/ 10 sessions (€20/session)</span>
+                  <span className="text-3xl font-bold text-[#8B7355] font-displayPlayFair">
+                    €{sessionPass?.price ? parseFloat(String(sessionPass.price)).toFixed(0) : "200"}
+                  </span>
+                  <span className="text-xs text-[#64748B]">
+                    / {sessionPass?.entry_limit || 10} sessions (€
+                    {sessionPass?.price && sessionPass?.entry_limit
+                      ? (parseFloat(String(sessionPass.price)) / sessionPass.entry_limit).toFixed(0)
+                      : "20"}
+                    /session)
+                  </span>
                 </div>
 
                 <ul className="space-y-3 text-xs text-[#475569] border-t border-[#E8E2DC] pt-4">
-                  <li className="flex items-start gap-2">
-                    <BiCheckCircle className="text-[#8B7355] text-base flex-shrink-0" />
-                    <span>Linked directly to your customer account</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <BiCheckCircle className="text-[#8B7355] text-base flex-shrink-0" />
-                    <span>Automatically deducts 1 session when booking</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <BiCheckCircle className="text-[#8B7355] text-base flex-shrink-0" />
-                    <span>View remaining session balance anytime in account</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <BiCheckCircle className="text-[#8B7355] text-base flex-shrink-0" />
-                    <span>Valid for 1 year after purchase date</span>
-                  </li>
+                  {sessionPass?.features && sessionPass.features.length > 0 ? (
+                    sessionPass.features.map((f, i) => (
+                      <li key={i} className="flex items-start gap-2">
+                        <BiCheckCircle className="text-[#8B7355] text-base flex-shrink-0" />
+                        <span>{f.feature.replace(/^[✓✔\s]+/, "")}</span>
+                      </li>
+                    ))
+                  ) : (
+                    <>
+                      <li className="flex items-start gap-2">
+                        <BiCheckCircle className="text-[#8B7355] text-base flex-shrink-0" />
+                        <span>Linked directly to your customer account</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <BiCheckCircle className="text-[#8B7355] text-base flex-shrink-0" />
+                        <span>Automatically deducts 1 session when booking</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <BiCheckCircle className="text-[#8B7355] text-base flex-shrink-0" />
+                        <span>View remaining session balance anytime in account</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <BiCheckCircle className="text-[#8B7355] text-base flex-shrink-0" />
+                        <span>Valid for 1 year after purchase date</span>
+                      </li>
+                    </>
+                  )}
                 </ul>
               </div>
 
               <Link
-                href="/booking/arrangements"
-                className="mt-8 w-full py-3.5 rounded-xl bg-[#8B7355] hover:bg-[#725e45] text-white text-center font-bold text-xs uppercase tracking-wider transition-all block"
+                href="/memberships#packages"
+                className="mt-8 w-full py-3.5 rounded-xl bg-[#8B7355] hover:bg-[#725e45] text-white text-center font-bold text-xs uppercase tracking-wider transition-all block shadow-xs"
               >
                 Purchase Pass
               </Link>
@@ -208,36 +338,51 @@ export default function ArrangementsPage() {
                   Weekly Membership
                 </span>
                 <h3 className="text-2xl font-bold font-displayPlayFair text-[#0F172A] mb-2">
-                  Once-a-Week
+                  {saltWeekly?.name || "Once-a-Week"}
                 </h3>
                 <div className="flex items-baseline gap-2 mb-4">
-                  <span className="text-3xl font-bold text-[#8B7355] font-displayPlayFair">€70</span>
-                  <span className="text-xs text-[#64748B]">/ 4 weeks</span>
+                  <span className="text-3xl font-bold text-[#8B7355] font-displayPlayFair">
+                    €{saltWeekly?.price ? parseFloat(String(saltWeekly.price)).toFixed(0) : "70"}
+                  </span>
+                  <span className="text-xs text-[#64748B]">
+                    / {saltWeekly?.duration_weeks || 4} weeks
+                  </span>
                 </div>
 
                 <ul className="space-y-3 text-xs text-[#475569] border-t border-[#E8E2DC] pt-4">
-                  <li className="flex items-start gap-2">
-                    <BiCheckCircle className="text-[#8B7355] text-base flex-shrink-0" />
-                    <span>1 session per week included</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <BiCheckCircle className="text-[#8B7355] text-base flex-shrink-0" />
-                    <span>Maximum 4 included sessions per 4-week period</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <BiCheckCircle className="text-[#8B7355] text-base flex-shrink-0" />
-                    <span>Automatic member recognition upon sign in</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <BiCheckCircle className="text-[#8B7355] text-base flex-shrink-0" />
-                    <span>Online advance session reservation</span>
-                  </li>
+                  {saltWeekly?.features && saltWeekly.features.length > 0 ? (
+                    saltWeekly.features.map((f, i) => (
+                      <li key={i} className="flex items-start gap-2">
+                        <BiCheckCircle className="text-[#8B7355] text-base flex-shrink-0" />
+                        <span>{f.feature.replace(/^[✓✔\s]+/, "")}</span>
+                      </li>
+                    ))
+                  ) : (
+                    <>
+                      <li className="flex items-start gap-2">
+                        <BiCheckCircle className="text-[#8B7355] text-base flex-shrink-0" />
+                        <span>1 session per week included</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <BiCheckCircle className="text-[#8B7355] text-base flex-shrink-0" />
+                        <span>Maximum 4 included sessions per 4-week period</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <BiCheckCircle className="text-[#8B7355] text-base flex-shrink-0" />
+                        <span>Automatic member recognition upon sign in</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <BiCheckCircle className="text-[#8B7355] text-base flex-shrink-0" />
+                        <span>Online advance session reservation</span>
+                      </li>
+                    </>
+                  )}
                 </ul>
               </div>
 
               <Link
-                href="/booking/arrangements"
-                className="mt-8 w-full py-3.5 rounded-xl border border-[#8B7355] text-[#8B7355] hover:bg-[#8B7355] hover:text-white text-center font-bold text-xs uppercase tracking-wider transition-all block"
+                href="/memberships#packages"
+                className="mt-8 w-full py-3.5 rounded-xl border border-[#8B7355] text-[#8B7355] hover:bg-[#8B7355] hover:text-white text-center font-bold text-xs uppercase tracking-wider transition-all block shadow-xs"
               >
                 Join Once-a-Week
               </Link>
@@ -253,36 +398,51 @@ export default function ArrangementsPage() {
                   Ultimate Membership
                 </span>
                 <h3 className="text-2xl font-bold font-displayPlayFair text-white mb-2">
-                  Unlimited
+                  {saltUnlimited?.name || "Unlimited"}
                 </h3>
                 <div className="flex items-baseline gap-2 mb-4">
-                  <span className="text-3xl font-bold text-white font-displayPlayFair">€100</span>
-                  <span className="text-xs text-white/60">/ 4 weeks</span>
+                  <span className="text-3xl font-bold text-white font-displayPlayFair">
+                    €{saltUnlimited?.price ? parseFloat(String(saltUnlimited.price)).toFixed(0) : "100"}
+                  </span>
+                  <span className="text-xs text-white/60">
+                    / {saltUnlimited?.duration_weeks || 4} weeks
+                  </span>
                 </div>
 
                 <ul className="space-y-3 text-xs text-white/80 border-t border-white/15 pt-4">
-                  <li className="flex items-start gap-2">
-                    <BiCheckCircle className="text-emerald-400 text-base flex-shrink-0" />
-                    <span>Unlimited use within available capacity</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <BiCheckCircle className="text-emerald-400 text-base flex-shrink-0" />
-                    <span>Each session reserved in advance</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <BiCheckCircle className="text-emerald-400 text-base flex-shrink-0" />
-                    <span>Maximum 10 future active reservations at the same time</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <BiCheckCircle className="text-emerald-400 text-base flex-shrink-0" />
-                    <span>Priority booking access for prime hours</span>
-                  </li>
+                  {saltUnlimited?.features && saltUnlimited.features.length > 0 ? (
+                    saltUnlimited.features.map((f, i) => (
+                      <li key={i} className="flex items-start gap-2">
+                        <BiCheckCircle className="text-emerald-400 text-base flex-shrink-0" />
+                        <span>{f.feature.replace(/^[✓✔\s]+/, "")}</span>
+                      </li>
+                    ))
+                  ) : (
+                    <>
+                      <li className="flex items-start gap-2">
+                        <BiCheckCircle className="text-emerald-400 text-base flex-shrink-0" />
+                        <span>Unlimited use within available capacity</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <BiCheckCircle className="text-emerald-400 text-base flex-shrink-0" />
+                        <span>Each session reserved in advance</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <BiCheckCircle className="text-emerald-400 text-base flex-shrink-0" />
+                        <span>Maximum {saltUnlimited?.max_reservations || 10} future active reservations</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <BiCheckCircle className="text-emerald-400 text-base flex-shrink-0" />
+                        <span>Priority booking access for prime hours</span>
+                      </li>
+                    </>
+                  )}
                 </ul>
               </div>
 
               <Link
-                href="/booking/arrangements"
-                className="mt-8 w-full py-3.5 rounded-xl bg-white text-[#081228] hover:bg-opacity-90 text-center font-bold text-xs uppercase tracking-wider transition-all block"
+                href="/memberships#packages"
+                className="mt-8 w-full py-3.5 rounded-xl bg-white text-[#081228] hover:bg-opacity-90 text-center font-bold text-xs uppercase tracking-wider transition-all block shadow-md"
               >
                 Join Unlimited
               </Link>
