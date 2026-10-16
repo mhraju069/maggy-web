@@ -15,7 +15,7 @@ const EventSpacePage = () => {
     <div className="min-h-screen bg-white">
       {/* Hero Section */}
       <PageHero
-        backgroundImage="/images/eventspace/hero/eventsHero.jpeg"
+        backgroundImage="/images/eventspace/hero/EventsHero.jpeg"
         title={t.eventspacePage?.hero?.title || "Multifunctional Space"}
         subtitle={
           t.eventspacePage?.hero?.subtitle ||
