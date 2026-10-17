@@ -19,6 +19,12 @@ export const ENDPOINTS = {
     LIST: "/users/",
     DETAIL: (id: string | number) => `/users/${id}/`,
     UPDATE: (id: string | number) => `/users/${id}/`,
+    ADMIN: {
+      LIST: "/dashboard/admin/users/",
+      DETAIL: (id: string | number) => `/dashboard/admin/users/${id}/`,
+      UPDATE: (id: string | number) => `/dashboard/admin/users/${id}/`,
+      DELETE: (id: string | number) => `/dashboard/admin/users/${id}/`,
+    },
   },
   BOOKINGS: {
     LIST: "/bookings/",
