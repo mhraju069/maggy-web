@@ -1,475 +1,416 @@
 "use client";
 
+import ArrangementCard from "@/components/shared/ArrangementCard";
+import DecorativeUnderline from "@/components/shared/DecorativeUnderline";
 import Footer from "@/components/shared/Footer";
 import PageHero from "@/components/shared/PageHero";
+import { formatImageUrl } from "@/lib/api/config";
+import { servicesService, ServicePackage } from "@/lib/api/services/servicesService";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
-import { servicesService, SaltroomServicesData, SaltRoomSlotItem } from "@/lib/api/services/servicesService";
-import { paymentsService, PlansAndPassesResponse, SessionPassItem, SubscriptionPlanItem } from "@/lib/api/services/paymentsService";
 import Link from "next/link";
-import { useEffect, useState, useMemo } from "react";
-import { BiCheckCircle, BiCreditCard, BiInfoCircle, BiTimeFive } from "react-icons/bi";
-import { FaBoxes, FaCalendarAlt, FaInfinity, FaUsers } from "react-icons/fa";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { BiCoffee, BiHeart, BiTimeFive } from "react-icons/bi";
+import { HiSparkles } from "react-icons/hi2";
+import { FaCalendarAlt, FaGift, FaGlassCheers, FaHotTub, FaSpa, FaUsers } from "react-icons/fa";
 import CreateYourOwn from "./components/CreateYourOwn";
+
+interface PackageDisplayItem {
+  id: number;
+  image: string;
+  rating: number;
+  title: string;
+  combo: string;
+  subServicesList: string[];
+  description: string;
+  includes: string[];
+  paymentType: "full" | "partial" | "spot";
+  price: string;
+  rawPriceNum: number;
+}
 
 export default function ArrangementsPage() {
   const { t } = useLanguage();
+  const router = useRouter();
 
-  const [saltServices, setSaltServices] = useState<SaltroomServicesData | null>(null);
-  const [plansData, setPlansData] = useState<PlansAndPassesResponse | null>(null);
-  const [slotsList, setSlotsList] = useState<SaltRoomSlotItem[]>([]);
-  const [slotsOpenTime, setSlotsOpenTime] = useState<string>("06:00 AM");
-  const [slotsCloseTime, setSlotsCloseTime] = useState<string>("23:20");
+  const [packages, setPackages] = useState<PackageDisplayItem[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
 
+  // Default curated arrangements / bundle deals (fallback when backend returns empty)
+  const defaultArrangements: PackageDisplayItem[] = [
+    {
+      id: 1,
+      title: "Sauna & Lunchroom Experience",
+      combo: "Private Sauna (3 Hours) • 2-Course Culinary Lunch",
+      description:
+        "Combine absolute relaxation in our luxury private sauna sanctuary with a fresh, organic 2-course lunch in our serene lunchroom.",
+      image: "/images/arrangements/cardimages/img1.png",
+      rating: 4.9,
+      includes: [
+        "3 hours exclusive Private Sauna access (jacuzzi, steam room & cold plunge)",
+        "2-course seasonal lunch per person in De Lunchroom",
+        "Complimentary bathrobes, towels & organic herbal teas",
+        "10% combined bundle savings",
+      ],
+      paymentType: "full",
+      price: "€165",
+      rawPriceNum: 165,
+      subServicesList: ["sauna", "lunchroom"],
+    },
+    {
+      id: 2,
+      title: "Wellness & High Tea Ritual",
+      combo: "Salt Room Halotherapy • High Tea in Restaurant • Relaxation",
+      description:
+        "Breathe deeply in our aerosol Salt Room micro-climate followed by an indulgent luxury high tea with sweet and savory artisanal bites.",
+      image: "/images/arrangements/cardimages/img2.png",
+      rating: 5.0,
+      includes: [
+        "1-hour therapeutic Salt Room session",
+        "Artisanal luxury High Tea with sweet & savory delights",
+        "Selection of premium loose-leaf organic teas",
+        "Reserved scenic lounge table",
+      ],
+      paymentType: "full",
+      price: "€85",
+      rawPriceNum: 85,
+      subServicesList: ["saltroom", "lunchroom"],
+    },
+    {
+      id: 3,
+      title: "The Ultimate Renewal Day",
+      combo: "Private Sauna • Salt Room • Lunchroom Dining • Wellness Refresh",
+      description:
+        "Our most comprehensive full-day package. Transition seamlessly between deep heat therapy, restorative halotherapy, and mindful dining.",
+      image: "/images/arrangements/cardimages/img3.png",
+      rating: 4.95,
+      includes: [
+        "3 hours Private Sauna with private jacuzzi and relaxation terrace",
+        "1 hour Salt Room aerosol halotherapy",
+        "Full organic lunchroom dining credit (€30 per person)",
+        "Luxury wellness gift bag to take home",
+      ],
+      paymentType: "full",
+      price: "€240",
+      rawPriceNum: 240,
+      subServicesList: ["sauna", "saltroom", "lunchroom"],
+    },
+    {
+      id: 4,
+      title: "Workshop & Spa Retreat",
+      combo: "Event Space Workshop • Mindful Yoga / Breathwork • Sauna Access",
+      description:
+        "Perfect for private groups, team offsites, or intimate celebrations. Blend an inspiring session with rejuvenating wellness recovery.",
+      image: "/images/eventspace/hero/eventhero.png",
+      rating: 4.9,
+      includes: [
+        "2 hours private use of our Event Space / Atelier",
+        "Guided breathwork or gentle movement session",
+        "Shared Sauna & relaxation recovery pass",
+        "Fresh smoothie and healthy snack bar included",
+      ],
+      paymentType: "partial",
+      price: "€95",
+      rawPriceNum: 95,
+      subServicesList: ["eventspace", "activity", "sauna"],
+    },
+  ];
+
   useEffect(() => {
-    const todayStr = new Date().toISOString().split("T")[0];
+    let isMounted = true;
+    setLoading(true);
 
-    Promise.all([
-      servicesService.getSaltRoomServices().catch((err) => {
-        console.warn("Error fetching saltroom services:", err);
-        return null;
-      }),
-      servicesService.getServiceSlots("saltroom", todayStr).catch((err) => {
-        console.warn("Error fetching saltroom slots:", err);
-        return null;
-      }),
-      paymentsService.getPlansAndPasses().catch((err) => {
-        console.warn("Error fetching plans and passes:", err);
-        return null;
-      }),
-    ])
-      .then(([saltRes, slotsRes, plansRes]) => {
-        if (saltRes) setSaltServices(saltRes);
-        if (plansRes) setPlansData(plansRes);
+    servicesService
+      .getPackages()
+      .then((apiData) => {
+        if (!isMounted) return;
 
-        if (slotsRes) {
-          const dataObj: any = slotsRes.data || slotsRes;
-          const rawSlots: SaltRoomSlotItem[] =
-            dataObj?.slots || dataObj?.saltroom?.slots || dataObj?.available_slots || [];
-          if (rawSlots.length > 0) {
-            setSlotsList(rawSlots);
-            const firstTime = rawSlots[0].start_time || rawSlots[0].time || "06:00";
-            const lastTime = rawSlots[rawSlots.length - 1].end_time || rawSlots[rawSlots.length - 1].time || "23:20";
-            setSlotsOpenTime(firstTime);
-            setSlotsCloseTime(lastTime);
-          }
+        if (apiData && Array.isArray(apiData) && apiData.length > 0) {
+          const mapped: PackageDisplayItem[] = apiData.map(
+            (item: ServicePackage, idx: number) => {
+              const priceVal =
+                typeof item.price === "number"
+                  ? item.price
+                  : parseFloat(String(item.price || 0)) || 0;
+
+              let subServicesList: string[] = [];
+              if (Array.isArray(item.packages)) {
+                subServicesList = item.packages;
+              } else if (typeof item.packages === "string") {
+                try {
+                  const parsed = JSON.parse(item.packages);
+                  if (Array.isArray(parsed)) subServicesList = parsed;
+                  else subServicesList = [item.packages];
+                } catch {
+                  subServicesList = item.packages.split(",").map((s) => s.trim());
+                }
+              }
+
+              const formattedCombo =
+                subServicesList.length > 0
+                  ? subServicesList
+                      .map((s) =>
+                        s.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())
+                      )
+                      .join(" • ")
+                  : "Curated Bundle Deal";
+
+              return {
+                id: item.id,
+                image: formatImageUrl(
+                  item.image,
+                  `/images/arrangements/cardimages/img${(idx % 3) + 1}.png`
+                ),
+                rating: 4.9,
+                title: item.title || "Wellness Arrangement",
+                combo: formattedCombo,
+                subServicesList,
+                description: item.description || "",
+                includes:
+                  item.features?.map((f) =>
+                    f.feature.replace(/^[✓✔\s]+/, "")
+                  ) || [],
+                paymentType: "full" as const,
+                price: `€${priceVal.toFixed(0)}`,
+                rawPriceNum: priceVal,
+              };
+            }
+          );
+          setPackages(mapped);
+        } else {
+          setPackages(defaultArrangements);
         }
       })
+      .catch((err) => {
+        console.warn("Using fallback arrangements data:", err);
+        if (isMounted) setPackages(defaultArrangements);
+      })
       .finally(() => {
-        setLoading(false);
+        if (isMounted) setLoading(false);
       });
+
+    return () => {
+      isMounted = false;
+    };
   }, []);
-
-  // Primary Salt Room item
-  const primarySaltItem = saltServices?.saltroom?.[0];
-
-  const dynamicCapacity = (primarySaltItem as any)?.max_capacity || (primarySaltItem as any)?.capacity || 2;
-  const dynamicPrice = primarySaltItem?.price_per_person
-    ? `€${parseFloat(String(primarySaltItem.price_per_person)).toFixed(0)} / Person`
-    : "€25 / Person";
-
-  // Parse duration from API or features
-  const dynamicDuration = useMemo(() => {
-    if ((primarySaltItem as any)?.duration_minutes || (primarySaltItem as any)?.duration) {
-      return `${(primarySaltItem as any)?.duration_minutes || (primarySaltItem as any)?.duration} Mins`;
-    }
-    if (primarySaltItem?.features && primarySaltItem.features.length > 0) {
-      for (const f of primarySaltItem.features) {
-        const text = (f as any).feature || (f as any).feature_en || "";
-        const match = text.match(/(\d+(?:\.\d+)?)\s*[- ]*(hour|hr|minute|min)/i);
-        if (match) {
-          const val = match[1];
-          const unit = match[2].toLowerCase().startsWith("h") ? "Hour" : "Mins";
-          return `${val} ${unit}`;
-        }
-      }
-    }
-    return "1 Hour";
-  }, [primarySaltItem]);
-
-  // Dynamic Plans from paymentsService or servicesService fallback
-  const sessionPass = useMemo(() => {
-    return plansData?.session_passes?.[0] || saltServices?.session_pass?.[0] || null;
-  }, [plansData, saltServices]);
-
-  const saltWeekly = useMemo(() => {
-    const list = plansData?.subscription_plans || saltServices?.subscription_plans || [];
-    return list.find((p) => p.plan_type?.toLowerCase() === "weekly") || null;
-  }, [plansData, saltServices]);
-
-  const saltUnlimited = useMemo(() => {
-    const list = plansData?.subscription_plans || saltServices?.subscription_plans || [];
-    return list.find((p) => p.plan_type?.toLowerCase() === "unlimited") || null;
-  }, [plansData, saltServices]);
-
-  // Default fallback timetable slots if API returns empty
-  const displayTimetableSlots = useMemo(() => {
-    if (slotsList.length > 0) {
-      return slotsList.map((s, idx) => {
-        const start = s.start_time || s.time || "06:00";
-        const end = s.end_time || "07:00";
-        return {
-          timeRange: `${start.slice(0, 5)}–${end.slice(0, 5)}`,
-          isFinal: idx === slotsList.length - 1,
-        };
-      });
-    }
-
-    return [
-      "06:00–07:00",
-      "07:10–08:10",
-      "08:20–09:20",
-      "09:30–10:30",
-      "10:40–11:40",
-      "11:50–12:50",
-      "13:00–14:00",
-      "14:10–15:10",
-      "15:20–16:20",
-      "16:30–17:30",
-      "17:40–18:40",
-      "18:50–19:50",
-      "20:00–21:00",
-      "21:10–22:10",
-      "22:20–23:20",
-    ].map((slot, idx, arr) => ({
-      timeRange: slot,
-      isFinal: idx === arr.length - 1,
-    }));
-  }, [slotsList]);
 
   return (
     <div className="min-h-screen bg-white">
       {/* ── Page Hero ── */}
       <PageHero
         backgroundImage="/images/arrangements/hero/arrangementshero.png"
-        title={t.arrangementsPage?.hero?.title || "Salt Room & Halotherapy"}
+        title={t.arrangementsPage?.hero?.title || "Arrangementen & Packages"}
         subtitle={
           t.arrangementsPage?.hero?.subtitle ||
-          "Experience pure aerosol halotherapy for respiratory wellness, skin revitalization, and deep relaxation."
+          "Combine our sauna, salt room, mindful lunchroom, and events into complete bundled wellness experiences."
         }
       />
 
-      {/* ── Overview Section ── */}
-      <section className="py-20 bg-[#FCF2E9]">
-        <div className="container mx-auto px-6 max-w-6xl">
-          <div className="text-center max-w-3xl mx-auto mb-16">
-            <span className="text-xs font-bold uppercase tracking-widest text-[#8B7355] block mb-2">
-              Therapeutic Halotherapy Sanctuary
-            </span>
-            <h2 className="text-4xl md:text-5xl font-bold font-displayPlayFair text-[#0F172A] mb-4">
-              Breathe Deeply. Restore Vitality.
-            </h2>
-            <p className="text-[#475569] text-lg font-serif leading-relaxed">
-              Step into our calming salt room micro-climate. Microscopic salt aerosol particles purify your airway, soothe skin conditions, and transport you into profound stillness.
-            </p>
+      {/* ── Philosophy & Why Book Arrangements ── */}
+      <section className="py-16 md:py-20 bg-[#FCF2E9]">
+        <div className="container mx-auto px-6 max-w-5xl text-center">
+          <span className="text-xs font-bold uppercase tracking-widest text-[#8B7355] block mb-2">
+            {t.arrangementsPage?.philosophy?.badge || "Curated Bundles & Combined Experiences"}
+          </span>
+          <h2
+            className="text-3xl md:text-5xl font-bold text-[#0F172A] mb-4"
+            style={{ fontFamily: "var(--font-playfair)" }}
+          >
+            {t.arrangementsPage?.philosophy?.title || "Multiple Services, Seamlessly Combined"}
+          </h2>
+          <div className="flex justify-center mb-6">
+            <DecorativeUnderline />
           </div>
+          <p className="text-[#475569] text-base md:text-lg max-w-3xl mx-auto font-serif leading-relaxed">
+            {t.arrangementsPage?.philosophy?.description ||
+              "Instead of booking single isolated visits, our Arrangements bring together the best of Heaven on Earth. Enjoy a private sauna session followed by a leisurely culinary lunch, or a therapeutic salt room reset paired with an afternoon high tea — with exclusive bundle pricing and zero hassle."}
+          </p>
 
-          {/* Quick Info Grid (Dynamically Populated from API) */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-            <div className="bg-white p-6 rounded-2xl border border-[#E8E2DC] shadow-xs text-center">
-              <div className="w-12 h-12 rounded-2xl bg-[#FCF2E9] text-[#8B7355] flex items-center justify-center mx-auto mb-4">
-                <FaUsers size={22} />
+          {/* Quick Perks Grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mt-12 text-left">
+            <div className="bg-white p-6 rounded-2xl border border-[#E8E2DC] shadow-xs flex items-start gap-4">
+              <div className="w-12 h-12 rounded-xl bg-[#FCF2E9] text-[#8B7355] flex items-center justify-center shrink-0">
+                <HiSparkles size={24} />
               </div>
-              <h3 className="font-bold text-[#0F172A] text-lg font-displayPlayFair mb-1">Capacity</h3>
-              <p className="text-sm font-semibold text-[#8B7355]">Max {dynamicCapacity} People / Session</p>
-              <p className="text-xs text-[#64748B] mt-1">Intimate, tranquil setting</p>
+              <div>
+                <h3 className="font-bold text-[#0F172A] font-serif text-lg mb-1">
+                  {t.arrangementsPage?.philosophy?.perks?.savings?.title || "Exclusive Bundle Savings"}
+                </h3>
+                <p className="text-xs text-[#64748B] leading-relaxed">
+                  {t.arrangementsPage?.philosophy?.perks?.savings?.description ||
+                    "Enjoy combined package rates and special culinary discounts when pairing multiple services."}
+                </p>
+              </div>
             </div>
 
-            <div className="bg-white p-6 rounded-2xl border border-[#E8E2DC] shadow-xs text-center">
-              <div className="w-12 h-12 rounded-2xl bg-[#FCF2E9] text-[#8B7355] flex items-center justify-center mx-auto mb-4">
+            <div className="bg-white p-6 rounded-2xl border border-[#E8E2DC] shadow-xs flex items-start gap-4">
+              <div className="w-12 h-12 rounded-xl bg-[#FCF2E9] text-[#8B7355] flex items-center justify-center shrink-0">
                 <BiTimeFive size={24} />
               </div>
-              <h3 className="font-bold text-[#0F172A] text-lg font-displayPlayFair mb-1">Duration</h3>
-              <p className="text-sm font-semibold text-[#8B7355]">{dynamicDuration} Session</p>
-              <p className="text-xs text-[#64748B] mt-1">+10 Mins changeover buffer</p>
+              <div>
+                <h3 className="font-bold text-[#0F172A] font-serif text-lg mb-1">
+                  {t.arrangementsPage?.philosophy?.perks?.timing?.title || "Coordinated Timing"}
+                </h3>
+                <p className="text-xs text-[#64748B] leading-relaxed">
+                  {t.arrangementsPage?.philosophy?.perks?.timing?.description ||
+                    "We schedule your sessions smoothly back-to-back so you never feel rushed between experiences."}
+                </p>
+              </div>
             </div>
 
-            <div className="bg-white p-6 rounded-2xl border border-[#E8E2DC] shadow-xs text-center">
-              <div className="w-12 h-12 rounded-2xl bg-[#FCF2E9] text-[#8B7355] flex items-center justify-center mx-auto mb-4">
-                <BiCreditCard size={24} />
+            <div className="bg-white p-6 rounded-2xl border border-[#E8E2DC] shadow-xs flex items-start gap-4">
+              <div className="w-12 h-12 rounded-xl bg-[#FCF2E9] text-[#8B7355] flex items-center justify-center shrink-0">
+                <FaGift size={22} />
               </div>
-              <h3 className="font-bold text-[#0F172A] text-lg font-displayPlayFair mb-1">Single Session</h3>
-              <p className="text-sm font-semibold text-[#8B7355]">{dynamicPrice}</p>
-              <p className="text-xs text-[#64748B] mt-1">Per hour session</p>
-            </div>
-
-            <div className="bg-white p-6 rounded-2xl border border-[#E8E2DC] shadow-xs text-center">
-              <div className="w-12 h-12 rounded-2xl bg-[#FCF2E9] text-[#8B7355] flex items-center justify-center mx-auto mb-4">
-                <BiInfoCircle size={24} />
+              <div>
+                <h3 className="font-bold text-[#0F172A] font-serif text-lg mb-1">
+                  {t.arrangementsPage?.philosophy?.perks?.inclusive?.title || "All-Inclusive Comfort"}
+                </h3>
+                <p className="text-xs text-[#64748B] leading-relaxed">
+                  {t.arrangementsPage?.philosophy?.perks?.inclusive?.description ||
+                    "Linens, bathrobes, organic teas, and dedicated guest hosting are thoughtfully included."}
+                </p>
               </div>
-              <h3 className="font-bold text-[#0F172A] text-lg font-displayPlayFair mb-1">First Start Time</h3>
-              <p className="text-sm font-semibold text-[#8B7355]">{slotsOpenTime}</p>
-              <p className="text-xs text-[#64748B] mt-1">Sessions until {slotsCloseTime}</p>
             </div>
           </div>
         </div>
       </section>
 
-      {/* ── Calculated Session Schedule Section ── */}
+      {/* ── Arrangements Grid Section ── */}
       <section className="py-20 bg-white">
         <div className="container mx-auto px-6 max-w-6xl">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-8 mb-12">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-6 mb-14">
             <div>
               <span className="text-xs font-bold uppercase tracking-widest text-[#8B7355] block mb-1">
-                Automated Session System
+                {t.arrangementsPage?.featured?.badge || "Explore Packages"}
               </span>
-              <h2 className="text-3xl md:text-4xl font-bold font-displayPlayFair text-[#0F172A]">
-                Daily Session Timetable
+              <h2
+                className="text-3xl md:text-4xl font-bold text-[#0F172A]"
+                style={{ fontFamily: "var(--font-playfair)" }}
+              >
+                {t.arrangementsPage?.featured?.title || "Featured Arrangements"}
               </h2>
               <p className="text-sm text-[#64748B] mt-1">
-                1-hour sessions plus a 10-minute automatic changeover period between bookings.
+                {t.arrangementsPage?.featured?.subtitle ||
+                  "Select a package below to book online, or design a custom arrangement with our team."}
               </p>
             </div>
 
             <Link
-              href="/booking/arrangements"
-              className="px-8 py-4 rounded-xl bg-[#8B7355] hover:bg-[#725e45] text-white font-bold text-sm uppercase tracking-wider transition-all shadow-md flex-shrink-0"
+              href="/booking/packages"
+              className="px-8 py-4 rounded-xl bg-[#8B7355] hover:bg-[#725e45] text-white font-bold text-sm uppercase tracking-wider transition-all shadow-md shrink-0"
             >
-              Book Salt Room Session
+              {t.arrangementsPage?.featured?.bookButton || "Book an Arrangement"}
             </Link>
           </div>
 
-          {/* All Slots Rendered from Start to End Time */}
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-            {displayTimetableSlots.map((slot, idx) => (
-              <div
-                key={idx}
-                className="p-4 rounded-xl bg-[#FBF6F3] border border-[#E8E2DC] text-center transition-all hover:border-[#8B7355]/40"
-              >
-                <span className="text-sm font-bold text-[#0F172A] font-displayPlayFair block">
-                  {slot.timeRange}
-                </span>
-                <span className="text-[10px] text-[#8B7355] font-mono block mt-1">
-                  {slot.isFinal ? "Final Session" : "10m changeover buffer"}
-                </span>
-              </div>
-            ))}
-          </div>
+          {loading ? (
+            <div className="py-16 text-center text-[#8B7355] font-serif">
+              {t.arrangementsPage?.featured?.loading || "Loading available packages..."}
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {packages.map((pkg) => (
+                <div key={pkg.id} className="flex flex-col">
+                  <ArrangementCard
+                    id={pkg.id}
+                    image={pkg.image}
+                    rating={pkg.rating}
+                    title={pkg.title}
+                    combo={pkg.combo}
+                    description={pkg.description}
+                    includes={pkg.includes}
+                    paymentType={pkg.paymentType}
+                    price={pkg.price}
+                    onClick={() => router.push(`/booking/packages`)}
+                  />
+                  <div className="mt-3">
+                    <Link
+                      href="/booking/packages"
+                      className="w-full py-3 rounded-xl bg-[#8B7355] hover:bg-[#725e45] text-white text-center font-bold text-xs uppercase tracking-wider transition-all block shadow-xs"
+                    >
+                      {t.arrangementsPage?.featured?.reserveButton || "Reserve This Bundle"} &rsaquo;
+                    </Link>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </section>
 
-      {/* ── Passes & Memberships Section (Dynamic API + Redirect to /memberships) ── */}
-      <section className="py-20 bg-[#FBF6F3]">
+      {/* ── Occasions Section (Birthdays, Babyshowers, Celebrations) ── */}
+      <section className="py-20 bg-[#FBF6F3] border-t border-[#E8E2DC]">
         <div className="container mx-auto px-6 max-w-6xl">
-          <div className="text-center max-w-2xl mx-auto mb-16">
+          <div className="text-center max-w-3xl mx-auto mb-16">
             <span className="text-xs font-bold uppercase tracking-widest text-[#8B7355] block mb-2">
-              Passes & Memberships
+              {t.arrangementsPage?.occasions?.badge || "Celebrate in Style"}
             </span>
-            <h2 className="text-4xl font-bold font-displayPlayFair text-[#0F172A]">
-              Choose Your Halotherapy Plan
+            <h2
+              className="text-3xl md:text-4xl font-bold text-[#0F172A] mb-3"
+              style={{ fontFamily: "var(--font-playfair)" }}
+            >
+              {t.arrangementsPage?.occasions?.title || "Special Occasions & Group Celebrations"}
             </h2>
-            <p className="text-sm text-[#64748B] mt-2">
-              Flexible session passes and memberships tailored to your wellness cadence.
+            <p className="text-[#64748B] text-base font-serif">
+              {t.arrangementsPage?.occasions?.subtitle ||
+                "Whether you are marking a birthday milestone, hosting a sweet baby shower, or gathering friends for a memorable celebration, we create an unforgettable custom package."}
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {/* 10-Session Pass Card */}
-            <div className="bg-white rounded-3xl p-8 border border-[#E8E2DC] shadow-sm flex flex-col justify-between">
-              <div>
-                <div className="w-12 h-12 rounded-2xl bg-[#FCF2E9] text-[#8B7355] flex items-center justify-center mb-6">
-                  <FaBoxes size={22} />
-                </div>
-                <span className="text-xs font-bold text-[#8B7355] uppercase tracking-wider block mb-1">
-                  Session Pass
-                </span>
-                <h3 className="text-2xl font-bold font-displayPlayFair text-[#0F172A] mb-2">
-                  {sessionPass?.name || "10-Session Pass"}
-                </h3>
-                <div className="flex items-baseline gap-2 mb-4">
-                  <span className="text-3xl font-bold text-[#8B7355] font-displayPlayFair">
-                    €{sessionPass?.price ? parseFloat(String(sessionPass.price)).toFixed(0) : "200"}
-                  </span>
-                  <span className="text-xs text-[#64748B]">
-                    / {sessionPass?.entry_limit || 10} sessions (€
-                    {sessionPass?.price && sessionPass?.entry_limit
-                      ? (parseFloat(String(sessionPass.price)) / sessionPass.entry_limit).toFixed(0)
-                      : "20"}
-                    /session)
-                  </span>
-                </div>
-
-                <ul className="space-y-3 text-xs text-[#475569] border-t border-[#E8E2DC] pt-4">
-                  {sessionPass?.features && sessionPass.features.length > 0 ? (
-                    sessionPass.features.map((f, i) => (
-                      <li key={i} className="flex items-start gap-2">
-                        <BiCheckCircle className="text-[#8B7355] text-base flex-shrink-0" />
-                        <span>{f.feature.replace(/^[✓✔\s]+/, "")}</span>
-                      </li>
-                    ))
-                  ) : (
-                    <>
-                      <li className="flex items-start gap-2">
-                        <BiCheckCircle className="text-[#8B7355] text-base flex-shrink-0" />
-                        <span>Linked directly to your customer account</span>
-                      </li>
-                      <li className="flex items-start gap-2">
-                        <BiCheckCircle className="text-[#8B7355] text-base flex-shrink-0" />
-                        <span>Automatically deducts 1 session when booking</span>
-                      </li>
-                      <li className="flex items-start gap-2">
-                        <BiCheckCircle className="text-[#8B7355] text-base flex-shrink-0" />
-                        <span>View remaining session balance anytime in account</span>
-                      </li>
-                      <li className="flex items-start gap-2">
-                        <BiCheckCircle className="text-[#8B7355] text-base flex-shrink-0" />
-                        <span>Valid for 1 year after purchase date</span>
-                      </li>
-                    </>
-                  )}
-                </ul>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="bg-white p-6 rounded-2xl border border-[#E8E2DC] shadow-xs text-center">
+              <div className="w-12 h-12 rounded-2xl bg-[#FCF2E9] text-[#8B7355] flex items-center justify-center mx-auto mb-4">
+                <FaGlassCheers size={22} />
               </div>
-
-              <Link
-                href="/memberships#packages"
-                className="mt-8 w-full py-3.5 rounded-xl bg-[#8B7355] hover:bg-[#725e45] text-white text-center font-bold text-xs uppercase tracking-wider transition-all block shadow-xs"
-              >
-                Purchase Pass
-              </Link>
+              <h3 className="font-bold text-[#0F172A] text-lg font-serif mb-2">
+                {t.arrangementsPage?.occasions?.birthdays?.title || "Birthdays & Milestones"}
+              </h3>
+              <p className="text-xs text-[#64748B] leading-relaxed">
+                {t.arrangementsPage?.occasions?.birthdays?.description ||
+                  "Celebrate with friends in private wellness, sparkling wine, and tailored delicacies."}
+              </p>
             </div>
 
-            {/* Once-a-Week Membership Card */}
-            <div className="bg-white rounded-3xl p-8 border border-[#E8E2DC] shadow-sm flex flex-col justify-between">
-              <div>
-                <div className="w-12 h-12 rounded-2xl bg-[#FCF2E9] text-[#8B7355] flex items-center justify-center mb-6">
-                  <FaCalendarAlt size={22} />
-                </div>
-                <span className="text-xs font-bold text-[#8B7355] uppercase tracking-wider block mb-1">
-                  Weekly Membership
-                </span>
-                <h3 className="text-2xl font-bold font-displayPlayFair text-[#0F172A] mb-2">
-                  {saltWeekly?.name || "Once-a-Week"}
-                </h3>
-                <div className="flex items-baseline gap-2 mb-4">
-                  <span className="text-3xl font-bold text-[#8B7355] font-displayPlayFair">
-                    €{saltWeekly?.price ? parseFloat(String(saltWeekly.price)).toFixed(0) : "70"}
-                  </span>
-                  <span className="text-xs text-[#64748B]">
-                    / {saltWeekly?.duration_weeks || 4} weeks
-                  </span>
-                </div>
-
-                <ul className="space-y-3 text-xs text-[#475569] border-t border-[#E8E2DC] pt-4">
-                  {saltWeekly?.features && saltWeekly.features.length > 0 ? (
-                    saltWeekly.features.map((f, i) => (
-                      <li key={i} className="flex items-start gap-2">
-                        <BiCheckCircle className="text-[#8B7355] text-base flex-shrink-0" />
-                        <span>{f.feature.replace(/^[✓✔\s]+/, "")}</span>
-                      </li>
-                    ))
-                  ) : (
-                    <>
-                      <li className="flex items-start gap-2">
-                        <BiCheckCircle className="text-[#8B7355] text-base flex-shrink-0" />
-                        <span>1 session per week included</span>
-                      </li>
-                      <li className="flex items-start gap-2">
-                        <BiCheckCircle className="text-[#8B7355] text-base flex-shrink-0" />
-                        <span>Maximum 4 included sessions per 4-week period</span>
-                      </li>
-                      <li className="flex items-start gap-2">
-                        <BiCheckCircle className="text-[#8B7355] text-base flex-shrink-0" />
-                        <span>Automatic member recognition upon sign in</span>
-                      </li>
-                      <li className="flex items-start gap-2">
-                        <BiCheckCircle className="text-[#8B7355] text-base flex-shrink-0" />
-                        <span>Online advance session reservation</span>
-                      </li>
-                    </>
-                  )}
-                </ul>
+            <div className="bg-white p-6 rounded-2xl border border-[#E8E2DC] shadow-xs text-center">
+              <div className="w-12 h-12 rounded-2xl bg-[#FCF2E9] text-[#8B7355] flex items-center justify-center mx-auto mb-4">
+                <BiHeart size={24} />
               </div>
-
-              <Link
-                href="/memberships#packages"
-                className="mt-8 w-full py-3.5 rounded-xl border border-[#8B7355] text-[#8B7355] hover:bg-[#8B7355] hover:text-white text-center font-bold text-xs uppercase tracking-wider transition-all block shadow-xs"
-              >
-                Join Once-a-Week
-              </Link>
+              <h3 className="font-bold text-[#0F172A] text-lg font-serif mb-2">
+                {t.arrangementsPage?.occasions?.babyshowers?.title || "Babyshowers & Reveals"}
+              </h3>
+              <p className="text-xs text-[#64748B] leading-relaxed">
+                {t.arrangementsPage?.occasions?.babyshowers?.description ||
+                  "An intimate, heartwarming setting for mom-to-be with artisanal high tea and gentle treats."}
+              </p>
             </div>
 
-            {/* Unlimited Membership Card */}
-            <div className="bg-[#081228] text-white rounded-3xl p-8 border border-white/20 shadow-xl flex flex-col justify-between">
-              <div>
-                <div className="w-12 h-12 rounded-2xl bg-white/10 text-white flex items-center justify-center mb-6">
-                  <FaInfinity size={22} />
-                </div>
-                <span className="text-xs font-bold text-white/70 uppercase tracking-wider block mb-1">
-                  Ultimate Membership
-                </span>
-                <h3 className="text-2xl font-bold font-displayPlayFair text-white mb-2">
-                  {saltUnlimited?.name || "Unlimited"}
-                </h3>
-                <div className="flex items-baseline gap-2 mb-4">
-                  <span className="text-3xl font-bold text-white font-displayPlayFair">
-                    €{saltUnlimited?.price ? parseFloat(String(saltUnlimited.price)).toFixed(0) : "100"}
-                  </span>
-                  <span className="text-xs text-white/60">
-                    / {saltUnlimited?.duration_weeks || 4} weeks
-                  </span>
-                </div>
-
-                <ul className="space-y-3 text-xs text-white/80 border-t border-white/15 pt-4">
-                  {saltUnlimited?.features && saltUnlimited.features.length > 0 ? (
-                    saltUnlimited.features.map((f, i) => (
-                      <li key={i} className="flex items-start gap-2">
-                        <BiCheckCircle className="text-emerald-400 text-base flex-shrink-0" />
-                        <span>{f.feature.replace(/^[✓✔\s]+/, "")}</span>
-                      </li>
-                    ))
-                  ) : (
-                    <>
-                      <li className="flex items-start gap-2">
-                        <BiCheckCircle className="text-emerald-400 text-base flex-shrink-0" />
-                        <span>Unlimited use within available capacity</span>
-                      </li>
-                      <li className="flex items-start gap-2">
-                        <BiCheckCircle className="text-emerald-400 text-base flex-shrink-0" />
-                        <span>Each session reserved in advance</span>
-                      </li>
-                      <li className="flex items-start gap-2">
-                        <BiCheckCircle className="text-emerald-400 text-base flex-shrink-0" />
-                        <span>Maximum {saltUnlimited?.max_reservations || 10} future active reservations</span>
-                      </li>
-                      <li className="flex items-start gap-2">
-                        <BiCheckCircle className="text-emerald-400 text-base flex-shrink-0" />
-                        <span>Priority booking access for prime hours</span>
-                      </li>
-                    </>
-                  )}
-                </ul>
+            <div className="bg-white p-6 rounded-2xl border border-[#E8E2DC] shadow-xs text-center">
+              <div className="w-12 h-12 rounded-2xl bg-[#FCF2E9] text-[#8B7355] flex items-center justify-center mx-auto mb-4">
+                <FaUsers size={22} />
               </div>
+              <h3 className="font-bold text-[#0F172A] text-lg font-serif mb-2">
+                {t.arrangementsPage?.occasions?.bachelorettes?.title || "Bachelorette Parties"}
+              </h3>
+              <p className="text-xs text-[#64748B] leading-relaxed">
+                {t.arrangementsPage?.occasions?.bachelorettes?.description ||
+                  "Relaxing wellness sanctuary, laughter, refreshing drinks, and memorable photo moments."}
+              </p>
+            </div>
 
-              <Link
-                href="/memberships#packages"
-                className="mt-8 w-full py-3.5 rounded-xl bg-white text-[#081228] hover:bg-opacity-90 text-center font-bold text-xs uppercase tracking-wider transition-all block shadow-md"
-              >
-                Join Unlimited
-              </Link>
+            <div className="bg-white p-6 rounded-2xl border border-[#E8E2DC] shadow-xs text-center">
+              <div className="w-12 h-12 rounded-2xl bg-[#FCF2E9] text-[#8B7355] flex items-center justify-center mx-auto mb-4">
+                <FaCalendarAlt size={22} />
+              </div>
+              <h3 className="font-bold text-[#0F172A] text-lg font-serif mb-2">
+                {t.arrangementsPage?.occasions?.corporate?.title || "Corporate & Team Days"}
+              </h3>
+              <p className="text-xs text-[#64748B] leading-relaxed">
+                {t.arrangementsPage?.occasions?.corporate?.description ||
+                  "Team connection with inspiring meeting spaces, workshop activities, and revitalizing sauna."}
+              </p>
             </div>
           </div>
-        </div>
-      </section>
-
-      {/* ── Combinable with Wellness Packages ── */}
-      <section className="py-20 bg-white">
-        <div className="container mx-auto px-6 max-w-6xl text-center">
-          <span className="text-xs font-bold uppercase tracking-widest text-[#8B7355] block mb-2">
-            Wellness Integration
-          </span>
-          <h2 className="text-3xl md:text-4xl font-bold font-displayPlayFair text-[#0F172A] mb-4">
-            Combinable with Wellness Packages
-          </h2>
-          <p className="text-[#64748B] text-base max-w-2xl mx-auto mb-10">
-            Elevate your wellness experience by combining Salt Room halotherapy with our private sauna sanctuary, farm-to-table lunchroom dining, and restorative massages.
-          </p>
-
-          <Link
-            href="/booking/packages"
-            className="inline-flex items-center gap-3 px-10 py-4 rounded-xl bg-[#8B7355] hover:bg-[#725e45] text-white font-bold text-sm tracking-wide transition-all shadow-lg"
-          >
-            Explore Combinable Wellness Packages
-          </Link>
         </div>
       </section>
 

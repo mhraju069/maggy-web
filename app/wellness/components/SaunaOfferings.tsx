@@ -60,12 +60,29 @@ export default function SaunaOfferings() {
                   </p>
                 </div>
                 <div className="mt-6">
-                  <Link
-                    href="/booking"
-                    className="inline-flex items-center justify-center px-6 py-3 bg-[#8B7355] text-white font-serif font-bold rounded-lg hover:bg-[#725e44] transition-colors"
-                  >
-                    {t.wellnessPage?.cta?.button || "Reserve"}
-                  </Link>
+                  {idx === 2 ? (
+                    <div className="flex flex-col sm:flex-row gap-2 justify-center">
+                      <Link
+                        href="/wellness/saltroom"
+                        className="inline-flex items-center justify-center px-4 py-2.5 bg-[#8B7355] text-white font-serif font-bold text-sm rounded-lg hover:bg-[#725e44] transition-colors"
+                      >
+                        Explore Salt Room
+                      </Link>
+                      <Link
+                        href="/booking/arrangements"
+                        className="inline-flex items-center justify-center px-4 py-2.5 border border-[#8B7355] text-[#8B7355] font-serif font-bold text-sm rounded-lg hover:bg-[#8B7355] hover:text-white transition-colors"
+                      >
+                        {t.wellnessPage?.cta?.button || "Reserve"}
+                      </Link>
+                    </div>
+                  ) : (
+                    <Link
+                      href={idx === 0 ? "/booking/sauna?type=private" : "/booking/sauna?type=shared"}
+                      className="inline-flex items-center justify-center px-6 py-3 bg-[#8B7355] text-white font-serif font-bold rounded-lg hover:bg-[#725e44] transition-colors"
+                    >
+                      {t.wellnessPage?.cta?.button || "Reserve"}
+                    </Link>
+                  )}
                 </div>
               </div>
             </div>

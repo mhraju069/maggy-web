@@ -411,13 +411,58 @@ export const translations = {
     },
     arrangementsPage: {
       hero: {
-        title: "Arrangements",
+        title: "Arrangements & Packages",
         subtitle:
-          "Celebrate your birthday, baby shower, bachelor or bachelorette party, or any other special occasion with us.",
+          "Combine our sauna, salt room, mindful lunchroom, and events into complete bundled wellness experiences.",
       },
-      intro: {
-        text:
-          "Celebrate your birthday, baby shower, bachelor or bachelorette party, or any other special occasion with us.",
+      philosophy: {
+        badge: "Curated Bundles & Combined Experiences",
+        title: "Multiple Services, Seamlessly Combined",
+        description:
+          "Instead of booking single isolated visits, our Arrangements bring together the best of Heaven on Earth. Enjoy a private sauna session followed by a leisurely culinary lunch, or a therapeutic salt room reset paired with an afternoon high tea — with exclusive bundle pricing and zero hassle.",
+        perks: {
+          savings: {
+            title: "Exclusive Bundle Savings",
+            description: "Enjoy combined package rates and special culinary discounts when pairing multiple services.",
+          },
+          timing: {
+            title: "Coordinated Timing",
+            description: "We schedule your sessions smoothly back-to-back so you never feel rushed between experiences.",
+          },
+          inclusive: {
+            title: "All-Inclusive Comfort",
+            description: "Linens, bathrobes, organic teas, and dedicated guest hosting are thoughtfully included.",
+          },
+        },
+      },
+      featured: {
+        badge: "Explore Packages",
+        title: "Featured Arrangements",
+        subtitle: "Select a package below to book online, or design a custom arrangement with our team.",
+        bookButton: "Book an Arrangement",
+        reserveButton: "Reserve This Bundle",
+        loading: "Loading available packages...",
+      },
+      occasions: {
+        badge: "Celebrate in Style",
+        title: "Special Occasions & Group Celebrations",
+        subtitle: "Whether you are marking a birthday milestone, hosting a sweet baby shower, or gathering friends for a memorable celebration, we create an unforgettable custom package.",
+        birthdays: {
+          title: "Birthdays & Milestones",
+          description: "Celebrate with friends in private wellness, sparkling wine, and tailored delicacies.",
+        },
+        babyshowers: {
+          title: "Babyshowers & Reveals",
+          description: "An intimate, heartwarming setting for mom-to-be with artisanal high tea and gentle treats.",
+        },
+        bachelorettes: {
+          title: "Bachelorette Parties",
+          description: "Relaxing wellness sanctuary, laughter, refreshing drinks, and memorable photo moments.",
+        },
+        corporate: {
+          title: "Corporate & Team Days",
+          description: "Team connection with inspiring meeting spaces, workshop activities, and revitalizing sauna.",
+        },
       },
       createYourOwn: {
         title: "Create Your Own",
@@ -425,6 +470,50 @@ export const translations = {
           "Don't see exactly what you're looking for? We'll work with you to design a bespoke arrangement that perfectly matches your intentions and desires.",
         body: "Don't see exactly what you're looking for? We'll work with you to design a bespoke arrangement that perfectly matches your intentions and desires.",
         button: "Contact Us",
+      },
+    },
+    saltRoomPage: {
+      hero: {
+        title: "Salt Room & Halotherapy",
+        subtitle: "Experience pure aerosol halotherapy for respiratory wellness, skin revitalization, and deep relaxation.",
+      },
+      sanctuary: {
+        badge: "Therapeutic Halotherapy Sanctuary",
+        title: "Breathe Deeply. Restore Vitality.",
+        description: "Step into our calming salt room micro-climate. Microscopic salt aerosol particles purify your airway, soothe skin conditions, and transport you into profound stillness.",
+        capacityTitle: "Capacity",
+        capacitySubtitle: "Intimate, tranquil setting",
+        durationTitle: "Duration",
+        durationSubtitle: "+10 Mins changeover buffer",
+        sessionTitle: "Single Session",
+        sessionSubtitle: "Per hour session",
+        firstStartTitle: "First Start Time",
+        sessionsUntil: "Sessions until",
+      },
+      timetable: {
+        badge: "Automated Session System",
+        title: "Daily Session Timetable",
+        subtitle: "1-hour sessions plus a 10-minute automatic changeover period between bookings.",
+        bookButton: "Book Salt Room Session",
+        finalSession: "Final Session",
+        bufferText: "10m changeover buffer",
+      },
+      memberships: {
+        badge: "Flexible Halotherapy Access",
+        title: "Passes & Memberships",
+        subtitle: "Choose between flexible multi-session passes or continuous renewal memberships designed for long-term well-being.",
+        passBadge: "Session Pass",
+        weeklyBadge: "Weekly Membership",
+        unlimitedBadge: "Ultimate Membership",
+        purchasePass: "Purchase Pass",
+        joinWeekly: "Join Once-a-Week",
+        joinUnlimited: "Join Unlimited",
+      },
+      integration: {
+        badge: "Wellness Integration",
+        title: "Combinable with Wellness Packages",
+        description: "Elevate your wellness experience by combining Salt Room halotherapy with our private sauna sanctuary, farm-to-table lunchroom dining, and restorative packages.",
+        button: "Explore Arrangements & Bundles",
       },
     },
     membershipsPage: {
@@ -974,59 +1063,109 @@ export const translations = {
     },
     arrangementsPage: {
       hero: {
-        title: "Arrangementen",
+        title: "Arrangementen & Pakketten",
         subtitle:
-          "Vier je verjaardag, babyshower, vrijgezellenfeest of een andere bijzondere gelegenheid bij ons.",
+          "Combineer onze sauna, zoutkamer, lunchroom en evenementen tot complete, ontspannen wellnessarrangementen.",
       },
-      intro: {
-        text:
-          "Vier je verjaardag, babyshower, vrijgezellenfeest of een andere bijzondere gelegenheid bij ons.",
+      philosophy: {
+        badge: "Samengestelde Arrangementen & Combodeals",
+        title: "Meerdere Diensten, Naadloos Gecombineerd",
+        description:
+          "In plaats van losse bezoeken te boeken, brengen onze Arrangementen het beste van Heaven on Earth samen. Geniet van een privésauna-sessie gevolgd door een ontspannen culinaire lunch, of een rustgevende zoutkamersessie met een luxe high tea — met exclusieve arrangementkorting en zonder haast.",
+        perks: {
+          savings: {
+            title: "Exclusief Pakketvoordeel",
+            description: "Geniet van scherpe combotarieven en speciale culinaire voordelen bij het combineren van diensten.",
+          },
+          timing: {
+            title: "Perfect Afgestemde Tijden",
+            description: "Wij plannen uw sessies soepel aansluitend, zodat u ontspannen en zonder haast kunt genieten.",
+          },
+          inclusive: {
+            title: "Alles-in-één Comfort",
+            description: "Badjassen, handdoeken, biologische theesoorten en persoonlijke gastvrijheid zijn inbegrepen.",
+          },
+        },
       },
-      grid: {
+      featured: {
+        badge: "Ontdek Arrangementen",
+        title: "Uitgelichte Arrangementen",
+        subtitle: "Kies hieronder een arrangement om online te boeken of ontwerp een maatwerkpakket met ons team.",
         bookButton: "Arrangement Boeken",
+        reserveButton: "Reserveer Dit Arrangement",
+        loading: "Beschikbare arrangementen laden...",
+      },
+      occasions: {
+        badge: "Vier het in Stijl",
+        title: "Bijzondere Gelegenheden & Groepsvieringen",
+        subtitle: "Of het nu gaat om een verjaardag, babyshower, vrijgezellenfeest of bedrijfsuitje: wij creëren een onvergetelijk arrangement op maat.",
+        birthdays: {
+          title: "Verjaardagen & Mijlpalen",
+          description: "Vier feest met vrienden in een privé wellnessomgeving met bubbels en ambachtelijke lekkernijen.",
+        },
+        babyshowers: {
+          title: "Babyshowers & Gender Reveals",
+          description: "Een warme en intieme sfeer voor de aanstaande moeder met luxe high tea en verwennerij.",
+        },
+        bachelorettes: {
+          title: "Vrijgezellenfeesten",
+          description: "Ontspannen wellness, gezelligheid, heerlijke drankjes en onvergetelijke fotomomenten.",
+        },
+        corporate: {
+          title: "Bedrijfs- & Teamdagen",
+          description: "Verbinding versterken met inspirerende vergaderruimtes, workshops en ontspannende wellness.",
+        },
       },
       createYourOwn: {
-        title: "Maak Uw Eigen",
-        body: "Ziet u niet precies wat u zoekt? Wij werken met u samen om een op maat gemaakt wellnessarrangement te ontwerpen dat perfect aansluit bij uw intenties en wensen.",
+        title: "Maak Uw Eigen Arrangement",
+        description:
+          "Ziet u niet precies wat u zoekt? Wij werken graag met u samen om een arrangement op maat te ontwerpen.",
+        body: "Ziet u niet precies wat u zoekt? Wij werken graag met u samen om een op maat gemaakt wellnessarrangement te ontwerpen dat perfect aansluit bij uw wensen.",
         button: "Neem Contact Op",
       },
-      faq: {
-        title: "Veelgestelde Vragen",
-        subtitle:
-          "We hebben de meest voorkomende vragen beantwoord om u te helpen vol vertrouwen uw offerte aan te vragen.",
-        items: [
-          {
-            question: "Wat is precies een arrangement?",
-            answer:
-              "Een arrangement is een samengesteld wellnesspakket dat meerdere diensten combineert — zoals sauna, massage, yoga en eten — tot één naadloze ervaring ontworpen rond uw intenties.",
-          },
-          {
-            question: "Wat is het doel van een arrangement?",
-            answer:
-              "Arrangementen zijn ontworpen om u een complete dag van welzijn te bieden. In plaats van diensten afzonderlijk te boeken, is alles doordacht gebundeld zodat u zich volledig kunt richten op ontspanning en transformatie.",
-          },
-          {
-            question: "Wat houdt vooruitbetaling in?",
-            answer:
-              "Vooruitbetaling betekent dat wij u vragen volledig te betalen op het moment van boeking om uw arrangement te beveiligen. Sommige arrangementen bieden gedeeltelijke betalingsopties — u betaalt een aanbetaling en voldoet de rest bij aankomst.",
-          },
-          {
-            question:
-              "Kunt u mij vertellen wat 'Ter plaatse betalen' betekent?",
-            answer:
-              "'Ter plaatse betalen' arrangementen kunnen worden geboekt zonder vooruitbetaling. U arriveert gewoon en betaalt op de dag van uw ervaring.",
-          },
-          {
-            question: "Kunt u uitleggen wat een groepsarrangement inhoudt?",
-            answer:
-              "Groepsarrangementen omvatten privé saunatoegang voor maximaal 18 personen, een begeleide wellnessactiviteit, premium catering en een toegewijde gastheer om ervoor te zorgen dat uw evenement soepel verloopt van begin tot einde.",
-          },
-        ],
+    },
+    saltRoomPage: {
+      hero: {
+        title: "Zoutkamer & Halotherapie",
+        subtitle: "Ervaar zuivere aerosol halotherapie voor gezonde luchtwegen, huidherstel en diepe ontspanning.",
       },
-      cta: {
-        title: "Begin Uw Reis",
-        subtitle: "Reserveer vandaag nog uw samengestelde wellnesservaring.",
-        button: "Arrangement Boeken",
+      sanctuary: {
+        badge: "Therapeutisch Halotherapie Heiligdom",
+        title: "Adem Diep. Herstel Jouw Vitaliteit.",
+        description: "Stap binnen in het rustgevende microklimaat van onze zoutkamer. Natuurlijke zoutaerosolen zuiveren uw luchtwegen, verzorgen de huid en brengen diepe innerlijke rust.",
+        capacityTitle: "Capaciteit",
+        capacitySubtitle: "Intieme en rustgevende setting",
+        durationTitle: "Duur",
+        durationSubtitle: "+10 min wisselbuffer",
+        sessionTitle: "Enkele Sessie",
+        sessionSubtitle: "Per sessie van 1 uur",
+        firstStartTitle: "Eerste Starttijd",
+        sessionsUntil: "Sessies tot",
+      },
+      timetable: {
+        badge: "Geautomatiseerd Sessiesysteem",
+        title: "Dagelijks Sessierooster",
+        subtitle: "Sessies van 1 uur inclusief 10 minuten automatische wisselbuffer tussen boekingen.",
+        bookButton: "Boek Zoutkamersessie",
+        finalSession: "Laatste Sessie",
+        bufferText: "10m wisselbuffer",
+      },
+      memberships: {
+        badge: "Flexibele Toegang",
+        title: "Rittenkaarten & Lidmaatschappen",
+        subtitle: "Kies voor een flexibele 10-rittenkaart of een doorlopend lidmaatschap voor duurzame gezondheid.",
+        passBadge: "Rittenkaart",
+        weeklyBadge: "Wekelijks Lidmaatschap",
+        unlimitedBadge: "Onbeperkt Lidmaatschap",
+        purchasePass: "Rittenkaart Aanschaffen",
+        joinWeekly: "Kies 1x per Week",
+        joinUnlimited: "Kies Onbeperkt",
+      },
+      integration: {
+        badge: "Wellness Integratie",
+        title: "Combineerbaar met Wellness Arrangementen",
+        description: "Verrijk uw welzijn door halotherapie te combineren met onze privésauna, biologische lunchroom gerechten en ontspannende massages.",
+        button: "Bekijk Arrangementen & Bundels",
       },
     },
     membershipsPage: {
@@ -1576,61 +1715,109 @@ export const translations = {
     },
     arrangementsPage: {
       hero: {
-        title: "Arrangements",
+        title: "Arrangements & Pakete",
         subtitle:
-          "Feiern Sie Ihren Geburtstag, Ihre Babyparty, Ihren Junggesellen- oder Junggesellinnenabschied oder jeden anderen besonderen Anlass mit uns.",
+          "Kombinieren Sie unsere Sauna, den Salzraum, die Lunchroom-Küche und Veranstaltungen zu ganzheitlichen Wellness-Erlebnissen.",
       },
-      intro: {
-        text:
-          "Feiern Sie Ihren Geburtstag, Ihre Babyparty, Ihren Junggesellen- oder Junggesellinnenabschied oder jeden anderen besonderen Anlass mit uns.",
+      philosophy: {
+        badge: "Kuratierte Arrangements & Kombi-Angebote",
+        title: "Mehrere Angebote, Nahtlos Kombiniert",
+        description:
+          "Anstatt Einzelsitzungen separat zu buchen, vereinen unsere Arrangements das Beste von Heaven on Earth. Genießen Sie eine private Saunasitzung gefolgt von einem entspannten kulinarischen Mittagessen oder einen erholsamen Salzraumbesuch mit einem Nachmittagstee — inklusive attraktiver Paketvorteile.",
+        perks: {
+          savings: {
+            title: "Exklusive Paketvorteile",
+            description: "Profitieren Sie von kombinierten Preisvorteilen und kulinarischen Vorzügen bei der Paketbuchung.",
+          },
+          timing: {
+            title: "Perfekt Abgestimmte Zeiten",
+            description: "Wir koordinieren Ihre Einheiten harmonisch nacheinander, damit Sie ohne Hektik entspannen.",
+          },
+          inclusive: {
+            title: "Rundum-Sorglos-Komfort",
+            description: "Bademäntel, Handtücher, Bio-Tees und aufmerksamer Service sind stets inklusive.",
+          },
+        },
       },
-      grid: {
+      featured: {
+        badge: "Arrangements Entdecken",
+        title: "Ausgewählte Arrangements",
+        subtitle: "Wählen Sie unten ein Arrangement zur Online-Buchung oder planen Sie ein individuelles Paket mit unserem Team.",
         bookButton: "Arrangement Buchen",
+        reserveButton: "Dieses Paket Reservieren",
+        loading: "Verfügbare Pakete werden geladen...",
+      },
+      occasions: {
+        badge: "Stilvoll Feiern",
+        title: "Besondere Anlässe & Gruppenfeiern",
+        subtitle: "Ob Geburtstag, Babyparty, Junggesellenabschied oder Firmenveranstaltung: Wir gestalten ein unvergessliches individuelles Erlebnis.",
+        birthdays: {
+          title: "Geburtstage & Jubiläen",
+          description: "Feiern Sie mit Freunden im privaten Wellnessbereich mit Schaumwein und feinen Köstlichkeiten.",
+        },
+        babyshowers: {
+          title: "Babypartys & Gender Reveals",
+          description: "Eine herzliche, behagliche Atmosphäre für die werdende Mutter mit feinem Nachmittagstee.",
+        },
+        bachelorettes: {
+          title: "Junggesellenabschiede",
+          description: "Entspannte Wohlfühlmomente, gemeinsame Freude, erfrischende Drinks und schöne Erinnerungen.",
+        },
+        corporate: {
+          title: "Firmen- & Teamtage",
+          description: "Stärken Sie den Teamgeist in inspirierenden Räumen, bei Workshop-Aktivitäten und wohltuender Sauna.",
+        },
       },
       createYourOwn: {
         title: "Ihr Eigenes Erstellen",
+        description:
+          "Sie finden nicht genau das, was Sie suchen? Wir arbeiten mit Ihnen zusammen, um ein maßgeschneidertes Wellness-Arrangement zu gestalten, das perfekt zu Ihren Wünschen passt.",
         body: "Sie finden nicht genau das, was Sie suchen? Wir arbeiten mit Ihnen zusammen, um ein maßgeschneidertes Wellness-Arrangement zu gestalten, das perfekt zu Ihren Absichten und Wünschen passt.",
         button: "Kontakt Aufnehmen",
       },
-      faq: {
-        title: "Häufig Gestellte Fragen",
-        subtitle:
-          "Wir haben die häufigsten Fragen beantwortet, damit Sie mit Zuversicht Ihr Angebot anfordern können.",
-        items: [
-          {
-            question: "Was genau ist ein Arrangement?",
-            answer:
-              "Ein Arrangement ist ein kuratiertes Wellness-Paket, das mehrere Leistungen kombiniert — wie Sauna, Massage, Yoga und Kulinarik — zu einem nahtlosen Erlebnis, das auf Ihre Absichten zugeschnitten ist.",
-          },
-          {
-            question: "Was ist der Zweck eines Arrangements?",
-            answer:
-              "Arrangements sind darauf ausgelegt, Ihnen einen vollständigen Tag des Wohlbefindens zu bieten. Anstatt Leistungen einzeln zu buchen, ist alles durchdacht gebündelt, damit Sie sich voll auf Entspannung und Transformation konzentrieren können.",
-          },
-          {
-            question: "Was bedeutet Vorauszahlung?",
-            answer:
-              "Vorauszahlung bedeutet, dass wir Sie bitten, bei der Buchung vollständig zu bezahlen, um Ihr Arrangement zu sichern. Einige Arrangements bieten Teilzahlungsoptionen — Sie leisten eine Anzahlung und begleichen den Rest bei der Ankunft.",
-          },
-          {
-            question:
-              "Können Sie mir erklären, was 'Vor Ort bezahlen' bedeutet?",
-            answer:
-              "Arrangements mit 'Vor Ort bezahlen' können ohne Vorauszahlung gebucht werden. Sie kommen einfach an und zahlen am Tag Ihres Erlebnisses.",
-          },
-          {
-            question:
-              "Können Sie erklären, was ein Gruppenarrangement beinhaltet?",
-            answer:
-              "Gruppenarrangements umfassen privaten Saunazugang für bis zu 18 Personen, eine geführte Wellness-Aktivität, Premium-Catering und einen dedizierten Gastgeber, der dafür sorgt, dass Ihre Veranstaltung reibungslos von Anfang bis Ende verläuft.",
-          },
-        ],
+    },
+    saltRoomPage: {
+      hero: {
+        title: "Salzraum & Halotherapie",
+        subtitle: "Erleben Sie reine Aerosol-Halotherapie für vitale Atemwege, Hautregeneration und tiefe Entspannung.",
       },
-      cta: {
-        title: "Beginnen Sie Ihre Reise",
-        subtitle:
-          "Reservieren Sie noch heute Ihr kuratiertes Wellness-Erlebnis.",
-        button: "Arrangement Buchen",
+      sanctuary: {
+        badge: "Therapeutisches Halotherapie-Refugium",
+        title: "Tief Durchatmen. Neue Vitalität Schöpfen.",
+        description: "Betreten Sie das beruhigende Mikroklima unseres Salzraums. Natürliche Salzaerosole reinigen die Atemwege, pflegen die Haut und schenken tiefe innere Ruhe.",
+        capacityTitle: "Kapazität",
+        capacitySubtitle: "Intime, ruhige Atmosphäre",
+        durationTitle: "Dauer",
+        durationSubtitle: "+10 Min. Wechselpuffer",
+        sessionTitle: "Einzelsitzung",
+        sessionSubtitle: "Pro 1-stündiger Sitzung",
+        firstStartTitle: "Erster Beginn",
+        sessionsUntil: "Sitzungen bis",
+      },
+      timetable: {
+        badge: "Automatisiertes Sitzungssystem",
+        title: "Täglicher Sitzungsplan",
+        subtitle: "1-stündige Sitzungen plus 10 Minuten automatischer Wechselpuffer zwischen Buchungen.",
+        bookButton: "Salzraumsitzung Buchen",
+        finalSession: "Letzte Sitzung",
+        bufferText: "10 Min. Wechselpuffer",
+      },
+      memberships: {
+        badge: "Flexibler Zugang",
+        title: "Pässe & Mitgliedschaften",
+        subtitle: "Wählen Sie flexible Mehrfachpässe oder dauerhafte Mitgliedschaften für langfristiges Wohlbefinden.",
+        passBadge: "Sitzungspass",
+        weeklyBadge: "Wöchentliche Mitgliedschaft",
+        unlimitedBadge: "Unbegrenzte Mitgliedschaft",
+        purchasePass: "Pass Erwerben",
+        joinWeekly: "1x Wöchentlich Wählen",
+        joinUnlimited: "Unbegrenzt Wählen",
+      },
+      integration: {
+        badge: "Wellness-Integration",
+        title: "Kombinierbar mit Wellness-Arrangements",
+        description: "Bereichern Sie Ihre Erholung, indem Sie Halotherapie mit unserer privaten Sauna, Bio-Küche im Lunchroom und Massagen kombinieren.",
+        button: "Arrangements & Pakete Entdecken",
       },
     },
     membershipsPage: {
