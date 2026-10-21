@@ -184,31 +184,15 @@ export default function ReviewPage() {
                 </div>
               )}
 
-              {/* Duration & Buffer Display */}
+              {/* Duration Display */}
               {!isPackage && !isLunchroom && !isActivity && (
-                <div className="pt-3 border-t border-[#F1F5F9] grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="pt-3 border-t border-[#F1F5F9]">
                   <div>
                     <span className="text-xs text-[#94A3B8] uppercase block mb-1">Session Duration</span>
                     <p className="text-base font-bold text-[#0F172A]">
                       {data.isSaltRoom || data.serviceType === "salt_room" || data.serviceType === "saltroom"
                         ? "1 Hour Aerosol Halotherapy"
                         : `${data.durationHours || 3} Hours ${data.isSharedSauna ? "Shared Session Access" : "Private Access"}`}
-                    </p>
-                  </div>
-                  <div>
-                    <span className="text-xs text-[#94A3B8] uppercase block mb-1">
-                      {data.isSaltRoom || data.serviceType === "salt_room" || data.serviceType === "saltroom"
-                        ? "Sanitization & Buffer"
-                        : data.isSharedSauna
-                        ? "Automatic Changeover Period"
-                        : "Automatic Cleaning Buffer"}
-                    </span>
-                    <p className="text-base font-bold text-[#8B7355]">
-                      {data.isSaltRoom || data.serviceType === "salt_room" || data.serviceType === "saltroom"
-                        ? "+10 Minutes Changeover Buffer"
-                        : data.isSharedSauna
-                        ? "+15 Minutes Blocked Between Sessions"
-                        : "+30 Minutes Reserved Afterwards"}
                     </p>
                   </div>
                 </div>

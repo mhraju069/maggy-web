@@ -282,11 +282,6 @@ export default function SaunaBookingPage() {
                 </p>
               </div>
             </div>
-
-            <div className="flex items-center gap-2 bg-white px-4 py-2 rounded-xl border border-[#D1B191]/60 text-xs font-bold text-[#8B7355] flex-shrink-0">
-              <FaBroom size={14} />
-              <span>+30 Mins Auto Cleaning Buffer</span>
-            </div>
           </div>
 
           {/* Duration Selector */}
@@ -478,13 +473,6 @@ export default function SaunaBookingPage() {
             </div>
           </div>
 
-          {/* Cleaning Buffer Notice */}
-          <div className="p-4 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0] flex items-center gap-3 text-xs text-[#64748B]">
-            <BiInfoCircle className="text-[#8B7355] text-lg flex-shrink-0" />
-            <span>
-              <strong>Automatic Cleaning Buffer:</strong> After your {durationHours}-hour booking, 30 minutes is automatically reserved for thorough cleaning and sanitation before the next group.
-            </span>
-          </div>
         </div>
       ) : (
         /* ── Shared Sauna Configurator ── */
@@ -510,12 +498,12 @@ export default function SaunaBookingPage() {
 
             <div className="flex items-center gap-2 bg-white px-4 py-2 rounded-xl border border-[#D1B191]/60 text-xs font-bold text-[#8B7355] flex-shrink-0">
               <BiTimeFive size={16} />
-              <span>1.5 Hours + 15 Mins Changeover Buffer</span>
+              <span>1.5 Hours</span>
             </div>
           </div>
 
           {/* Session Overview Badges */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="p-5 rounded-2xl bg-[#FBF6F3] border border-[#E8E2DC] text-center">
               <span className="text-xs text-[#64748B] block mb-1">Session Duration</span>
               <span className="text-lg font-bold text-[#0F172A] font-displayPlayFair">1.5 Hours (90 Mins)</span>
@@ -524,11 +512,6 @@ export default function SaunaBookingPage() {
             <div className="p-5 rounded-2xl bg-[#FBF6F3] border border-[#E8E2DC] text-center">
               <span className="text-xs text-[#64748B] block mb-1">Price Per Person</span>
               <span className="text-lg font-bold text-[#8B7355] font-displayPlayFair">€{sharedPricePerson} / Person</span>
-            </div>
-
-            <div className="p-5 rounded-2xl bg-[#FBF6F3] border border-[#E8E2DC] text-center">
-              <span className="text-xs text-[#64748B] block mb-1">Changeover Period</span>
-              <span className="text-lg font-bold text-[#0F172A] font-displayPlayFair">15 Mins (Blocked)</span>
             </div>
           </div>
 

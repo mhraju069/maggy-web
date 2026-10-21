@@ -560,7 +560,7 @@ export default function SaltRoomBookingPage() {
       )}
 
       {/* ── Key Parameters Banner ── */}
-      <div className="mb-10 bg-white rounded-2xl p-6 border border-[#E8E2DC] shadow-xs grid grid-cols-1 md:grid-cols-4 gap-4 text-center">
+      <div className="mb-10 bg-white rounded-2xl p-6 border border-[#E8E2DC] shadow-xs grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
         <div className="p-4 rounded-xl bg-[#FCF2E9] border border-[#E8E2DC]">
           <span className="text-xs text-[#8B7355] font-bold uppercase tracking-wider block mb-1">
             Max Capacity
@@ -588,16 +588,6 @@ export default function SaltRoomBookingPage() {
           <div className="flex items-center justify-center gap-1 text-[#0F172A] font-bold text-base font-displayPlayFair">
             <BiCreditCard className="text-[#8B7355] text-lg" />
             <span>€{singlePriceNum.toFixed(0)} / Person</span>
-          </div>
-        </div>
-
-        <div className="p-4 rounded-xl bg-[#FCF2E9] border border-[#E8E2DC]">
-          <span className="text-xs text-[#8B7355] font-bold uppercase tracking-wider block mb-1">
-            Changeover Buffer
-          </span>
-          <div className="flex items-center justify-center gap-1 text-[#0F172A] font-bold text-base font-displayPlayFair">
-            <BiInfoCircle className="text-[#8B7355] text-lg" />
-            <span>10 Mins (Auto-Calculated)</span>
           </div>
         </div>
       </div>

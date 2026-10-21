@@ -188,7 +188,7 @@ export default function SaltRoomPage() {
               </h3>
               <p className="text-sm font-semibold text-[#8B7355]">{dynamicDuration} Session</p>
               <p className="text-xs text-[#64748B] mt-1">
-                {t.saltRoomPage?.sanctuary?.durationSubtitle || "+10 Mins changeover buffer"}
+                {t.saltRoomPage?.sanctuary?.durationSubtitle || "Deep relaxation"}
               </p>
             </div>
 
@@ -234,7 +234,7 @@ export default function SaltRoomPage() {
               </h2>
               <p className="text-sm text-[#64748B] mt-1">
                 {t.saltRoomPage?.timetable?.subtitle ||
-                  "1-hour sessions plus a 10-minute automatic changeover period between bookings."}
+                  "1-hour sessions available daily."}
               </p>
             </div>
 
@@ -256,11 +256,11 @@ export default function SaltRoomPage() {
                 <span className="text-sm font-bold text-[#0F172A] font-displayPlayFair block">
                   {slot.timeRange}
                 </span>
-                <span className="text-[10px] text-[#8B7355] font-mono block mt-1">
-                  {slot.isFinal
-                    ? t.saltRoomPage?.timetable?.finalSession || "Final Session"
-                    : t.saltRoomPage?.timetable?.bufferText || "10m changeover buffer"}
-                </span>
+                {slot.isFinal && (
+                  <span className="text-[10px] text-[#8B7355] font-mono block mt-1">
+                    {t.saltRoomPage?.timetable?.finalSession || "Final Session"}
+                  </span>
+                )}
               </div>
             ))}
           </div>

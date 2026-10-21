@@ -653,7 +653,7 @@ export default function ChooseTimePage() {
               </div>
               <p className="text-xs text-[#8B7355] font-medium mt-1">
                 {saltRoomSlotData.info ||
-                  `Maximum 2 people per session. Automatic 10-minute changeover buffer between sessions (${saltRoomSlotData.openTime || "06:00"}–${saltRoomSlotData.closeTime || "23:20"}).`}
+                  `Maximum 2 people per session (${saltRoomSlotData.openTime || "06:00"}–${saltRoomSlotData.closeTime || "23:20"}).`}
               </p>
               {slotMembership?.session_pass && (
                 <p className="text-[11px] text-amber-700 font-semibold mt-0.5">
@@ -692,13 +692,9 @@ export default function ChooseTimePage() {
                 Private Sauna ({storedData.durationHours || 3} Hours Session)
               </h4>
               <p className="text-xs text-[#8B7355] font-medium">
-                Automatic 30-minute cleaning buffer reserved after your time slot.
+                Exclusive wellness sanctuary reserved for your group.
               </p>
             </div>
-          </div>
-
-          <div className="flex items-center gap-2 bg-[#FCF2E9]/70 px-4 py-2 rounded-xl text-xs font-semibold text-[#8B7355]">
-            <span>Total Blocked Period: {(storedData.durationHours || 3)}h 30m</span>
           </div>
         </div>
       )}
@@ -857,7 +853,7 @@ export default function ChooseTimePage() {
                                   <div>
                                     <span className="text-sm font-bold text-[#0F172A] block">{label}</span>
                                     <span className="text-[10px] text-[#64748B]">
-                                      {slot.time_slot === "4_hours" ? "4-hour" : "3-hour"} private session • Buffer until {slot.buffer_end_time}
+                                      {slot.time_slot === "4_hours" ? "4-hour" : "3-hour"} private session
                                     </span>
                                   </div>
                                   {isSel && <BiCheckCircle className="text-[#8B7355]" size={20} />}
@@ -1135,9 +1131,9 @@ export default function ChooseTimePage() {
               <div className="flex justify-between items-center mb-4">
                 <label className="block text-sm font-bold text-[#0F172A] uppercase tracking-wider" style={{ fontFamily: "Inter, sans-serif" }}>
                   {isSaltRoom
-                    ? "Select Salt Room Session (1 Hour Session + 10m Changeover)"
+                    ? "Select Salt Room Session (1 Hour Session)"
                     : isSharedSauna
-                    ? "Select Shared Session Slot (1.5 Hours + 15m Changeover)"
+                    ? "Select Shared Session Slot (1.5 Hours)"
                     : "Time Slot"}
                 </label>
                 {isLunchroom && (
@@ -1235,7 +1231,7 @@ export default function ChooseTimePage() {
                             </div>
 
                             <span className="text-[10px] text-[#64748B] block">
-                              {sess.duration_minutes || 60}m session • Buffer ({sess.buffer_end_time || `${sess.end_time}+${sess.buffer_minutes || 10}m`})
+                              {sess.duration_minutes || 60}m session
                             </span>
                           </button>
                         );
@@ -1287,7 +1283,7 @@ export default function ChooseTimePage() {
                           </div>
 
                           <span className="text-[10px] text-[#64748B] block">
-                            1h session • Changeover ({sess.changeover})
+                            1h session
                           </span>
                         </button>
                       );
@@ -1327,7 +1323,7 @@ export default function ChooseTimePage() {
                                 {label}
                               </span>
                               <span className="text-[11px] text-[#64748B]">
-                                90m session • Changeover buffer ({slot.buffer_end_time})
+                                90m session
                               </span>
                             </div>
 
@@ -1377,7 +1373,7 @@ export default function ChooseTimePage() {
                               {sess.slot}
                             </span>
                             <span className="text-[11px] text-[#64748B]">
-                              1.5h session • 15m changeover buffer ({sess.changeover})
+                              1.5h session
                             </span>
                           </div>
 
@@ -1432,9 +1428,6 @@ export default function ChooseTimePage() {
                             </span>
                             {isSelected && <BiCheckCircle className="text-[#8B7355]" size={18} />}
                           </div>
-                          <span className="text-[10px] text-[#64748B] mt-1">
-                            Buffer until {slot.buffer_end_time}
-                          </span>
                         </button>
                       );
                     });
