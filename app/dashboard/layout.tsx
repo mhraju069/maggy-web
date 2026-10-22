@@ -1,4 +1,5 @@
 "use client";
+import { formatImageUrl } from '@/lib/api/config';
 
 import Image from "next/image";
 import Link from "next/link";
@@ -66,7 +67,6 @@ function DashboardHeader() {
           {profile?.image ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img
-              src={profile.image}
               alt={profile.name}
               className="w-9 h-9 rounded-full object-cover border border-[#E8E2DC]"
             />

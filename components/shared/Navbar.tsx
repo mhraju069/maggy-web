@@ -2,7 +2,8 @@
 
 import BookNow from "@/components/shared/BookNow";
 import { authService } from "@/lib/api/services/authService";
-import { clearAuthSession, getStoredRole, getStoredToken } from "@/lib/api/token";
+import { clearAuthSession, getStoredRole, getStoredToken, getStoredUser, setStoredUser } from '@/lib/api/token';
+import { formatImageUrl } from '@/lib/api/config';
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 import { Language } from "@/lib/i18n/translations";
 import Image from "next/image";

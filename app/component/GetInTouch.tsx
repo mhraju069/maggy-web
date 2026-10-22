@@ -2,10 +2,25 @@
 
 import DecorativeUnderline from "@/components/shared/DecorativeUnderline";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
+import { othersService, ContactInfo } from "@/lib/api/services/othersService";
 import Image from "next/image";
+import { useEffect, useState } from "react";
 
 const GetInTouch = () => {
   const { t } = useLanguage();
+  const [contactInfo, setContactInfo] = useState<ContactInfo | null>(null);
+
+  useEffect(() => {
+    const fetchContact = async () => {
+      try {
+        const res = await othersService.getContactInfo();
+        setContactInfo(res?.data || null);
+      } catch (err) {
+        console.error("Failed to load contact info:", err);
+      }
+    };
+    fetchContact();
+  }, []);
   return (
     <section
       className="w-full min-h-screen flex items-center"
@@ -49,33 +64,43 @@ const GetInTouch = () => {
 
           {/* Contact items */}
           <div className="flex flex-col gap-6">
-            {t.getInTouch.contacts.map((item, idx) => (
-              <div key={idx} className="flex flex-col gap-1">
-                <p
-                  style={{
-                    color: "#0F172A",
-                    fontFamily: "Cambria, Georgia, serif",
-                    fontSize: "20px",
-                    fontWeight: 700,
-                    lineHeight: "30px",
-                  }}
-                >
-                  {item.label}
-                </p>
-                <p
-                  style={{
-                    color: "#475569",
-                    fontFamily: "Cambria, Georgia, serif",
-                    fontSize: "18px",
-                    fontWeight: 400,
-                    lineHeight: "28px",
-                    whiteSpace: "pre-line",
-                  }}
-                >
-                  {item.value}
-                </p>
-              </div>
-            ))}
+            {t.getInTouch.contacts.map((item, idx) => {
+              // idx 0 = Address, idx 3 = Phone number
+              let displayValue: string = item.value;
+              if (idx === 0 && contactInfo?.address) {
+                displayValue = contactInfo.address;
+              } else if (idx === 3 && contactInfo?.phone) {
+                displayValue = contactInfo.phone;
+              }
+
+              return (
+                <div key={idx} className="flex flex-col gap-1">
+                  <p
+                    style={{
+                      color: "#0F172A",
+                      fontFamily: "Cambria, Georgia, serif",
+                      fontSize: "20px",
+                      fontWeight: 700,
+                      lineHeight: "30px",
+                    }}
+                  >
+                    {item.label}
+                  </p>
+                  <p
+                    style={{
+                      color: "#475569",
+                      fontFamily: "Cambria, Georgia, serif",
+                      fontSize: "18px",
+                      fontWeight: 400,
+                      lineHeight: "28px",
+                      whiteSpace: "pre-line",
+                    }}
+                  >
+                    {displayValue}
+                  </p>
+                </div>
+              );
+            })}
           </div>
         </div>
       </div>

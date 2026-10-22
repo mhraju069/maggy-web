@@ -9,7 +9,8 @@ import {
   HiOutlineKey,
   HiOutlineUser,
 } from "react-icons/hi";
-import { authService } from "@/lib/api";
+import { authService } from '@/lib/api';
+import { formatImageUrl } from '@/lib/api/config';
 import { useDashboard } from "../DashboardContext";
 import Spinner from "@/components/shared/Spinner";
 
@@ -280,7 +281,7 @@ export default function ProfilePage() {
                 {previewImage ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img
-                    src={previewImage}
+                    src={previewImage ? (previewImage.startsWith("blob:") || previewImage.startsWith("data:") ? previewImage : formatImageUrl(previewImage)) : ""}
                     alt={draft.name || "Avatar"}
                     className="w-20 h-20 rounded-full object-cover border-2 border-[#E8E2DC] shadow-xs"
                   />
