@@ -13,6 +13,11 @@ export default function Footer() {
   const [privacyData, setPrivacyData] = useState<PrivacyPolicy | null>(null);
   const [termsData, setTermsData] = useState<TermsAndConditions | null>(null);
   const [contactInfo, setContactInfo] = useState<ContactInfo | null>(null);
+  const [socialLinks, setSocialLinks] = useState<{ facebook?: string; instagram?: string; twitter?: string }>({
+    facebook: "https://facebook.com",
+    instagram: "https://instagram.com",
+    twitter: "https://twitter.com",
+  });
   const [loadingPolicy, setLoadingPolicy] = useState(false);
 
   useEffect(() => {
@@ -24,7 +29,54 @@ export default function Footer() {
         console.error("Failed to load contact info in footer:", err);
       }
     };
+
+    const ensureAbsoluteUrl = (url?: string) => {
+      if (!url) return "";
+      const trimmed = url.trim();
+      if (!trimmed) return "";
+      if (/^https?:\/\//i.test(trimmed)) return trimmed;
+      return `https://${trimmed}`;
+    };
+
+    const fetchSocial = async () => {
+      try {
+        const res: any = await othersService.getSocialMediaLinks();
+        if (res) {
+          const linksData = res.links || res.data || res;
+
+          let fb = "";
+          let insta = "";
+          let tw = "";
+
+          if (res.links && typeof res.links === "object") {
+            fb = res.links.facebook || "";
+            insta = res.links.instagram || "";
+            tw = res.links.twitter || "";
+          } else if (Array.isArray(linksData)) {
+            linksData.forEach((item: any) => {
+              if (item.media_type === "facebook") fb = item.url || "";
+              if (item.media_type === "instagram") insta = item.url || "";
+              if (item.media_type === "twitter") tw = item.url || "";
+            });
+          } else if (typeof linksData === "object") {
+            fb = linksData.facebook || "";
+            insta = linksData.instagram || "";
+            tw = linksData.twitter || "";
+          }
+
+          setSocialLinks((prev) => ({
+            facebook: ensureAbsoluteUrl(fb) || prev.facebook,
+            instagram: ensureAbsoluteUrl(insta) || prev.instagram,
+            twitter: ensureAbsoluteUrl(tw) || prev.twitter,
+          }));
+        }
+      } catch (err) {
+        console.error("Failed to load social media links in footer:", err);
+      }
+    };
+
     fetchContact();
+    fetchSocial();
   }, []);
 
   const fetchPolicy = async (tab: "privacy" | "terms") => {
@@ -80,7 +132,7 @@ export default function Footer() {
             {/* Enlarged Facebook & Instagram Logos */}
             <div className="flex gap-6 mt-5">
               <a
-                href="https://facebook.com"
+                href={socialLinks.facebook || "https://facebook.com"}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-11 h-11 bg-[#1E293B] rounded-full flex items-center justify-center hover:bg-[#9B7C56] transition-all transform hover:scale-110 shadow-lg"
@@ -100,7 +152,7 @@ export default function Footer() {
                 </svg>
               </a>
               <a
-                href="https://instagram.com"
+                href={socialLinks.instagram || "https://instagram.com"}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-11 h-11 bg-[#1E293B] rounded-full flex items-center justify-center hover:bg-[#9B7C56] transition-all transform hover:scale-110 shadow-lg"
@@ -128,7 +180,7 @@ export default function Footer() {
                 </svg>
               </a>
               <a
-                href="https://twitter.com"
+                href={socialLinks.twitter || "https://twitter.com"}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-11 h-11 bg-[#1E293B] rounded-full flex items-center justify-center hover:bg-[#9B7C56] transition-all transform hover:scale-110 shadow-lg"

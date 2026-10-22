@@ -20,6 +20,37 @@ export interface UpdateContactInfoPayload {
   address?: string;
 }
 
+export type SocialMediaType = "facebook" | "instagram" | "twitter";
+
+export interface SocialMediaLink {
+  id?: number;
+  media_type: SocialMediaType | string;
+  url: string;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export interface SocialMediaLinksResponse {
+  success: boolean;
+  message?: string;
+  data: SocialMediaLink[];
+  links: {
+    facebook?: string;
+    instagram?: string;
+    twitter?: string;
+    [key: string]: string | undefined;
+  };
+}
+
+export interface UpdateSocialMediaPayload {
+  facebook?: string;
+  instagram?: string;
+  twitter?: string;
+  media_type?: string;
+  url?: string;
+  [key: string]: any;
+}
+
 export interface PrivacyPolicy {
   id: number;
   effective_date: string | null;
@@ -91,6 +122,15 @@ export const othersService = {
 
   async updateContactInfo(payload: UpdateContactInfoPayload): Promise<{ success: boolean; message: string; data: ContactInfo }> {
     return ApiClient.patch(ENDPOINTS.OTHERS.CONTACT_INFO, payload);
+  },
+
+  // ── Social Media Links ──
+  async getSocialMediaLinks(): Promise<SocialMediaLinksResponse> {
+    return ApiClient.get<SocialMediaLinksResponse>(ENDPOINTS.OTHERS.SOCIAL_MEDIA, { skipAuth: true });
+  },
+
+  async updateSocialMediaLinks(payload: UpdateSocialMediaPayload): Promise<SocialMediaLinksResponse> {
+    return ApiClient.patch<SocialMediaLinksResponse>(ENDPOINTS.OTHERS.SOCIAL_MEDIA, payload);
   },
 
   // ── Privacy Policy ──

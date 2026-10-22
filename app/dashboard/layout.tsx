@@ -36,26 +36,11 @@ function DashboardHeader() {
     <header className="flex flex-wrap items-center justify-between gap-4 px-8 py-3.5 bg-white border-b border-[#F1EDE8]">
       {/* Left / Title area (can be empty or subtle) */}
       <div className="hidden sm:flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-[#94A3B8]">
-        <span>Member Portal</span>
+        <span></span>
       </div>
 
       {/* Right side: View Website, Logout, and Profile */}
       <div className="flex items-center gap-4 ml-auto">
-        <Link
-          href="/"
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold text-[#64748B] hover:text-[#1d1a17] hover:bg-[#F8F4F0] border border-[#E8E2DC] transition-all"
-        >
-          <HiOutlineGlobe className="w-4 h-4 text-[#8B7355]" />
-          <span>View Website</span>
-        </Link>
-
-        <button
-          onClick={handleLogout}
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold text-red-600 hover:bg-red-50 border border-red-200 transition-all cursor-pointer"
-        >
-          <HiArrowRightOnRectangle className="w-4 h-4" />
-          <span>Log Out</span>
-        </button>
 
         <div className="h-6 w-px bg-[#E2E8F0] mx-1 hidden sm:block" />
 

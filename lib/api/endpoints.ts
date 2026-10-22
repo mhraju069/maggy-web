@@ -116,5 +116,6 @@ export const ENDPOINTS = {
       LIST: "/others/support-messages/",
       DETAIL: (id: string | number) => `/others/support-messages/${id}/`,
     },
+    SOCIAL_MEDIA: "/others/social-media/",
   },
 } as const;
