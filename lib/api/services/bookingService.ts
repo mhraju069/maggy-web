@@ -198,6 +198,26 @@ export interface CreateSaltRoomBookingResponse {
   message?: string;
 }
 
+export interface CancelBookingPayload {
+  booking_id?: string;
+  reason?: string;
+}
+
+export interface CancelBookingResponse {
+  success: boolean;
+  cancellation_allowed?: boolean;
+  message: string;
+  booking_id?: string;
+  status?: string;
+  payment_status?: string;
+  credit_restored?: boolean;
+  remaining_sessions?: number;
+  hours_until_start?: number;
+  start_time?: string;
+  required_notice_hours?: number;
+  data?: any;
+}
+
 export const bookingService = {
   async getBookings(params?: Record<string, string | number>): Promise<PaginatedResponse<Booking> | Booking[]> {
     return ApiClient.get<PaginatedResponse<Booking> | Booking[]>(ENDPOINTS.BOOKINGS.LIST, { params });
@@ -248,12 +268,11 @@ export const bookingService = {
     return ApiClient.get<Booking>(ENDPOINTS.BOOKINGS.DETAIL(id));
   },
 
-  async cancelBooking(id: string | number): Promise<Booking> {
-    return ApiClient.post<Booking>(ENDPOINTS.BOOKINGS.CANCEL(id));
+  async cancelBooking(id: string | number, payload?: CancelBookingPayload): Promise<CancelBookingResponse> {
+    return ApiClient.post<CancelBookingResponse>(ENDPOINTS.BOOKINGS.CANCEL(id), payload || {});
   },
 
   async getTimeSlots(params: GetSlotsParams): Promise<any> {
-    return ApiClient.get(ENDPOINTS.BOOKINGS.SLOTS, { params });
   },
 
   async getAvailableSlots(params: AvailableSlotsParams): Promise<any> {

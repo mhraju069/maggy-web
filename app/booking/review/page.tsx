@@ -1,6 +1,7 @@
 "use client";
 
 import StripePaymentForm from "@/components/booking/StripePaymentForm";
+import CancellationPolicyCard from "@/components/booking/CancellationPolicyCard";
 import DecorativeUnderline from "@/components/shared/DecorativeUnderline";
 import { bookingService } from "@/lib/api/services/bookingService";
 import { getStoredBookingData, updateStoredBookingData } from "@/lib/bookingStore";
@@ -15,6 +16,7 @@ export default function ReviewPage() {
   const [data, setData] = useState(getStoredBookingData());
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [policyAccepted, setPolicyAccepted] = useState(false);
 
   useEffect(() => {
     setData(getStoredBookingData());
@@ -28,6 +30,11 @@ export default function ReviewPage() {
 
   const handleConfirmLunchroom = async () => {
     try {
+      if (!policyAccepted) {
+        setError("Please read and accept the Cancellation, Rescheduling & Refund Policy to proceed.");
+        return;
+      }
+
       setLoading(true);
       setError(null);
 
@@ -332,7 +339,13 @@ export default function ReviewPage() {
 
           {/* ── Payment or Confirmation Action ── */}
           {isLunchroom ? (
-            <div className="pt-2">
+            <div className="pt-2 space-y-6">
+              <CancellationPolicyCard
+                accepted={policyAccepted}
+                onAcceptedChange={setPolicyAccepted}
+                serviceName="Lunchroom Table Reservation"
+              />
+
               <div className="p-6 rounded-2xl bg-[#FCF2E9] border border-[#E8E2DC] flex flex-col md:flex-row items-center justify-between gap-4">
                 <div>
                   <h4 className="text-base font-bold text-[#0F172A] font-displayPlayFair">Free Table Reservation</h4>
@@ -341,8 +354,14 @@ export default function ReviewPage() {
                 <button
                   type="button"
                   onClick={handleConfirmLunchroom}
-                  disabled={loading}
-                  className="w-full md:w-auto px-10 py-4 rounded-xl bg-[#8B7355] hover:bg-[#786247] text-white font-bold text-sm transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer"
+                  disabled={loading || !policyAccepted}
+                  className={`w-full md:w-auto px-10 py-4 rounded-xl font-bold text-sm transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer ${
+                    !policyAccepted
+                      ? "bg-[#CBD5E1] text-[#64748B] cursor-not-allowed shadow-none"
+                      : loading
+                      ? "bg-[#8B7355] opacity-75 cursor-wait text-white"
+                      : "bg-[#8B7355] hover:bg-[#786247] text-white"
+                  }`}
                 >
                   {loading ? (
                     <>

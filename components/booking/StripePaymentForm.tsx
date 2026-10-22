@@ -15,6 +15,7 @@ import { getStoredBookingData, updateStoredBookingData } from "@/lib/bookingStor
 import { useRouter } from "next/navigation";
 import { BiCheckCircle as BiCheckIcon, BiCreditCard, BiLockAlt, BiShieldQuarter } from "react-icons/bi";
 import { MdOutlinePayments } from "react-icons/md";
+import CancellationPolicyCard from "./CancellationPolicyCard";
 
 interface StripePaymentFormProps {
   totalAmount?: number | string;
@@ -74,6 +75,7 @@ function InnerPaymentForm({
 
   const [processing, setProcessing] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [policyAccepted, setPolicyAccepted] = useState(false);
 
   const formattedAmount =
     typeof totalAmount === "number"
@@ -98,6 +100,11 @@ function InnerPaymentForm({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMsg(null);
+
+    if (!policyAccepted) {
+      setErrorMsg("Please read and accept the Cancellation, Rescheduling & Refund Policy to proceed.");
+      return;
+    }
 
     if (!isZeroPayment) {
       if (!cardName.trim()) {
@@ -653,6 +660,13 @@ function InnerPaymentForm({
           </>
         )}
 
+        {/* Cancellation, Rescheduling & Refund Policy */}
+        <CancellationPolicyCard
+          accepted={policyAccepted}
+          onAcceptedChange={setPolicyAccepted}
+          serviceName={serviceName}
+        />
+
         {/* Error Alert */}
         {errorMsg && (
           <div className="p-4 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs font-bold">
@@ -673,9 +687,13 @@ function InnerPaymentForm({
 
           <button
             type="submit"
-            disabled={processing}
-            className={`w-full md:w-auto px-10 py-4 rounded-xl bg-[#8B7355] hover:bg-[#786247] text-white font-bold text-sm transition-all shadow-md flex items-center justify-center gap-2 ${
-              processing ? "opacity-75 cursor-wait" : ""
+            disabled={processing || !policyAccepted}
+            className={`w-full md:w-auto px-10 py-4 rounded-xl font-bold text-sm transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer ${
+              !policyAccepted
+                ? "bg-[#CBD5E1] text-[#64748B] cursor-not-allowed shadow-none"
+                : processing
+                ? "bg-[#8B7355] opacity-75 cursor-wait text-white"
+                : "bg-[#8B7355] hover:bg-[#786247] text-white"
             }`}
           >
             {processing ? (
