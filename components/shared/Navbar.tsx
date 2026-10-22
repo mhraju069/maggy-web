@@ -82,7 +82,7 @@ const Navbar = () => {
             <div className="relative h-[48px] w-[48px] sm:h-[54px] sm:w-[54px] overflow-hidden rounded-[41px]">
               <Image
                 src="/images/logo.png"
-                alt="Haven on Earth Logo"
+                alt="Heaven on Earth Logo"
                 fill
                 sizes="54px"
                 className="object-cover"

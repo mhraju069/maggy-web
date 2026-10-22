@@ -122,7 +122,7 @@ export default function Footer() {
             <div className="relative h-[84px] w-[84px] overflow-hidden rounded-[41px] mb-6">
               <Image
                 src="/images/logo.png"
-                alt="Heaven Logo"
+                alt="Heaven on Earth Logo"
                 fill
                 sizes="84px"
                 className="object-cover"

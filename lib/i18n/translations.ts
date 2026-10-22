@@ -106,9 +106,9 @@ export const translations = {
     },
     wellnessJourney: {
       title: "Book here for all our services",
-      subtitle: "We look forward to welcoming you in Heaven.",
+      subtitle: "We look forward to welcoming you at Heaven on Earth.",
       bookNow: "Reserve",
-      welcomeText: "We look forward to welcoming you in Heaven.",
+      welcomeText: "We look forward to welcoming you at Heaven on Earth.",
     },
     philosophyPage: {
       hero: {
@@ -757,9 +757,9 @@ export const translations = {
     },
     wellnessJourney: {
       title: "Reserveer hier voor al onze diensten",
-      subtitle: "We kijken er naar uit u te verwelkomen in Heaven.",
+      subtitle: "We kijken er naar uit u te verwelkomen bij Heaven on Earth.",
       bookNow: "Reserveer hier",
-      welcomeText: "We kijken er naar uit u te verwelkomen in Heaven.",
+      welcomeText: "We kijken er naar uit u te verwelkomen bij Heaven on Earth.",
     },
     philosophyPage: {
       hero: {
@@ -1409,9 +1409,9 @@ export const translations = {
     },
     wellnessJourney: {
       title: "Buchen Sie hier für alle unsere Dienste",
-      subtitle: "Wir freuen uns darauf, Sie im Heaven zu begrüßen.",
+      subtitle: "Wir freuen uns darauf, Sie im Heaven on Earth zu begrüßen.",
       bookNow: "Reservieren",
-      welcomeText: "Wir freuen uns darauf, Sie im Heaven zu begrüßen.",
+      welcomeText: "Wir freuen uns darauf, Sie im Heaven on Earth zu begrüßen.",
     },
     philosophyPage: {
       hero: {
