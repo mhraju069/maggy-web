@@ -114,6 +114,15 @@ export default function AdminEditServicePage({ params }: PageProps) {
   const [settingsSuccessMsg, setSettingsSuccessMsg] = useState<string | null>(null);
   const [settingsErrorMsg, setSettingsErrorMsg] = useState<string | null>(null);
 
+  // Dedicated states for Private Sauna and Shared Sauna
+  const [isSavingPrivateSauna, setIsSavingPrivateSauna] = useState(false);
+  const [privateSaunaSuccessMsg, setPrivateSaunaSuccessMsg] = useState<string | null>(null);
+  const [privateSaunaErrorMsg, setPrivateSaunaErrorMsg] = useState<string | null>(null);
+
+  const [isSavingSharedSauna, setIsSavingSharedSauna] = useState(false);
+  const [sharedSaunaSuccessMsg, setSharedSaunaSuccessMsg] = useState<string | null>(null);
+  const [sharedSaunaErrorMsg, setSharedSaunaErrorMsg] = useState<string | null>(null);
+
   // ═════════════════════════════════════════════════════════════════════
   // SERVICE FEATURES STATE: Private Sauna, Shared Sauna & Salt Room
   // ═════════════════════════════════════════════════════════════════════
@@ -565,8 +574,67 @@ export default function AdminEditServicePage({ params }: PageProps) {
   };
 
   // ═════════════════════════════════════════════════════════════════════
-  // SECTION 3 HANDLERS: Sauna & Saltroom Inline Save
+  // SECTION 3 HANDLERS: Sauna & Saltroom Inline Save (Separated APIs)
   // ═════════════════════════════════════════════════════════════════════
+
+  // Dedicated Handler: Private Sauna Configuration
+  const handleSavePrivateSauna = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSavingPrivateSauna(true);
+    setPrivateSaunaErrorMsg(null);
+    setPrivateSaunaSuccessMsg(null);
+
+    try {
+      const payload = {
+        base_price_3hrs: parseFloat(String(saunaSettings.base_price_3hrs)) || 75.0,
+        base_price_4hrs: parseFloat(String(saunaSettings.base_price_4hrs)) || 100.0,
+        max_person: Number(saunaSettings.max_person) || 2,
+        max_person_private: Number(saunaSettings.max_person) || 2,
+        extra_person_price: parseFloat(String(saunaSettings.extra_person_price)) || 15.0,
+        is_available: saunaSettings.is_available_private,
+        is_available_private: saunaSettings.is_available_private,
+      };
+
+      await servicesService.updatePrivateSauna(payload);
+      setPrivateSaunaSuccessMsg("Private Sauna configuration saved successfully!");
+      setTimeout(() => setPrivateSaunaSuccessMsg(null), 3500);
+      await reloadData();
+    } catch (err: any) {
+      setPrivateSaunaErrorMsg(err?.message || "Failed to update Private Sauna settings.");
+    } finally {
+      setIsSavingPrivateSauna(false);
+    }
+  };
+
+  // Dedicated Handler: Shared Sauna Configuration
+  const handleSaveSharedSauna = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSavingSharedSauna(true);
+    setSharedSaunaErrorMsg(null);
+    setSharedSaunaSuccessMsg(null);
+
+    try {
+      const payload = {
+        price_per_person: parseFloat(String(saunaSettings.price_per_person)) || 15.0,
+        max_person: Number(saunaSettings.max_person_shared) || 6,
+        max_person_shared: Number(saunaSettings.max_person_shared) || 6,
+        max_capacity: Number(saunaSettings.max_person_shared) || 6,
+        is_available: saunaSettings.is_available_shared,
+        is_available_shared: saunaSettings.is_available_shared,
+      };
+
+      await servicesService.updateSharedSauna(payload);
+      setSharedSaunaSuccessMsg("Shared Sauna configuration saved successfully!");
+      setTimeout(() => setSharedSaunaSuccessMsg(null), 3500);
+      await reloadData();
+    } catch (err: any) {
+      setSharedSaunaErrorMsg(err?.message || "Failed to update Shared Sauna settings.");
+    } finally {
+      setIsSavingSharedSauna(false);
+    }
+  };
+
+  // Generic Handler: Saltroom and other services
   const handleSaveSettings = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSavingSettings(true);
@@ -581,19 +649,7 @@ export default function AdminEditServicePage({ params }: PageProps) {
         type: s_type,
       };
 
-      if (s_type === "sauna") {
-        payload = {
-          ...payload,
-          base_price_3hrs: parseFloat(String(saunaSettings.base_price_3hrs)) || 75.0,
-          base_price_4hrs: parseFloat(String(saunaSettings.base_price_4hrs)) || 100.0,
-          max_person: Number(saunaSettings.max_person) || 6,
-          extra_person_price: parseFloat(String(saunaSettings.extra_person_price)) || 15.0,
-          is_available: saunaSettings.is_available_private,
-          price_per_person: parseFloat(String(saunaSettings.price_per_person)) || 15.0,
-          max_person_shared: Number(saunaSettings.max_person_shared) || 6,
-          is_available_shared: saunaSettings.is_available_shared,
-        };
-      } else if (s_type === "saltroom") {
+      if (s_type === "saltroom") {
         payload = {
           ...payload,
           max_capacity: Number(saltroomSettings.max_capacity) || 2,
@@ -1442,14 +1498,64 @@ export default function AdminEditServicePage({ params }: PageProps) {
           </div>
         )}
 
-        {/* ── SAUNA SETTINGS (INLINE) ── */}
+        {/* ── SAUNA SETTINGS (TWO SEPARATE INDEPENDENT FORMS) ── */}
         {s_type === "sauna" && (
-          <form onSubmit={handleSaveSettings} className="space-y-6">
-            {/* Private Sauna */}
-            <div className="p-5 rounded-2xl bg-[#FAF8F5]/50 border border-[#F1EDE8] space-y-4">
-              <h3 className="text-xs font-bold text-[#8B7355] uppercase tracking-wider flex items-center gap-2">
-                <span>🧖</span> Private Sauna
-              </h3>
+          <div className="space-y-8">
+            {/* ── 1. PRIVATE SAUNA UPDATE FORM ── */}
+            <form
+              onSubmit={handleSavePrivateSauna}
+              className="p-6 rounded-2xl bg-white border border-[#E8E2DC] shadow-sm space-y-5"
+            >
+              {/* Header */}
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-[#F1EDE8]">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-[#FAF8F5] border border-[#E8E2DC] flex items-center justify-center text-xl shadow-xs">
+                    🧖
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <h3 className="text-sm font-bold text-[#1d1a17]">Private Sauna Configuration</h3>
+                      <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-[#FAF8F5] text-[#8B7355] border border-[#E8E2DC]">
+                        Dedicated API
+                      </span>
+                    </div>
+                    <p className="text-[11px] text-[#64748B] mt-0.5">
+                      Configure base pricing (3h / 4h), included guest count, add-on rates, and private amenities.
+                    </p>
+                  </div>
+                </div>
+
+                {/* Available for Booking Toggle */}
+                <label className="flex items-center gap-2.5 cursor-pointer select-none bg-[#FAF8F5] px-3.5 py-2 rounded-xl border border-[#F1EDE8] hover:border-[#8B7355]/40 transition-colors">
+                  <input
+                    type="checkbox"
+                    checked={Boolean(saunaSettings.is_available_private)}
+                    onChange={(e) =>
+                      setSaunaSettings((s) => ({ ...s, is_available_private: e.target.checked }))
+                    }
+                    className="w-4 h-4 rounded text-[#8B7355] focus:ring-[#8B7355] border-[#E2E8F0] cursor-pointer"
+                  />
+                  <span className="text-xs font-semibold text-[#1d1a17]">
+                    {saunaSettings.is_available_private ? "Available for Booking" : "Offline / Unavailable"}
+                  </span>
+                </label>
+              </div>
+
+              {/* Success / Error Messages for Private Sauna */}
+              {privateSaunaSuccessMsg && (
+                <div className="p-3.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-medium flex items-center gap-2 animate-in fade-in">
+                  <HiOutlineCheck className="w-4 h-4 text-emerald-600 shrink-0" />
+                  <span>{privateSaunaSuccessMsg}</span>
+                </div>
+              )}
+              {privateSaunaErrorMsg && (
+                <div className="p-3.5 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs font-medium flex items-center gap-2">
+                  <HiOutlineX className="w-4 h-4 text-red-500 shrink-0" />
+                  <span>{privateSaunaErrorMsg}</span>
+                </div>
+              )}
+
+              {/* Private Sauna Inputs */}
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
                 <div>
                   <label className="block text-[11px] font-semibold text-[#64748B] mb-1">
@@ -1462,7 +1568,7 @@ export default function AdminEditServicePage({ params }: PageProps) {
                     onChange={(e) =>
                       setSaunaSettings((s) => ({ ...s, base_price_3hrs: e.target.value }))
                     }
-                    className="w-full px-3.5 py-2.5 rounded-xl text-xs text-[#1d1a17] border border-[#E2E8F0] bg-white"
+                    className="w-full px-3.5 py-2.5 rounded-xl text-xs text-[#1d1a17] border border-[#E2E8F0] bg-white focus:outline-none focus:border-[#8B7355] transition-all"
                   />
                 </div>
                 <div>
@@ -1476,7 +1582,7 @@ export default function AdminEditServicePage({ params }: PageProps) {
                     onChange={(e) =>
                       setSaunaSettings((s) => ({ ...s, base_price_4hrs: e.target.value }))
                     }
-                    className="w-full px-3.5 py-2.5 rounded-xl text-xs text-[#1d1a17] border border-[#E2E8F0] bg-white"
+                    className="w-full px-3.5 py-2.5 rounded-xl text-xs text-[#1d1a17] border border-[#E2E8F0] bg-white focus:outline-none focus:border-[#8B7355] transition-all"
                   />
                 </div>
                 <div>
@@ -1485,11 +1591,12 @@ export default function AdminEditServicePage({ params }: PageProps) {
                   </label>
                   <input
                     type="number"
+                    min="1"
                     value={saunaSettings.max_person}
                     onChange={(e) =>
                       setSaunaSettings((s) => ({ ...s, max_person: parseInt(e.target.value) || 1 }))
                     }
-                    className="w-full px-3.5 py-2.5 rounded-xl text-xs text-[#1d1a17] border border-[#E2E8F0] bg-white"
+                    className="w-full px-3.5 py-2.5 rounded-xl text-xs text-[#1d1a17] border border-[#E2E8F0] bg-white focus:outline-none focus:border-[#8B7355] transition-all"
                   />
                 </div>
                 <div>
@@ -1503,7 +1610,7 @@ export default function AdminEditServicePage({ params }: PageProps) {
                     onChange={(e) =>
                       setSaunaSettings((s) => ({ ...s, extra_person_price: e.target.value }))
                     }
-                    className="w-full px-3.5 py-2.5 rounded-xl text-xs text-[#1d1a17] border border-[#E2E8F0] bg-white"
+                    className="w-full px-3.5 py-2.5 rounded-xl text-xs text-[#1d1a17] border border-[#E2E8F0] bg-white focus:outline-none focus:border-[#8B7355] transition-all"
                   />
                 </div>
               </div>
@@ -1531,7 +1638,7 @@ export default function AdminEditServicePage({ params }: PageProps) {
                 </div>
 
                 {privateSaunaFeatures.length === 0 ? (
-                  <div className="p-4 rounded-xl bg-white border border-dashed border-[#E2E8F0] text-center">
+                  <div className="p-4 rounded-xl bg-[#FAF8F5]/50 border border-dashed border-[#E2E8F0] text-center">
                     <p className="text-xs text-[#94A3B8]">No features added yet to Private Sauna.</p>
                     <button
                       type="button"
@@ -1607,13 +1714,84 @@ export default function AdminEditServicePage({ params }: PageProps) {
                   </div>
                 )}
               </div>
-            </div>
 
-            {/* Shared Sauna */}
-            <div className="p-5 rounded-2xl bg-[#FAF8F5]/50 border border-[#F1EDE8] space-y-4">
-              <h3 className="text-xs font-bold text-[#8B7355] uppercase tracking-wider flex items-center gap-2">
-                <span>👥</span> Shared Sauna
-              </h3>
+              {/* Private Sauna Dedicated Submit */}
+              <div className="flex justify-end pt-4 border-t border-[#F1EDE8]">
+                <button
+                  type="submit"
+                  disabled={isSavingPrivateSauna}
+                  className="px-5 py-2.5 rounded-xl bg-[#8B7355] hover:bg-[#705b41] text-white text-xs font-bold uppercase tracking-wider transition-all shadow-md flex items-center gap-2 cursor-pointer disabled:opacity-50"
+                >
+                  {isSavingPrivateSauna ? (
+                    <>
+                      <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                      <span>Saving Private Sauna...</span>
+                    </>
+                  ) : (
+                    <>
+                      <HiOutlineCheck className="w-4 h-4" />
+                      <span>Save Private Sauna</span>
+                    </>
+                  )}
+                </button>
+              </div>
+            </form>
+
+            {/* ── 2. SHARED SAUNA UPDATE FORM ── */}
+            <form
+              onSubmit={handleSaveSharedSauna}
+              className="p-6 rounded-2xl bg-white border border-[#E8E2DC] shadow-sm space-y-5"
+            >
+              {/* Header */}
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-[#F1EDE8]">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-[#FAF8F5] border border-[#E8E2DC] flex items-center justify-center text-xl shadow-xs">
+                    👥
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <h3 className="text-sm font-bold text-[#1d1a17]">Shared Sauna Configuration</h3>
+                      <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                        Dedicated API
+                      </span>
+                    </div>
+                    <p className="text-[11px] text-[#64748B] mt-0.5">
+                      Configure public slots per-person rate, maximum slot capacity, and shared amenities.
+                    </p>
+                  </div>
+                </div>
+
+                {/* Available for Booking Toggle */}
+                <label className="flex items-center gap-2.5 cursor-pointer select-none bg-[#FAF8F5] px-3.5 py-2 rounded-xl border border-[#F1EDE8] hover:border-[#8B7355]/40 transition-colors">
+                  <input
+                    type="checkbox"
+                    checked={Boolean(saunaSettings.is_available_shared)}
+                    onChange={(e) =>
+                      setSaunaSettings((s) => ({ ...s, is_available_shared: e.target.checked }))
+                    }
+                    className="w-4 h-4 rounded text-[#8B7355] focus:ring-[#8B7355] border-[#E2E8F0] cursor-pointer"
+                  />
+                  <span className="text-xs font-semibold text-[#1d1a17]">
+                    {saunaSettings.is_available_shared ? "Available for Booking" : "Offline / Unavailable"}
+                  </span>
+                </label>
+              </div>
+
+              {/* Success / Error Messages for Shared Sauna */}
+              {sharedSaunaSuccessMsg && (
+                <div className="p-3.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-medium flex items-center gap-2 animate-in fade-in">
+                  <HiOutlineCheck className="w-4 h-4 text-emerald-600 shrink-0" />
+                  <span>{sharedSaunaSuccessMsg}</span>
+                </div>
+              )}
+              {sharedSaunaErrorMsg && (
+                <div className="p-3.5 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs font-medium flex items-center gap-2">
+                  <HiOutlineX className="w-4 h-4 text-red-500 shrink-0" />
+                  <span>{sharedSaunaErrorMsg}</span>
+                </div>
+              )}
+
+              {/* Shared Sauna Inputs */}
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                 <div>
                   <label className="block text-[11px] font-semibold text-[#64748B] mb-1">
@@ -1626,21 +1804,25 @@ export default function AdminEditServicePage({ params }: PageProps) {
                     onChange={(e) =>
                       setSaunaSettings((s) => ({ ...s, price_per_person: e.target.value }))
                     }
-                    className="w-full px-3.5 py-2.5 rounded-xl text-xs text-[#1d1a17] border border-[#E2E8F0] bg-white"
+                    className="w-full px-3.5 py-2.5 rounded-xl text-xs text-[#1d1a17] border border-[#E2E8F0] bg-white focus:outline-none focus:border-[#8B7355] transition-all"
                   />
                 </div>
                 <div>
                   <label className="block text-[11px] font-semibold text-[#64748B] mb-1">
-                    Max Capacity
+                    Max Capacity (Guests per Slot)
                   </label>
                   <input
                     type="number"
+                    min="1"
                     value={saunaSettings.max_person_shared}
                     onChange={(e) =>
                       setSaunaSettings((s) => ({ ...s, max_person_shared: parseInt(e.target.value) || 1 }))
                     }
-                    className="w-full px-3.5 py-2.5 rounded-xl text-xs text-[#1d1a17] border border-[#E2E8F0] bg-white"
+                    className="w-full px-3.5 py-2.5 rounded-xl text-xs text-[#1d1a17] border border-[#E2E8F0] bg-white focus:outline-none focus:border-[#8B7355] transition-all"
                   />
+                  <p className="text-[10px] text-[#94A3B8] mt-1">
+                    Controls total capacity per session block for public booking.
+                  </p>
                 </div>
               </div>
 
@@ -1667,7 +1849,7 @@ export default function AdminEditServicePage({ params }: PageProps) {
                 </div>
 
                 {sharedSaunaFeatures.length === 0 ? (
-                  <div className="p-4 rounded-xl bg-white border border-dashed border-[#E2E8F0] text-center">
+                  <div className="p-4 rounded-xl bg-[#FAF8F5]/50 border border-dashed border-[#E2E8F0] text-center">
                     <p className="text-xs text-[#94A3B8]">No features added yet to Shared Sauna.</p>
                     <button
                       type="button"
@@ -1743,25 +1925,29 @@ export default function AdminEditServicePage({ params }: PageProps) {
                   </div>
                 )}
               </div>
-            </div>
 
-            <div className="flex justify-end pt-4 border-t border-[#F1EDE8]">
-              <button
-                type="submit"
-                disabled={isSavingSettings}
-                className="px-6 py-2.5 rounded-xl bg-[#8B7355] hover:bg-[#705b41] text-white text-xs font-bold uppercase tracking-wider transition-all shadow-md flex items-center gap-2 cursor-pointer disabled:opacity-50"
-              >
-                {isSavingSettings ? (
-                  <>
-                    <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                    <span>Saving Configuration...</span>
-                  </>
-                ) : (
-                  <span>Save Configuration</span>
-                )}
-              </button>
-            </div>
-          </form>
+              {/* Shared Sauna Dedicated Submit */}
+              <div className="flex justify-end pt-4 border-t border-[#F1EDE8]">
+                <button
+                  type="submit"
+                  disabled={isSavingSharedSauna}
+                  className="px-5 py-2.5 rounded-xl bg-[#8B7355] hover:bg-[#705b41] text-white text-xs font-bold uppercase tracking-wider transition-all shadow-md flex items-center gap-2 cursor-pointer disabled:opacity-50"
+                >
+                  {isSavingSharedSauna ? (
+                    <>
+                      <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                      <span>Saving Shared Sauna...</span>
+                    </>
+                  ) : (
+                    <>
+                      <HiOutlineCheck className="w-4 h-4" />
+                      <span>Save Shared Sauna</span>
+                    </>
+                  )}
+                </button>
+              </div>
+            </form>
+          </div>
         )}
 
         {/* ── SALT ROOM SETTINGS (INLINE) ── */}

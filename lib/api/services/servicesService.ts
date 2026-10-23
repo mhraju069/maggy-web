@@ -791,6 +791,32 @@ export const servicesService = {
     }
   },
 
+  async updatePrivateSauna(data: Record<string, any>): Promise<any> {
+    const payload = {
+      section: "service_settings",
+      sub_type: "private",
+      ...data,
+    };
+    try {
+      return await ApiClient.patch(`/dashboard/admin/services/private-sauna/`, payload);
+    } catch {
+      return ApiClient.patch(`/dashboard/admin/services/sauna/`, payload);
+    }
+  },
+
+  async updateSharedSauna(data: Record<string, any>): Promise<any> {
+    const payload = {
+      section: "service_settings",
+      sub_type: "shared",
+      ...data,
+    };
+    try {
+      return await ApiClient.patch(`/dashboard/admin/services/shared-sauna/`, payload);
+    } catch {
+      return ApiClient.patch(`/dashboard/admin/services/sauna/`, payload);
+    }
+  },
+
   // ══════════════════════════════════════════════════════════════════════
   // 1. OPENING HOURS / SERVICE SETTINGS CRUD
   // ══════════════════════════════════════════════════════════════════════
