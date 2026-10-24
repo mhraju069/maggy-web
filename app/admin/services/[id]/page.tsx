@@ -1515,9 +1515,6 @@ export default function AdminEditServicePage({ params }: PageProps) {
                   <div>
                     <div className="flex items-center gap-2">
                       <h3 className="text-sm font-bold text-[#1d1a17]">Private Sauna Configuration</h3>
-                      <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-[#FAF8F5] text-[#8B7355] border border-[#E8E2DC]">
-                        Dedicated API
-                      </span>
                     </div>
                     <p className="text-[11px] text-[#64748B] mt-0.5">
                       Configure base pricing (3h / 4h), included guest count, add-on rates, and private amenities.
@@ -1751,9 +1748,6 @@ export default function AdminEditServicePage({ params }: PageProps) {
                   <div>
                     <div className="flex items-center gap-2">
                       <h3 className="text-sm font-bold text-[#1d1a17]">Shared Sauna Configuration</h3>
-                      <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
-                        Dedicated API
-                      </span>
                     </div>
                     <p className="text-[11px] text-[#64748B] mt-0.5">
                       Configure public slots per-person rate, maximum slot capacity, and shared amenities.
