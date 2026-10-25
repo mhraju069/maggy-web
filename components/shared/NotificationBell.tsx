@@ -19,15 +19,17 @@ import {
 
 interface NotificationBellProps {
   className?: string;
+  scope?: "admin" | "user" | "all";
 }
 
-export default function NotificationBell({ className = "" }: NotificationBellProps) {
+export default function NotificationBell({ className = "", scope }: NotificationBellProps) {
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
   const [unreadCount, setUnreadCount] = useState<number>(0);
   const [notifications, setNotifications] = useState<NotificationItem[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [filter, setFilter] = useState<"all" | "unread">("all");
+  const [scopeFilter, setScopeFilter] = useState<"all" | "admin" | "user">(scope || "all");
   const [isWsConnected, setIsWsConnected] = useState<boolean>(false);
 
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -49,12 +51,19 @@ export default function NotificationBell({ className = "" }: NotificationBellPro
   }, []);
 
   // Fetch notifications list
-  const fetchNotificationsList = useCallback(async (isReadFilter?: boolean) => {
+  const fetchNotificationsList = useCallback(async (isReadFilter?: boolean, activeScope?: "admin" | "user" | "all") => {
     try {
       const token = getStoredToken();
       if (!token) return;
       setLoading(true);
-      const params = isReadFilter !== undefined ? { is_read: !isReadFilter ? false : undefined } : undefined;
+      const params: any = {};
+      if (isReadFilter !== undefined) {
+        params.is_read = !isReadFilter ? false : undefined;
+      }
+      const targetScope = activeScope || scope;
+      if (targetScope && targetScope !== "all") {
+        params.scope = targetScope;
+      }
       const res = await notificationService.getNotifications(params);
       if (res?.notifications) {
         setNotifications(res.notifications);
@@ -67,7 +76,7 @@ export default function NotificationBell({ className = "" }: NotificationBellPro
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [scope]);
 
   // WebSocket Connection Handler
   useEffect(() => {
@@ -148,9 +157,9 @@ export default function NotificationBell({ className = "" }: NotificationBellPro
   // Load notifications when dropdown opens or filter changes
   useEffect(() => {
     if (isOpen) {
-      fetchNotificationsList(filter === "unread" ? false : undefined);
+      fetchNotificationsList(filter === "unread" ? false : undefined, scopeFilter);
     }
-  }, [isOpen, filter, fetchNotificationsList]);
+  }, [isOpen, filter, scopeFilter, fetchNotificationsList]);
 
   // Close dropdown on outside click
   useEffect(() => {
@@ -345,13 +354,25 @@ export default function NotificationBell({ className = "" }: NotificationBellPro
                   {/* Content */}
                   <div className="flex-1 min-w-0">
                     <div className="flex items-start justify-between gap-2">
-                      <p
-                        className={`text-sm ${
-                          !item.is_read ? "font-semibold text-[#1d1a17]" : "font-medium text-[#475569]"
-                        } line-clamp-1`}
-                      >
-                        {item.title}
-                      </p>
+                      <div className="flex items-center gap-1.5 flex-wrap min-w-0">
+                        <p
+                          className={`text-sm ${
+                            !item.is_read ? "font-semibold text-[#1d1a17]" : "font-medium text-[#475569]"
+                          } line-clamp-1`}
+                        >
+                          {item.title}
+                        </p>
+                        {item.audience === "admin" && (
+                          <span className="text-[10px] font-semibold bg-amber-100 text-amber-800 px-1.5 py-0.2 rounded-md">
+                            Admin
+                          </span>
+                        )}
+                        {item.notification_type === "reminder" && (
+                          <span className="text-[10px] font-semibold bg-blue-100 text-blue-800 px-1.5 py-0.2 rounded-md">
+                            Reminder
+                          </span>
+                        )}
+                      </div>
                       <span className="text-[11px] text-[#94A3B8] flex-shrink-0 flex items-center gap-1">
                         <HiOutlineClock className="w-3 h-3" />
                         {formatTime(item.created_at)}

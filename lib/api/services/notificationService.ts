@@ -6,6 +6,7 @@ export interface NotificationItem {
   title: string;
   body: string;
   notification_type?: string;
+  audience?: "user" | "admin" | "all" | string;
   link?: string | null;
   data?: Record<string, any>;
   is_read: boolean;
@@ -38,6 +39,7 @@ export interface MarkAllReadResponse {
 export interface NotificationFilterParams {
   is_read?: boolean;
   type?: string;
+  scope?: "admin" | "user" | "all";
 }
 
 export const notificationService = {
