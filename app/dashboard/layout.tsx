@@ -53,17 +53,21 @@ function DashboardHeader() {
           href="/dashboard/profile"
           className="flex items-center gap-3 p-1 rounded-xl hover:bg-[#F8F4F0] transition-colors"
         >
-          {profile?.image ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              alt={profile.name}
-              className="w-9 h-9 rounded-full object-cover border border-[#E8E2DC]"
-            />
-          ) : (
-            <div className="w-9 h-9 rounded-full bg-[#CFB9A3] flex items-center justify-center text-white font-bold text-sm">
-              {initial}
-            </div>
-          )}
+          <div className="w-9 h-9 rounded-full bg-[#CFB9A3] flex items-center justify-center text-white font-bold text-sm overflow-hidden border border-[#E8E2DC] flex-shrink-0">
+            {profile?.image ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={formatImageUrl(profile.image)}
+                alt={profile.name || "Profile"}
+                className="w-full h-full object-cover"
+                onError={(e) => {
+                  (e.currentTarget as HTMLElement).style.display = "none";
+                }}
+              />
+            ) : (
+              <span>{initial}</span>
+            )}
+          </div>
           <div className="text-left">
             <p className="text-sm font-semibold text-[#1d1a17] leading-none">
               {profile?.name || "Welcome"}
