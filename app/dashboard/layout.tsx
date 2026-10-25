@@ -21,6 +21,8 @@ const NAV = [
   { href: "/dashboard/profile",      label: "Profile",      Icon: HiOutlineUser },
 ];
 
+import NotificationBell from "@/components/shared/NotificationBell";
+
 function DashboardHeader() {
   const { dashboardData } = useDashboard();
   const router = useRouter();
@@ -39,8 +41,10 @@ function DashboardHeader() {
         <span></span>
       </div>
 
-      {/* Right side: View Website, Logout, and Profile */}
+      {/* Right side: Notification Bell & Profile */}
       <div className="flex items-center gap-4 ml-auto">
+        {/* Notification Bell */}
+        <NotificationBell />
 
         <div className="h-6 w-px bg-[#E2E8F0] mx-1 hidden sm:block" />
 

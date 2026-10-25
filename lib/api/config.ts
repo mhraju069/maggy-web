@@ -60,3 +60,29 @@ export const formatImageUrl = (
 
   return fallback;
 };
+
+/**
+ * Builds WebSocket URL based on current API_BASE_URL or browser location
+ */
+export const buildWebSocketUrl = (path: string, token?: string | null): string => {
+  let wsProtocol = "ws:";
+  let host = "localhost:8000";
+
+  if (typeof window !== "undefined") {
+    wsProtocol = window.location.protocol === "https:" ? "wss:" : "ws:";
+  }
+
+  try {
+    const parsed = new URL(API_BASE_URL);
+    wsProtocol = parsed.protocol === "https:" ? "wss:" : "ws:";
+    host = parsed.host;
+  } catch {
+    if (typeof window !== "undefined") {
+      host = window.location.host;
+    }
+  }
+
+  const cleanPath = path.startsWith("/") ? path : `/${path}`;
+  const url = `${wsProtocol}//${host}${cleanPath}`;
+  return token ? `${url}?token=${encodeURIComponent(token)}` : url;
+};

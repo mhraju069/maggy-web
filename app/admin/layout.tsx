@@ -40,6 +40,7 @@ import { useState, useEffect } from "react";
 import { authService } from "@/lib/api/services/authService";
 import { getStoredUser, setStoredUser } from "@/lib/api/token";
 import { formatImageUrl } from "@/lib/api/config";
+import NotificationBell from "@/components/shared/NotificationBell";
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -147,10 +148,11 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       <div className="flex-1 flex flex-col bg-[#FCF2E9] min-h-screen">
         {/* Top bar */}
         <header className="flex items-center justify-end gap-4 px-8 py-4 bg-white border-b border-[#F1EDE8]">
-          {/* <button className="relative text-[#94A3B8] hover:text-[#8b7355] transition-colors">
-            <HiOutlineBell className="w-6 h-6" />
-            <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full text-white text-[9px] flex items-center justify-center font-bold">3</span>
-          </button> */}
+          {/* Real-time Notification Bell */}
+          <NotificationBell />
+
+          <div className="h-6 w-px bg-[#E2E8F0] mx-1 hidden sm:block" />
+
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 rounded-full bg-[#CFB9A3] flex items-center justify-center text-white font-bold text-sm shadow-xs uppercase overflow-hidden border border-[#E8E2DC]">
               {adminUser.image ? (

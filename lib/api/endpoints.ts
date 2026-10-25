@@ -118,4 +118,10 @@ export const ENDPOINTS = {
     },
     SOCIAL_MEDIA: "/others/social-media/",
   },
+  NOTIFICATIONS: {
+    LIST: "/notify/",
+    UNREAD_COUNT: "/notify/unread-count/",
+    MARK_READ: (id: string | number) => `/notify/${id}/read/`,
+    MARK_ALL_READ: "/notify/mark-all-read/",
+  },
 } as const;

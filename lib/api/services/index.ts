@@ -38,6 +38,7 @@ export type {
   AdminDateActionResponse,
 } from "./adminDatesService";
 export { default as othersService } from "./othersService";
+export * from "./notificationService";
 export type {
   ContactInfo,
   UpdateContactInfoPayload,
