@@ -16,6 +16,7 @@ import {
   notificationService,
   NotificationItem,
 } from "@/lib/api/services/notificationService";
+import BookingDetailsModal, { BookingModalData } from "./BookingDetailsModal";
 
 interface NotificationBellProps {
   className?: string;
@@ -31,6 +32,11 @@ export default function NotificationBell({ className = "", scope }: Notification
   const [filter, setFilter] = useState<"all" | "unread">("all");
   const [scopeFilter, setScopeFilter] = useState<"all" | "admin" | "user">(scope || "all");
   const [isWsConnected, setIsWsConnected] = useState<boolean>(false);
+
+  // Booking detail modal state
+  const [selectedBookingId, setSelectedBookingId] = useState<string | number | null>(null);
+  const [modalBookingData, setModalBookingData] = useState<BookingModalData | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
   const dropdownRef = useRef<HTMLDivElement>(null);
   const wsRef = useRef<WebSocket | null>(null);
@@ -213,6 +219,36 @@ export default function NotificationBell({ className = "", scope }: Notification
       await handleMarkAsRead(notification);
     }
     setIsOpen(false);
+
+    // Extract booking ID from data or link (supports both /bookings/ID and /admin/bookings/ID)
+    let bookingIdFromData =
+      notification.data?.booking_id ||
+      notification.data?.id ||
+      null;
+
+    if (!bookingIdFromData && notification.link) {
+      const match = notification.link.match(/(?:\/admin)?\/bookings\/([A-Za-z0-9_-]+)/);
+      if (match && match[1]) {
+        bookingIdFromData = match[1];
+      }
+    }
+
+    // If it's a booking notification or has a booking reference, open modal directly
+    if (bookingIdFromData || notification.notification_type === "booking" || notification.notification_type === "reminder") {
+      setSelectedBookingId(bookingIdFromData || notification.id);
+      setModalBookingData({
+        booking_id: bookingIdFromData || "",
+        title: notification.title,
+        body: notification.body,
+        service_name: notification.data?.type || notification.data?.service_name || notification.title,
+        service_type: notification.data?.type || notification.notification_type,
+        date: notification.data?.date,
+        time: notification.data?.time,
+        ...(notification.data || {}),
+      });
+      setIsModalOpen(true);
+      return;
+    }
 
     if (notification.link) {
       router.push(notification.link);
@@ -414,6 +450,18 @@ export default function NotificationBell({ className = "", scope }: Notification
           </div>
         </div>
       )}
+
+      {/* Booking Details Modal */}
+      <BookingDetailsModal
+        isOpen={isModalOpen}
+        onClose={() => {
+          setIsModalOpen(false);
+          setSelectedBookingId(null);
+          setModalBookingData(null);
+        }}
+        bookingId={selectedBookingId}
+        initialData={modalBookingData}
+      />
     </div>
   );
 }
