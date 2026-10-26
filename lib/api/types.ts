@@ -174,15 +174,24 @@ export interface ChangePasswordPayload {
   confirm_password?: string;
 }
 
+export interface FirebaseSocialAuthPayload {
+  id_token: string;
+  role?: string;
+}
+
+export interface SimpleApiResponse {
+  status: boolean;
+  log: string;
+}
+
 export interface ForgotPasswordPayload {
   email: string;
 }
 
 export interface ResetPasswordPayload {
-  token?: string;
-  uid?: string;
-  new_password?: string;
-  confirm_password?: string;
+  email: string;
+  otp_code: string;
+  new_password: string;
 }
 
 // Domain Model Types (Booking, Services, etc.)

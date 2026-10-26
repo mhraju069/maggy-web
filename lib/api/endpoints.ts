@@ -12,8 +12,9 @@ export const ENDPOINTS = {
     PROFILE: "/auth/user/",
     USER: "/auth/user/",
     CHANGE_PASSWORD: "/auth/password/change/",
-    FORGOT_PASSWORD: "/auth/password/forgot/",
-    RESET_PASSWORD: "/auth/password/reset/",
+    FORGOT_PASSWORD: "/auth/forgot-password/",
+    RESET_PASSWORD: "/auth/reset-password/",
+    FIREBASE_LOGIN: "/auth/firebase-login/",
   },
   USERS: {
     LIST: "/users/",

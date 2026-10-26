@@ -115,21 +115,49 @@ export const authService = {
   },
 
   /**
-   * Request password reset link
+   * Log in user with Firebase ID Token (Google, Apple, Phone, etc.)
    */
-  async forgotPassword(payload: ForgotPasswordPayload): Promise<{ message: string }> {
-    return ApiClient.post<{ message: string }>(ENDPOINTS.AUTH.FORGOT_PASSWORD, payload, {
-      skipAuth: true,
-    });
+  async firebaseLogin(idToken: string, role: string = "user"): Promise<AuthResponse> {
+    const response = await ApiClient.post<AuthResponse>(
+      ENDPOINTS.AUTH.FIREBASE_LOGIN,
+      { id_token: idToken, role },
+      { skipAuth: true }
+    );
+
+    const token = response.access || response.token || response.tokens?.access;
+    const refresh = response.refresh || response.tokens?.refresh;
+    const userRole = response.user?.role || "user";
+
+    if (response.status !== false && token) {
+      setAuthToken(token, refresh, userRole);
+      if (typeof window !== "undefined" && response.user) {
+        localStorage.setItem("user_info", JSON.stringify(response.user));
+      }
+    }
+
+    return response;
   },
 
   /**
-   * Reset password with reset token
+   * Request password reset OTP
    */
-  async resetPassword(payload: ResetPasswordPayload): Promise<{ message: string }> {
-    return ApiClient.post<{ message: string }>(ENDPOINTS.AUTH.RESET_PASSWORD, payload, {
-      skipAuth: true,
-    });
+  async forgotPassword(payload: ForgotPasswordPayload): Promise<{ status: boolean; log: string }> {
+    return ApiClient.post<{ status: boolean; log: string }>(
+      ENDPOINTS.AUTH.FORGOT_PASSWORD,
+      payload,
+      { skipAuth: true }
+    );
+  },
+
+  /**
+   * Reset password with OTP and new password
+   */
+  async resetPassword(payload: ResetPasswordPayload): Promise<{ status: boolean; log: string }> {
+    return ApiClient.post<{ status: boolean; log: string }>(
+      ENDPOINTS.AUTH.RESET_PASSWORD,
+      payload,
+      { skipAuth: true }
+    );
   },
 };
 

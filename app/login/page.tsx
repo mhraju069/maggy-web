@@ -4,10 +4,13 @@ import Footer from "@/components/shared/Footer";
 import Navbar from "@/components/shared/Navbar";
 import { authService, parseApiErrorMessage } from "@/lib/api";
 import { getStoredRole, getStoredToken } from "@/lib/api/token";
+import { appleProvider, auth, googleProvider } from "@/lib/firebase";
+import { signInWithPopup } from "firebase/auth";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
+import { FaApple, FaGoogle } from "react-icons/fa";
 import { HiOutlineLockClosed, HiOutlineMail } from "react-icons/hi";
 import { IoEyeOutline } from "react-icons/io5";
 
@@ -22,6 +25,7 @@ function LoginForm() {
   const [error, setError] = useState<string | null>(null);
   const [isInactive, setIsInactive] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [socialLoading, setSocialLoading] = useState<"google" | "apple" | null>(null);
 
   useEffect(() => {
     const token = getStoredToken();
@@ -35,6 +39,62 @@ function LoginForm() {
       }
     }
   }, [redirectUrl, router]);
+
+  const handleGoogleLogin = async () => {
+    setError(null);
+    setSocialLoading("google");
+    try {
+      const result = await signInWithPopup(auth, googleProvider);
+      const idToken = await result.user.getIdToken();
+      const response = await authService.firebaseLogin(idToken, "user");
+
+      if (response.status === false) {
+        setError(response.log || "Google login failed.");
+      } else if (response.access || response.token || response.status === true) {
+        if (redirectUrl && redirectUrl.startsWith("/")) {
+          router.push(redirectUrl);
+        } else {
+          const targetRoute = response.user?.role === "admin" ? "/admin" : "/dashboard";
+          router.push(targetRoute);
+        }
+      } else {
+        setError(response.log || "Authentication failed. Please try again.");
+      }
+    } catch (err: unknown) {
+      const msg = parseApiErrorMessage((err as { data?: unknown })?.data || err);
+      setError(msg || "Failed to sign in with Google.");
+    } finally {
+      setSocialLoading(null);
+    }
+  };
+
+  const handleAppleLogin = async () => {
+    setError(null);
+    setSocialLoading("apple");
+    try {
+      const result = await signInWithPopup(auth, appleProvider);
+      const idToken = await result.user.getIdToken();
+      const response = await authService.firebaseLogin(idToken, "user");
+
+      if (response.status === false) {
+        setError(response.log || "Apple login failed.");
+      } else if (response.access || response.token || response.status === true) {
+        if (redirectUrl && redirectUrl.startsWith("/")) {
+          router.push(redirectUrl);
+        } else {
+          const targetRoute = response.user?.role === "admin" ? "/admin" : "/dashboard";
+          router.push(targetRoute);
+        }
+      } else {
+        setError(response.log || "Authentication failed. Please try again.");
+      }
+    } catch (err: unknown) {
+      const msg = parseApiErrorMessage((err as { data?: unknown })?.data || err);
+      setError(msg || "Failed to sign in with Apple.");
+    } finally {
+      setSocialLoading(null);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -185,6 +245,14 @@ function LoginForm() {
                     <IoEyeOutline className="w-4 h-4" />
                   </button>
                 </div>
+                <div className="flex justify-end mt-0.5">
+                  <Link
+                    href={`/forgot-password${email.trim() ? `?email=${encodeURIComponent(email.trim())}` : ""}`}
+                    className="text-xs text-[#8b7355] hover:text-[#6f5c43] hover:underline transition-colors"
+                  >
+                    Forgot Password?
+                  </Link>
+                </div>
               </div>
 
               {/* Error message alert */}
@@ -205,8 +273,8 @@ function LoginForm() {
               {/* Submit */}
               <button
                 type="submit"
-                disabled={loading}
-                className="w-full flex items-center justify-center gap-2 py-3.5 mt-1 bg-[#CFB9A3] hover:bg-[#bfa77f] disabled:opacity-70 text-white text-xs font-bold uppercase tracking-widest rounded-sm transition-colors"
+                disabled={loading || !!socialLoading}
+                className="w-full flex items-center justify-center gap-2 py-3.5 mt-1 bg-[#CFB9A3] hover:bg-[#bfa77f] disabled:opacity-70 text-white text-xs font-bold uppercase tracking-widest rounded-sm transition-colors cursor-pointer"
                 style={{ boxShadow: "0 0 20px 0 rgba(202,117,33,0.30)" }}
               >
                 {loading ? "Logging in…" : "Log In"}
@@ -222,6 +290,40 @@ function LoginForm() {
                   </svg>
                 )}
               </button>
+
+              {/* Divider */}
+              <div className="relative my-2 flex items-center justify-center">
+                <div className="border-t border-[#E2E8F0] w-full" />
+                <span className="bg-white px-3 text-[11px] text-[#94A3B8] uppercase tracking-wider">
+                  or continue with
+                </span>
+                <div className="border-t border-[#E2E8F0] w-full" />
+              </div>
+
+              {/* Social Login Buttons */}
+              <div className="flex flex-col gap-3">
+                <button
+                  type="button"
+                  onClick={handleGoogleLogin}
+                  disabled={loading || !!socialLoading}
+                  className="w-full flex items-center justify-center gap-2.5 py-2.5 px-4 border border-[#E2E8F0] hover:border-[#8b7355] hover:bg-[#FAF8F5] rounded-sm text-xs font-medium text-[#1d1a17] transition-all disabled:opacity-60 cursor-pointer shadow-xs"
+                >
+                  <FaGoogle className="w-4 h-4 text-[#EA4335]" />
+                  <span>{socialLoading === "google" ? "Connecting to Google…" : "Continue with Google"}</span>
+                </button>
+
+                {/* Apple Sign-In (Kept for future use when Apple Developer credentials are ready)
+                <button
+                  type="button"
+                  onClick={handleAppleLogin}
+                  disabled={loading || !!socialLoading}
+                  className="w-full flex items-center justify-center gap-2 py-2.5 px-3 border border-[#E2E8F0] hover:border-[#8b7355] hover:bg-[#FAF8F5] rounded-sm text-xs font-medium text-[#1d1a17] transition-all disabled:opacity-60 cursor-pointer"
+                >
+                  <FaApple className="w-4 h-4 text-[#000000]" />
+                  <span>{socialLoading === "apple" ? "Connecting…" : "Continue with Apple"}</span>
+                </button>
+                */}
+              </div>
 
               {/* Sign up link */}
               <p className="text-center text-xs text-[#64748B] pt-3 border-t border-[#f1f5f9]">
