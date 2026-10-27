@@ -258,7 +258,7 @@ export default function SaltRoomPage() {
                 </span>
                 {slot.isFinal && (
                   <span className="text-[10px] text-[#8B7355] font-mono block mt-1">
-                    {t.saltRoomPage?.timetable?.finalSession || "Final Session"}
+                    {t.saltRoomPage?.timetable?.finalSession || ""}
                   </span>
                 )}
               </div>

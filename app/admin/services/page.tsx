@@ -39,7 +39,7 @@ export interface ServiceData {
 const DEFAULT_SERVICES: ServiceData[] = [
   {
     id: 1,
-    title: "Private Sauna",
+    title: "VIP Sauna",
     subtitle: "Exclusive private sauna experience with essential oils",
     description: "Exclusive private sauna experience with essential oils and premium amenities",
     type: "sauna",
@@ -48,9 +48,9 @@ const DEFAULT_SERVICES: ServiceData[] = [
     price: "€75",
     capacity: "1 guests",
     status: "Active",
-    title_en: "Private Sauna",
-    title_nl: "Privé Sauna",
-    title_de: "Private Sauna",
+    title_en: "VIP Sauna",
+    title_nl: "VIP Sauna",
+    title_de: "VIP Sauna",
     subtitle_en: "Exclusive private sauna experience with essential oils",
     subtitle_nl: "Exclusieve privésauna met etherische oliën",
     subtitle_de: "Exklusives privates Saunaerlebnis mit ätherischen Ölen",
@@ -60,7 +60,7 @@ const DEFAULT_SERVICES: ServiceData[] = [
   },
   {
     id: 2,
-    title: "Shared Sauna",
+    title: "Sauna",
     subtitle: "Traditional Finnish sauna in a peaceful environment",
     description: "Traditional Finnish sauna experience in a shared, peaceful environment",
     type: "sauna",
@@ -69,9 +69,9 @@ const DEFAULT_SERVICES: ServiceData[] = [
     price: "€15",
     capacity: "1 guests",
     status: "Active",
-    title_en: "Shared Sauna",
-    title_nl: "Gedeelde Sauna",
-    title_de: "Gemeinschaftssauna",
+    title_en: "Sauna",
+    title_nl: "Sauna",
+    title_de: "Sauna",
     subtitle_en: "Traditional Finnish sauna in a peaceful environment",
     subtitle_nl: "Traditionele Finse sauna in een rustige omgeving",
     subtitle_de: "Traditionelle finnische Sauna in friedlicher Umgebung",
@@ -854,7 +854,7 @@ export default function ServicesPage() {
                       value={modalForm.title_en}
                       onChange={(e) => setModalForm((m) => ({ ...m, title_en: e.target.value }))}
                       className="w-full px-3.5 py-2 rounded-xl text-xs text-[#1d1a17] border border-[#E2E8F0] focus:outline-none focus:ring-2 focus:ring-[#8B7355]/20 focus:border-[#8B7355] bg-white transition-all"
-                      placeholder="e.g. Private Sauna"
+                      placeholder="e.g. VIP Sauna"
                     />
                   </div>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
@@ -867,7 +867,7 @@ export default function ServicesPage() {
                         value={modalForm.title_nl}
                         onChange={(e) => setModalForm((m) => ({ ...m, title_nl: e.target.value }))}
                         className="w-full px-3.5 py-2 rounded-xl text-xs text-[#1d1a17] border border-[#E2E8F0] focus:outline-none focus:ring-2 focus:ring-[#8B7355]/20 focus:border-[#8B7355] bg-white transition-all"
-                        placeholder="e.g. Privé Sauna"
+                        placeholder="e.g. VIP Sauna"
                       />
                     </div>
                     <div>
@@ -879,7 +879,7 @@ export default function ServicesPage() {
                         value={modalForm.title_de}
                         onChange={(e) => setModalForm((m) => ({ ...m, title_de: e.target.value }))}
                         className="w-full px-3.5 py-2 rounded-xl text-xs text-[#1d1a17] border border-[#E2E8F0] focus:outline-none focus:ring-2 focus:ring-[#8B7355]/20 focus:border-[#8B7355] bg-white transition-all"
-                        placeholder="e.g. Private Sauna"
+                        placeholder="e.g. VIP Sauna"
                       />
                     </div>
                   </div>

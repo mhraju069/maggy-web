@@ -114,7 +114,7 @@ export default function AdminEditServicePage({ params }: PageProps) {
   const [settingsSuccessMsg, setSettingsSuccessMsg] = useState<string | null>(null);
   const [settingsErrorMsg, setSettingsErrorMsg] = useState<string | null>(null);
 
-  // Dedicated states for Private Sauna and Shared Sauna
+  // Dedicated states for VIP Sauna and Sauna
   const [isSavingPrivateSauna, setIsSavingPrivateSauna] = useState(false);
   const [privateSaunaSuccessMsg, setPrivateSaunaSuccessMsg] = useState<string | null>(null);
   const [privateSaunaErrorMsg, setPrivateSaunaErrorMsg] = useState<string | null>(null);
@@ -124,7 +124,7 @@ export default function AdminEditServicePage({ params }: PageProps) {
   const [sharedSaunaErrorMsg, setSharedSaunaErrorMsg] = useState<string | null>(null);
 
   // ═════════════════════════════════════════════════════════════════════
-  // SERVICE FEATURES STATE: Private Sauna, Shared Sauna & Salt Room
+  // SERVICE FEATURES STATE: VIP Sauna, Sauna & Salt Room
   // ═════════════════════════════════════════════════════════════════════
   const [privateSaunaFeatures, setPrivateSaunaFeatures] = useState<any[]>([]);
   const [sharedSaunaFeatures, setSharedSaunaFeatures] = useState<any[]>([]);
@@ -577,7 +577,7 @@ export default function AdminEditServicePage({ params }: PageProps) {
   // SECTION 3 HANDLERS: Sauna & Saltroom Inline Save (Separated APIs)
   // ═════════════════════════════════════════════════════════════════════
 
-  // Dedicated Handler: Private Sauna Configuration
+  // Dedicated Handler: VIP Sauna Configuration
   const handleSavePrivateSauna = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSavingPrivateSauna(true);
@@ -596,17 +596,17 @@ export default function AdminEditServicePage({ params }: PageProps) {
       };
 
       await servicesService.updatePrivateSauna(payload);
-      setPrivateSaunaSuccessMsg("Private Sauna configuration saved successfully!");
+      setPrivateSaunaSuccessMsg("VIP Sauna configuration saved successfully!");
       setTimeout(() => setPrivateSaunaSuccessMsg(null), 3500);
       await reloadData();
     } catch (err: any) {
-      setPrivateSaunaErrorMsg(err?.message || "Failed to update Private Sauna settings.");
+      setPrivateSaunaErrorMsg(err?.message || "Failed to update VIP Sauna settings.");
     } finally {
       setIsSavingPrivateSauna(false);
     }
   };
 
-  // Dedicated Handler: Shared Sauna Configuration
+  // Dedicated Handler: Sauna Configuration
   const handleSaveSharedSauna = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSavingSharedSauna(true);
@@ -624,11 +624,11 @@ export default function AdminEditServicePage({ params }: PageProps) {
       };
 
       await servicesService.updateSharedSauna(payload);
-      setSharedSaunaSuccessMsg("Shared Sauna configuration saved successfully!");
+      setSharedSaunaSuccessMsg("Sauna configuration saved successfully!");
       setTimeout(() => setSharedSaunaSuccessMsg(null), 3500);
       await reloadData();
     } catch (err: any) {
-      setSharedSaunaErrorMsg(err?.message || "Failed to update Shared Sauna settings.");
+      setSharedSaunaErrorMsg(err?.message || "Failed to update Sauna settings.");
     } finally {
       setIsSavingSharedSauna(false);
     }
@@ -1514,7 +1514,7 @@ export default function AdminEditServicePage({ params }: PageProps) {
                   </div>
                   <div>
                     <div className="flex items-center gap-2">
-                      <h3 className="text-sm font-bold text-[#1d1a17]">Private Sauna Configuration</h3>
+                      <h3 className="text-sm font-bold text-[#1d1a17]">VIP Sauna Configuration</h3>
                     </div>
                     <p className="text-[11px] text-[#64748B] mt-0.5">
                       Configure base pricing (3h / 4h), included guest count, add-on rates, and private amenities.
@@ -1538,7 +1538,7 @@ export default function AdminEditServicePage({ params }: PageProps) {
                 </label>
               </div>
 
-              {/* Success / Error Messages for Private Sauna */}
+              {/* Success / Error Messages for VIP Sauna */}
               {privateSaunaSuccessMsg && (
                 <div className="p-3.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-medium flex items-center gap-2 animate-in fade-in">
                   <HiOutlineCheck className="w-4 h-4 text-emerald-600 shrink-0" />
@@ -1552,7 +1552,7 @@ export default function AdminEditServicePage({ params }: PageProps) {
                 </div>
               )}
 
-              {/* Private Sauna Inputs */}
+              {/* VIP Sauna Inputs */}
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
                 <div>
                   <label className="block text-[11px] font-semibold text-[#64748B] mb-1">
@@ -1612,13 +1612,13 @@ export default function AdminEditServicePage({ params }: PageProps) {
                 </div>
               </div>
 
-              {/* Private Sauna Features & Amenities */}
+              {/* VIP Sauna Features & Amenities */}
               <div className="pt-4 border-t border-[#F1EDE8]">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
                   <div>
                     <h4 className="text-xs font-bold text-[#1d1a17] flex items-center gap-1.5">
                       <HiOutlineSparkles className="w-4 h-4 text-[#8B7355]" />
-                      Private Sauna Features & Inclusions ({privateSaunaFeatures.length})
+                      VIP Sauna Features & Inclusions ({privateSaunaFeatures.length})
                     </h4>
                     <p className="text-[11px] text-[#64748B] mt-0.5">
                       Multilingual amenities (EN, NL, DE) and optional add-on prices
@@ -1626,7 +1626,7 @@ export default function AdminEditServicePage({ params }: PageProps) {
                   </div>
                   <button
                     type="button"
-                    onClick={() => handleOpenAddFeature("sauna", "private", "Private Sauna")}
+                    onClick={() => handleOpenAddFeature("sauna", "private", "VIP Sauna")}
                     className="px-3 py-1.5 rounded-lg bg-[#8B7355] hover:bg-[#705b41] text-white text-[11px] font-bold flex items-center gap-1.5 transition-all shadow-xs self-start sm:self-auto cursor-pointer"
                   >
                     <HiOutlinePlus className="w-3.5 h-3.5" />
@@ -1636,10 +1636,10 @@ export default function AdminEditServicePage({ params }: PageProps) {
 
                 {privateSaunaFeatures.length === 0 ? (
                   <div className="p-4 rounded-xl bg-[#FAF8F5]/50 border border-dashed border-[#E2E8F0] text-center">
-                    <p className="text-xs text-[#94A3B8]">No features added yet to Private Sauna.</p>
+                    <p className="text-xs text-[#94A3B8]">No features added yet to VIP Sauna.</p>
                     <button
                       type="button"
-                      onClick={() => handleOpenAddFeature("sauna", "private", "Private Sauna")}
+                      onClick={() => handleOpenAddFeature("sauna", "private", "VIP Sauna")}
                       className="mt-1.5 text-xs font-semibold text-[#8B7355] hover:underline cursor-pointer"
                     >
                       + Add first feature
@@ -1683,7 +1683,7 @@ export default function AdminEditServicePage({ params }: PageProps) {
                         <div className="flex items-center justify-end gap-1.5 pt-2 mt-2 border-t border-[#F8F6F3]">
                           <button
                             type="button"
-                            onClick={() => handleOpenEditFeature(feat, "sauna", "private", "Private Sauna")}
+                            onClick={() => handleOpenEditFeature(feat, "sauna", "private", "VIP Sauna")}
                             className="p-1.5 rounded-lg hover:bg-[#F3EFEA] text-[#8B7355] transition-colors cursor-pointer flex items-center gap-1 text-[11px] font-medium"
                             title="Edit feature"
                           >
@@ -1712,7 +1712,7 @@ export default function AdminEditServicePage({ params }: PageProps) {
                 )}
               </div>
 
-              {/* Private Sauna Dedicated Submit */}
+              {/* VIP Sauna Dedicated Submit */}
               <div className="flex justify-end pt-4 border-t border-[#F1EDE8]">
                 <button
                   type="submit"
@@ -1722,12 +1722,12 @@ export default function AdminEditServicePage({ params }: PageProps) {
                   {isSavingPrivateSauna ? (
                     <>
                       <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                      <span>Saving Private Sauna...</span>
+                      <span>Saving VIP Sauna...</span>
                     </>
                   ) : (
                     <>
                       <HiOutlineCheck className="w-4 h-4" />
-                      <span>Save Private Sauna</span>
+                      <span>Save VIP Sauna</span>
                     </>
                   )}
                 </button>
@@ -1747,7 +1747,7 @@ export default function AdminEditServicePage({ params }: PageProps) {
                   </div>
                   <div>
                     <div className="flex items-center gap-2">
-                      <h3 className="text-sm font-bold text-[#1d1a17]">Shared Sauna Configuration</h3>
+                      <h3 className="text-sm font-bold text-[#1d1a17]">Sauna Configuration</h3>
                     </div>
                     <p className="text-[11px] text-[#64748B] mt-0.5">
                       Configure public slots per-person rate, maximum slot capacity, and shared amenities.
@@ -1771,7 +1771,7 @@ export default function AdminEditServicePage({ params }: PageProps) {
                 </label>
               </div>
 
-              {/* Success / Error Messages for Shared Sauna */}
+              {/* Success / Error Messages for Sauna */}
               {sharedSaunaSuccessMsg && (
                 <div className="p-3.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-medium flex items-center gap-2 animate-in fade-in">
                   <HiOutlineCheck className="w-4 h-4 text-emerald-600 shrink-0" />
@@ -1785,7 +1785,7 @@ export default function AdminEditServicePage({ params }: PageProps) {
                 </div>
               )}
 
-              {/* Shared Sauna Inputs */}
+              {/* Sauna Inputs */}
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                 <div>
                   <label className="block text-[11px] font-semibold text-[#64748B] mb-1">
@@ -1820,13 +1820,13 @@ export default function AdminEditServicePage({ params }: PageProps) {
                 </div>
               </div>
 
-              {/* Shared Sauna Features & Amenities */}
+              {/* Sauna Features & Amenities */}
               <div className="pt-4 border-t border-[#F1EDE8]">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
                   <div>
                     <h4 className="text-xs font-bold text-[#1d1a17] flex items-center gap-1.5">
                       <HiOutlineSparkles className="w-4 h-4 text-[#8B7355]" />
-                      Shared Sauna Features & Inclusions ({sharedSaunaFeatures.length})
+                      Sauna Features & Inclusions ({sharedSaunaFeatures.length})
                     </h4>
                     <p className="text-[11px] text-[#64748B] mt-0.5">
                       Multilingual amenities (EN, NL, DE) and optional add-on prices
@@ -1834,7 +1834,7 @@ export default function AdminEditServicePage({ params }: PageProps) {
                   </div>
                   <button
                     type="button"
-                    onClick={() => handleOpenAddFeature("sauna", "shared", "Shared Sauna")}
+                    onClick={() => handleOpenAddFeature("sauna", "shared", "Sauna")}
                     className="px-3 py-1.5 rounded-lg bg-[#8B7355] hover:bg-[#705b41] text-white text-[11px] font-bold flex items-center gap-1.5 transition-all shadow-xs self-start sm:self-auto cursor-pointer"
                   >
                     <HiOutlinePlus className="w-3.5 h-3.5" />
@@ -1844,10 +1844,10 @@ export default function AdminEditServicePage({ params }: PageProps) {
 
                 {sharedSaunaFeatures.length === 0 ? (
                   <div className="p-4 rounded-xl bg-[#FAF8F5]/50 border border-dashed border-[#E2E8F0] text-center">
-                    <p className="text-xs text-[#94A3B8]">No features added yet to Shared Sauna.</p>
+                    <p className="text-xs text-[#94A3B8]">No features added yet to Sauna.</p>
                     <button
                       type="button"
-                      onClick={() => handleOpenAddFeature("sauna", "shared", "Shared Sauna")}
+                      onClick={() => handleOpenAddFeature("sauna", "shared", "Sauna")}
                       className="mt-1.5 text-xs font-semibold text-[#8B7355] hover:underline cursor-pointer"
                     >
                       + Add first feature
@@ -1891,7 +1891,7 @@ export default function AdminEditServicePage({ params }: PageProps) {
                         <div className="flex items-center justify-end gap-1.5 pt-2 mt-2 border-t border-[#F8F6F3]">
                           <button
                             type="button"
-                            onClick={() => handleOpenEditFeature(feat, "sauna", "shared", "Shared Sauna")}
+                            onClick={() => handleOpenEditFeature(feat, "sauna", "shared", "Sauna")}
                             className="p-1.5 rounded-lg hover:bg-[#F3EFEA] text-[#8B7355] transition-colors cursor-pointer flex items-center gap-1 text-[11px] font-medium"
                             title="Edit feature"
                           >
@@ -1920,7 +1920,7 @@ export default function AdminEditServicePage({ params }: PageProps) {
                 )}
               </div>
 
-              {/* Shared Sauna Dedicated Submit */}
+              {/* Sauna Dedicated Submit */}
               <div className="flex justify-end pt-4 border-t border-[#F1EDE8]">
                 <button
                   type="submit"
@@ -1930,12 +1930,12 @@ export default function AdminEditServicePage({ params }: PageProps) {
                   {isSavingSharedSauna ? (
                     <>
                       <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                      <span>Saving Shared Sauna...</span>
+                      <span>Saving Sauna...</span>
                     </>
                   ) : (
                     <>
                       <HiOutlineCheck className="w-4 h-4" />
-                      <span>Save Shared Sauna</span>
+                      <span>Save Sauna</span>
                     </>
                   )}
                 </button>

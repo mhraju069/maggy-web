@@ -47,7 +47,7 @@ function formatDisplayTime(timeStr: string) {
 
 export function cleanServiceName(name?: string): string {
   if (!name) return "Wellness Experience";
-  // Fix duplicated words like "Private Sauna Sauna" -> "Private Sauna"
+  // Fix duplicated words like "VIP Sauna Sauna" -> "VIP Sauna"
   let cleaned = name.replace(/\b([A-Za-z]+)\s+\1\b/gi, "$1");
   // Clean repeated "Sauna Sauna" or "Sauna sauna"
   cleaned = cleaned.replace(/sauna\s+sauna/gi, "Sauna");

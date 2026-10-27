@@ -12,13 +12,13 @@ const stats = [
 const schedule = [
   { time: "3:00 PM", dur: "38 min", title: "Lunchroom Reservation", guest: "Sophie Anderson • 3 guests", status: "On-site", statusColor: "text-yellow-600 bg-yellow-50" },
   { time: "3:00 PM", dur: "58 min", title: "Yoga Class", guest: "Michael Lee • 8 guests", status: "Paid", statusColor: "text-green-600 bg-green-50" },
-  { time: "3:00 PM", dur: "15 min", title: "Shared Sauna", guest: "Emily Chen • 6 guests", status: "Paid", statusColor: "text-green-600 bg-green-50" },
+  { time: "3:00 PM", dur: "15 min", title: "Sauna", guest: "Emily Chen • 6 guests", status: "Paid", statusColor: "text-green-600 bg-green-50" },
   { time: "3:00 PM", dur: "38 min", title: "Wellness Arrangement", guest: "Ben Davis • 2 guests", status: "Paid", statusColor: "text-green-600 bg-green-50" },
-  { time: "3:00 PM", dur: "15 min", title: "Private Sauna", guest: "Jordan Smith • 2 guests", status: "On-site", statusColor: "text-yellow-600 bg-yellow-50" },
-  { time: "3:00 PM", dur: "15 min", title: "Private Sauna", guest: "Oliver James • 1 guests", status: "Paid", statusColor: "text-green-600 bg-green-50" },
+  { time: "3:00 PM", dur: "15 min", title: "VIP Sauna", guest: "Jordan Smith • 2 guests", status: "On-site", statusColor: "text-yellow-600 bg-yellow-50" },
+  { time: "3:00 PM", dur: "15 min", title: "VIP Sauna", guest: "Oliver James • 1 guests", status: "Paid", statusColor: "text-green-600 bg-green-50" },
 ];
 
-const services = ["Private Sauna", "Shared Sauna", "Lunchroom Reservation", "Yoga Class"];
+const services = ["VIP Sauna", "Sauna", "Lunchroom Reservation", "Yoga Class"];
 */
 
 export default function AdminDashboard() {

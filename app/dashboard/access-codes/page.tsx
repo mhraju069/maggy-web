@@ -46,7 +46,7 @@ function AccessCodeCard({ item }: { item: DashboardAccessCodeItem }) {
     }
   };
 
-  const title = item.sauna_type === "private" ? "Private Sauna" : "Shared Sauna";
+  const title = item.sauna_type === "private" ? "VIP Sauna" : "Sauna";
 
   return (
     <div className="bg-white rounded-xl p-6 border border-[#F1EDE8] max-w-2xl mb-6">

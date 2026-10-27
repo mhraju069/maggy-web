@@ -33,8 +33,8 @@ import {
 
 const SAUNA_TYPE_OPTIONS = [
   { value: "all", label: "All Sauna Types" },
-  { value: "private", label: "Private Sauna" },
-  { value: "shared", label: "Shared Sauna" },
+  { value: "private", label: "VIP Sauna" },
+  { value: "shared", label: "Sauna" },
 ];
 
 const STATUS_OPTIONS = [
@@ -318,13 +318,13 @@ export default function AdminAccessCodesPage() {
           </div>
         </div>
 
-        {/* Card 2: Private Sauna Codes */}
+        {/* Card 2: VIP Sauna Codes */}
         <div className="bg-white border border-[#E8E2DC] hover:border-[#8B7355]/40 rounded-2xl p-5 shadow-2xs flex flex-col justify-between transition-all">
           <div className="space-y-1">
             <div className="flex items-center justify-between">
               <span className="text-[11px] font-bold text-[#8B7355] uppercase tracking-wider flex items-center gap-1.5">
                 <MdSpa className="w-4 h-4 text-[#8B7355]" />
-                Private Sauna
+                VIP Sauna
               </span>
               <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-[#FAF8F5] text-[#8B7355] border border-[#E8E2DC]">
                 Exclusive
@@ -340,13 +340,13 @@ export default function AdminAccessCodesPage() {
           </div>
         </div>
 
-        {/* Card 3: Shared Sauna Codes */}
+        {/* Card 3: Sauna Codes */}
         <div className="bg-white border border-[#E8E2DC] hover:border-cyan-400/40 rounded-2xl p-5 shadow-2xs flex flex-col justify-between transition-all">
           <div className="space-y-1">
             <div className="flex items-center justify-between">
               <span className="text-[11px] font-bold text-cyan-700 uppercase tracking-wider flex items-center gap-1.5">
                 <MdSpa className="w-4 h-4 text-cyan-600" />
-                Shared Sauna
+                Sauna
               </span>
               <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-cyan-50 text-cyan-700 border border-cyan-200">
                 Community

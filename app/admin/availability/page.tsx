@@ -28,13 +28,13 @@ const SERVICES_CONFIG = [
   },
   {
     id: "private_sauna",
-    label: "Private Sauna",
+    label: "VIP Sauna",
     icon: FaSpa,
     description: "Exclusive reservation slots (3-hour & 4-hour blocks with 30m cleaning buffer)",
   },
   {
     id: "shared_sauna",
-    label: "Shared Sauna",
+    label: "Sauna",
     icon: FaHotTub,
     description: "Public / Shared sessions (90-minute blocks with capacity tracking)",
   },
@@ -147,7 +147,7 @@ export default function AvailabilityPage() {
     }
   }, [selectedDate]);
 
-  // Derived Private Sauna slots
+  // Derived VIP Sauna slots
   const privateSlots = useMemo(() => {
     const pData = saunaSlotsRes?.data?.private_sauna;
     const slots3 = pData?.slots?.["3_hours"] || [];
@@ -185,7 +185,7 @@ export default function AvailabilityPage() {
     };
   }, [saunaSlotsRes]);
 
-  // Derived Shared Sauna slots
+  // Derived Sauna slots
   const sharedSlots = useMemo(() => {
     const sData = saunaSlotsRes?.data?.shared_sauna;
     const list: SharedSaunaSlot[] = sData?.slots || [];
@@ -369,10 +369,10 @@ export default function AvailabilityPage() {
 
       {/* ── Summary KPI Cards ── */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {/* Private Sauna KPI */}
+        {/* VIP Sauna KPI */}
         <div className="bg-white rounded-2xl p-4 border border-[#E8E2DC] shadow-xs relative overflow-hidden">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-xs font-bold uppercase tracking-wider text-gray-500">Private Sauna</span>
+            <span className="text-xs font-bold uppercase tracking-wider text-gray-500">VIP Sauna</span>
             <div className="w-8 h-8 rounded-xl bg-[#FCF2E9] text-[#8B7355] flex items-center justify-center">
               <FaSpa size={15} />
             </div>
@@ -397,10 +397,10 @@ export default function AvailabilityPage() {
           </p>
         </div>
 
-        {/* Shared Sauna KPI */}
+        {/* Sauna KPI */}
         <div className="bg-white rounded-2xl p-4 border border-[#E8E2DC] shadow-xs relative overflow-hidden">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-xs font-bold uppercase tracking-wider text-gray-500">Shared Sauna</span>
+            <span className="text-xs font-bold uppercase tracking-wider text-gray-500">Sauna</span>
             <div className="w-8 h-8 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center">
               <FaHotTub size={15} />
             </div>
@@ -553,7 +553,7 @@ export default function AvailabilityPage() {
                   </div>
                   <div>
                     <h3 className="font-displayPlayFair text-lg font-bold text-[#1d1a17]">
-                      Private Sauna Slots
+                      VIP Sauna Slots
                     </h3>
                     <p className="text-xs text-gray-500">
                       Exclusive group booking blocks (Max 6 guests per group • Includes 30m automatic cleaning buffer)
@@ -671,7 +671,7 @@ export default function AvailabilityPage() {
                   </div>
                   <div>
                     <h3 className="font-displayPlayFair text-lg font-bold text-[#1d1a17]">
-                      Shared Sauna Slots &amp; Occupancy
+                      Sauna Slots &amp; Occupancy
                     </h3>
                     <p className="text-xs text-gray-500">
                       90-minute public wellness sessions with individual seat availability (Max {sharedSlots.list[0]?.max_capacity || 7} persons per slot)

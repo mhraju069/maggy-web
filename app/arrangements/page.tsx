@@ -41,13 +41,13 @@ export default function ArrangementsPage() {
     {
       id: 1,
       title: "Sauna & Lunchroom Experience",
-      combo: "Private Sauna (3 Hours) • 2-Course Culinary Lunch",
+      combo: "VIP Sauna (3 Hours) • 2-Course Culinary Lunch",
       description:
         "Combine absolute relaxation in our luxury private sauna sanctuary with a fresh, organic 2-course lunch in our serene lunchroom.",
       image: "/images/arrangements/cardimages/img1.png",
       rating: 4.9,
       includes: [
-        "3 hours exclusive Private Sauna access (jacuzzi, steam room & cold plunge)",
+        "3 hours exclusive VIP Sauna access (jacuzzi, steam room & cold plunge)",
         "2-course seasonal lunch per person in De Lunchroom",
         "Complimentary bathrobes, towels & organic herbal teas",
         "10% combined bundle savings",
@@ -79,13 +79,13 @@ export default function ArrangementsPage() {
     {
       id: 3,
       title: "The Ultimate Renewal Day",
-      combo: "Private Sauna • Salt Room • Lunchroom Dining • Wellness Refresh",
+      combo: "VIP Sauna • Salt Room • Lunchroom Dining • Wellness Refresh",
       description:
         "Our most comprehensive full-day package. Transition seamlessly between deep heat therapy, restorative halotherapy, and mindful dining.",
       image: "/images/arrangements/cardimages/img3.png",
       rating: 4.95,
       includes: [
-        "3 hours Private Sauna with private jacuzzi and relaxation terrace",
+        "3 hours VIP Sauna with private jacuzzi and relaxation terrace",
         "1 hour Salt Room aerosol halotherapy",
         "Full organic lunchroom dining credit (€30 per person)",
         "Luxury wellness gift bag to take home",
@@ -106,7 +106,7 @@ export default function ArrangementsPage() {
       includes: [
         "2 hours private use of our Event Space / Atelier",
         "Guided breathwork or gentle movement session",
-        "Shared Sauna & relaxation recovery pass",
+        "Sauna & relaxation recovery pass",
         "Fresh smoothie and healthy snack bar included",
       ],
       paymentType: "partial",

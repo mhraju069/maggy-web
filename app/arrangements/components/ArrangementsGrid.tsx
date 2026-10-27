@@ -62,7 +62,7 @@ const arrangements: Arrangement[] = [
     image: "/images/arrangements/cardimages/img3.png",
     rating: 4.9,
     title: "Group Experience",
-    combo: "Private Sauna + Activities + Catering",
+    combo: "VIP Sauna + Activities + Catering",
     description:
       "Perfect for celebrations, team building, or gatherings with loved ones.",
     includes: [
@@ -112,7 +112,7 @@ const arrangements: Arrangement[] = [
     image: "/images/arrangements/cardimages/img3.png",
     rating: 4.9,
     title: "Group Experience",
-    combo: "Private Sauna + Activities + Catering",
+    combo: "VIP Sauna + Activities + Catering",
     description:
       "Perfect for celebrations, team building, or gatherings with loved ones.",
     includes: [

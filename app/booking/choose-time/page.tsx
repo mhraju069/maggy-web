@@ -688,7 +688,7 @@ export default function ChooseTimePage() {
         </div>
       )}
 
-      {/* ── Private Sauna Banner ── */}
+      {/* ── VIP Sauna Banner ── */}
       {!isPackage && isPrivateSauna && (
         <div className="max-w-4xl mx-auto mb-8 bg-white rounded-2xl p-6 border border-[#E8E2DC] shadow-xs flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
@@ -697,7 +697,7 @@ export default function ChooseTimePage() {
             </div>
             <div>
               <h4 className="font-bold text-[#0F172A] text-sm">
-                Private Sauna ({storedData.durationHours || 3} Hours Session)
+                VIP Sauna ({storedData.durationHours || 3} Hours Session)
               </h4>
               <p className="text-xs text-[#8B7355] font-medium">
                 Exclusive wellness sanctuary reserved for your group.
@@ -787,7 +787,7 @@ export default function ChooseTimePage() {
                             {saunaStepNumber}
                           </span>
                           <h4 className="font-bold text-[#0F172A] text-base font-displayPlayFair">
-                            {pkgSaunaType === "shared" ? (ctTrans?.sharedSaunaTimeSlot || "Shared Sauna Session Time Slot") : (ctTrans?.saunaTimeSlot || "Private Sauna Session Time Slot")}
+                            {pkgSaunaType === "shared" ? (ctTrans?.sharedSaunaTimeSlot || "Sauna Session Time Slot") : (ctTrans?.saunaTimeSlot || "VIP Sauna Session Time Slot")}
                           </h4>
                         </div>
                         {!packageSlots.data.sauna.is_closed &&
@@ -806,7 +806,7 @@ export default function ChooseTimePage() {
                                   pkgSaunaType === "private" ? "bg-[#8B7355] text-white shadow-xs" : "text-[#64748B]"
                                 }`}
                               >
-                                {ctTrans?.privateSaunaBtn || "Private Sauna"}
+                                {ctTrans?.privateSaunaBtn || "VIP Sauna"}
                               </button>
                               <button
                                 type="button"
@@ -819,13 +819,13 @@ export default function ChooseTimePage() {
                                   pkgSaunaType === "shared" ? "bg-[#8B7355] text-white shadow-xs" : "text-[#64748B]"
                                 }`}
                               >
-                                {ctTrans?.sharedSaunaBtn || "Shared Sauna"}
+                                {ctTrans?.sharedSaunaBtn || "Sauna"}
                               </button>
                             </div>
                           )}
                       </div>
 
-                      {/* Private Sauna Slots */}
+                      {/* VIP Sauna Slots */}
                       {pkgSaunaType === "private" && packageSlots.data.sauna.private_sauna?.slots && (
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-3">
                           {(() => {
@@ -874,7 +874,7 @@ export default function ChooseTimePage() {
                         </div>
                       )}
 
-                      {/* Shared Sauna Slots */}
+                      {/* Sauna Slots */}
                       {pkgSaunaType === "shared" && packageSlots.data.sauna.shared_sauna?.slots && (
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-3">
                           {packageSlots.data.sauna.shared_sauna.slots.map((slot: any, idx: number) => {
@@ -1305,7 +1305,7 @@ export default function ChooseTimePage() {
                   })()}
                 </div>
               ) : !loadingApiSlots && !apiSlots?.is_blocked && isSharedSauna ? (
-                /* Shared Sauna Live API Slots or Fallback */
+                /* Sauna Live API Slots or Fallback */
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {(() => {
                     const slotsList = apiSlots?.data?.shared_sauna?.slots;
@@ -1410,7 +1410,7 @@ export default function ChooseTimePage() {
                   })()}
                 </div>
               ) : !loadingApiSlots && !apiSlots?.is_blocked && isPrivateSauna && (apiSlots?.data?.private_sauna?.slots || apiSlots?.data?.private_sauna?.available_slots) ? (
-                /* Private Sauna Live API Slots */
+                /* VIP Sauna Live API Slots */
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                   {(() => {
                     const durationKey = storedData.durationHours === 4 ? "4_hours" : "3_hours";

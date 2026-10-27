@@ -38,8 +38,8 @@ import { FaWater } from "react-icons/fa";
 const SERVICE_TYPE_OPTIONS = [
   { value: "all", label: "All Services" },
   { value: "sauna", label: "Sauna (All)" },
-  { value: "private_sauna", label: "Private Sauna" },
-  { value: "shared_sauna", label: "Shared Sauna" },
+  { value: "private_sauna", label: "VIP Sauna" },
+  { value: "shared_sauna", label: "Sauna" },
   { value: "lunchroom", label: "Lunchroom" },
   { value: "activity", label: "Activity" },
   { value: "saltroom", label: "Salt Room" },

@@ -39,7 +39,7 @@ export default function PackagesBookingPage() {
     guests: 2,
     date: "",
     duration: "Half Day (4 Hours)",
-    treatments: ["Private Sauna", "Lunchroom", "Yoga Activity"] as string[],
+    treatments: ["VIP Sauna", "Lunchroom", "Yoga Activity"] as string[],
     otherExperienceDetails: "",
     specialRequests: "",
     name: "",
@@ -599,10 +599,10 @@ export default function PackagesBookingPage() {
                     </label>
                     <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
                       {[
-                        "Private Sauna",
+                        "VIP Sauna",
                         "Lunchroom",
                         "Yoga Activity",
-                        "Shared Sauna",
+                        "Sauna",
                         "Salt Room",
                         "Activities",
                         "Others",

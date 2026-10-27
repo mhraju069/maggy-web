@@ -155,7 +155,7 @@ export default function SaunaBookingPage() {
   useEffect(() => {
     if (selectedSaunaType === "private") {
       updateStoredBookingData({
-        serviceName: `Private Sauna (${durationHours} Hours)`,
+        serviceName: `VIP Sauna (${durationHours} Hours)`,
         serviceType: "sauna",
         isSharedSauna: false,
         isSaltRoom: false,
@@ -168,7 +168,7 @@ export default function SaunaBookingPage() {
       });
     } else {
       updateStoredBookingData({
-        serviceName: "Shared Sauna Experience",
+        serviceName: "Sauna Experience",
         serviceType: "sauna",
         isSharedSauna: true,
         isSaltRoom: false,
@@ -250,7 +250,7 @@ export default function SaunaBookingPage() {
             }`}
           >
             <FaSpa size={18} />
-            {sTrans?.privateTab || "Private Sauna (Exclusive Group)"}
+            {sTrans?.privateTab || "VIP Sauna (Exclusive Group)"}
           </button>
           <button
             type="button"
@@ -262,12 +262,12 @@ export default function SaunaBookingPage() {
             }`}
           >
             <FaHotTub size={18} />
-            {sTrans?.sharedTab || "Shared Sauna"}
+            {sTrans?.sharedTab || "Sauna"}
           </button>
         </div>
       </div>
 
-      {/* ── Private Sauna Configurator ── */}
+      {/* ── VIP Sauna Configurator ── */}
       {selectedSaunaType === "private" ? (
         <div className="max-w-4xl mx-auto bg-white rounded-[32px] p-8 md:p-10 shadow-sm border border-[#E8E2DC] space-y-10">
           {/* Badge & Banner */}
@@ -281,7 +281,7 @@ export default function SaunaBookingPage() {
                   {sTrans?.exclusiveReservation || "Exclusive Reservation"}
                 </span>
                 <h3 className="text-xl font-bold font-displayPlayFair text-[#0F172A]">
-                  {sTrans?.privateBannerTitle || "Private Sauna Sanctuary"}
+                  {sTrans?.privateBannerTitle || "VIP Sauna Sanctuary"}
                 </h3>
                 <p className="text-xs text-[#64748B] mt-0.5">
                   {sTrans?.privateBannerDesc || "Booked exclusively by your group (2 to 6 people). Includes private sauna, jacuzzi & lounge."}
@@ -497,7 +497,7 @@ export default function SaunaBookingPage() {
 
         </div>
       ) : (
-        /* ── Shared Sauna Configurator ── */
+        /* ── Sauna Configurator ── */
         <div className="max-w-4xl mx-auto bg-white rounded-[32px] p-8 md:p-10 shadow-sm border border-[#E8E2DC] space-y-8">
           {/* Header Banner */}
           <div className="p-6 rounded-2xl bg-[#FCF2E9] border border-[#E8E2DC] flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
@@ -510,7 +510,7 @@ export default function SaunaBookingPage() {
                   {sTrans?.sharedSessionAccess || "Shared Session Access"}
                 </span>
                 <h3 className="text-xl font-bold font-displayPlayFair text-[#0F172A]">
-                  {sTrans?.sharedBannerTitle || "Shared Sauna Experience"}
+                  {sTrans?.sharedBannerTitle || "Sauna Experience"}
                 </h3>
                 <p className="text-xs text-[#64748B] mt-0.5">
                   {sTrans?.sharedDesc

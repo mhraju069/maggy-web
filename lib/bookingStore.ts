@@ -68,9 +68,9 @@ export interface BookingData {
   date: string;
   timeSlot: string;
   guestsCount: number;
-  durationHours?: number; // 3 or 4 hours for Private Sauna, 1.5 for Shared Sauna
-  cleaningTimeMinutes?: number; // 30 mins for Private Sauna
-  changeoverMinutes?: number; // 15 mins for Shared Sauna, 10 mins for Salt Room
+  durationHours?: number; // 3 or 4 hours for VIP Sauna, 1.5 for Sauna
+  cleaningTimeMinutes?: number; // 30 mins for VIP Sauna
+  changeoverMinutes?: number; // 15 mins for Sauna, 10 mins for Salt Room
   isSharedSauna?: boolean;
   isSaltRoom?: boolean;
   passType?: "single" | "10_session_pass" | "once_a_week" | "unlimited";
@@ -98,7 +98,7 @@ export interface BookingData {
 const STORAGE_KEY = "maggy_booking_data";
 
 export const initialBookingData: BookingData = {
-  serviceName: "Private Sauna",
+  serviceName: "VIP Sauna",
   serviceType: "sauna",
   price: "€250",
   date: "",
