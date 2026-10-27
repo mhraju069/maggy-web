@@ -7,6 +7,7 @@ import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { BiCheckCircle, BiInfoCircle, BiTimeFive } from "react-icons/bi";
 import { FaSpa, FaWalking } from "react-icons/fa";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
 
 const defaultTimeSlots = [
   "9:00 AM", "10:00 AM", "11:00 AM",
@@ -74,6 +75,11 @@ export const saltRoomSessions: SessionSlotInfo[] = [
 ];
 
 export default function ChooseTimePage() {
+  const { t } = useLanguage();
+  const flow = (t as any)?.bookingFlow;
+  const ctTrans = flow?.chooseTime;
+  const btnTrans = flow?.buttons;
+
   const [storedData, setStoredData] = useState(getStoredBookingData());
   const serviceTypeLower = (storedData.serviceType || "").toLowerCase().trim();
   const serviceNameLower = (storedData.serviceName || "").toLowerCase().trim();
@@ -576,10 +582,12 @@ export default function ChooseTimePage() {
     <div className="w-full px-6 md:px-12">
       {/* ── Title Section ── */}
       <div className="text-center mb-12 flex flex-col items-center">
-        <h1 className="font-displayPlayFair text-5xl text-[#1d1a17] mb-2 leading-tight">Choose Your Time</h1>
+        <h1 className="font-displayPlayFair text-5xl text-[#1d1a17] mb-2 leading-tight">
+          {ctTrans?.title || "Choose Your Time"}
+        </h1>
         <DecorativeUnderline />
         <p className="font-cambria text-sm text-[#475569] mt-6 italic tracking-wide">
-          Select a date and customize sub-service times for {storedData.serviceName || "your package reservation"}.
+          {ctTrans?.subtitle || `Select a date and customize sub-service times for ${storedData.serviceName || "your package reservation"}.`}
         </p>
       </div>
 
@@ -595,12 +603,12 @@ export default function ChooseTimePage() {
                 {storedData.serviceName}
               </h4>
               <p className="text-xs text-[#8B7355] font-medium mt-0.5">
-                Multi-service slot selection • Please choose times for included package components below
+                {ctTrans?.packageNotice || "Multi-service slot selection • Please choose times for included package components below"}
               </p>
             </div>
           </div>
           <div className="flex items-center gap-2 bg-white/80 px-4 py-2 rounded-xl border border-[#E8E2DC] text-xs font-bold text-[#8B7355]">
-            <span>Package Price: {storedData.price || `€${storedData.totalAmount}`}</span>
+            <span>{ctTrans?.packagePrice ? ctTrans.packagePrice.replace("{price}", storedData.price || `€${storedData.totalAmount}`) : `Package Price: ${storedData.price || `€${storedData.totalAmount}`}`}</span>
           </div>
         </div>
       )}
@@ -615,20 +623,20 @@ export default function ChooseTimePage() {
               <BiTimeFive size={20} />
             </div>
             <div>
-              <h4 className="font-bold text-[#0F172A] text-sm">Lunchroom Opening Hours</h4>
+              <h4 className="font-bold text-[#0F172A] text-sm">{ctTrans?.lunchroomHours || "Lunchroom Opening Hours"}</h4>
               <p className={`text-xs font-medium ${isSingleServiceClosed ? "text-rose-600 font-bold" : "text-[#8B7355]"}`}>
                 {isSingleServiceClosed
-                  ? "Closed on this selected day"
+                  ? (ctTrans?.closedOnDay || "Closed on this selected day")
                   : apiSlots?.open_time && apiSlots?.close_time
-                  ? `Hours for selected date: ${apiSlots.open_time} – ${apiSlots.close_time}`
-                  : "Flexible dining during opening hours"}
+                  ? (ctTrans?.hoursForDate ? ctTrans.hoursForDate.replace("{open}", apiSlots.open_time).replace("{close}", apiSlots.close_time) : `Hours for selected date: ${apiSlots.open_time} – ${apiSlots.close_time}`)
+                  : (ctTrans?.flexibleDining || "Flexible dining during opening hours")}
               </p>
             </div>
           </div>
 
           <div className="flex items-center gap-2 bg-[#FCF2E9]/70 px-4 py-2 rounded-xl text-xs text-[#475569]">
             <FaWalking className="text-[#8B7355]" />
-            <span>Walk-ins welcome anytime during opening hours!</span>
+            <span>{ctTrans?.walkinsWelcome || "Walk-ins welcome anytime during opening hours!"}</span>
           </div>
         </div>
       )}
@@ -706,14 +714,14 @@ export default function ChooseTimePage() {
           <div>
             <div className="flex justify-between items-center mb-4">
               <label className="block text-sm font-bold text-[#0F172A] uppercase tracking-wider" style={{ fontFamily: "Inter, sans-serif" }}>
-                Date
+                {ctTrans?.dateLabel || "Date"}
               </label>
               {isSaltRoom ? (
                 <span className="text-xs text-[#8B7355] font-semibold bg-[#FCF2E9] px-2.5 py-1 rounded-md border border-[#E8E2DC]">
-                  🔒 Date locked from previous step
+                  {ctTrans?.dateLocked || "🔒 Date locked from previous step"}
                 </span>
               ) : isLunchroom ? (
-                <span className="text-xs text-[#8B7355] font-semibold">Available: Wed – Sun</span>
+                <span className="text-xs text-[#8B7355] font-semibold">{ctTrans?.lunchroomAvailableDays || "Available: Wed – Sun"}</span>
               ) : null}
             </div>
             <div className="relative">
@@ -779,7 +787,7 @@ export default function ChooseTimePage() {
                             {saunaStepNumber}
                           </span>
                           <h4 className="font-bold text-[#0F172A] text-base font-displayPlayFair">
-                            {pkgSaunaType === "shared" ? "Shared Sauna Session Time Slot" : "Private Sauna Session Time Slot"}
+                            {pkgSaunaType === "shared" ? (ctTrans?.sharedSaunaTimeSlot || "Shared Sauna Session Time Slot") : (ctTrans?.saunaTimeSlot || "Private Sauna Session Time Slot")}
                           </h4>
                         </div>
                         {!packageSlots.data.sauna.is_closed &&
@@ -798,7 +806,7 @@ export default function ChooseTimePage() {
                                   pkgSaunaType === "private" ? "bg-[#8B7355] text-white shadow-xs" : "text-[#64748B]"
                                 }`}
                               >
-                                Private Sauna
+                                {ctTrans?.privateSaunaBtn || "Private Sauna"}
                               </button>
                               <button
                                 type="button"
@@ -811,7 +819,7 @@ export default function ChooseTimePage() {
                                   pkgSaunaType === "shared" ? "bg-[#8B7355] text-white shadow-xs" : "text-[#64748B]"
                                 }`}
                               >
-                                Shared Sauna
+                                {ctTrans?.sharedSaunaBtn || "Shared Sauna"}
                               </button>
                             </div>
                           )}
@@ -828,7 +836,7 @@ export default function ChooseTimePage() {
                             if (allSlots.length === 0) {
                               return (
                                 <p className="col-span-full text-xs text-amber-800 bg-amber-50 p-3 rounded-xl">
-                                  No private sauna slots available for this date.
+                                  {ctTrans?.noPrivateSlotsDate || "No private sauna slots available for this date."}
                                 </p>
                               );
                             }
@@ -836,6 +844,8 @@ export default function ChooseTimePage() {
                             return allSlots.map((slot: any, idx: number) => {
                               const label = `${slot.start_time} - ${slot.end_time}`;
                               const isSel = pkgSaunaSlot === label;
+                              const sessionHours = slot.time_slot === "4_hours" ? "4" : "3";
+                              const durationTag = ctTrans?.privateSessionTag ? ctTrans.privateSessionTag.replace("{hours}", sessionHours) : `${sessionHours}-hour private session`;
                               return (
                                 <button
                                   key={idx}
@@ -853,7 +863,7 @@ export default function ChooseTimePage() {
                                   <div>
                                     <span className="text-sm font-bold text-[#0F172A] block">{label}</span>
                                     <span className="text-[10px] text-[#64748B]">
-                                      {slot.time_slot === "4_hours" ? "4-hour" : "3-hour"} private session
+                                      {durationTag}
                                     </span>
                                   </div>
                                   {isSel && <BiCheckCircle className="text-[#8B7355]" size={20} />}
@@ -891,14 +901,14 @@ export default function ChooseTimePage() {
                               >
                                 <div>
                                   <span className="text-sm font-bold text-[#0F172A] block">{label}</span>
-                                  <span className="text-[10px] text-[#64748B]">Shared sauna • 90 mins</span>
+                                  <span className="text-[10px] text-[#64748B]">{ctTrans?.sharedSessionTag || "Shared sauna • 90 mins"}</span>
                                 </div>
                                 <div>
                                   {isSoldOut ? (
-                                    <span className="px-2 py-0.5 bg-rose-100 text-rose-700 text-[10px] font-bold rounded-full">Sold Out</span>
+                                    <span className="px-2 py-0.5 bg-rose-100 text-rose-700 text-[10px] font-bold rounded-full">{ctTrans?.soldOut || "Sold Out"}</span>
                                   ) : (
                                     <span className="px-2 py-0.5 bg-emerald-50 text-emerald-700 border border-emerald-300 text-[10px] font-bold rounded-full">
-                                      {slot.remaining_capacity} left
+                                      {ctTrans?.placesRemaining ? ctTrans.placesRemaining.replace("{count}", String(slot.remaining_capacity)) : `${slot.remaining_capacity} left`}
                                     </span>
                                   )}
                                 </div>
@@ -918,20 +928,20 @@ export default function ChooseTimePage() {
                           {lunchStepNumber}
                         </span>
                         <h4 className="font-bold text-[#0F172A] text-base font-displayPlayFair">
-                          Lunchroom Preferred Dining Arrival
+                          {ctTrans?.lunchroomPreferredArrival || "Lunchroom Preferred Dining Arrival"}
                         </h4>
                       </div>
                       {packageSlots?.data?.lunchroom?.is_closed ? (
                         <div className="p-4 bg-amber-50 border border-amber-200 rounded-xl text-xs text-amber-900 font-semibold flex items-center gap-2">
                           <BiInfoCircle size={18} className="text-amber-700 flex-shrink-0" />
-                          <span>{packageSlots?.data?.lunchroom?.info || "Lunchroom is closed on this day. You can continue with your other package options or pick another date."}</span>
+                          <span>{ctTrans?.lunchroomClosedNotice || "Lunchroom is closed on this day. You can continue with your other package options or pick another date."}</span>
                         </div>
                       ) : (
                         <>
                           <p className="text-xs text-[#64748B] mb-4">
-                            {packageSlots?.data?.lunchroom?.info || "Lunchroom accommodates flexible dining during opening hours."}
+                            {packageSlots?.data?.lunchroom?.info || (ctTrans?.flexibleDining || "Lunchroom accommodates flexible dining during opening hours.")}
                             {packageSlots?.data?.lunchroom?.open_time && packageSlots?.data?.lunchroom?.close_time
-                              ? ` (Hours: ${packageSlots.data.lunchroom.open_time} – ${packageSlots.data.lunchroom.close_time})`
+                              ? ` (${ctTrans?.hoursForDate ? ctTrans.hoursForDate.replace("{open}", packageSlots.data.lunchroom.open_time).replace("{close}", packageSlots.data.lunchroom.close_time) : `Hours: ${packageSlots.data.lunchroom.open_time} – ${packageSlots.data.lunchroom.close_time}`})`
                               : " (Hours: 09:00 – 16:00)"}
                           </p>
                           <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-4 gap-3">
@@ -973,19 +983,19 @@ export default function ChooseTimePage() {
                           {saltRoomStepNumber}
                         </span>
                         <h4 className="font-bold text-[#0F172A] text-base font-displayPlayFair">
-                          Salt Room Session Time Slot
+                          {ctTrans?.saltRoomTimeSlot || "Salt Room Session Time Slot"}
                         </h4>
                       </div>
 
                       {packageSlots?.data?.saltroom?.is_closed ? (
                         <div className="p-4 bg-amber-50 border border-amber-200 rounded-xl text-xs text-amber-900 font-semibold flex items-center gap-2">
                           <BiInfoCircle size={18} className="text-amber-700 flex-shrink-0" />
-                          <span>Salt Room is closed on this date. You can choose another date or proceed with your remaining package options.</span>
+                          <span>{ctTrans?.saltRoomClosedNotice || "Salt Room is closed on this date. You can choose another date or proceed with your remaining package options."}</span>
                         </div>
                       ) : loadingSaltSlots ? (
                         <div className="py-6 flex justify-center items-center gap-2 text-xs text-[#8B7355]">
                           <span className="animate-spin rounded-full h-4 w-4 border-2 border-[#8B7355] border-t-transparent" />
-                          Loading salt room slots...
+                          {ctTrans?.checkingLiveSlots ? ctTrans.checkingLiveSlots.replace("{date}", date) : `Loading salt room slots for ${date}...`}
                         </div>
                       ) : saltRoomSlotsList.length > 0 ? (
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-3">
@@ -1000,6 +1010,8 @@ export default function ChooseTimePage() {
                               ? slot.available_capacity
                               : 2;
                             const isSoldOut = slot.is_fully_booked || !slot.is_available || slot.is_booked || remainingCap <= 0;
+                            const sessionMinutes = slot.duration_minutes || 45;
+                            const durationTag = ctTrans?.minuteSessionTag ? ctTrans.minuteSessionTag.replace("{mins}", String(sessionMinutes)) : `${sessionMinutes}-minute salt room session`;
 
                             return (
                               <button
@@ -1021,17 +1033,17 @@ export default function ChooseTimePage() {
                                 <div>
                                   <span className="text-sm font-bold text-[#0F172A] block">{label}</span>
                                   <span className="text-[10px] text-[#64748B]">
-                                    {slot.duration_minutes ? `${slot.duration_minutes}-minute` : "45-minute"} salt room session
+                                    {durationTag}
                                   </span>
                                 </div>
                                 <div className="flex items-center gap-2">
                                   {isSoldOut ? (
                                     <span className="px-2 py-0.5 bg-rose-100 text-rose-700 text-[10px] font-bold rounded-full">
-                                      Sold Out
+                                      {ctTrans?.soldOut || "Sold Out"}
                                     </span>
                                   ) : (
                                     <span className="px-2 py-0.5 bg-emerald-50 text-emerald-700 border border-emerald-300 text-[10px] font-bold rounded-full">
-                                      {remainingCap} left
+                                      {ctTrans?.placesRemaining ? ctTrans.placesRemaining.replace("{count}", String(remainingCap)) : `${remainingCap} left`}
                                     </span>
                                   )}
                                   {isSel && <BiCheckCircle className="text-[#8B7355]" size={20} />}
@@ -1044,8 +1056,8 @@ export default function ChooseTimePage() {
                         <div className="p-4 bg-amber-50/80 border border-amber-200/80 rounded-xl text-xs text-amber-900 flex items-start gap-2.5">
                           <BiInfoCircle className="text-amber-700 flex-shrink-0 mt-0.5" size={18} />
                           <div>
-                            <span className="font-bold block text-sm text-amber-950 mb-0.5">No Salt Room Session Found</span>
-                            <span>No scheduled salt room sessions are available on {date}. Please pick another date or proceed with your remaining package options.</span>
+                            <span className="font-bold block text-sm text-amber-950 mb-0.5">{ctTrans?.noSaltRoomSlotsFound || "No Salt Room Session Found"}</span>
+                            <span>{ctTrans?.noSaltRoomSlotsDate ? ctTrans.noSaltRoomSlotsDate.replace("{date}", date) : `No scheduled salt room sessions are available on ${date}. Please pick another date or proceed with your remaining package options.`}</span>
                           </div>
                         </div>
                       )}
@@ -1060,13 +1072,13 @@ export default function ChooseTimePage() {
                           {activityStepNumber}
                         </span>
                         <h4 className="font-bold text-[#0F172A] text-base font-displayPlayFair">
-                          Activity Session on {date}
+                          {ctTrans?.activitySessionOnDate ? ctTrans.activitySessionOnDate.replace("{date}", date) : `Activity Session on ${date}`}
                         </h4>
                       </div>
                       {isPackageActivitiesClosed ? (
                         <div className="p-4 bg-amber-50 border border-amber-200 rounded-xl text-xs text-amber-900 font-semibold flex items-center gap-2">
                           <BiInfoCircle size={18} className="text-amber-700 flex-shrink-0" />
-                          <span>Activities are closed on this date.</span>
+                          <span>{ctTrans?.serviceClosedOnDate || "Activities are closed on this date."}</span>
                         </div>
                       ) : packageActivitiesList.length > 0 ? (
                         <div className="space-y-3">
@@ -1093,17 +1105,19 @@ export default function ChooseTimePage() {
                                 <div>
                                   <h5 className="font-bold text-[#0F172A] text-base">{act.title}</h5>
                                   <p className="text-xs text-[#64748B] mt-1">
-                                    Time: {act.open_time} – {act.close_time} • Host: {act.host || "Wellness Guide"}
+                                    {ctTrans?.activityTimeAndHost
+                                      ? ctTrans.activityTimeAndHost.replace("{open}", act.open_time).replace("{close}", act.close_time).replace("{host}", act.host || "Wellness Guide")
+                                      : `Time: ${act.open_time} – ${act.close_time} • Host: ${act.host || "Wellness Guide"}`}
                                   </p>
                                 </div>
                                 <div className="flex items-center gap-3">
                                   {isSoldOut ? (
                                     <span className="px-3 py-1 bg-rose-100 text-rose-700 text-xs font-bold rounded-full">
-                                      Sold Out
+                                      {ctTrans?.soldOut || "Sold Out"}
                                     </span>
                                   ) : (
                                     <span className="px-3 py-1 bg-emerald-50 text-emerald-700 border border-emerald-300 text-xs font-bold rounded-full">
-                                      {act.available_slots} spots left
+                                      {ctTrans?.placesRemaining ? ctTrans.placesRemaining.replace("{count}", String(act.available_slots)) : `${act.available_slots} spots left`}
                                     </span>
                                   )}
                                   {isSel && <BiCheckCircle className="text-[#8B7355]" size={22} />}
@@ -1116,8 +1130,8 @@ export default function ChooseTimePage() {
                         <div className="p-4 bg-amber-50/80 border border-amber-200/80 rounded-xl text-xs text-amber-900 flex items-start gap-2.5">
                           <BiInfoCircle className="text-amber-700 flex-shrink-0 mt-0.5" size={18} />
                           <div>
-                            <span className="font-bold block text-sm text-amber-950 mb-0.5">No Activity Session Found</span>
-                            <span>No scheduled activity sessions are available on {date}. Please pick another date or proceed with your remaining package options.</span>
+                            <span className="font-bold block text-sm text-amber-950 mb-0.5">{ctTrans?.noActivitySessionFound || "No Activity Session Found"}</span>
+                            <span>{ctTrans?.noActivitySessionDate ? ctTrans.noActivitySessionDate.replace("{date}", date) : `No scheduled activity sessions are available on ${date}. Please pick another date or proceed with your remaining package options.`}</span>
                           </div>
                         </div>
                       )}
@@ -1467,10 +1481,10 @@ export default function ChooseTimePage() {
           <div>
             <div className="flex justify-between items-center mb-4">
               <label className="block text-sm font-bold text-[#0F172A] uppercase tracking-wider" style={{ fontFamily: "Inter, sans-serif" }}>
-                Number of People / Places {isSaltRoom && "(Max 2 People)"}
+                {ctTrans?.numberOfPeoplePlaces || "Number of People / Places"} {isSaltRoom && "(Max 2)"}
               </label>
               {isSaltRoom && (
-                <span className="text-xs font-semibold text-[#8B7355]">Salt Room limit: Max 2 guests</span>
+                <span className="text-xs font-semibold text-[#8B7355]">{ctTrans?.saltRoomLimitTag || "Salt Room limit: Max 2 guests"}</span>
               )}
             </div>
 
@@ -1487,11 +1501,16 @@ export default function ChooseTimePage() {
                 backgroundSize: "1.2em",
               }}
             >
-              {guestOptions.map((n) => (
-                <option key={n} value={n}>
-                  {n} {n === 1 ? "Person / Place" : "People / Places"} {!isPackage && `(${calculateOptionPrice(n)})`}
-                </option>
-              ))}
+              {guestOptions.map((n) => {
+                const label = n === 1
+                  ? (ctTrans?.personPlaceOption ? ctTrans.personPlaceOption.replace("{count}", "1") : "1 Person / Place")
+                  : (ctTrans?.peoplePlacesOption ? ctTrans.peoplePlacesOption.replace("{count}", String(n)) : `${n} People / Places`);
+                return (
+                  <option key={n} value={n}>
+                    {label} {!isPackage && `(${calculateOptionPrice(n)})`}
+                  </option>
+                );
+              })}
             </select>
           </div>
         </div>
@@ -1508,7 +1527,7 @@ export default function ChooseTimePage() {
             <line x1="19" y1="12" x2="5" y2="12"></line>
             <polyline points="12 19 5 12 12 5"></polyline>
           </svg>
-          Back
+          {btnTrans?.back || "Back"}
         </button>
 
         <Link
@@ -1520,7 +1539,7 @@ export default function ChooseTimePage() {
           }`}
           style={{ fontFamily: "Inter, sans-serif" }}
         >
-          Continue
+          {btnTrans?.continue || "Continue"}
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
             <line x1="5" y1="12" x2="19" y2="12"></line>
             <polyline points="12 5 19 12 12 19"></polyline>

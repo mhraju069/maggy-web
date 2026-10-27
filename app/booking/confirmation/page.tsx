@@ -7,8 +7,14 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { FaCheck, FaLock } from "react-icons/fa";
 import { FaCakeCandles } from "react-icons/fa6";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
 
 export default function ConfirmationPage() {
+  const { t } = useLanguage();
+  const flow = (t as any)?.bookingFlow;
+  const confTrans = flow?.confirmation;
+  const revTrans = flow?.review;
+  const btnTrans = flow?.buttons;
   const [data, setData] = useState<BookingData | null>(null);
   const [bookingRef, setBookingRef] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(true);
@@ -87,12 +93,14 @@ export default function ConfirmationPage() {
         <div className="w-20 h-20 bg-[#8B735B] rounded-full flex items-center justify-center shadow-lg mb-6">
           <FaCheck className="text-white text-3xl" />
         </div>
-        <h1 className="font-displayPlayFair text-5xl text-[#1d1a17] mb-4">Reservation Confirmed!</h1>
+        <h1 className="font-displayPlayFair text-5xl text-[#1d1a17] mb-4">
+          {confTrans?.title || "Reservation Confirmed!"}
+        </h1>
         <DecorativeUnderline />
         <p className="font-cambria text-sm text-[#475569] mt-6 italic tracking-wide">
           {isLunchroom
-            ? "Your table is set. We look forward to welcoming you to the Lunchroom."
-            : "Your reservation is confirmed. We look forward to welcoming you for pure relaxation."}
+            ? (confTrans?.subtitleLunchroom || "Your table is set. We look forward to welcoming you to the Lunchroom.")
+            : (confTrans?.subtitleGeneral || "Your reservation is confirmed. We look forward to welcoming you for pure relaxation.")}
         </p>
       </div>
 
@@ -106,9 +114,9 @@ export default function ConfirmationPage() {
             </div>
             <div>
               <h4 className="text-xs font-bold text-[#0F172A] uppercase tracking-wider" style={{ fontFamily: "Inter, sans-serif" }}>
-                Confirmed & Secured
+                {confTrans?.confirmedAndSecured || "Confirmed & Secured"}
               </h4>
-              <p className="text-[11px] text-[#64748B]">Your reservation has been saved in our system.</p>
+              <p className="text-[11px] text-[#64748B]">{confTrans?.savedInSystem || "Your reservation has been saved in our system."}</p>
             </div>
           </div>
 
@@ -116,14 +124,14 @@ export default function ConfirmationPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div>
               <span className="text-[10px] text-[#94A3B8] uppercase tracking-widest block mb-1" style={{ fontFamily: "Inter, sans-serif" }}>
-                Booking Reference
+                {confTrans?.bookingReference || "Booking Reference"}
               </span>
               <h2 className="text-3xl font-bold text-[#0F172A] font-displayPlayFair">{bookingRef}</h2>
             </div>
 
             <div>
               <span className="text-[10px] text-[#94A3B8] uppercase tracking-widest block mb-1" style={{ fontFamily: "Inter, sans-serif" }}>
-                Guest Name
+                {confTrans?.guestName || "Guest Name"}
               </span>
               <p className="text-xl font-bold text-[#0F172A]">{data.name || "Valued Guest"}</p>
             </div>
@@ -132,14 +140,14 @@ export default function ConfirmationPage() {
           <div className="space-y-4 pt-4 border-t border-[#F1F5F9]">
             <div>
               <span className="text-[10px] text-[#94A3B8] uppercase tracking-widest block mb-1" style={{ fontFamily: "Inter, sans-serif" }}>
-                Experience
+                {confTrans?.experience || "Experience"}
               </span>
               <h3 className="text-2xl font-bold text-[#0F172A] font-displayPlayFair">{data.serviceName || "Wellness Experience"}</h3>
               <p className="text-base font-medium text-[#475569] mt-1">
                 {data.date
                   ? new Date(data.date).toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric", year: "numeric" })
                   : "Upcoming Date"}{" "}
-                • {data.guestsCount} {data.guestsCount === 1 ? "Person" : "People"}
+                • {data.guestsCount} {data.guestsCount === 1 ? (revTrans?.numberOfPeople ? "1" : "Person") : "People"}
               </p>
             </div>
 
@@ -147,7 +155,7 @@ export default function ConfirmationPage() {
             {(data.serviceType === "package" || data.serviceType === "packages") && data.packageSelections && (
               <div className="pt-2 space-y-2">
                 <span className="text-[10px] text-[#94A3B8] uppercase tracking-widest block font-bold" style={{ fontFamily: "Inter, sans-serif" }}>
-                  Scheduled Package Component Times
+                  {confTrans?.scheduledTimes || "Scheduled Package Component Times"}
                 </span>
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
                   {data.packageSelections.saunaSlot && (
@@ -197,7 +205,7 @@ export default function ConfirmationPage() {
                 <FaCakeCandles size={20} />
               </div>
               <div>
-                <h4 className="font-bold text-[#0F172A] text-sm">Celebration Noted 🎉</h4>
+                <h4 className="font-bold text-[#0F172A] text-sm">{confTrans?.celebrationNoted || "Celebration Noted 🎉"}</h4>
                 <p className="text-xs text-[#475569] mt-1">
                   We are excited to celebrate {celebration.occasion} for {celebration.celebrantName || "your special guest"}! Our team will prepare standard celebratory arrangements.
                 </p>
@@ -210,17 +218,17 @@ export default function ConfirmationPage() {
             <div className="relative z-10">
               <h4 className="text-xl font-bold font-displayPlayFair mb-2">
                 {isSaltRoom
-                  ? "Salt Room Session Reminder"
+                  ? (confTrans?.saltRoomReminderTitle || "Salt Room Session Reminder")
                   : isLunchroom
-                  ? "Lunchroom Opening Hours Reminder"
-                  : "Wellness Experience Reminder"}
+                  ? (confTrans?.lunchroomReminderTitle || "Lunchroom Opening Hours Reminder")
+                  : (confTrans?.wellnessReminderTitle || "Wellness Experience Reminder")}
               </h4>
               <p className="text-xs opacity-90 leading-relaxed max-w-lg">
                 {isSaltRoom
-                  ? "Please arrive 10 minutes prior to your halotherapy session. Comfortable clothing is recommended. Please present your booking reference upon arrival."
+                  ? (confTrans?.saltRoomReminderText || "Please arrive 10 minutes prior to your halotherapy session. Comfortable clothing is recommended. Please present your booking reference upon arrival.")
                   : isLunchroom
-                  ? "Wednesday through Sunday (09:00–16:00). Walk-ins are also welcome anytime! Please present your booking reference upon arrival."
-                  : "Please arrive 15 minutes before your scheduled session. Towels, private facilities, and organic refreshments will be prepared for your visit."}
+                  ? (confTrans?.lunchroomReminderText || "Wednesday through Sunday (09:00–16:00). Walk-ins are also welcome anytime! Please present your booking reference upon arrival.")
+                  : (confTrans?.wellnessReminderText || "Please arrive 15 minutes before your scheduled session. Towels, private facilities, and organic refreshments will be prepared for your visit.")}
               </p>
             </div>
           </div>
@@ -228,7 +236,7 @@ export default function ConfirmationPage() {
           {/* Confirmation Info */}
           <div className="pt-2">
             <span className="text-[10px] text-[#94A3B8] uppercase tracking-widest block mb-1" style={{ fontFamily: "Inter, sans-serif" }}>
-              Confirmation Email Sent To
+              {confTrans?.emailConfirmationNotice || "Confirmation Email Sent To"}
             </span>
             <p className="text-base font-bold text-[#0F172A]">{data.email || "Your email"}</p>
           </div>
@@ -246,7 +254,7 @@ export default function ConfirmationPage() {
             <line x1="19" y1="12" x2="5" y2="12"></line>
             <polyline points="12 19 5 12 12 5"></polyline>
           </svg>
-          Book Another Experience
+          {confTrans?.bookAnotherExperience || "Book Another Experience"}
         </Link>
       </div>
     </div>

@@ -42,17 +42,29 @@ export interface SaunaServicesResponse {
 export interface ActivityFeature {
   id?: number;
   feature: string;
+  feature_en?: string;
+  feature_nl?: string;
+  feature_de?: string;
 }
 
 export interface ActivityApiItem {
   id: number;
   title?: string;
+  title_en?: string;
+  title_nl?: string;
+  title_de?: string;
   name?: string;
+  name_en?: string;
+  name_nl?: string;
+  name_de?: string;
   description?: string;
+  description_en?: string;
+  description_nl?: string;
+  description_de?: string;
   image?: string | null;
   images?: string | null;
   price?: string | number;
-  features?: ActivityFeature[];
+  features?: (ActivityFeature | string)[];
   category?: string;
   teacher_host?: string;
   teacherHost?: string;
@@ -72,6 +84,9 @@ export interface ActivityApiItem {
   booked_participants?: number;
   bookedParticipants?: number;
   additional_notes?: string | null;
+  additional_notes_en?: string | null;
+  additional_notes_nl?: string | null;
+  additional_notes_de?: string | null;
   is_available?: boolean;
   is_recurring?: boolean;
   isRecurring?: boolean;

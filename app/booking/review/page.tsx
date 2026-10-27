@@ -10,9 +10,15 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { FaCakeCandles, FaGift, FaHeart } from "react-icons/fa6";
 import { MdOutlineRestaurantMenu } from "react-icons/md";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
 
 export default function ReviewPage() {
   const router = useRouter();
+  const { t } = useLanguage();
+  const flow = (t as any)?.bookingFlow;
+  const revTrans = flow?.review;
+  const btnTrans = flow?.buttons;
+
   const [data, setData] = useState(getStoredBookingData());
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -85,9 +91,13 @@ export default function ReviewPage() {
     <div className="w-full px-6 md:px-12">
       {/* ── Title Section ── */}
       <div className="text-center mb-16 flex flex-col items-center">
-        <h1 className="font-displayPlayFair text-5xl text-[#1d1a17] mb-2 leading-tight">Review & Confirm</h1>
+        <h1 className="font-displayPlayFair text-5xl text-[#1d1a17] mb-2 leading-tight">
+          {revTrans?.title || "Review & Confirm"}
+        </h1>
         <DecorativeUnderline />
-        <p className="font-cambria text-sm text-[#475569] mt-6 italic tracking-wide">Please review your reservation details below.</p>
+        <p className="font-cambria text-sm text-[#475569] mt-6 italic tracking-wide">
+          {revTrans?.subtitle || "Please review your reservation details below."}
+        </p>
       </div>
 
       {/* ── Content Card ── */}
@@ -96,12 +106,12 @@ export default function ReviewPage() {
           {/* Services Information */}
           <section>
             <h2 className="text-xs font-bold text-[#64748B] uppercase tracking-[0.2em] mb-8" style={{ fontFamily: "Inter, sans-serif" }}>
-              Reservation Summary
+              {revTrans?.summaryTitle || "Reservation Summary"}
             </h2>
 
             <div className="space-y-6">
               <div>
-                <span className="text-xs text-[#94A3B8] uppercase block mb-1">Selected Experience</span>
+                <span className="text-xs text-[#94A3B8] uppercase block mb-1">{revTrans?.selectedExperience || "Selected Experience"}</span>
                 <h3 className="text-3xl font-bold text-[#0F172A] font-displayPlayFair flex items-center gap-3">
                   <MdOutlineRestaurantMenu className="text-[#8B7355]" />
                   {data.serviceName || "Lunchroom Table Reservation"}
@@ -110,7 +120,7 @@ export default function ReviewPage() {
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-4 border-t border-[#F1F5F9]">
                 <div>
-                  <span className="text-xs text-[#94A3B8] uppercase block mb-1">Date</span>
+                  <span className="text-xs text-[#94A3B8] uppercase block mb-1">{revTrans?.date || "Date"}</span>
                   <p className="text-lg font-bold text-[#0F172A]">
                     {data.date ? new Date(data.date).toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric", year: "numeric" }) : "Not selected"}
                   </p>
@@ -118,7 +128,7 @@ export default function ReviewPage() {
                 {!isPackage && (
                   <div>
                     <span className="text-xs text-[#94A3B8] uppercase block mb-1">
-                      {isActivity ? "Session Time" : isLunchroom ? "Start Time" : "Start Time Slot"}
+                      {isActivity ? (revTrans?.sessionTime || "Session Time") : isLunchroom ? (revTrans?.time || "Start Time") : (revTrans?.startTimeSlot || "Start Time Slot")}
                     </span>
                     <p className="text-lg font-bold text-[#0F172A]">
                       {isActivity && data.activityDetails?.startTime
@@ -130,7 +140,7 @@ export default function ReviewPage() {
                   </div>
                 )}
                 <div>
-                  <span className="text-xs text-[#94A3B8] uppercase block mb-1">Number of People</span>
+                  <span className="text-xs text-[#94A3B8] uppercase block mb-1">{revTrans?.numberOfPeople || "Number of People"}</span>
                   <p className="text-lg font-bold text-[#0F172A]">
                     {data.guestsCount} {data.guestsCount === 1 ? "Person" : "People"}
                   </p>
@@ -141,12 +151,12 @@ export default function ReviewPage() {
               {isPackage && pkgSelections && (
                 <div className="pt-4 border-t border-[#F1F5F9] space-y-3">
                   <span className="text-xs text-[#94A3B8] uppercase block font-bold tracking-wider">
-                    Scheduled Sub-Services & Times
+                    {revTrans?.scheduledSubServices || "Scheduled Sub-Services & Times"}
                   </span>
                   <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
                     {pkgSelections.saunaSlot && (
                       <div className="p-3.5 bg-[#FAF7F2] rounded-xl border border-[#E8E2DC]">
-                        <span className="text-[10px] uppercase font-bold text-[#8B7355] block">Sauna Session</span>
+                        <span className="text-[10px] uppercase font-bold text-[#8B7355] block">{revTrans?.saunaSession || "Sauna Session"}</span>
                         <p className="font-bold text-[#0F172A] text-sm mt-0.5">
                           {pkgSelections.saunaSlot.startTime} – {pkgSelections.saunaSlot.endTime}
                         </p>
@@ -158,7 +168,7 @@ export default function ReviewPage() {
 
                     {pkgSelections.lunchroomTime && (
                       <div className="p-3.5 bg-[#FAF7F2] rounded-xl border border-[#E8E2DC]">
-                        <span className="text-[10px] uppercase font-bold text-[#8B7355] block">Lunchroom Dining</span>
+                        <span className="text-[10px] uppercase font-bold text-[#8B7355] block">{revTrans?.lunchroomDining || "Lunchroom Dining"}</span>
                         <p className="font-bold text-[#0F172A] text-sm mt-0.5">
                           {pkgSelections.lunchroomTime} Arrival
                         </p>
@@ -168,7 +178,7 @@ export default function ReviewPage() {
 
                     {pkgSelections.saltRoomSlot && (
                       <div className="p-3.5 bg-[#FAF7F2] rounded-xl border border-[#E8E2DC]">
-                        <span className="text-[10px] uppercase font-bold text-[#8B7355] block">Salt Room Session</span>
+                        <span className="text-[10px] uppercase font-bold text-[#8B7355] block">{revTrans?.saltRoomSession || "Salt Room Session"}</span>
                         <p className="font-bold text-[#0F172A] text-sm mt-0.5">
                           {pkgSelections.saltRoomSlot.startTime} – {pkgSelections.saltRoomSlot.endTime}
                         </p>
@@ -178,7 +188,7 @@ export default function ReviewPage() {
 
                     {pkgSelections.activitySession && (
                       <div className="p-3.5 bg-[#FAF7F2] rounded-xl border border-[#E8E2DC]">
-                        <span className="text-[10px] uppercase font-bold text-[#8B7355] block">Activity Session</span>
+                        <span className="text-[10px] uppercase font-bold text-[#8B7355] block">{revTrans?.activitySession || "Activity Session"}</span>
                         <p className="font-bold text-[#0F172A] text-sm mt-0.5">
                           {pkgSelections.activitySession.title}
                         </p>
@@ -255,29 +265,29 @@ export default function ReviewPage() {
           {/* Customer Information */}
           <section>
             <h2 className="text-xs font-bold text-[#64748B] uppercase tracking-[0.2em] mb-6" style={{ fontFamily: "Inter, sans-serif" }}>
-              Customer Details
+              {revTrans?.personalDetails || "Customer Details"}
             </h2>
 
             <div className="space-y-6">
               <div>
-                <span className="text-xs text-[#94A3B8] uppercase block mb-1">Name</span>
+                <span className="text-xs text-[#94A3B8] uppercase block mb-1">{revTrans?.name || "Name"}</span>
                 <p className="text-xl font-bold text-[#0F172A]">{data.name || "Not provided"}</p>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <span className="text-xs text-[#94A3B8] uppercase block mb-1">Email</span>
+                  <span className="text-xs text-[#94A3B8] uppercase block mb-1">{revTrans?.email || "Email"}</span>
                   <p className="text-base font-medium text-[#0F172A]">{data.email || "Not provided"}</p>
                 </div>
                 <div>
-                  <span className="text-xs text-[#94A3B8] uppercase block mb-1">Phone</span>
+                  <span className="text-xs text-[#94A3B8] uppercase block mb-1">{revTrans?.phone || "Phone"}</span>
                   <p className="text-base font-medium text-[#0F172A]">{data.phone || "Not provided"}</p>
                 </div>
               </div>
 
               {data.requests && (
                 <div>
-                  <span className="text-xs text-[#94A3B8] uppercase block mb-1">Comments / Special Requests</span>
+                  <span className="text-xs text-[#94A3B8] uppercase block mb-1">{revTrans?.specialRequests || "Comments / Special Requests"}</span>
                   <p className="text-sm font-medium text-[#475569] bg-[#F8FAFC] p-4 rounded-xl border border-[#E2E8F0]">
                     {data.requests}
                   </p>
@@ -297,31 +307,31 @@ export default function ReviewPage() {
                   </div>
                   <div>
                     <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#8B7355] block">Special Occasion</span>
-                    <h3 className="text-xl font-bold font-displayPlayFair text-[#0F172A]">Celebration Details 🎉</h3>
+                    <h3 className="text-xl font-bold font-displayPlayFair text-[#0F172A]">{revTrans?.celebrationNoted || "Celebration Details 🎉"}</h3>
                   </div>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm">
                   <div>
-                    <span className="text-xs text-[#8B7355] uppercase font-bold block mb-1">What is being celebrated?</span>
+                    <span className="text-xs text-[#8B7355] uppercase font-bold block mb-1">{flow?.information?.whatIsBeingCelebrated || "What is being celebrated?"}</span>
                     <p className="font-bold text-[#0F172A]">{celebration.occasion || "Special Celebration"}</p>
                   </div>
 
                   <div>
-                    <span className="text-xs text-[#8B7355] uppercase font-bold block mb-1">Who is it for?</span>
+                    <span className="text-xs text-[#8B7355] uppercase font-bold block mb-1">{flow?.information?.whoIsItFor || "Who is it for?"}</span>
                     <p className="font-bold text-[#0F172A]">{celebration.celebrantName || "Guest of Honor"}</p>
                   </div>
 
                   {celebration.age && (
                     <div>
-                      <span className="text-xs text-[#8B7355] uppercase font-bold block mb-1">Age / Milestone</span>
+                      <span className="text-xs text-[#8B7355] uppercase font-bold block mb-1">{flow?.information?.ageMilestoneNumber || "Age / Milestone"}</span>
                       <p className="font-bold text-[#0F172A]">{celebration.age}</p>
                     </div>
                   )}
 
                   {celebration.hobbiesInterests && (
                     <div>
-                      <span className="text-xs text-[#8B7355] uppercase font-bold block mb-1">Hobbies / Personal Interests</span>
+                      <span className="text-xs text-[#8B7355] uppercase font-bold block mb-1">{flow?.information?.hobbiesInterests || "Hobbies / Personal Interests"}</span>
                       <p className="font-bold text-[#0F172A]">{celebration.hobbiesInterests}</p>
                     </div>
                   )}
@@ -329,7 +339,7 @@ export default function ReviewPage() {
 
                 {celebration.otherDetails && (
                   <div className="mt-4 pt-4 border-t border-[#E8E2DC]/80">
-                    <span className="text-xs text-[#8B7355] uppercase font-bold block mb-1">Other Celebration Details</span>
+                    <span className="text-xs text-[#8B7355] uppercase font-bold block mb-1">{flow?.information?.otherCelebrationDetails || "Other Celebration Details"}</span>
                     <p className="text-sm italic text-[#475569]">{celebration.otherDetails}</p>
                   </div>
                 )}
@@ -407,7 +417,7 @@ export default function ReviewPage() {
             <line x1="19" y1="12" x2="5" y2="12"></line>
             <polyline points="12 19 5 12 12 5"></polyline>
           </svg>
-          Back to Details
+          {btnTrans?.changeDetails || btnTrans?.back || "Back to Details"}
         </button>
 
         <span className="text-xs text-[#8B7355] font-semibold italic hidden sm:inline">

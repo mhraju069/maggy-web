@@ -1,20 +1,23 @@
 "use client";
 
 import React from "react";
-
-const steps = [
-  { id: 1, name: "Select Your Experience" },
-  { id: 2, name: "Choose Your Time" },
-  { id: 3, name: "Your Information" },
-  { id: 4, name: "Review & Confirm" },
-  { id: 5, name: "Payment" },
-];
+import { useLanguage } from "@/lib/i18n/LanguageContext";
 
 interface StepperProps {
   activeStep: number;
 }
 
 const Stepper: React.FC<StepperProps> = ({ activeStep }) => {
+  const { t } = useLanguage();
+  const flow = (t as any)?.bookingFlow?.stepper;
+
+  const steps = [
+    { id: 1, name: flow?.selectExperience || "Select Your Experience" },
+    { id: 2, name: flow?.chooseTime || "Choose Your Time" },
+    { id: 3, name: flow?.yourInformation || "Your Information" },
+    { id: 4, name: flow?.reviewConfirm || "Review & Confirm" },
+    { id: 5, name: flow?.payment || "Payment" },
+  ];
   return (
     <div className="mx-auto container px-6 py-8">
       <div className="bg-white rounded-[24px] border border-[#E8E2DC] shadow-sm p-10">

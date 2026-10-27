@@ -8,6 +8,7 @@ import { useCallback, useEffect, useState } from "react";
 import { BiTimeFive } from "react-icons/bi";
 import { FaWalking } from "react-icons/fa";
 import { FaCakeCandles, FaGift, FaHeart } from "react-icons/fa6";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
 
 function generateTimeSlots(openTime?: string, closeTime?: string, intervalMinutes = 60): string[] {
   if (!openTime || !closeTime) return ["09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00"];
@@ -46,6 +47,11 @@ const occasionOptions = [
 ];
 
 export default function InformationPage() {
+  const { t } = useLanguage();
+  const flow = (t as any)?.bookingFlow;
+  const infoTrans = flow?.information;
+  const btnTrans = flow?.buttons;
+
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -250,24 +256,25 @@ export default function InformationPage() {
       {/* ── Title Section ── */}
       <div className="text-center mb-16 flex flex-col items-center">
         <h1 className="font-displayPlayFair text-5xl text-[#1d1a17] mb-2 leading-tight">
-          Your Information
+          {infoTrans?.title || "Your Information"}
         </h1>
         <DecorativeUnderline />
         <p className="font-cambria text-sm text-[#475569] mt-6 italic tracking-wide">
-          Please provide your contact details & any special requests.
+          {infoTrans?.subtitle || "Please provide your contact details & any special requests."}
         </p>
       </div>
 
       {/* ── Content Card ── */}
       <div className="max-w-4xl mx-auto space-y-8">
         {/* Table Reservation Details Card (Lunchroom Only) */}
+        {/* Standalone Lunchroom Table Reservation Details Card */}
         {isLunchroom && (
           <div className="bg-white rounded-[32px] p-10 shadow-sm border border-[#E8E2DC]">
             <h2
               className="text-xs font-bold text-[#64748B] uppercase tracking-[0.2em] mb-6"
               style={{ fontFamily: "Inter, sans-serif" }}
             >
-              Table Reservation Details
+              {infoTrans?.tableReservationDetails || "Table Reservation Details"}
             </h2>
 
             {/* Opening Hours Banner */}
@@ -295,7 +302,7 @@ export default function InformationPage() {
               {!lunchroomIsClosed && !lunchroomIsBlocked && (
                 <div className="flex items-center gap-1.5 font-semibold bg-white/80 px-3 py-1.5 rounded-xl border border-[#E8E2DC] self-start md:self-auto">
                   <FaWalking />
-                  <span>Walk-ins welcome anytime!</span>
+                  <span>{infoTrans?.lunchroomWalkinsWelcome || "Walk-ins welcome anytime!"}</span>
                 </div>
               )}
             </div>
@@ -307,7 +314,7 @@ export default function InformationPage() {
                   className="block text-xs font-bold text-[#0F172A] mb-2 uppercase tracking-wider"
                   style={{ fontFamily: "Inter, sans-serif" }}
                 >
-                  Reservation Date *
+                  {infoTrans?.reservationDateRequired || "Reservation Date *"}
                 </label>
                 <input
                   type="date"
@@ -323,7 +330,7 @@ export default function InformationPage() {
                   className="block text-xs font-bold text-[#0F172A] mb-2 uppercase tracking-wider"
                   style={{ fontFamily: "Inter, sans-serif" }}
                 >
-                  Preferred Arrival Time *
+                  {infoTrans?.preferredArrivalTimeRequired || "Preferred Arrival Time *"}
                 </label>
                 <select
                   value={timeSlot}
@@ -347,7 +354,7 @@ export default function InformationPage() {
                   className="block text-xs font-bold text-[#0F172A] mb-2 uppercase tracking-wider"
                   style={{ fontFamily: "Inter, sans-serif" }}
                 >
-                  Number of Guests *
+                  {infoTrans?.numberOfGuestsRequired || "Number of Guests *"}
                 </label>
                 <select
                   value={guestsCount}
@@ -356,7 +363,9 @@ export default function InformationPage() {
                 >
                   {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 15, 20].map((num) => (
                     <option key={num} value={num}>
-                      {num} {num === 1 ? "Guest" : "Guests"}
+                      {num === 1
+                        ? (infoTrans?.guestOptionSingle || "1 Guest")
+                        : (infoTrans?.guestOptionPlural ? infoTrans.guestOptionPlural.replace("{count}", String(num)) : `${num} Guests`)}
                     </option>
                   ))}
                 </select>
@@ -372,7 +381,7 @@ export default function InformationPage() {
               className="text-xs font-bold text-[#64748B] uppercase tracking-[0.2em] mb-6"
               style={{ fontFamily: "Inter, sans-serif" }}
             >
-              Lunchroom — Preferred Arrival Time
+              {infoTrans?.packageLunchroomTitle || "Lunchroom — Preferred Arrival Time"}
             </h2>
 
             {/* Opening Hours Banner */}
@@ -400,7 +409,7 @@ export default function InformationPage() {
               {!lunchroomIsClosed && !lunchroomIsBlocked && (
                 <div className="flex items-center gap-1.5 font-semibold bg-white/80 px-3 py-1.5 rounded-xl border border-[#E8E2DC] self-start md:self-auto">
                   <FaWalking />
-                  <span>Walk-ins welcome anytime!</span>
+                  <span>{infoTrans?.lunchroomWalkinsWelcome || "Walk-ins welcome anytime!"}</span>
                 </div>
               )}
             </div>
@@ -410,7 +419,7 @@ export default function InformationPage() {
                 className="block text-xs font-bold text-[#0F172A] mb-2 uppercase tracking-wider"
                 style={{ fontFamily: "Inter, sans-serif" }}
               >
-                Preferred Lunchroom Arrival *
+                {infoTrans?.preferredLunchroomArrival || "Preferred Lunchroom Arrival *"}
               </label>
               <select
                 value={pkgLunchroomTime}
@@ -418,13 +427,13 @@ export default function InformationPage() {
                 disabled={lunchroomIsClosed || lunchroomIsBlocked || loadingSlots}
                 className="w-full p-4 border border-[#E2E8F0] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#D1B191] text-[#475569] font-medium bg-white cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                <option value="" disabled>Select arrival time...</option>
+                <option value="" disabled>{infoTrans?.selectArrivalTimePrompt || "Select arrival time..."}</option>
                 {!lunchroomIsBlocked && generateTimeSlots(lunchroomOpenTime, lunchroomCloseTime, 60).map((t) => (
                   <option key={t} value={t}>{formatTime12h(t)}</option>
                 ))}
               </select>
               <p className="text-[11px] text-[#64748B] mt-2">
-                Your lunchroom visit is included in your package — just pick your preferred arrival window.
+                {infoTrans?.packageLunchroomDesc || "Your lunchroom visit is included in your package — just pick your preferred arrival window."}
               </p>
             </div>
           </div>
@@ -436,7 +445,7 @@ export default function InformationPage() {
               className="text-xs font-bold text-[#64748B] uppercase tracking-[0.2em] mb-6"
               style={{ fontFamily: "Inter, sans-serif" }}
             >
-              Activity Session Details
+              {infoTrans?.activitySessionDetails || "Activity Session Details"}
             </h2>
 
             <div className="p-6 rounded-2xl bg-gradient-to-r from-[#FCF2E9] to-[#FBF6F3] border border-[#E8E2DC] mb-6">
@@ -452,21 +461,27 @@ export default function InformationPage() {
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4 border-t border-[#E8E2DC]/80 text-xs text-[#475569]">
                 <div>
-                  <span className="text-[10px] uppercase font-bold text-[#8B7355] block">Date & Schedule</span>
+                  <span className="text-[10px] uppercase font-bold text-[#8B7355] block">
+                    {infoTrans?.dateAndSchedule || "Date & Schedule"}
+                  </span>
                   <span className="font-semibold text-[#0F172A]">
                     {storedData.activityDetails.date ? new Date(storedData.activityDetails.date).toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric", year: "numeric" }) : "Upcoming"}
                   </span>
                 </div>
 
                 <div>
-                  <span className="text-[10px] uppercase font-bold text-[#8B7355] block">Time Slot</span>
+                  <span className="text-[10px] uppercase font-bold text-[#8B7355] block">
+                    {infoTrans?.timeSlot || "Time Slot"}
+                  </span>
                   <span className="font-semibold text-[#0F172A]">
                     {storedData.activityDetails.startTime} - {storedData.activityDetails.endTime}
                   </span>
                 </div>
 
                 <div>
-                  <span className="text-[10px] uppercase font-bold text-[#8B7355] block">Host / Guide</span>
+                  <span className="text-[10px] uppercase font-bold text-[#8B7355] block">
+                    {infoTrans?.hostGuide || "Host / Guide"}
+                  </span>
                   <span className="font-semibold text-[#0F172A]">
                     {storedData.activityDetails.teacherHost || "Elena Rostova"}
                   </span>
@@ -481,7 +496,7 @@ export default function InformationPage() {
                   className="block text-xs font-bold text-[#0F172A] mb-2 uppercase tracking-wider"
                   style={{ fontFamily: "Inter, sans-serif" }}
                 >
-                  Number of Participants / Tickets *
+                  {infoTrans?.numberParticipantsTickets || "Number of Participants / Tickets *"}
                 </label>
                 {(() => {
                   const maxAllowed = storedData.activityDetails?.availableSlots !== undefined
@@ -504,27 +519,31 @@ export default function InformationPage() {
                     >
                       {Array.from({ length: Math.min(10, maxAllowed) }, (_, i) => i + 1).map((num) => (
                         <option key={num} value={num}>
-                          {num} {num === 1 ? "Person" : "People"} (€{(storedData.activityDetails!.price * num).toFixed(2)})
+                          {num === 1
+                            ? (infoTrans?.guestOptionSingle || "1 Person")
+                            : (infoTrans?.guestOptionPlural ? infoTrans.guestOptionPlural.replace("{count}", String(num)) : `${num} People`)} (€{(storedData.activityDetails!.price * num).toFixed(2)})
                         </option>
                       ))}
                     </select>
                   );
                 })()}
                 <span className="text-[11px] text-[#64748B] mt-1.5 block">
-                  €{storedData.activityDetails.price} per person
+                  {infoTrans?.perPersonTag ? infoTrans.perPersonTag.replace("{price}", String(storedData.activityDetails.price)) : `€${storedData.activityDetails.price} per person`}
                 </span>
               </div>
 
               <div className="bg-[#F8FAFC] p-5 rounded-2xl border border-[#E2E8F0] flex flex-col justify-between">
                 <span className="text-[10px] uppercase font-bold tracking-widest text-[#64748B] block mb-1">
-                  Total Investment Due
+                  {infoTrans?.totalInvestmentDue || "Total Investment Due"}
                 </span>
                 <div className="flex items-baseline gap-2">
                   <span className="text-3xl font-bold font-displayPlayFair text-[#8B7355]">
                     €{(storedData.activityDetails.price * guestsCount).toFixed(2)}
                   </span>
                   <span className="text-xs text-[#94A3B8]">
-                    ({guestsCount} {guestsCount === 1 ? "ticket" : "tickets"})
+                    {infoTrans?.ticketsCount
+                      ? infoTrans.ticketsCount.replace("{count}", String(guestsCount)).replace("{label}", guestsCount === 1 ? (infoTrans?.ticketSingle || "ticket") : (infoTrans?.ticketPlural || "tickets"))
+                      : `(${guestsCount} ${guestsCount === 1 ? "ticket" : "tickets"})`}
                   </span>
                 </div>
               </div>
@@ -538,7 +557,7 @@ export default function InformationPage() {
             className="text-xs font-bold text-[#64748B] uppercase tracking-[0.2em] mb-8"
             style={{ fontFamily: "Inter, sans-serif" }}
           >
-            Contact & Guest Details
+            {infoTrans?.contactGuestDetails || "Contact & Guest Details"}
           </h2>
 
           <div className="space-y-6">
@@ -547,14 +566,14 @@ export default function InformationPage() {
                 className="block text-sm font-bold text-[#0F172A] mb-2 uppercase tracking-wider"
                 style={{ fontFamily: "Inter, sans-serif" }}
               >
-                Full Name *
+                {infoTrans?.fullNameRequired || "Full Name *"}
               </label>
               <input
                 type="text"
                 name="name"
                 value={formData.name}
                 onChange={handleChange}
-                placeholder="e.g. Sarah Jenkins"
+                placeholder={infoTrans?.fullNamePlaceholder || "e.g. Sarah Jenkins"}
                 className="w-full p-4 border border-[#E2E8F0] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#D1B191] text-[#475569]"
               />
             </div>
@@ -565,14 +584,14 @@ export default function InformationPage() {
                   className="block text-sm font-bold text-[#0F172A] mb-2 uppercase tracking-wider"
                   style={{ fontFamily: "Inter, sans-serif" }}
                 >
-                  Email Address *
+                  {infoTrans?.emailAddressRequired || "Email Address *"}
                 </label>
                 <input
                   type="email"
                   name="email"
                   value={formData.email}
                   onChange={handleChange}
-                  placeholder="e.g. sarah@example.com"
+                  placeholder={infoTrans?.emailPlaceholder || "e.g. sarah@example.com"}
                   className="w-full p-4 border border-[#E2E8F0] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#D1B191] text-[#475569]"
                 />
               </div>
@@ -582,14 +601,14 @@ export default function InformationPage() {
                   className="block text-sm font-bold text-[#0F172A] mb-2 uppercase tracking-wider"
                   style={{ fontFamily: "Inter, sans-serif" }}
                 >
-                  Phone Number *
+                  {infoTrans?.phoneNumberRequired || "Phone Number *"}
                 </label>
                 <input
                   type="tel"
                   name="phone"
                   value={formData.phone}
                   onChange={handleChange}
-                  placeholder="+1 (555) 000-0000"
+                  placeholder={infoTrans?.phonePlaceholder || "+1 (555) 000-0000"}
                   className="w-full p-4 border border-[#E2E8F0] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#D1B191] text-[#475569]"
                 />
               </div>
@@ -600,14 +619,14 @@ export default function InformationPage() {
                 className="block text-sm font-bold text-[#0F172A] mb-2 uppercase tracking-wider"
                 style={{ fontFamily: "Inter, sans-serif" }}
               >
-                Comments or Special Requests (Optional)
+                {infoTrans?.commentsSpecialRequests || "Comments or Special Requests (Optional)"}
               </label>
               <textarea
                 name="requests"
                 value={formData.requests}
                 onChange={handleChange}
                 rows={3}
-                placeholder="Dietary requirements, seating preferences, allergies, or anything else we should know..."
+                placeholder={infoTrans?.commentsPlaceholder || "Dietary requirements, seating preferences, allergies, or anything else we should know..."}
                 className="w-full p-4 border border-[#E2E8F0] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#D1B191] text-[#475569] resize-none text-sm"
               />
             </div>
@@ -624,10 +643,10 @@ export default function InformationPage() {
                 </div>
                 <div>
                   <h3 className="text-xl font-bold font-displayPlayFair text-[#0F172A]">
-                    Are you celebrating something?
+                    {infoTrans?.celebrationTitle || "Are you celebrating something?"}
                   </h3>
                   <p className="text-xs text-[#64748B]">
-                    Birthdays, anniversaries, or special milestones
+                    {infoTrans?.celebrationSubtitle || "Birthdays, anniversaries, or special milestones"}
                   </p>
                 </div>
               </div>
@@ -643,7 +662,7 @@ export default function InformationPage() {
                       : "text-[#64748B] hover:text-[#0F172A]"
                   }`}
                 >
-                  Yes 🎉
+                  {infoTrans?.yesCelebrationBtn || "Yes 🎉"}
                 </button>
                 <button
                   type="button"
@@ -654,7 +673,7 @@ export default function InformationPage() {
                       : "text-[#64748B] hover:text-[#0F172A]"
                   }`}
                 >
-                  No
+                  {infoTrans?.noCelebrationBtn || "No"}
                 </button>
               </div>
             </div>
@@ -665,7 +684,7 @@ export default function InformationPage() {
                 <div className="p-4 rounded-2xl bg-[#FCF2E9]/70 border border-[#E8E2DC]/80 flex items-center gap-3 text-xs text-[#8B7355] font-medium">
                   <FaGift className="text-base flex-shrink-0" />
                   <span>
-                    Tell us a bit about the occasion so we can prepare a warm, personalized table experience for your guest of honor!
+                    {infoTrans?.celebrationBannerText || "Tell us a bit about the occasion so we can prepare a warm, personalized table experience for your guest of honor!"}
                   </span>
                 </div>
 
@@ -676,7 +695,7 @@ export default function InformationPage() {
                       className="block text-xs font-bold text-[#0F172A] mb-2 uppercase tracking-wider"
                       style={{ fontFamily: "Inter, sans-serif" }}
                     >
-                      What is being celebrated? *
+                      {infoTrans?.whatIsBeingCelebrated || "What is being celebrated? *"}
                     </label>
                     <select
                       name="occasion"
@@ -684,11 +703,29 @@ export default function InformationPage() {
                       onChange={handleCelebrationChange}
                       className="w-full p-4 border border-[#E2E8F0] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#D1B191] text-[#475569] bg-white cursor-pointer"
                     >
-                      {occasionOptions.map((occ) => (
-                        <option key={occ} value={occ}>
-                          {occ}
-                        </option>
-                      ))}
+                      {occasionOptions.map((occ) => {
+                        const occKey = occ.toLowerCase().includes("birth")
+                          ? "birthday"
+                          : occ.toLowerCase().includes("anniv")
+                          ? "anniversary"
+                          : occ.toLowerCase().includes("grad")
+                          ? "graduation"
+                          : occ.toLowerCase().includes("promo")
+                          ? "promotion"
+                          : occ.toLowerCase().includes("baby")
+                          ? "babyShower"
+                          : occ.toLowerCase().includes("engage")
+                          ? "engagement"
+                          : occ.toLowerCase().includes("retire")
+                          ? "retirement"
+                          : "other";
+                        const localizedOcc = infoTrans?.occasions?.[occKey] || occ;
+                        return (
+                          <option key={occ} value={occ}>
+                            {localizedOcc}
+                          </option>
+                        );
+                      })}
                     </select>
                   </div>
 
@@ -698,14 +735,14 @@ export default function InformationPage() {
                       className="block text-xs font-bold text-[#0F172A] mb-2 uppercase tracking-wider"
                       style={{ fontFamily: "Inter, sans-serif" }}
                     >
-                      Who is it for? (Name of Celebrant) *
+                      {infoTrans?.whoIsItFor || "Who is it for? (Name of Celebrant) *"}
                     </label>
                     <input
                       type="text"
                       name="celebrantName"
                       value={celebration.celebrantName}
                       onChange={handleCelebrationChange}
-                      placeholder="e.g. John / Mom / Alex"
+                      placeholder={infoTrans?.whoIsItForPlaceholder || "e.g. John / Mom / Alex"}
                       className="w-full p-4 border border-[#E2E8F0] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#D1B191] text-[#475569]"
                     />
                   </div>
@@ -718,14 +755,14 @@ export default function InformationPage() {
                       className="block text-xs font-bold text-[#0F172A] mb-2 uppercase tracking-wider"
                       style={{ fontFamily: "Inter, sans-serif" }}
                     >
-                      Age / Milestone Number (Optional)
+                      {infoTrans?.ageMilestoneNumber || "Age / Milestone Number (Optional)"}
                     </label>
                     <input
                       type="text"
                       name="age"
                       value={celebration.age}
                       onChange={handleCelebrationChange}
-                      placeholder="e.g. 30th Birthday / 25th Anniversary"
+                      placeholder={infoTrans?.ageMilestonePlaceholder || "e.g. 30th Birthday / 25th Anniversary"}
                       className="w-full p-4 border border-[#E2E8F0] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#D1B191] text-[#475569]"
                     />
                   </div>
@@ -736,14 +773,14 @@ export default function InformationPage() {
                       className="block text-xs font-bold text-[#0F172A] mb-2 uppercase tracking-wider"
                       style={{ fontFamily: "Inter, sans-serif" }}
                     >
-                      Hobbies / Interests or Personal Details
+                      {infoTrans?.hobbiesInterests || "Hobbies / Interests or Personal Details"}
                     </label>
                     <input
                       type="text"
                       name="hobbiesInterests"
                       value={celebration.hobbiesInterests}
                       onChange={handleCelebrationChange}
-                      placeholder="e.g. Loves chocolate, jazz music, coffee..."
+                      placeholder={infoTrans?.hobbiesPlaceholder || "e.g. Loves chocolate, jazz music, coffee..."}
                       className="w-full p-4 border border-[#E2E8F0] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#D1B191] text-[#475569]"
                     />
                   </div>
@@ -755,14 +792,14 @@ export default function InformationPage() {
                     className="block text-xs font-bold text-[#0F172A] mb-2 uppercase tracking-wider"
                     style={{ fontFamily: "Inter, sans-serif" }}
                   >
-                    Any Other Relevant Celebration Details
+                    {infoTrans?.otherCelebrationDetails || "Any Other Relevant Celebration Details"}
                   </label>
                   <textarea
                     name="otherDetails"
                     value={celebration.otherDetails}
                     onChange={handleCelebrationChange}
                     rows={3}
-                    placeholder="e.g. Surprise party setup, special candle on dessert, favorite seating corner..."
+                    placeholder={infoTrans?.otherCelebrationPlaceholder || "e.g. Surprise party setup, special candle on dessert, favorite seating corner..."}
                     className="w-full p-4 border border-[#E2E8F0] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#D1B191] text-[#475569] resize-none text-sm"
                   />
                 </div>
@@ -792,7 +829,7 @@ export default function InformationPage() {
             <line x1="19" y1="12" x2="5" y2="12"></line>
             <polyline points="12 19 5 12 12 5"></polyline>
           </svg>
-          Back
+          {btnTrans?.back || "Back"}
         </button>
 
         <Link
@@ -804,7 +841,7 @@ export default function InformationPage() {
           }`}
           style={{ fontFamily: "Inter, sans-serif" }}
         >
-          Continue
+          {btnTrans?.continue || "Continue"}
           <svg
             width="20"
             height="20"

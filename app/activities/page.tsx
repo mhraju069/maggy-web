@@ -4,6 +4,7 @@ import CTASection from "@/components/shared/CTASection";
 import Footer from "@/components/shared/Footer";
 import PageHero from "@/components/shared/PageHero";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
+import ActivitiesOfferings from "./components/ActivitiesOfferings";
 import PrivateSessions from "./components/PrivateSessions";
 
 const ActivitiesPage = () => {
@@ -18,14 +19,8 @@ const ActivitiesPage = () => {
         subtitle={act?.hero?.subtitle || "Join our monthly or weekly activities"}
       />
 
-      {/* Intro Section */}
-      {/*<section className="py-16 md:py-20 bg-[#FCF2E9]">
-        <div className="container mx-auto px-6 max-w-3xl text-center">
-          <p className="text-[#475569] text-xl md:text-2xl font-serif leading-relaxed">
-            {act?.intro?.text || "Join our monthly or weekly activities"}
-          </p>
-        </div>
-      </section> */}
+      {/* Activities Offerings Section (API dynamic) */}
+      <ActivitiesOfferings />
 
       {/* Become a Partner Section */}
       <PrivateSessions />

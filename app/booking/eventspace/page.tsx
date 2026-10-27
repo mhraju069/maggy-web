@@ -15,6 +15,7 @@ import {
 } from "react-icons/bi";
 import { FaCalendarAlt, FaGlassCheers, FaPaperPlane, FaUser } from "react-icons/fa";
 import { MdOutlineEmail, MdOutlinePhone } from "react-icons/md";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
 
 const EVENT_TYPES = [
   { id: "Birthdays", label: "Birthdays" },
@@ -28,6 +29,10 @@ const EVENT_TYPES = [
 
 export default function EventSpaceInquiryPage() {
   const router = useRouter();
+  const { t } = useLanguage();
+  const flow = (t as any)?.bookingFlow;
+  const esTrans = flow?.eventspace;
+  const btnTrans = flow?.buttons;
 
   // Form State
   const [eventType, setEventType] = useState<string>("Birthdays");
@@ -128,37 +133,41 @@ export default function EventSpaceInquiryPage() {
           </div>
 
           <h2 className="font-displayPlayFair text-4xl text-[#0F172A]">
-            Inquiry Submitted Successfully!
+            {esTrans?.inquirySuccessTitle || "Inquiry Submitted Successfully!"}
           </h2>
 
           <DecorativeUnderline />
 
           <p className="font-cambria text-base text-[#475569] max-w-xl italic leading-relaxed">
-            Thank you, <span className="font-bold text-[#0F172A] not-italic">{name}</span>! We have received your inquiry for a{" "}
-            <span className="font-bold text-[#8B7355] not-italic">{eventType}</span> on{" "}
-            <span className="font-bold text-[#0F172A] not-italic">{preferredDate}</span> for {expectedGuests} guests.
+            {esTrans?.inquirySuccessDesc
+              ? esTrans.inquirySuccessDesc
+                  .replace("{name}", name)
+                  .replace("{event}", eventType)
+                  .replace("{date}", preferredDate)
+                  .replace("{guests}", String(expectedGuests))
+              : <>Thank you, <span className="font-bold text-[#0F172A] not-italic">{name}</span>! We have received your inquiry for a <span className="font-bold text-[#8B7355] not-italic">{eventType}</span> on <span className="font-bold text-[#0F172A] not-italic">{preferredDate}</span> for {expectedGuests} guests.</>}
           </p>
 
           <div className="w-full bg-[#FCF2E9] rounded-2xl p-6 border border-[#E8E2DC] text-left max-w-lg space-y-3 text-xs text-[#475569]">
             <div className="flex justify-between items-center pb-2 border-b border-[#E8E2DC]">
-              <p className="font-bold text-[#8B7355] uppercase tracking-wider text-[11px]">Booking Reference</p>
+              <p className="font-bold text-[#8B7355] uppercase tracking-wider text-[11px]">{esTrans?.bookingReference || "Booking Reference"}</p>
               <span className="font-bold font-mono text-base text-[#0F172A]">{bookingRef}</span>
             </div>
             <div className="grid grid-cols-2 gap-2 pt-1">
-              <div><span className="font-semibold">Event Type:</span> {eventType === "Other events" && otherEventDetails ? otherEventDetails : eventType}</div>
-              <div><span className="font-semibold">Date:</span> {preferredDate}</div>
-              <div><span className="font-semibold">Time:</span> {startTime} - {endTime}</div>
-              <div><span className="font-semibold">Guests:</span> {expectedGuests}</div>
+              <div><span className="font-semibold">{esTrans?.eventTypeLabel || "Event Type:"}</span> {eventType === "Other events" && otherEventDetails ? otherEventDetails : eventType}</div>
+              <div><span className="font-semibold">{esTrans?.dateLabel || "Date:"}</span> {preferredDate}</div>
+              <div><span className="font-semibold">{esTrans?.timeLabel || "Time:"}</span> {startTime} - {endTime}</div>
+              <div><span className="font-semibold">{esTrans?.guestsLabel || "Guests:"}</span> {expectedGuests}</div>
             </div>
-            {foodPreference && <div><span className="font-semibold">Food:</span> {foodPreference}</div>}
-            {drinkPreference && <div><span className="font-semibold">Drinks:</span> {drinkPreference}</div>}
-            {entertainmentPreference && <div><span className="font-semibold">Entertainment:</span> {entertainmentPreference}</div>}
-            <div><span className="font-semibold">Contact Email:</span> {email}</div>
-            <div><span className="font-semibold">Phone:</span> {phone}</div>
+            {foodPreference && <div><span className="font-semibold">{esTrans?.foodLabel || "Food:"}</span> {foodPreference}</div>}
+            {drinkPreference && <div><span className="font-semibold">{esTrans?.drinksLabel || "Drinks:"}</span> {drinkPreference}</div>}
+            {entertainmentPreference && <div><span className="font-semibold">{esTrans?.entertainmentLabel || "Entertainment:"}</span> {entertainmentPreference}</div>}
+            <div><span className="font-semibold">{esTrans?.contactEmailLabel || "Contact Email:"}</span> {email}</div>
+            <div><span className="font-semibold">{esTrans?.phoneLabel || "Phone:"}</span> {phone}</div>
           </div>
 
           <p className="text-xs text-[#64748B] max-w-md">
-            Our event planning team will review your requirements and contact you via phone or email with a tailored quotation within 24 hours. A confirmation email has been sent.
+            {esTrans?.inquirySuccessFooter || "Our event planning team will review your requirements and contact you via phone or email with a tailored quotation within 24 hours. A confirmation email has been sent."}
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 pt-4">
@@ -170,13 +179,13 @@ export default function EventSpaceInquiryPage() {
               }}
               className="px-8 py-3.5 rounded-xl border border-[#D1B191] text-[#8B7355] font-bold text-sm hover:bg-[#FCF2E9] transition-all"
             >
-              Submit Another Inquiry
+              {esTrans?.submitAnotherInquiry || "Submit Another Inquiry"}
             </button>
             <Link
               href="/booking"
               className="px-8 py-3.5 rounded-xl bg-[#8B7355] text-white font-bold text-sm shadow-md hover:bg-[#725e45] transition-all"
             >
-              Back to Booking Overview
+              {esTrans?.backToBookingOverview || "Back to Booking Overview"}
             </Link>
           </div>
         </div>
@@ -189,11 +198,11 @@ export default function EventSpaceInquiryPage() {
       {/* ── Title Section ── */}
       <div className="text-center mb-12 flex flex-col items-center">
         <h1 className="font-displayPlayFair text-5xl text-[#1d1a17] mb-2 uppercase tracking-tight">
-          Events & Party Room Inquiry
+          {esTrans?.title || "Events & Party Room Inquiry"}
         </h1>
         <DecorativeUnderline />
         <p className="font-cambria text-sm text-[#475569] mt-6 italic max-w-2xl">
-          Whether celebrating intimate moments or grand occasions, request a customized proposal and let our team tailor the perfect experience for you.
+          {esTrans?.subtitle || "Whether celebrating intimate moments or grand occasions, request a customized proposal and let our team tailor the perfect experience for you."}
         </p>
       </div>
 
@@ -210,9 +219,9 @@ export default function EventSpaceInquiryPage() {
         <div className="bg-white rounded-[32px] p-8 md:p-10 shadow-sm border border-[#E8E2DC] space-y-6">
           <div>
             <label className="block text-sm font-bold text-[#0F172A] mb-1 uppercase tracking-wider" style={{ fontFamily: "Inter, sans-serif" }}>
-              1. Select Event Type
+              {esTrans?.selectEventType || "1. Select Event Type"}
             </label>
-            <p className="text-xs text-[#64748B]">Choose the occasion you are planning to host</p>
+            <p className="text-xs text-[#64748B]">{esTrans?.selectEventTypeSub || "Choose the occasion you are planning to host"}</p>
           </div>
 
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
@@ -242,14 +251,14 @@ export default function EventSpaceInquiryPage() {
                 className="block text-xs font-bold text-[#0F172A] mb-2 uppercase tracking-wider"
                 style={{ fontFamily: "Inter, sans-serif" }}
               >
-                Describe Your Event / Occasion *
+                {esTrans?.describeEventPrompt || "Describe Your Event / Occasion *"}
               </label>
               <input
                 type="text"
                 required
                 value={otherEventDetails}
                 onChange={(e) => setOtherEventDetails(e.target.value)}
-                placeholder="e.g. Wellness retreat, product launch, photography shoot, graduation gathering..."
+                placeholder={esTrans?.describeEventPlaceholder || "e.g. Wellness retreat, product launch, photography shoot, graduation gathering..."}
                 className="w-full px-4 py-3.5 rounded-xl border border-[#D1B191] bg-[#FCF2E9]/40 text-sm text-[#0F172A] focus:outline-none focus:ring-2 focus:ring-[#8B7355]"
               />
             </div>
@@ -260,16 +269,16 @@ export default function EventSpaceInquiryPage() {
         <div className="bg-white rounded-[32px] p-8 md:p-10 shadow-sm border border-[#E8E2DC] space-y-6">
           <div>
             <label className="block text-sm font-bold text-[#0F172A] mb-1 uppercase tracking-wider" style={{ fontFamily: "Inter, sans-serif" }}>
-              2. Date, Time & Capacity
+              {esTrans?.dateTimeCapacity || "2. Date, Time & Capacity"}
             </label>
-            <p className="text-xs text-[#64748B]">Specify your preferred schedule and expected guest count</p>
+            <p className="text-xs text-[#64748B]">{esTrans?.dateTimeCapacitySub || "Specify your preferred schedule and expected guest count"}</p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
             {/* Preferred Date */}
             <div>
               <label className="block text-xs font-semibold text-[#475569] mb-2 flex items-center gap-1.5">
-                <FaCalendarAlt className="text-[#8B7355]" /> Preferred Date
+                <FaCalendarAlt className="text-[#8B7355]" /> {esTrans?.preferredDate || "Preferred Date"}
               </label>
               <input
                 type="date"
@@ -284,7 +293,7 @@ export default function EventSpaceInquiryPage() {
             {/* Start Time */}
             <div>
               <label className="block text-xs font-semibold text-[#475569] mb-2 flex items-center gap-1.5">
-                <BiTimeFive className="text-[#8B7355] text-base" /> Start Time
+                <BiTimeFive className="text-[#8B7355] text-base" /> {esTrans?.startTime || "Start Time"}
               </label>
               <input
                 type="time"
@@ -298,7 +307,7 @@ export default function EventSpaceInquiryPage() {
             {/* End Time */}
             <div>
               <label className="block text-xs font-semibold text-[#475569] mb-2 flex items-center gap-1.5">
-                <BiTimeFive className="text-[#8B7355] text-base" /> End Time
+                <BiTimeFive className="text-[#8B7355] text-base" /> {esTrans?.endTime || "End Time"}
               </label>
               <input
                 type="time"
@@ -312,7 +321,7 @@ export default function EventSpaceInquiryPage() {
             {/* Expected Guests */}
             <div>
               <label className="block text-xs font-semibold text-[#475569] mb-2 flex items-center gap-1.5">
-                <BiGroup className="text-[#8B7355] text-base" /> Expected Guests
+                <BiGroup className="text-[#8B7355] text-base" /> {esTrans?.expectedGuests || "Expected Guests"}
               </label>
               <input
                 type="number"
@@ -331,20 +340,20 @@ export default function EventSpaceInquiryPage() {
         <div className="bg-white rounded-[32px] p-8 md:p-10 shadow-sm border border-[#E8E2DC] space-y-6">
           <div>
             <label className="block text-sm font-bold text-[#0F172A] mb-1 uppercase tracking-wider" style={{ fontFamily: "Inter, sans-serif" }}>
-              3. Food, Drinks & Entertainment
+              {esTrans?.foodDrinksEntertainment || "3. Food, Drinks & Entertainment"}
             </label>
-            <p className="text-xs text-[#64748B]">Specify your event catering and entertainment preferences</p>
+            <p className="text-xs text-[#64748B]">{esTrans?.foodDrinksEntertainmentSub || "Specify your event catering and entertainment preferences"}</p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {/* Food Preferences */}
             <div>
               <label className="block text-xs font-semibold text-[#475569] mb-2 flex items-center gap-1.5">
-                <BiRestaurant className="text-[#8B7355] text-base" /> Food Preferences
+                <BiRestaurant className="text-[#8B7355] text-base" /> {esTrans?.foodPreferences || "Food Preferences"}
               </label>
               <input
                 type="text"
-                placeholder="e.g. Organic Buffet, Vegan menu..."
+                placeholder={esTrans?.foodPlaceholder || "e.g. Organic Buffet, Vegan menu..."}
                 value={foodPreference}
                 onChange={(e) => setFoodPreference(e.target.value)}
                 className="w-full px-4 py-3 rounded-xl border border-[#E2E8F0] text-sm text-[#0F172A] focus:outline-none focus:border-[#8B7355]"
@@ -354,11 +363,11 @@ export default function EventSpaceInquiryPage() {
             {/* Drink Preferences */}
             <div>
               <label className="block text-xs font-semibold text-[#475569] mb-2 flex items-center gap-1.5">
-                <BiDrink className="text-[#8B7355] text-base" /> Drink Preferences
+                <BiDrink className="text-[#8B7355] text-base" /> {esTrans?.drinkPreferences || "Drink Preferences"}
               </label>
               <input
                 type="text"
-                placeholder="e.g. Wine & Champagne, Fresh juices..."
+                placeholder={esTrans?.drinkPlaceholder || "e.g. Wine & Champagne, Fresh juices..."}
                 value={drinkPreference}
                 onChange={(e) => setDrinkPreference(e.target.value)}
                 className="w-full px-4 py-3 rounded-xl border border-[#E2E8F0] text-sm text-[#0F172A] focus:outline-none focus:border-[#8B7355]"
@@ -368,11 +377,11 @@ export default function EventSpaceInquiryPage() {
             {/* DJ / Music / Entertainment */}
             <div>
               <label className="block text-xs font-semibold text-[#475569] mb-2 flex items-center gap-1.5">
-                <BiMusic className="text-[#8B7355] text-base" /> DJ / Music / Entertainment
+                <BiMusic className="text-[#8B7355] text-base" /> {esTrans?.musicEntertainment || "DJ / Music / Entertainment"}
               </label>
               <input
                 type="text"
-                placeholder="e.g. Live DJ, Acoustic duo, Playlist..."
+                placeholder={esTrans?.musicPlaceholder || "e.g. Live DJ, Acoustic duo, Playlist..."}
                 value={entertainmentPreference}
                 onChange={(e) => setEntertainmentPreference(e.target.value)}
                 className="w-full px-4 py-3 rounded-xl border border-[#E2E8F0] text-sm text-[#0F172A] focus:outline-none focus:border-[#8B7355]"
@@ -383,11 +392,11 @@ export default function EventSpaceInquiryPage() {
           {/* Additional Requests */}
           <div className="space-y-2 pt-2">
             <label className="block text-xs font-semibold text-[#475569]">
-              Additional Requests / Notes
+              {esTrans?.additionalRequestsNotes || "Additional Requests / Notes"}
             </label>
             <textarea
               rows={3}
-              placeholder="e.g. Flower decorations, surprise birthday setup, custom seating arrangement..."
+              placeholder={esTrans?.additionalRequestsPlaceholder || "e.g. Flower decorations, surprise birthday setup, custom seating arrangement..."}
               value={additionalRequests}
               onChange={(e) => setAdditionalRequests(e.target.value)}
               className="w-full px-4 py-3 rounded-xl border border-[#E2E8F0] text-sm text-[#0F172A] focus:outline-none focus:border-[#8B7355]"
@@ -399,16 +408,16 @@ export default function EventSpaceInquiryPage() {
         <div className="bg-white rounded-[32px] p-8 md:p-10 shadow-sm border border-[#E8E2DC] space-y-6">
           <div>
             <label className="block text-sm font-bold text-[#0F172A] mb-1 uppercase tracking-wider" style={{ fontFamily: "Inter, sans-serif" }}>
-              4. Contact Information
+              {esTrans?.contactInformation || "4. Contact Information"}
             </label>
-            <p className="text-xs text-[#64748B]">Where should we send your customized quotation?</p>
+            <p className="text-xs text-[#64748B]">{esTrans?.contactInformationSub || "Where should we send your customized quotation?"}</p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {/* Name */}
             <div>
               <label className="block text-xs font-semibold text-[#475569] mb-2 flex items-center gap-1.5">
-                <FaUser className="text-[#8B7355]" /> Full Name
+                <FaUser className="text-[#8B7355]" /> {esTrans?.fullName || "Full Name"}
               </label>
               <input
                 type="text"
@@ -423,7 +432,7 @@ export default function EventSpaceInquiryPage() {
             {/* Phone */}
             <div>
               <label className="block text-xs font-semibold text-[#475569] mb-2 flex items-center gap-1.5">
-                <MdOutlinePhone className="text-[#8B7355] text-base" /> Phone Number
+                <MdOutlinePhone className="text-[#8B7355] text-base" /> {esTrans?.phoneNumber || "Phone Number"}
               </label>
               <input
                 type="tel"
@@ -438,7 +447,7 @@ export default function EventSpaceInquiryPage() {
             {/* Email */}
             <div>
               <label className="block text-xs font-semibold text-[#475569] mb-2 flex items-center gap-1.5">
-                <MdOutlineEmail className="text-[#8B7355] text-base" /> Email Address
+                <MdOutlineEmail className="text-[#8B7355] text-base" /> {esTrans?.emailAddress || "Email Address"}
               </label>
               <input
                 type="email"
@@ -462,7 +471,7 @@ export default function EventSpaceInquiryPage() {
               <line x1="19" y1="12" x2="5" y2="12"></line>
               <polyline points="12 19 5 12 12 5"></polyline>
             </svg>
-            Back to Services
+            {esTrans?.backToServices || "Back to Services"}
           </Link>
 
           <button
@@ -475,11 +484,11 @@ export default function EventSpaceInquiryPage() {
             {submitting ? (
               <>
                 <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent" />
-                Submitting...
+                {esTrans?.submitting || "Submitting..."}
               </>
             ) : (
               <>
-                Submit
+                {esTrans?.submit || "Submit"}
                 <FaPaperPlane size={14} />
               </>
             )}

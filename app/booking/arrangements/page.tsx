@@ -15,6 +15,7 @@ import {
   BiTimeFive,
 } from "react-icons/bi";
 import { FaBoxes, FaCalendarAlt, FaInfinity, FaSpa, FaUsers } from "react-icons/fa";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
 
 type OptionType = "single" | "10_session_pass" | "once_a_week" | "unlimited";
 
@@ -38,6 +39,10 @@ interface PackageComboItem {
 
 export default function SaltRoomBookingPage() {
   const router = useRouter();
+  const { t } = useLanguage();
+  const flow = (t as any)?.bookingFlow;
+  const saltTrans = flow?.saltroom;
+  const btnTrans = flow?.buttons;
   const [selectedOption, setSelectedOption] = useState<OptionType>("single");
   const [guestsCount, setGuestsCount] = useState<number>(1);
   const [hasActivePass, setHasActivePass] = useState<boolean>(false);
@@ -214,8 +219,8 @@ export default function SaltRoomBookingPage() {
     if (saltroomInfo) {
       options.push({
         id: "single",
-        title: saltroomInfo.title || "Salt Room",
-        badge: "Standard Booking",
+        title: saltroomInfo.title || saltTrans?.title || "Salt Room",
+        badge: saltTrans?.standardBooking || "Standard Booking",
         price: singlePrice,
         subtitle: saltroomInfo.subtitle || "Aerosol Halotherapy Session",
         icon: <FaSpa className="w-5 h-5 text-[#8B7355]" />,
@@ -233,7 +238,7 @@ export default function SaltRoomBookingPage() {
       options.push({
         id: "10_session_pass",
         title: sessionPass.name || `${unitLimit} Session Pass`,
-        badge: "Best Value Pass",
+        badge: saltTrans?.bestValuePass || "Best Value Pass",
         price: `€${passPriceNum.toFixed(0)}`,
         subtitle: `${unitLimit} Sessions (€${unitPriceCalc} per session)`,
         icon: <FaBoxes className="w-5 h-5 text-[#8B7355]" />,
@@ -249,7 +254,7 @@ export default function SaltRoomBookingPage() {
       options.push({
         id: "once_a_week",
         title: weeklyPlan.name || "Once a Week",
-        badge: "Weekly Ritual",
+        badge: saltTrans?.weeklyRitual || "Weekly Ritual",
         price: `€${planPriceNum.toFixed(0)} / ${durationWeeks} weeks`,
         subtitle: "1 Session Every Week",
         icon: <FaCalendarAlt className="w-5 h-5 text-[#8B7355]" />,
@@ -265,7 +270,7 @@ export default function SaltRoomBookingPage() {
       options.push({
         id: "unlimited",
         title: unlimitedPlan.name || "Unlimited",
-        badge: "Ultimate Wellness",
+        badge: saltTrans?.ultimateWellness || "Ultimate Wellness",
         price: `€${planPriceNum.toFixed(0)} / ${durationWeeks} weeks`,
         subtitle: "Unlimited Halotherapy Access",
         icon: <FaInfinity className="w-5 h-5 text-[#8B7355]" />,
@@ -276,7 +281,7 @@ export default function SaltRoomBookingPage() {
     }
 
     return options;
-  }, [saltroomInfo, sessionPass, weeklyPlan, unlimitedPlan, singlePrice]);
+  }, [saltroomInfo, sessionPass, weeklyPlan, unlimitedPlan, singlePrice, saltTrans]);
 
   useEffect(() => {
     if (saltOptions.length > 0 && !saltOptions.some((o) => o.id === selectedOption)) {
@@ -563,17 +568,21 @@ export default function SaltRoomBookingPage() {
       <div className="mb-10 bg-white rounded-2xl p-6 border border-[#E8E2DC] shadow-xs grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
         <div className="p-4 rounded-xl bg-[#FCF2E9] border border-[#E8E2DC]">
           <span className="text-xs text-[#8B7355] font-bold uppercase tracking-wider block mb-1">
-            Max Capacity
+            {saltTrans?.maxCapacity || "Max Capacity"}
           </span>
           <div className="flex items-center justify-center gap-1 text-[#0F172A] font-bold text-base font-displayPlayFair">
             <FaUsers className="text-[#8B7355]" />
-            <span>{dynamicMaxCapacity} {dynamicMaxCapacity === 1 ? "Person" : "People"} / Session</span>
+            <span>
+              {dynamicMaxCapacity === 1
+                ? (saltTrans?.personPerSession ? saltTrans.personPerSession.replace("{count}", "1") : "1 Person / Session")
+                : (saltTrans?.peoplePerSession ? saltTrans.peoplePerSession.replace("{count}", String(dynamicMaxCapacity)) : `${dynamicMaxCapacity} People / Session`)}
+            </span>
           </div>
         </div>
 
         <div className="p-4 rounded-xl bg-[#FCF2E9] border border-[#E8E2DC]">
           <span className="text-xs text-[#8B7355] font-bold uppercase tracking-wider block mb-1">
-            Session Duration
+            {saltTrans?.sessionDuration || "Session Duration"}
           </span>
           <div className="flex items-center justify-center gap-1 text-[#0F172A] font-bold text-base font-displayPlayFair">
             <BiTimeFive className="text-[#8B7355] text-lg" />
@@ -583,11 +592,11 @@ export default function SaltRoomBookingPage() {
 
         <div className="p-4 rounded-xl bg-[#FCF2E9] border border-[#E8E2DC]">
           <span className="text-xs text-[#8B7355] font-bold uppercase tracking-wider block mb-1">
-            Single Price
+            {saltTrans?.singlePrice || "Single Price"}
           </span>
           <div className="flex items-center justify-center gap-1 text-[#0F172A] font-bold text-base font-displayPlayFair">
             <BiCreditCard className="text-[#8B7355] text-lg" />
-            <span>€{singlePriceNum.toFixed(0)} / Person</span>
+            <span>€{singlePriceNum.toFixed(0)} / {saltTrans?.perPerson || "Person"}</span>
           </div>
         </div>
       </div>
@@ -598,10 +607,10 @@ export default function SaltRoomBookingPage() {
         <div>
           <div className="flex justify-between items-center mb-3">
             <label className="block text-sm font-bold text-[#0F172A] uppercase tracking-wider" style={{ fontFamily: "Inter, sans-serif" }}>
-              1. Select Reservation Date
+              {saltTrans?.selectReservationDate || "1. Select Reservation Date"}
             </label>
             <span className="text-xs text-[#8B7355] font-semibold">
-              Operating hours: 09:00 – 21:00
+              {saltTrans?.operatingHours || "Operating hours: 09:00 – 21:00"}
             </span>
           </div>
           <div className="relative max-w-md">
@@ -617,7 +626,7 @@ export default function SaltRoomBookingPage() {
             {loadingDateSlots && (
               <span className="absolute right-12 top-4 text-xs text-[#8B7355] italic flex items-center gap-1">
                 <span className="inline-block animate-spin rounded-full h-3.5 w-3.5 border-2 border-[#8B7355] border-t-transparent"></span>
-                Checking date limits...
+                {saltTrans?.checkingLimits || "Checking date limits..."}
               </span>
             )}
           </div>
@@ -627,9 +636,11 @@ export default function SaltRoomBookingPage() {
             <div className="mt-3 p-4 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 flex items-start gap-3 max-w-xl">
               <BiInfoCircle size={20} className="flex-shrink-0 mt-0.5" />
               <div>
-                <h5 className="text-xs font-bold uppercase tracking-wider">Date Blocked for Reservations</h5>
+                <h5 className="text-xs font-bold uppercase tracking-wider">
+                  {saltTrans?.dateBlockedTitle || "Date Blocked for Reservations"}
+                </h5>
                 <p className="text-xs font-medium mt-0.5">
-                  {dateBlockedMessage || "This date is currently blocked. No reservations can be made on this date."}
+                  {dateBlockedMessage || (saltTrans?.dateBlockedDefault || "This date is currently blocked. No reservations can be made on this date.")}
                 </p>
               </div>
             </div>
@@ -637,9 +648,9 @@ export default function SaltRoomBookingPage() {
 
           {date && !isDateBlocked && slotDateMembership && (
             <p className="text-xs text-emerald-700 mt-2 font-medium">
-              ✓ Verified limits for {new Date(date).toLocaleDateString()}:{" "}
-              {slotDateMembership.has_active_pass ? `${slotDateMembership.session_pass?.remaining_sessions ?? 0} Pass sessions remaining` : ""}{" "}
-              {slotDateMembership.has_active_subscription ? `${slotDateMembership.subscription?.name} Subscription active` : ""}
+              {saltTrans?.verifiedLimits ? saltTrans.verifiedLimits.replace("{date}", new Date(date).toLocaleDateString()) : `✓ Verified limits for ${new Date(date).toLocaleDateString()}: `}
+              {slotDateMembership.has_active_pass ? (saltTrans?.passSessionsRemaining ? saltTrans.passSessionsRemaining.replace("{count}", String(slotDateMembership.session_pass?.remaining_sessions ?? 0)) : `${slotDateMembership.session_pass?.remaining_sessions ?? 0} Pass sessions remaining`) : ""}{" "}
+              {slotDateMembership.has_active_subscription ? (saltTrans?.subscriptionActive ? saltTrans.subscriptionActive.replace("{name}", slotDateMembership.subscription?.name || "") : `${slotDateMembership.subscription?.name} Subscription active`) : ""}
             </p>
           )}
         </div>
@@ -648,11 +659,11 @@ export default function SaltRoomBookingPage() {
         <div>
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
             <label className="block text-sm font-bold text-[#0F172A] uppercase tracking-wider" style={{ fontFamily: "Inter, sans-serif" }}>
-              2. Select Booking Option or Membership
+              {saltTrans?.selectBookingOption || "2. Select Booking Option or Membership"}
             </label>
             {!date && (
               <span className="text-xs text-amber-700 bg-amber-50 px-3 py-1 rounded-full border border-amber-200 font-semibold flex items-center gap-1.5 self-start sm:self-auto">
-                <BiInfoCircle size={15} /> Please select a reservation date above first
+                <BiInfoCircle size={15} /> {saltTrans?.pleaseSelectDateFirst || "Please select a reservation date above first"}
               </span>
             )}
           </div>
@@ -714,11 +725,11 @@ export default function SaltRoomBookingPage() {
                       <div className="flex items-center gap-2">
                         {isOptionDisabledForDate ? (
                           <span className="px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider bg-rose-100 text-rose-700 border border-rose-300">
-                            Limit Reached
+                            {saltTrans?.limitReached || "Limit Reached"}
                           </span>
                         ) : isCardCovered ? (
                           <span className="px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider bg-emerald-100 text-emerald-800 border border-emerald-300">
-                            Active (Covered)
+                            {saltTrans?.activeCovered || "Active (Covered)"}
                           </span>
                         ) : null}
                         <div
@@ -777,10 +788,14 @@ export default function SaltRoomBookingPage() {
         <div>
           <div className="flex justify-between items-center mb-4">
             <label className="block text-sm font-bold text-[#0F172A] uppercase tracking-wider" style={{ fontFamily: "Inter, sans-serif" }}>
-              3. Number of Guests (Maximum {dynamicMaxCapacity} {dynamicMaxCapacity === 1 ? "person" : "people"} per session)
+              {saltTrans?.numberOfGuests
+                ? saltTrans.numberOfGuests.replace("{max}", String(dynamicMaxCapacity))
+                : `3. Number of Guests (Maximum ${dynamicMaxCapacity} ${dynamicMaxCapacity === 1 ? "person" : "people"} per session)`}
             </label>
             <span className="text-xs font-semibold text-[#8B7355]">
-              Strict capacity: Max {dynamicMaxCapacity} guests
+              {saltTrans?.strictCapacity
+                ? saltTrans.strictCapacity.replace("{max}", String(dynamicMaxCapacity))
+                : `Strict capacity: Max ${dynamicMaxCapacity} guests`}
             </span>
           </div>
 
@@ -799,13 +814,17 @@ export default function SaltRoomBookingPage() {
                     : "bg-white border-[#E2E8F0] text-[#475569] hover:border-[#D1B191]"
                 }`}
               >
-                <span className="block text-xl font-displayPlayFair">{num} {num === 1 ? "Person" : "People"}</span>
+                <span className="block text-xl font-displayPlayFair">
+                  {num === 1
+                    ? (saltTrans?.person ? saltTrans.person.replace("{count}", "1") : "1 Person")
+                    : (saltTrans?.people ? saltTrans.people.replace("{count}", String(num)) : `${num} People`)}
+                </span>
                 <span className="text-[11px] opacity-90 font-mono">
                   {selectedOption === "single"
                     ? `€${(num * singlePriceNum).toFixed(0)}`
                     : isSelectedOptionCovered
-                    ? "Covered (€0)"
-                    : "Included in plan"}
+                    ? (saltTrans?.coveredZero || "Covered (€0)")
+                    : (saltTrans?.includedInPlan || "Included in plan")}
                 </span>
               </button>
             ))}
@@ -817,25 +836,27 @@ export default function SaltRoomBookingPage() {
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
             <div>
               <span className="text-xs font-bold uppercase tracking-widest text-[#8B7355] block mb-1">
-                Calculated Price
+                {saltTrans?.calculatedPrice || "Calculated Price"}
               </span>
               <h4 className="text-xl font-bold text-[#0F172A] font-displayPlayFair">
                 {selectedOption === "single"
-                  ? `${saltroomInfo?.title || "Salt Room"} • ${guestsCount} ${guestsCount === 1 ? "Person" : "People"}`
+                  ? `${saltroomInfo?.title || saltTrans?.title || "Salt Room"} • ${guestsCount === 1 ? (saltTrans?.person ? saltTrans.person.replace("{count}", "1") : "1 Person") : (saltTrans?.people ? saltTrans.people.replace("{count}", String(guestsCount)) : `${guestsCount} People`)}`
                   : saltOptions.find((o) => o.id === selectedOption)?.title || "Selected Plan"}
               </h4>
               <p className="text-xs text-[#64748B] mt-1">
                 {isSelectedOptionCovered
-                  ? "✓ Active subscription / pass detected & valid — €0 due today."
+                  ? (saltTrans?.coveredActiveNote || "✓ Active subscription / pass detected & valid — €0 due today.")
                   : selectedOption === "single"
-                  ? `€${singlePriceNum.toFixed(0)} × ${guestsCount} guest(s)`
-                  : "No active membership for this option — standard price applies."}
+                  ? (saltTrans?.standardPriceNote
+                      ? saltTrans.standardPriceNote.replace("{price}", singlePriceNum.toFixed(0)).replace("{count}", String(guestsCount))
+                      : `€${singlePriceNum.toFixed(0)} × ${guestsCount} guest(s)`)
+                  : (saltTrans?.noMembershipNote || "No active membership for this option — standard price applies.")}
               </p>
             </div>
 
             <div className="text-left md:text-right flex flex-col items-start md:items-end justify-center">
               <span className="text-xs text-[#8B7355] uppercase font-bold tracking-wider mb-0.5">
-                Total Due
+                {saltTrans?.totalDue || "Total Due"}
               </span>
               <div className="flex items-baseline gap-2">
                 {isSelectedOptionCovered && (
@@ -869,7 +890,7 @@ export default function SaltRoomBookingPage() {
             <line x1="19" y1="12" x2="5" y2="12"></line>
             <polyline points="12 19 5 12 12 5"></polyline>
           </svg>
-          Back
+          {btnTrans?.back || "Back"}
         </Link>
 
         <button
@@ -884,12 +905,12 @@ export default function SaltRoomBookingPage() {
           style={{ fontFamily: "Inter, sans-serif" }}
         >
           {!date
-            ? "Please Select a Date to Continue"
+            ? (saltTrans?.btnSelectDatePrompt || "Please Select a Date to Continue")
             : isDateBlocked
-            ? "Date Blocked — Select Another Date"
+            ? (saltTrans?.btnDateBlocked || "Date Blocked — Select Another Date")
             : isSelectedOptionCovered
-            ? "Book with Membership / Pass (Free)"
-            : "Continue to Choose Time"}
+            ? (saltTrans?.btnBookFree || "Book with Membership / Pass (Free)")
+            : (saltTrans?.btnContinueToTime || "Continue to Choose Time")}
           {date && !isDateBlocked && (
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
               <line x1="5" y1="12" x2="19" y2="12"></line>

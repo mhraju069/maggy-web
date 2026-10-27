@@ -11,6 +11,7 @@ import { useCallback, useEffect, useState } from "react";
 import { AiOutlineClockCircle } from "react-icons/ai";
 import { FaChalkboardTeacher, FaCheckCircle, FaInfoCircle } from "react-icons/fa";
 import { LuUsers } from "react-icons/lu";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
 
 const CATEGORIES = [
   "All Activities",
@@ -42,6 +43,10 @@ const parsePrice = (val: string | number | undefined, defaultVal: number): numbe
 
 export default function ActivitiesBookingPage() {
   const router = useRouter();
+  const { language, t } = useLanguage();
+  const flow = (t as any)?.bookingFlow;
+  const btnTrans = flow?.buttons;
+
   const [activities, setActivities] = useState<Activity[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string>("All Activities");
   const [selectedActivity, setSelectedActivity] = useState<Activity | null>(null);
@@ -57,6 +62,28 @@ export default function ActivitiesBookingPage() {
         const mapped: Activity[] = apiData.map((item, idx) => {
           const defaultCategory = CATEGORIES[(idx % (CATEGORIES.length - 1)) + 1];
           const rawPrice = parsePrice(item.price, 40);
+
+          // Language-aware title & description
+          const localizedTitle =
+            language === "nl"
+              ? item.title_nl || item.title || item.name
+              : language === "de"
+              ? item.title_de || item.title || item.name
+              : item.title_en || item.title || item.name;
+
+          const localizedDesc =
+            language === "nl"
+              ? item.description_nl || item.description
+              : language === "de"
+              ? item.description_de || item.description
+              : item.description_en || item.description;
+
+          const localizedNotes =
+            language === "nl"
+              ? item.additional_notes_nl || item.additional_notes || localizedDesc
+              : language === "de"
+              ? item.additional_notes_de || item.additional_notes || localizedDesc
+              : item.additional_notes_en || item.additional_notes || localizedDesc;
 
           // Format session times
           const startTime = item.open_time
@@ -74,15 +101,15 @@ export default function ActivitiesBookingPage() {
           const bookedCount = item.booked_slots ?? item.booked_participants ?? item.bookedParticipants ?? 0;
           const availableCount = item.available_slots !== undefined ? item.available_slots : Math.max(0, maxCapacity - bookedCount);
           const hostName = item.host || item.teacher_host || item.teacherHost || "Elena Rostova";
-          const notes = item.additional_notes || item.description || "Complimentary herbal tea & mat provided.";
+          const notes = localizedNotes || "Complimentary herbal tea & mat provided.";
           const available = (item.is_available ?? true) && availableCount > 0;
 
           return {
             id: String(item.id ?? idx),
-            name: item.title || item.name || "Mindful Session",
+            name: localizedTitle || "Mindful Session",
             category: item.category || defaultCategory,
             description:
-              item.description ||
+              localizedDesc ||
               "Transformative session designed to center the mind, cultivate stillness, and revitalize the body.",
             image: formatImageUrl(
               item.images || item.image,
@@ -99,7 +126,12 @@ export default function ActivitiesBookingPage() {
             teacherHost: hostName,
             additionalInfo: notes,
             isRecurring: item.is_recurring ?? item.isRecurring ?? true,
-            features: item.features?.map((f: any) => (typeof f === "string" ? f : f.feature)) || [],
+            features: item.features?.map((f: any) => {
+              if (typeof f === "string") return f;
+              if (language === "nl" && f.feature_nl) return f.feature_nl;
+              if (language === "de" && f.feature_de) return f.feature_de;
+              return f.feature_en || f.feature;
+            }) || [],
             isAvailable: available,
           };
         });
@@ -116,7 +148,7 @@ export default function ActivitiesBookingPage() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [language]);
 
   useEffect(() => {
     fetchActivitiesData();
@@ -383,7 +415,7 @@ export default function ActivitiesBookingPage() {
             <line x1="19" y1="12" x2="5" y2="12"></line>
             <polyline points="12 19 5 12 12 5"></polyline>
           </svg>
-          Back to Experiences
+          {btnTrans?.back || "Back to Experiences"}
         </Link>
 
         {selectedActivity && (
@@ -392,7 +424,7 @@ export default function ActivitiesBookingPage() {
             className="px-12 py-4 rounded-xl bg-[#D1B191] hover:bg-[#C4A484] text-white font-bold text-sm flex items-center gap-3 transition-all shadow-lg transform translate-y-[-2px]"
             style={{ fontFamily: "Inter, sans-serif" }}
           >
-            Continue
+            {btnTrans?.continue || "Continue"}
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
               <line x1="5" y1="12" x2="19" y2="12"></line>
               <polyline points="12 5 19 12 12 19"></polyline>
