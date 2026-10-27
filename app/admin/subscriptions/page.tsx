@@ -6,6 +6,7 @@ import {
   SessionPassItem,
   SubscriptionPlanItem,
   PlanFeature,
+  MultilingualFeature,
 } from "@/lib/api/services/paymentsService";
 import { parseApiErrorMessage } from "@/lib/api/types";
 import {
@@ -40,6 +41,10 @@ export default function AdminSubscriptionsPage() {
   const [editingPass, setEditingPass] = useState<SessionPassItem | null>(null);
 
   const [planModalOpen, setPlanModalOpen] = useState<boolean>(false);
+
+  // Language tab state for modal forms ('en' | 'nl' | 'de')
+  const [formLangTab, setFormLangTab] = useState<"en" | "nl" | "de">("en");
+
   const [editingPlan, setEditingPlan] = useState<SubscriptionPlanItem | null>(null);
 
   // Delete confirm state
@@ -52,20 +57,24 @@ export default function AdminSubscriptionsPage() {
 
   // Forms
   const [passForm, setPassForm] = useState({
-    name: "",
+    name_en: "",
+    name_nl: "",
+    name_de: "",
     price: "",
     entry_limit: 10,
-    featuresText: "",
+    features: [] as MultilingualFeature[],
   });
 
   const [planForm, setPlanForm] = useState({
-    name: "",
+    name_en: "",
+    name_nl: "",
+    name_de: "",
     price: "",
     plan_type: "weekly",
     plan_category: "sauna",
     max_reservations: 10,
     duration_weeks: 4,
-    featuresText: "",
+    features: [] as MultilingualFeature[],
   });
 
   // Fetch all plans and passes
@@ -101,23 +110,37 @@ export default function AdminSubscriptionsPage() {
   // ─────────────────────────────────────────────────────────────
   const openNewPassModal = () => {
     setEditingPass(null);
+    setFormLangTab("en");
     setPassForm({
-      name: "",
+      name_en: "",
+      name_nl: "",
+      name_de: "",
       price: "",
       entry_limit: 10,
-      featuresText: "Valid for 6 months\nAccess to sauna\nTowel included",
+      features: [
+        { feature_en: "Valid for 6 months", feature_nl: "6 maanden geldig", feature_de: "Gültig für 6 Monate" },
+        { feature_en: "Access to sauna", feature_nl: "Toegang tot de sauna", feature_de: "Zugang zur Sauna" },
+        { feature_en: "Towel included", feature_nl: "Handdoek inbegrepen", feature_de: "Handtuch inklusive" },
+      ],
     });
     setPassModalOpen(true);
   };
 
   const openEditPassModal = (pass: SessionPassItem) => {
     setEditingPass(pass);
-    const featStr = (pass.features || []).map((f) => f.feature || (f as any).name || "").join("\n");
+    setFormLangTab("en");
+    const mappedFeatures: MultilingualFeature[] = (pass.features || []).map((f: any) => ({
+      feature_en: f.feature_en || f.feature || f.name || "",
+      feature_nl: f.feature_nl || "",
+      feature_de: f.feature_de || "",
+    }));
     setPassForm({
-      name: pass.name || "",
+      name_en: pass.name_en || pass.name || "",
+      name_nl: pass.name_nl || "",
+      name_de: pass.name_de || "",
       price: String(pass.price || ""),
       entry_limit: pass.entry_limit || 10,
-      featuresText: featStr,
+      features: mappedFeatures.length > 0 ? mappedFeatures : [{ feature_en: "", feature_nl: "", feature_de: "" }],
     });
     setPassModalOpen(true);
   };
@@ -127,28 +150,39 @@ export default function AdminSubscriptionsPage() {
     setSubmitting(true);
     setError(null);
 
-    const feature_list = passForm.featuresText
-      .split("\n")
-      .map((s) => s.trim())
-      .filter(Boolean);
+    const feature_list = passForm.features
+      .filter((f) => f.feature_en?.trim() || f.feature_nl?.trim() || f.feature_de?.trim())
+      .map((f) => ({
+        feature_en: f.feature_en?.trim() || f.feature_nl?.trim() || f.feature_de?.trim() || "",
+        feature_nl: f.feature_nl?.trim() || f.feature_en?.trim() || "",
+        feature_de: f.feature_de?.trim() || f.feature_en?.trim() || "",
+      }));
+
+    const primaryName = passForm.name_en || passForm.name_nl || passForm.name_de || "Session Pass";
 
     try {
       if (editingPass) {
         await paymentsService.updateSessionPass(editingPass.id, {
-          name: passForm.name,
+          name: primaryName,
+          name_en: passForm.name_en,
+          name_nl: passForm.name_nl,
+          name_de: passForm.name_de,
           price: passForm.price,
           entry_limit: Number(passForm.entry_limit),
           feature_list,
         });
-        showSuccess(`Session Pass "${passForm.name}" updated successfully.`);
+        showSuccess(`Session Pass "${primaryName}" updated successfully in all languages.`);
       } else {
         await paymentsService.createSessionPass({
-          name: passForm.name,
+          name: primaryName,
+          name_en: passForm.name_en,
+          name_nl: passForm.name_nl,
+          name_de: passForm.name_de,
           price: passForm.price,
           entry_limit: Number(passForm.entry_limit),
           feature_list,
         });
-        showSuccess(`New Session Pass "${passForm.name}" created successfully.`);
+        showSuccess(`New Session Pass "${primaryName}" created successfully.`);
       }
       setPassModalOpen(false);
       loadData(true);
@@ -164,29 +198,43 @@ export default function AdminSubscriptionsPage() {
   // ─────────────────────────────────────────────────────────────
   const openNewPlanModal = () => {
     setEditingPlan(null);
+    setFormLangTab("en");
     setPlanForm({
-      name: "",
+      name_en: "",
+      name_nl: "",
+      name_de: "",
       price: "",
       plan_type: "weekly",
       plan_category: "sauna",
       max_reservations: 10,
       duration_weeks: 4,
-      featuresText: "Once a week session\nMax active reservations: 10\nComplimentary towel",
+      features: [
+        { feature_en: "Once a week session", feature_nl: "Wekelijkse sessie", feature_de: "Einmal pro Woche Sitzung" },
+        { feature_en: "Max active reservations: 10", feature_nl: "Max actieve reserveringen: 10", feature_de: "Max. aktive Reservierungen: 10" },
+        { feature_en: "Complimentary towel", feature_nl: "Inclusief handdoek", feature_de: "Handtuch inbegriffen" },
+      ],
     });
     setPlanModalOpen(true);
   };
 
   const openEditPlanModal = (plan: SubscriptionPlanItem) => {
     setEditingPlan(plan);
-    const featStr = (plan.features || []).map((f) => f.feature || (f as any).name || "").join("\n");
+    setFormLangTab("en");
+    const mappedFeatures: MultilingualFeature[] = (plan.features || []).map((f: any) => ({
+      feature_en: f.feature_en || f.feature || f.name || "",
+      feature_nl: f.feature_nl || "",
+      feature_de: f.feature_de || "",
+    }));
     setPlanForm({
-      name: plan.name || "",
+      name_en: plan.name_en || plan.name || "",
+      name_nl: plan.name_nl || "",
+      name_de: plan.name_de || "",
       price: String(plan.price || ""),
       plan_type: plan.plan_type || "weekly",
       plan_category: plan.plan_category || "sauna",
       max_reservations: plan.max_reservations ?? 10,
       duration_weeks: plan.duration_weeks ?? 4,
-      featuresText: featStr,
+      features: mappedFeatures.length > 0 ? mappedFeatures : [{ feature_en: "", feature_nl: "", feature_de: "" }],
     });
     setPlanModalOpen(true);
   };
@@ -196,15 +244,23 @@ export default function AdminSubscriptionsPage() {
     setSubmitting(true);
     setError(null);
 
-    const feature_list = planForm.featuresText
-      .split("\n")
-      .map((s) => s.trim())
-      .filter(Boolean);
+    const feature_list = planForm.features
+      .filter((f) => f.feature_en?.trim() || f.feature_nl?.trim() || f.feature_de?.trim())
+      .map((f) => ({
+        feature_en: f.feature_en?.trim() || f.feature_nl?.trim() || f.feature_de?.trim() || "",
+        feature_nl: f.feature_nl?.trim() || f.feature_en?.trim() || "",
+        feature_de: f.feature_de?.trim() || f.feature_en?.trim() || "",
+      }));
+
+    const primaryName = planForm.name_en || planForm.name_nl || planForm.name_de || "Subscription Plan";
 
     try {
       if (editingPlan) {
         await paymentsService.updateSubscriptionPlan(editingPlan.id, {
-          name: planForm.name,
+          name: primaryName,
+          name_en: planForm.name_en,
+          name_nl: planForm.name_nl,
+          name_de: planForm.name_de,
           price: planForm.price,
           plan_type: planForm.plan_type,
           plan_category: planForm.plan_category,
@@ -212,10 +268,13 @@ export default function AdminSubscriptionsPage() {
           duration_weeks: Number(planForm.duration_weeks),
           feature_list,
         });
-        showSuccess(`Subscription Plan "${planForm.name}" updated successfully.`);
+        showSuccess(`Subscription Plan "${primaryName}" updated successfully in all languages.`);
       } else {
         await paymentsService.createSubscriptionPlan({
-          name: planForm.name,
+          name: primaryName,
+          name_en: planForm.name_en,
+          name_nl: planForm.name_nl,
+          name_de: planForm.name_de,
           price: planForm.price,
           plan_type: planForm.plan_type,
           plan_category: planForm.plan_category,
@@ -223,7 +282,7 @@ export default function AdminSubscriptionsPage() {
           duration_weeks: Number(planForm.duration_weeks),
           feature_list,
         });
-        showSuccess(`Subscription Plan "${planForm.name}" created successfully.`);
+        showSuccess(`Subscription Plan "${primaryName}" created successfully.`);
       }
       setPlanModalOpen(false);
       loadData(true);
@@ -674,7 +733,7 @@ export default function AdminSubscriptionsPage() {
       {/* ───────────────────────────────────────────────────────────── */}
       {passModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-          <div className="bg-white rounded-2xl w-full max-w-md p-6 shadow-2xl relative border border-[#E8E2DC]">
+          <div className="bg-white rounded-2xl w-full max-w-lg p-6 shadow-2xl relative border border-[#E8E2DC] max-h-[90vh] flex flex-col">
             <button
               type="button"
               onClick={() => setPassModalOpen(false)}
@@ -686,21 +745,67 @@ export default function AdminSubscriptionsPage() {
             <h3 className="font-displayPlayFair text-xl font-bold text-[#1d1a17] mb-1">
               {editingPass ? "Edit Session Pass" : "New Session Pass"}
             </h3>
-            <p className="text-xs text-gray-400 mb-5">
-              Configure session pass entry limit, pricing, and features.
+            <p className="text-xs text-gray-400 mb-4">
+              Configure session pass entry limit, pricing, and 3-language features.
             </p>
 
-            <form onSubmit={handleSavePass} className="space-y-4 text-xs">
+            {/* Language Switcher Tabs */}
+            <div className="flex items-center gap-2 mb-4 p-1 bg-gray-100 rounded-xl">
+              {(["en", "nl", "de"] as const).map((lang) => (
+                <button
+                  key={lang}
+                  type="button"
+                  onClick={() => setFormLangTab(lang)}
+                  className={`flex-1 py-1.5 text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-1.5 ${
+                    formLangTab === lang
+                      ? "bg-white text-[#8B7355] shadow-xs"
+                      : "text-gray-500 hover:text-gray-900"
+                  }`}
+                >
+                  <span className="uppercase">{lang}</span>
+                  <span className="text-[10px] font-normal text-gray-400">
+                    {lang === "en" ? "(English)" : lang === "nl" ? "(Dutch)" : "(German)"}
+                  </span>
+                </button>
+              ))}
+            </div>
+
+            <form onSubmit={handleSavePass} className="space-y-4 text-xs overflow-y-auto pr-1 flex-1">
+              {/* Pass Name in Active Language Tab */}
               <div>
-                <label className="block text-gray-700 font-semibold mb-1">Pass Name</label>
-                <input
-                  type="text"
-                  required
-                  placeholder="e.g. 10 Session Pass"
-                  value={passForm.name}
-                  onChange={(e) => setPassForm({ ...passForm, name: e.target.value })}
-                  className="w-full border border-[#E8E2DC] rounded-xl p-2.5 bg-white text-[#1d1a17] placeholder-gray-400 font-medium focus:outline-none focus:ring-2 focus:ring-[#CFB9A3]"
-                />
+                <label className="block text-gray-700 font-semibold mb-1">
+                  Pass Name (
+                  <span className="uppercase text-[#8B7355] font-bold">{formLangTab}</span>
+                  )
+                </label>
+                {formLangTab === "en" && (
+                  <input
+                    type="text"
+                    required
+                    placeholder="e.g. 10-Session Salt Room Pass"
+                    value={passForm.name_en}
+                    onChange={(e) => setPassForm({ ...passForm, name_en: e.target.value })}
+                    className="w-full border border-[#E8E2DC] rounded-xl p-2.5 bg-white text-[#1d1a17] placeholder-gray-400 font-medium focus:outline-none focus:ring-2 focus:ring-[#CFB9A3]"
+                  />
+                )}
+                {formLangTab === "nl" && (
+                  <input
+                    type="text"
+                    placeholder="e.g. 10-Sessies Zoutkamer Pas"
+                    value={passForm.name_nl}
+                    onChange={(e) => setPassForm({ ...passForm, name_nl: e.target.value })}
+                    className="w-full border border-[#E8E2DC] rounded-xl p-2.5 bg-white text-[#1d1a17] placeholder-gray-400 font-medium focus:outline-none focus:ring-2 focus:ring-[#CFB9A3]"
+                  />
+                )}
+                {formLangTab === "de" && (
+                  <input
+                    type="text"
+                    placeholder="e.g. 10er-Sitzungskarte Salzraum"
+                    value={passForm.name_de}
+                    onChange={(e) => setPassForm({ ...passForm, name_de: e.target.value })}
+                    className="w-full border border-[#E8E2DC] rounded-xl p-2.5 bg-white text-[#1d1a17] placeholder-gray-400 font-medium focus:outline-none focus:ring-2 focus:ring-[#CFB9A3]"
+                  />
+                )}
               </div>
 
               <div className="grid grid-cols-2 gap-3">
@@ -730,20 +835,78 @@ export default function AdminSubscriptionsPage() {
                 </div>
               </div>
 
-              <div>
-                <label className="block text-gray-700 font-semibold mb-1">
-                  Features (one feature per line)
-                </label>
-                <textarea
-                  rows={4}
-                  placeholder="Valid for 6 months&#10;Access to private/shared sauna&#10;Towel included"
-                  value={passForm.featuresText}
-                  onChange={(e) => setPassForm({ ...passForm, featuresText: e.target.value })}
-                  className="w-full border border-[#E8E2DC] rounded-xl p-2.5 bg-white text-[#1d1a17] placeholder-gray-400 font-medium focus:outline-none focus:ring-2 focus:ring-[#CFB9A3] resize-none font-sans"
-                />
+              {/* Multilingual Features List */}
+              <div className="space-y-2 pt-1">
+                <div className="flex items-center justify-between">
+                  <label className="block text-gray-700 font-semibold">
+                    Features (
+                    <span className="uppercase text-[#8B7355] font-bold">{formLangTab}</span>
+                    )
+                  </label>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setPassForm({
+                        ...passForm,
+                        features: [...passForm.features, { feature_en: "", feature_nl: "", feature_de: "" }],
+                      })
+                    }
+                    className="text-[11px] font-bold text-[#8B7355] hover:text-[#725e45] flex items-center gap-1"
+                  >
+                    <FiPlus size={12} /> Add Feature
+                  </button>
+                </div>
+
+                {passForm.features.length === 0 ? (
+                  <p className="text-gray-400 italic text-[11px] py-2">No features added. Click &quot;+ Add Feature&quot;.</p>
+                ) : (
+                  <div className="space-y-2">
+                    {passForm.features.map((feat, fIdx) => (
+                      <div key={fIdx} className="flex items-center gap-2">
+                        <span className="text-[10px] text-gray-400 w-4 font-mono">{fIdx + 1}.</span>
+                        <input
+                          type="text"
+                          placeholder={
+                            formLangTab === "en"
+                              ? "English feature text"
+                              : formLangTab === "nl"
+                              ? "Nederlandse vertaling"
+                              : "Deutsche Übersetzung"
+                          }
+                          value={
+                            formLangTab === "en"
+                              ? feat.feature_en || ""
+                              : formLangTab === "nl"
+                              ? feat.feature_nl || ""
+                              : feat.feature_de || ""
+                          }
+                          onChange={(e) => {
+                            const updated = [...passForm.features];
+                            if (formLangTab === "en") updated[fIdx].feature_en = e.target.value;
+                            else if (formLangTab === "nl") updated[fIdx].feature_nl = e.target.value;
+                            else updated[fIdx].feature_de = e.target.value;
+                            setPassForm({ ...passForm, features: updated });
+                          }}
+                          className="flex-1 border border-[#E8E2DC] rounded-lg p-2 bg-white text-[#1d1a17] placeholder-gray-400 font-sans focus:outline-none focus:ring-1 focus:ring-[#CFB9A3]"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const updated = passForm.features.filter((_, idx) => idx !== fIdx);
+                            setPassForm({ ...passForm, features: updated });
+                          }}
+                          className="p-2 text-rose-500 hover:text-rose-700 hover:bg-rose-50 rounded-lg transition-colors"
+                          title="Remove feature"
+                        >
+                          <FiTrash2 size={13} />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
 
-              <div className="pt-2 flex items-center justify-end gap-2">
+              <div className="pt-3 border-t border-[#F5F0EB] flex items-center justify-end gap-2">
                 <button
                   type="button"
                   onClick={() => setPassModalOpen(false)}
@@ -754,7 +917,7 @@ export default function AdminSubscriptionsPage() {
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="px-5 py-2 bg-[#CFB9A3] hover:bg-[#8b7355] text-white rounded-xl font-bold transition-colors disabled:opacity-50"
+                  className="px-5 py-2 bg-[#8B7355] hover:bg-[#725e45] text-white rounded-xl font-bold transition-colors disabled:opacity-50"
                 >
                   {submitting ? "Saving..." : editingPass ? "Update Pass" : "Create Pass"}
                 </button>
@@ -769,7 +932,7 @@ export default function AdminSubscriptionsPage() {
       {/* ───────────────────────────────────────────────────────────── */}
       {planModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-          <div className="bg-white rounded-2xl w-full max-w-lg p-6 shadow-2xl relative border border-[#E8E2DC]">
+          <div className="bg-white rounded-2xl w-full max-w-lg p-6 shadow-2xl relative border border-[#E8E2DC] max-h-[90vh] flex flex-col">
             <button
               type="button"
               onClick={() => setPlanModalOpen(false)}
@@ -781,21 +944,67 @@ export default function AdminSubscriptionsPage() {
             <h3 className="font-displayPlayFair text-xl font-bold text-[#1d1a17] mb-1">
               {editingPlan ? "Edit Subscription Plan" : "New Subscription Plan"}
             </h3>
-            <p className="text-xs text-gray-400 mb-5">
-              Set plan type (weekly/unlimited), service category, limits, and pricing.
+            <p className="text-xs text-gray-400 mb-4">
+              Set plan type (weekly/unlimited), service category, limits, and 3-language features.
             </p>
 
-            <form onSubmit={handleSavePlan} className="space-y-4 text-xs">
+            {/* Language Switcher Tabs */}
+            <div className="flex items-center gap-2 mb-4 p-1 bg-gray-100 rounded-xl">
+              {(["en", "nl", "de"] as const).map((lang) => (
+                <button
+                  key={lang}
+                  type="button"
+                  onClick={() => setFormLangTab(lang)}
+                  className={`flex-1 py-1.5 text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-1.5 ${
+                    formLangTab === lang
+                      ? "bg-white text-[#8B7355] shadow-xs"
+                      : "text-gray-500 hover:text-gray-900"
+                  }`}
+                >
+                  <span className="uppercase">{lang}</span>
+                  <span className="text-[10px] font-normal text-gray-400">
+                    {lang === "en" ? "(English)" : lang === "nl" ? "(Dutch)" : "(German)"}
+                  </span>
+                </button>
+              ))}
+            </div>
+
+            <form onSubmit={handleSavePlan} className="space-y-4 text-xs overflow-y-auto pr-1 flex-1">
+              {/* Plan Name in Active Language Tab */}
               <div>
-                <label className="block text-gray-700 font-semibold mb-1">Plan Name</label>
-                <input
-                  type="text"
-                  required
-                  placeholder="e.g. Unlimited Saltroom Monthly"
-                  value={planForm.name}
-                  onChange={(e) => setPlanForm({ ...planForm, name: e.target.value })}
-                  className="w-full border border-[#E8E2DC] rounded-xl p-2.5 bg-white text-[#1d1a17] placeholder-gray-400 font-medium focus:outline-none focus:ring-2 focus:ring-[#CFB9A3]"
-                />
+                <label className="block text-gray-700 font-semibold mb-1">
+                  Plan Name (
+                  <span className="uppercase text-[#8B7355] font-bold">{formLangTab}</span>
+                  )
+                </label>
+                {formLangTab === "en" && (
+                  <input
+                    type="text"
+                    required
+                    placeholder="e.g. Unlimited Saltroom Monthly"
+                    value={planForm.name_en}
+                    onChange={(e) => setPlanForm({ ...planForm, name_en: e.target.value })}
+                    className="w-full border border-[#E8E2DC] rounded-xl p-2.5 bg-white text-[#1d1a17] placeholder-gray-400 font-medium focus:outline-none focus:ring-2 focus:ring-[#CFB9A3]"
+                  />
+                )}
+                {formLangTab === "nl" && (
+                  <input
+                    type="text"
+                    placeholder="e.g. Onbeperkt Zoutkamer Maandelijks"
+                    value={planForm.name_nl}
+                    onChange={(e) => setPlanForm({ ...planForm, name_nl: e.target.value })}
+                    className="w-full border border-[#E8E2DC] rounded-xl p-2.5 bg-white text-[#1d1a17] placeholder-gray-400 font-medium focus:outline-none focus:ring-2 focus:ring-[#CFB9A3]"
+                  />
+                )}
+                {formLangTab === "de" && (
+                  <input
+                    type="text"
+                    placeholder="e.g. Unbegrenzter Salzraum Monatlich"
+                    value={planForm.name_de}
+                    onChange={(e) => setPlanForm({ ...planForm, name_de: e.target.value })}
+                    className="w-full border border-[#E8E2DC] rounded-xl p-2.5 bg-white text-[#1d1a17] placeholder-gray-400 font-medium focus:outline-none focus:ring-2 focus:ring-[#CFB9A3]"
+                  />
+                )}
               </div>
 
               <div className="grid grid-cols-3 gap-3">
@@ -871,20 +1080,78 @@ export default function AdminSubscriptionsPage() {
                 </div>
               </div>
 
-              <div>
-                <label className="block text-gray-700 font-semibold mb-1">
-                  Features (one feature per line)
-                </label>
-                <textarea
-                  rows={4}
-                  placeholder="Unlimited access&#10;Complimentary locker&#10;Member tea lounge"
-                  value={planForm.featuresText}
-                  onChange={(e) => setPlanForm({ ...planForm, featuresText: e.target.value })}
-                  className="w-full border border-[#E8E2DC] rounded-xl p-2.5 bg-white text-[#1d1a17] placeholder-gray-400 font-medium focus:outline-none focus:ring-2 focus:ring-[#CFB9A3] resize-none font-sans"
-                />
+              {/* Multilingual Features List */}
+              <div className="space-y-2 pt-1">
+                <div className="flex items-center justify-between">
+                  <label className="block text-gray-700 font-semibold">
+                    Features (
+                    <span className="uppercase text-[#8B7355] font-bold">{formLangTab}</span>
+                    )
+                  </label>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setPlanForm({
+                        ...planForm,
+                        features: [...planForm.features, { feature_en: "", feature_nl: "", feature_de: "" }],
+                      })
+                    }
+                    className="text-[11px] font-bold text-[#8B7355] hover:text-[#725e45] flex items-center gap-1"
+                  >
+                    <FiPlus size={12} /> Add Feature
+                  </button>
+                </div>
+
+                {planForm.features.length === 0 ? (
+                  <p className="text-gray-400 italic text-[11px] py-2">No features added. Click &quot;+ Add Feature&quot;.</p>
+                ) : (
+                  <div className="space-y-2">
+                    {planForm.features.map((feat, fIdx) => (
+                      <div key={fIdx} className="flex items-center gap-2">
+                        <span className="text-[10px] text-gray-400 w-4 font-mono">{fIdx + 1}.</span>
+                        <input
+                          type="text"
+                          placeholder={
+                            formLangTab === "en"
+                              ? "English feature text"
+                              : formLangTab === "nl"
+                              ? "Nederlandse vertaling"
+                              : "Deutsche Übersetzung"
+                          }
+                          value={
+                            formLangTab === "en"
+                              ? feat.feature_en || ""
+                              : formLangTab === "nl"
+                              ? feat.feature_nl || ""
+                              : feat.feature_de || ""
+                          }
+                          onChange={(e) => {
+                            const updated = [...planForm.features];
+                            if (formLangTab === "en") updated[fIdx].feature_en = e.target.value;
+                            else if (formLangTab === "nl") updated[fIdx].feature_nl = e.target.value;
+                            else updated[fIdx].feature_de = e.target.value;
+                            setPlanForm({ ...planForm, features: updated });
+                          }}
+                          className="flex-1 border border-[#E8E2DC] rounded-lg p-2 bg-white text-[#1d1a17] placeholder-gray-400 font-sans focus:outline-none focus:ring-1 focus:ring-[#CFB9A3]"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const updated = planForm.features.filter((_, idx) => idx !== fIdx);
+                            setPlanForm({ ...planForm, features: updated });
+                          }}
+                          className="p-2 text-rose-500 hover:text-rose-700 hover:bg-rose-50 rounded-lg transition-colors"
+                          title="Remove feature"
+                        >
+                          <FiTrash2 size={13} />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
 
-              <div className="pt-2 flex items-center justify-end gap-2">
+              <div className="pt-3 border-t border-[#F5F0EB] flex items-center justify-end gap-2">
                 <button
                   type="button"
                   onClick={() => setPlanModalOpen(false)}
@@ -895,7 +1162,7 @@ export default function AdminSubscriptionsPage() {
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="px-5 py-2 bg-[#CFB9A3] hover:bg-[#8b7355] text-white rounded-xl font-bold transition-colors disabled:opacity-50"
+                  className="px-5 py-2 bg-[#8B7355] hover:bg-[#725e45] text-white rounded-xl font-bold transition-colors disabled:opacity-50"
                 >
                   {submitting ? "Saving..." : editingPlan ? "Update Plan" : "Create Plan"}
                 </button>

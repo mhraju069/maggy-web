@@ -224,6 +224,33 @@ export const translations = {
       },
     },
     lunchroomPage: {
+      hoursAndReservations: {
+        kicker: "Welcome to the Lunchroom",
+        title: "Opening Hours & Table Reservations",
+        openingHoursCard: {
+          title: "Opening Hours",
+          subtitle: "Fresh meals & drinks served daily",
+          wedSun: "Wednesday – Sunday",
+          monTue: "Monday & Tuesday",
+          closed: "Closed",
+          kitchenNotice: "Kitchen closes 30 minutes before closing time.",
+        },
+        walkInsCard: {
+          title: "Walk-Ins & Table Booking",
+          subtitle: "Spontaneous or reserved, we welcome you",
+          walkInsTitle: "Walk-Ins Welcome",
+          walkInsDesc: "No reservation needed! Guests can drop by anytime Wednesday to Sunday from 09:00 to 16:00.",
+          tableBookingTitle: "Standard Table Reservations",
+          tableBookingDesc: "Reserve a table online for guaranteed seating and personalized special requests.",
+          reserveButton: "Reserve a Table Online",
+        },
+        celebrationBanner: {
+          badge: "Special Occasions & Birthdays",
+          title: "Celebrating Something Special?",
+          description: "Let us know what you're celebrating (birthday, anniversary, milestone), who it's for, and their hobbies or age. We'll prepare a personalized experience!",
+          button: "Plan Celebration Table",
+        },
+      },
       hero: {
         title: "Lunchroom",
         subtitle:
@@ -887,6 +914,15 @@ export const translations = {
         },
       },
       eventspace: {
+        eventTypes: {
+          birthdays: "Birthdays",
+          weddings: "Weddings",
+          babyShowers: "Baby Showers",
+          corporateParties: "Corporate Parties",
+          anniversaries: "Anniversaries",
+          privateParties: "Private Parties",
+          otherEvents: "Other Events",
+        },
         title: "Events & Party Room Inquiry",
         subtitle: "Whether celebrating intimate moments or grand occasions, request a customized proposal and let our team tailor the perfect experience for you.",
         selectEventType: "1. Select Event Type",
@@ -1211,6 +1247,33 @@ export const translations = {
       },
     },
     lunchroomPage: {
+      hoursAndReservations: {
+        kicker: "Welkom in de Lunchroom",
+        title: "Openingstijden & Tafelreserveringen",
+        openingHoursCard: {
+          title: "Openingstijden",
+          subtitle: "Dagelijks verse maaltijden & drankjes geserveerd",
+          wedSun: "Woensdag – Zondag",
+          monTue: "Maandag & Dinsdag",
+          closed: "Gesloten",
+          kitchenNotice: "De keuken sluit 30 minuten voor sluitingstijd.",
+        },
+        walkInsCard: {
+          title: "Vrije Inloop & Tafelreservering",
+          subtitle: "Spontaan of gereserveerd, u bent van harte welkom",
+          walkInsTitle: "Vrije Inloop Welkom",
+          walkInsDesc: "Geen reservering nodig! Gasten kunnen woensdag t/m zondag van 09:00 tot 16:00 altijd binnenlopen.",
+          tableBookingTitle: "Standaard Tafelreservering",
+          tableBookingDesc: "Reserveer online een tafel voor gegarandeerde zitplaatsen en persoonlijke wensen.",
+          reserveButton: "Reserveer een Tafel Online",
+        },
+        celebrationBanner: {
+          badge: "Speciale Gelegenheden & Verjaardagen",
+          title: "Iets Bijzonders te Vieren?",
+          description: "Laat ons weten wat u viert (verjaardag, jubileum, mijlpaal), voor wie het is en hobby's of leeftijd. Wij zorgen voor een persoonlijke ervaring!",
+          button: "Plan Feestelijke Tafel",
+        },
+      },
       hero: {
         title: "Lunchroom",
         subtitle:
@@ -1875,6 +1938,15 @@ export const translations = {
         },
       },
       eventspace: {
+        eventTypes: {
+          birthdays: "Verjaardagen",
+          weddings: "Bruiloften",
+          babyShowers: "Babyshowers",
+          corporateParties: "Bedrijfsfeesten",
+          anniversaries: "Jubilea",
+          privateParties: "Privéfeesten",
+          otherEvents: "Overige Evenementen",
+        },
         title: "Evenementen & Zaalverhuur Aanvraag",
         subtitle: "Of het nu gaat om intieme momenten of grote feesten: vraag een voorstel op maat aan en laat ons team het perfecte evenement verzorgen.",
         selectEventType: "1. Kies Type Evenement",
@@ -2199,6 +2271,33 @@ export const translations = {
       },
     },
     lunchroomPage: {
+      hoursAndReservations: {
+        kicker: "Willkommen im Lunchroom",
+        title: "Öffnungszeiten & Tischreservierungen",
+        openingHoursCard: {
+          title: "Öffnungszeiten",
+          subtitle: "Täglich frisch zubereitete Speisen & Getränke",
+          wedSun: "Mittwoch – Sonntag",
+          monTue: "Montag & Dienstag",
+          closed: "Geschlossen",
+          kitchenNotice: "Die Küche schließt 30 Minuten vor Geschäftsschluss.",
+        },
+        walkInsCard: {
+          title: "Spontanbesuche & Tischreservierung",
+          subtitle: "Spontan oder reserviert – Sie sind herzlich willkommen",
+          walkInsTitle: "Spontanbesuche Willkommen",
+          walkInsDesc: "Keine Reservierung erforderlich! Sie können von Mittwoch bis Sonntag zwischen 09:00 und 16:00 Uhr jederzeit vorbeikommen.",
+          tableBookingTitle: "Standard Tischreservierung",
+          tableBookingDesc: "Reservieren Sie online einen Tisch für garantierte Sitzplätze und besondere Wünsche.",
+          reserveButton: "Tisch Online Reservieren",
+        },
+        celebrationBanner: {
+          badge: "Besondere Anlässe & Geburtstage",
+          title: "Feiern Sie etwas Besonderes?",
+          description: "Teilen Sie uns mit, was Sie feiern (Geburtstag, Jubiläum, Meilenstein), für wen es ist und welche Hobbys oder welches Alter. Wir bereiten ein individuelles Erlebnis vor!",
+          button: "Feiertisch Planen",
+        },
+      },
       hero: {
         title: "Lunchroom",
         subtitle:
@@ -2863,6 +2962,15 @@ export const translations = {
         },
       },
       eventspace: {
+        eventTypes: {
+          birthdays: "Geburtstage",
+          weddings: "Hochzeiten",
+          babyShowers: "Babypartys",
+          corporateParties: "Firmenfeiern",
+          anniversaries: "Jubiläen",
+          privateParties: "Private Feiern",
+          otherEvents: "Sonstige Anlässe",
+        },
         title: "Event- & Raumanfrage",
         subtitle: "Ob intime Momente oder große Feste: Fordern Sie ein maßgeschneidertes Angebot an und lassen Sie unser Team Ihr perfektes Erlebnis gestalten.",
         selectEventType: "1. Event-Typ auswählen",

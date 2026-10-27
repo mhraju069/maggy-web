@@ -8,6 +8,7 @@ import {
   SubscriptionPlanItem,
 } from "@/lib/api/services/paymentsService";
 import { servicesService, SaltroomServicesData } from "@/lib/api/services/servicesService";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
 import { getStoredToken } from "@/lib/api/token";
 import { User } from "@/lib/api/types";
 import { getStoredBookingData, updateStoredBookingData } from "@/lib/bookingStore";
@@ -114,6 +115,7 @@ interface MembershipPlan {
 
 const MembershipCards = () => {
   const router = useRouter();
+  const { language, t } = useLanguage();
   const [category, setCategory] = useState<"salt" | "sauna">("salt");
   const [isLoading, setIsLoading] = useState(true);
   const [apiData, setApiData] = useState<SaltroomServicesData | null>(null);
@@ -144,7 +146,7 @@ const MembershipCards = () => {
     // 1. Fetch all session passes & subscription plans from the API
     setIsLoading(true);
     paymentsService
-      .getPlansAndPasses()
+      .getPlansAndPasses(language)
       .then((res) => {
         if (res && (res.session_passes?.length || res.subscription_plans?.length)) {
           setPlansData(res);
@@ -198,6 +200,26 @@ const MembershipCards = () => {
     }
   }, []);
 
+  
+  const getLocalizedName = (item: any) => {
+    if (!item) return "";
+    if (language === "nl") return item.name_nl || item.name || item.name_en || "";
+    if (language === "de") return item.name_de || item.name || item.name_en || "";
+    return item.name_en || item.name || "";
+  };
+
+  const getLocalizedFeatures = (featuresList: any[]) => {
+    if (!featuresList || !featuresList.length) return [];
+    return featuresList.map((f: any) => {
+      let text = "";
+      if (typeof f === "string") text = f;
+      else if (language === "nl") text = f.feature_nl || f.feature || f.feature_en || "";
+      else if (language === "de") text = f.feature_de || f.feature || f.feature_en || "";
+      else text = f.feature_en || f.feature || "";
+      return text.replace(/^[✓✔\s]+/, "");
+    });
+  };
+
   // Map Session Passes & Subscription Plans exclusively from API data
   const sessionPass = plansData?.session_passes?.[0] || apiData?.session_pass?.[0];
   const saltPlans =
@@ -218,7 +240,7 @@ const MembershipCards = () => {
       id: sessionPass.id,
       itemType: "session_pass",
       variant: "essential",
-      name: sessionPass.name || "10 Session pass",
+      name: getLocalizedName(sessionPass) || "10 Session pass",
       price: sessionPass.price ? `€${parseFloat(String(sessionPass.price)).toFixed(0)}` : "€200",
       rawPrice: sessionPass.price ? parseFloat(String(sessionPass.price)) : 200,
       perPeriod: `/ ${sessionPass.entry_limit || 10} sessions`,
@@ -228,7 +250,7 @@ const MembershipCards = () => {
       totalSessions: sessionPass.entry_limit || 10,
       maxActiveReservations: sessionPass.entry_limit || 10,
       features: sessionPass.features?.length
-        ? sessionPass.features.map((f) => f.feature.replace(/^[✓✔\s]+/, ""))
+        ? getLocalizedFeatures(sessionPass.features)
         : [
           "10-session salt pass (€20 per session)",
           "Linked directly to customer account",
@@ -243,7 +265,7 @@ const MembershipCards = () => {
       planType: "weekly",
       planCategory: "saltroom",
       variant: "weekly",
-      name: saltWeekly.name || "Once a Week",
+      name: getLocalizedName(saltWeekly) || "Once a Week",
       price: saltWeekly.price ? `€${parseFloat(String(saltWeekly.price)).toFixed(0)}` : "€70",
       rawPrice: saltWeekly.price ? parseFloat(String(saltWeekly.price)) : 70,
       perPeriod: "/ 4 weeks",
@@ -254,7 +276,7 @@ const MembershipCards = () => {
       totalSessions: 4,
       maxActiveReservations: 1,
       features: saltWeekly.features?.length
-        ? saltWeekly.features.map((f) => f.feature.replace(/^[✓✔\s]+/, ""))
+        ? getLocalizedFeatures(saltWeekly.features)
         : [
           "1 Salt Room session per week included",
           "Maximum 4 included sessions per 4-week period",
@@ -268,7 +290,7 @@ const MembershipCards = () => {
       planType: "unlimited",
       planCategory: "saltroom",
       variant: "infinite",
-      name: saltUnlimited.name || "Unlimited",
+      name: getLocalizedName(saltUnlimited) || "Unlimited",
       price: saltUnlimited.price ? `€${parseFloat(String(saltUnlimited.price)).toFixed(0)}` : "€100",
       rawPrice: saltUnlimited.price ? parseFloat(String(saltUnlimited.price)) : 100,
       perPeriod: "/ 4 weeks",
@@ -279,7 +301,7 @@ const MembershipCards = () => {
       totalSessions: 0,
       maxActiveReservations: saltUnlimited.max_reservations || 10,
       features: saltUnlimited.features?.length
-        ? saltUnlimited.features.map((f) => f.feature.replace(/^[✓✔\s]+/, ""))
+        ? getLocalizedFeatures(saltUnlimited.features)
         : [
           "Unlimited use within available capacity",
           "1-hour Salt Room halotherapy access",
@@ -540,7 +562,7 @@ const MembershipCards = () => {
                   >
                     {/* Plan Header with Badges */}
                     <div className="space-y-3">
-                      <div className="flex flex-wrap items-center gap-2">
+                      {/* <div className="flex flex-wrap items-center gap-2">
                         {plan.badge && (
                           <span
                             className={`px-3 py-1 rounded-full text-[11px] font-bold tracking-wider uppercase ${isDark
@@ -561,7 +583,7 @@ const MembershipCards = () => {
                             ⏱️ {plan.validityText}
                           </span>
                         )}
-                      </div>
+                      </div> */}
 
                       {/* Title */}
                       <h3
@@ -685,7 +707,7 @@ const MembershipCards = () => {
                           lineHeight: "150%",
                         }}
                       >
-                        Apply Now
+                        {(t.membershipsPage as any)?.cards?.applyNow || "Apply Now"}
                       </span>
                       <ArrowIcon color={isFilled ? "#FFFFFF" : "#5D360F"} />
                     </button>

@@ -32,6 +32,7 @@ export const LanguageProvider = ({ children }: { children: ReactNode }) => {
     if (typeof window !== "undefined") {
       localStorage.setItem("haven_language", lang);
       window.dispatchEvent(new Event("languageChange"));
+      window.location.reload();
     }
   };
 

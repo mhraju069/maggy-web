@@ -5,6 +5,13 @@
 import ApiClient from "../client";
 import { ENDPOINTS } from "../endpoints";
 
+export interface MultilingualFeature {
+  feature?: string;
+  feature_en?: string;
+  feature_nl?: string;
+  feature_de?: string;
+}
+
 export interface PlanFeature {
   id?: number;
   feature: string;
@@ -79,8 +86,9 @@ export const paymentsService = {
   /**
    * Fetch all session passes & subscription plans in a single call (public)
    */
-  async getPlansAndPasses(): Promise<PlansAndPassesResponse> {
+  async getPlansAndPasses(lang?: string): Promise<PlansAndPassesResponse> {
     return ApiClient.get<PlansAndPassesResponse>(ENDPOINTS.PAYMENTS.PLANS_AND_PASSES, {
+      params: lang ? { lang } : undefined,
       skipAuth: true,
     });
   },
@@ -98,10 +106,13 @@ export const paymentsService = {
    * Create new Session Pass (Admin)
    */
   async createSessionPass(payload: {
-    name: string;
+    name?: string;
+    name_en?: string;
+    name_nl?: string;
+    name_de?: string;
     price: string | number;
     entry_limit: number;
-    feature_list?: string[];
+    feature_list?: (string | MultilingualFeature)[];
   }): Promise<SessionPassItem> {
     return ApiClient.post<SessionPassItem>(ENDPOINTS.PAYMENTS.SESSION_PASSES, payload);
   },
@@ -113,9 +124,12 @@ export const paymentsService = {
     id: number | string,
     payload: {
       name?: string;
+      name_en?: string;
+      name_nl?: string;
+      name_de?: string;
       price?: string | number;
       entry_limit?: number;
-      feature_list?: string[];
+      feature_list?: (string | MultilingualFeature)[];
     }
   ): Promise<SessionPassItem> {
     return ApiClient.patch<SessionPassItem>(ENDPOINTS.PAYMENTS.SESSION_PASS_DETAIL(id), payload);
@@ -145,13 +159,16 @@ export const paymentsService = {
    * Create new Subscription Plan (Admin)
    */
   async createSubscriptionPlan(payload: {
-    name: string;
+    name?: string;
+    name_en?: string;
+    name_nl?: string;
+    name_de?: string;
     price: string | number;
     plan_type: "weekly" | "unlimited" | string;
     plan_category: "saltroom" | "sauna" | string;
     max_reservations?: number;
     duration_weeks?: number;
-    feature_list?: string[];
+    feature_list?: (string | MultilingualFeature)[];
   }): Promise<SubscriptionPlanItem> {
     return ApiClient.post<SubscriptionPlanItem>(ENDPOINTS.PAYMENTS.SUBSCRIPTION_PLANS, payload);
   },
@@ -163,12 +180,15 @@ export const paymentsService = {
     id: number | string,
     payload: {
       name?: string;
+      name_en?: string;
+      name_nl?: string;
+      name_de?: string;
       price?: string | number;
       plan_type?: string;
       plan_category?: string;
       max_reservations?: number;
       duration_weeks?: number;
-      feature_list?: string[];
+      feature_list?: (string | MultilingualFeature)[];
     }
   ): Promise<SubscriptionPlanItem> {
     return ApiClient.patch<SubscriptionPlanItem>(ENDPOINTS.PAYMENTS.SUBSCRIPTION_PLAN_DETAIL(id), payload);

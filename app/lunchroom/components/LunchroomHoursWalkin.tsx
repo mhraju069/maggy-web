@@ -5,18 +5,22 @@ import React from "react";
 import { BiCalendarCheck, BiTimeFive } from "react-icons/bi";
 import { FaGlassCheers, FaWalking } from "react-icons/fa";
 import { MdCheckCircle, MdInfoOutline } from "react-icons/md";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
 
 export default function LunchroomHoursWalkin() {
+  const { t } = useLanguage();
+  const h = (t.lunchroomPage as any)?.hoursAndReservations;
+
   return (
     <section className="py-16 md:py-20 bg-[#FBF6F3] border-y border-[#E8E2DC]">
       <div className="container mx-auto px-6 max-w-6xl">
         {/* Header */}
         <div className="text-center mb-12">
           <span className="text-xs font-bold uppercase tracking-[0.2em] text-[#8B7355] block mb-2 font-mono">
-            Welcome to the Lunchroom
+            {h?.kicker || "Welcome to the Lunchroom"}
           </span>
           <h2 className="text-3xl md:text-4xl font-displayPlayFair text-[#1d1a17]">
-            Opening Hours & Table Reservations
+            {h?.title || "Opening Hours & Table Reservations"}
           </h2>
           <div className="w-16 h-[2px] bg-[#D1B191] mx-auto mt-4" />
         </div>
@@ -27,15 +31,15 @@ export default function LunchroomHoursWalkin() {
           <div className="bg-white rounded-[28px] p-8 md:p-10 border border-[#E8E2DC] shadow-sm flex flex-col justify-between hover:shadow-md transition-all">
             <div>
               <div className="flex items-center gap-4 mb-6">
-                <div className="w-12 h-12 rounded-2xl bg-[#FCF2E9] flex items-center justify-center text-[#8B7355]">
+                 <div className="w-12 h-12 rounded-2xl bg-[#FCF2E9] flex items-center justify-center text-[#8B7355]">
                   <BiTimeFive size={24} />
                 </div>
                 <div>
                   <h3 className="text-2xl font-bold font-displayPlayFair text-[#0F172A]">
-                    Opening Hours
+                    {h?.openingHoursCard?.title || "Opening Hours"}
                   </h3>
                   <p className="text-xs text-[#64748B] tracking-wide">
-                    Fresh meals & drinks served daily
+                    {h?.openingHoursCard?.subtitle || "Fresh meals & drinks served daily"}
                   </p>
                 </div>
               </div>
@@ -43,20 +47,28 @@ export default function LunchroomHoursWalkin() {
               {/* Schedule List */}
               <div className="space-y-4 my-6 bg-[#FCF2E9]/60 p-6 rounded-2xl border border-[#E8E2DC]/80">
                 <div className="flex justify-between items-center pb-3 border-b border-[#E8E2DC]/60">
-                  <span className="font-medium text-[#1d1a17]">Wednesday – Sunday</span>
+                  <span className="font-medium text-[#1d1a17]">
+                    {h?.openingHoursCard?.wedSun || "Wednesday – Sunday"}
+                  </span>
                   <span className="font-bold text-[#8B7355] bg-white px-3 py-1 rounded-full border border-[#D1B191]/40 text-sm shadow-xs">
                     09:00 – 16:00
                   </span>
                 </div>
                 <div className="flex justify-between items-center text-sm">
-                  <span className="text-[#64748B]">Monday & Tuesday</span>
-                  <span className="text-[#94A3B8] italic font-medium">Closed</span>
+                  <span className="text-[#64748B]">
+                    {h?.openingHoursCard?.monTue || "Monday & Tuesday"}
+                  </span>
+                  <span className="text-[#94A3B8] italic font-medium">
+                    {h?.openingHoursCard?.closed || "Closed"}
+                  </span>
                 </div>
               </div>
 
               <div className="flex items-start gap-3 text-xs text-[#64748B] mt-4">
                 <MdInfoOutline className="text-[#8B7355] text-base flex-shrink-0 mt-0.5" />
-                <span>Kitchen closes 30 minutes before closing time.</span>
+                <span>
+                  {h?.openingHoursCard?.kitchenNotice || "Kitchen closes 30 minutes before closing time."}
+                </span>
               </div>
             </div>
           </div>
@@ -70,10 +82,10 @@ export default function LunchroomHoursWalkin() {
                 </div>
                 <div>
                   <h3 className="text-2xl font-bold font-displayPlayFair text-[#0F172A]">
-                    Walk-Ins & Table Booking
+                    {h?.walkInsCard?.title || "Walk-Ins & Table Booking"}
                   </h3>
                   <p className="text-xs text-[#64748B] tracking-wide">
-                    Spontaneous or reserved, we welcome you
+                    {h?.walkInsCard?.subtitle || "Spontaneous or reserved, we welcome you"}
                   </p>
                 </div>
               </div>
@@ -82,9 +94,11 @@ export default function LunchroomHoursWalkin() {
                 <div className="flex items-start gap-3 p-4 rounded-xl bg-[#FCF2E9]/50 border border-[#E8E2DC]/60">
                   <MdCheckCircle className="text-[#8B7355] text-lg flex-shrink-0 mt-0.5" />
                   <div>
-                    <h4 className="font-bold text-sm text-[#0F172A]">Walk-Ins Welcome</h4>
+                    <h4 className="font-bold text-sm text-[#0F172A]">
+                      {h?.walkInsCard?.walkInsTitle || "Walk-Ins Welcome"}
+                    </h4>
                     <p className="text-xs text-[#64748B] mt-0.5">
-                      No reservation needed! Guests can drop by anytime Wednesday to Sunday from 09:00 to 16:00.
+                      {h?.walkInsCard?.walkInsDesc || "No reservation needed! Guests can drop by anytime Wednesday to Sunday from 09:00 to 16:00."}
                     </p>
                   </div>
                 </div>
@@ -92,9 +106,11 @@ export default function LunchroomHoursWalkin() {
                 <div className="flex items-start gap-3 p-4 rounded-xl bg-[#FCF2E9]/50 border border-[#E8E2DC]/60">
                   <BiCalendarCheck className="text-[#8B7355] text-xl flex-shrink-0 mt-0.5" />
                   <div>
-                    <h4 className="font-bold text-sm text-[#0F172A]">Standard Table Reservations</h4>
+                    <h4 className="font-bold text-sm text-[#0F172A]">
+                      {h?.walkInsCard?.tableBookingTitle || "Standard Table Reservations"}
+                    </h4>
                     <p className="text-xs text-[#64748B] mt-0.5">
-                      Reserve a table online for guaranteed seating and personalized special requests.
+                      {h?.walkInsCard?.tableBookingDesc || "Reserve a table online for guaranteed seating and personalized special requests."}
                     </p>
                   </div>
                 </div>
@@ -107,7 +123,7 @@ export default function LunchroomHoursWalkin() {
                 className="w-full inline-flex items-center justify-center gap-2 py-3.5 px-6 rounded-xl bg-[#8B7355] hover:bg-[#725e45] text-white font-bold text-sm transition-all shadow-md hover:shadow-lg"
               >
                 <BiCalendarCheck size={18} />
-                Reserve a Table Online
+                {h?.walkInsCard?.reserveButton || "Reserve a Table Online"}
               </Link>
             </div>
           </div>
@@ -121,13 +137,13 @@ export default function LunchroomHoursWalkin() {
             </div>
             <div>
               <span className="text-[11px] uppercase tracking-widest font-bold text-amber-100 block mb-1">
-                Special Occasions & Birthdays
+                {h?.celebrationBanner?.badge || "Special Occasions & Birthdays"}
               </span>
               <h3 className="text-xl font-bold font-displayPlayFair">
-                Celebrating Something Special?
+                {h?.celebrationBanner?.title || "Celebrating Something Special?"}
               </h3>
               <p className="text-xs md:text-sm text-amber-50/90 mt-1 max-w-xl">
-                Let us know what you&apos;re celebrating (birthday, anniversary, milestone), who it&apos;s for, and their hobbies or age. We&apos;ll prepare a personalized experience!
+                {h?.celebrationBanner?.description || "Let us know what you're celebrating (birthday, anniversary, milestone), who it's for, and their hobbies or age. We'll prepare a personalized experience!"}
               </p>
             </div>
           </div>
@@ -136,7 +152,7 @@ export default function LunchroomHoursWalkin() {
             href="/booking/lunchroom"
             className="flex-shrink-0 bg-white text-[#8B7355] hover:bg-amber-50 font-bold px-6 py-3 rounded-xl text-sm transition-all shadow-md"
           >
-            Plan Celebration Table
+            {h?.celebrationBanner?.button || "Plan Celebration Table"}
           </Link>
         </div>
       </div>

@@ -18,13 +18,13 @@ import { MdOutlineEmail, MdOutlinePhone } from "react-icons/md";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 
 const EVENT_TYPES = [
-  { id: "Birthdays", label: "Birthdays" },
-  { id: "Weddings", label: "Weddings" },
-  { id: "Baby showers", label: "Baby Showers" },
-  { id: "Corporate parties", label: "Corporate Parties" },
-  { id: "Anniversaries", label: "Anniversaries" },
-  { id: "Private parties", label: "Private Parties" },
-  { id: "Other events", label: "Other Events" },
+  { id: "Birthdays", key: "birthdays", label: "Birthdays" },
+  { id: "Weddings", key: "weddings", label: "Weddings" },
+  { id: "Baby showers", key: "babyShowers", label: "Baby Showers" },
+  { id: "Corporate parties", key: "corporateParties", label: "Corporate Parties" },
+  { id: "Anniversaries", key: "anniversaries", label: "Anniversaries" },
+  { id: "Private parties", key: "privateParties", label: "Private Parties" },
+  { id: "Other events", key: "otherEvents", label: "Other Events" },
 ];
 
 export default function EventSpaceInquiryPage() {
@@ -238,7 +238,7 @@ export default function EventSpaceInquiryPage() {
                       : "bg-white border-[#E2E8F0] text-[#0F172A] hover:border-[#D1B191]"
                   }`}
                 >
-                  {type.label}
+                  {(esTrans?.eventTypes as any)?.[type.key] || type.label}
                 </button>
               );
             })}
