@@ -301,13 +301,13 @@ export default function ActivitiesBookingPage() {
                     {/* <span className="px-3 py-1 bg-white/95 backdrop-blur-md rounded-full text-[11px] font-bold text-[#8B7355] shadow-xs">
                       {act.category}
                     </span> */}
-                    <span
+                    {/* <span
                       className={`px-3 py-1 rounded-full text-[10px] font-bold text-white uppercase tracking-wider ${
                         act.isRecurring ? "bg-[#8B7355]" : "bg-[#B8860B]"
                       }`}
                     >
                       {act.isRecurring ? "Recurring Class" : "One-Time Event"}
-                    </span>
+                    </span> */}
                   </div>
 
                   {isSoldOut ? (
