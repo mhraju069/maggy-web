@@ -16,12 +16,14 @@ import { RiCalendarCheckLine, RiHistoryLine } from "react-icons/ri";
 import { DashboardBookingItem } from "@/lib/api";
 import { useDashboard } from "./DashboardContext";
 import Spinner from "@/components/shared/Spinner";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
+import { dashboardTranslations } from "@/lib/i18n/dashboardTranslations";
 
-function formatDisplayDate(dateStr: string) {
+function formatDisplayDate(dateStr: string, locale: string = "en-US") {
   if (!dateStr) return "";
   try {
     const d = new Date(dateStr);
-    return d.toLocaleDateString("en-US", {
+    return d.toLocaleDateString(locale === "nl" ? "nl-NL" : locale === "de" ? "de-DE" : "en-US", {
       weekday: "short",
       day: "numeric",
       month: "short",
@@ -47,9 +49,7 @@ function formatDisplayTime(timeStr: string) {
 
 export function cleanServiceName(name?: string): string {
   if (!name) return "Wellness Experience";
-  // Fix duplicated words like "VIP Sauna Sauna" -> "VIP Sauna"
   let cleaned = name.replace(/\b([A-Za-z]+)\s+\1\b/gi, "$1");
-  // Clean repeated "Sauna Sauna" or "Sauna sauna"
   cleaned = cleaned.replace(/sauna\s+sauna/gi, "Sauna");
   return cleaned.trim() || "Wellness Experience";
 }
@@ -97,6 +97,9 @@ function StatCard({
 }
 
 function NextVisitHighlight({ booking }: { booking: DashboardBookingItem }) {
+  const { language } = useLanguage();
+  const dt = dashboardTranslations[language]?.home || dashboardTranslations.en.home;
+
   return (
     <div className="bg-gradient-to-br from-[#FAF5F0] via-white to-[#F8EFE6] rounded-3xl p-8 border border-[#E8E2DC] shadow-sm relative overflow-hidden mb-8">
       <div className="absolute top-0 right-0 -mr-16 -mt-16 w-64 h-64 bg-[#EBDBC9]/40 rounded-full blur-3xl pointer-events-none" />
@@ -104,7 +107,7 @@ function NextVisitHighlight({ booking }: { booking: DashboardBookingItem }) {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 relative">
         <div className="flex items-center gap-3">
           <span className="px-3.5 py-1 text-xs bg-[#8B7355] text-white rounded-full font-bold uppercase tracking-wider shadow-xs">
-            Priority • Next Up
+            {dt.nextUp}
           </span>
           <span className="px-3 py-1 text-xs bg-white text-[#8B7355] border border-[#E8E2DC] rounded-full font-semibold uppercase tracking-wider">
             {booking.service_type}
@@ -113,7 +116,7 @@ function NextVisitHighlight({ booking }: { booking: DashboardBookingItem }) {
         <div className="flex items-center gap-2">
           <span className="text-xs text-emerald-700 font-bold bg-emerald-50 border border-emerald-200 px-3 py-1 rounded-full flex items-center gap-1.5">
             <BsCheckCircle className="w-3.5 h-3.5" />
-            Confirmed
+            {dt.confirmed}
           </span>
           {booking.access_code && (
             <Link
@@ -121,7 +124,7 @@ function NextVisitHighlight({ booking }: { booking: DashboardBookingItem }) {
               className="text-xs font-mono font-bold bg-[#1d1a17] text-white px-3 py-1 rounded-full flex items-center gap-1 hover:bg-[#8B7355] transition-colors"
             >
               <HiOutlineKey className="w-3.5 h-3.5" />
-              Code: {booking.access_code}
+              {dt.code}: {booking.access_code}
             </Link>
           )}
         </div>
@@ -132,7 +135,7 @@ function NextVisitHighlight({ booking }: { booking: DashboardBookingItem }) {
           {cleanServiceName(booking.service_name)}
         </h2>
         <p className="text-xs text-[#64748B]">
-          Booking Reference: <span className="font-mono font-semibold text-[#1d1a17]">{booking.booking_id}</span>
+          {dt.bookingReference} <span className="font-mono font-semibold text-[#1d1a17]">{booking.booking_id}</span>
         </p>
       </div>
 
@@ -142,8 +145,8 @@ function NextVisitHighlight({ booking }: { booking: DashboardBookingItem }) {
             <HiOutlineCalendar className="w-5 h-5" />
           </div>
           <div>
-            <p className="text-[10px] uppercase font-bold text-[#94A3B8] tracking-wider">Date</p>
-            <p className="text-sm font-bold text-[#1d1a17]">{formatDisplayDate(booking.date)}</p>
+            <p className="text-[10px] uppercase font-bold text-[#94A3B8] tracking-wider">{dt.date}</p>
+            <p className="text-sm font-bold text-[#1d1a17]">{formatDisplayDate(booking.date, language)}</p>
           </div>
         </div>
 
@@ -152,7 +155,7 @@ function NextVisitHighlight({ booking }: { booking: DashboardBookingItem }) {
             <HiOutlineClock className="w-5 h-5" />
           </div>
           <div>
-            <p className="text-[10px] uppercase font-bold text-[#94A3B8] tracking-wider">Arrival Time</p>
+            <p className="text-[10px] uppercase font-bold text-[#94A3B8] tracking-wider">{dt.arrivalTime}</p>
             <p className="text-sm font-bold text-[#1d1a17]">{formatDisplayTime(booking.time)}</p>
           </div>
         </div>
@@ -162,9 +165,9 @@ function NextVisitHighlight({ booking }: { booking: DashboardBookingItem }) {
             <HiOutlineUsers className="w-5 h-5" />
           </div>
           <div>
-            <p className="text-[10px] uppercase font-bold text-[#94A3B8] tracking-wider">Party Size</p>
+            <p className="text-[10px] uppercase font-bold text-[#94A3B8] tracking-wider">{dt.guests}</p>
             <p className="text-sm font-bold text-[#1d1a17]">
-              {booking.guests} {booking.guests === 1 ? "Guest" : "Guests"}
+              {booking.guests} {booking.guests === 1 ? dt.guest : dt.guests}
             </p>
           </div>
         </div>
@@ -175,21 +178,18 @@ function NextVisitHighlight({ booking }: { booking: DashboardBookingItem }) {
 
 function SubscriptionsSection() {
   const { subscriptions } = useDashboard();
+  const { language } = useLanguage();
+  const dt = dashboardTranslations[language]?.home || dashboardTranslations.en.home;
 
   return (
-    <div className="bg-white rounded-3xl p-8 border border-[#F1EDE8] shadow-xs mb-8">
+    <div className="bg-white rounded-3xl p-8 border border-[#F1EDE8] shadow-xs">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
         <div>
-          <div className="flex items-center gap-2">
-            <h2 className="text-2xl font-bold font-displayPlayFair text-[#1d1a17]">
-              Subscriptions & Passes
-            </h2>
-            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-[#FCF2E9] text-[#8B7355] uppercase tracking-wider">
-              {subscriptions.length} Plan{subscriptions.length === 1 ? "" : "s"}
-            </span>
-          </div>
-          <p className="text-xs text-[#64748B] mt-1">
-            Manage your active wellness passes and recurring memberships
+          <h2 className="text-xl font-bold font-displayPlayFair text-[#1d1a17]">
+            {dt.wellnessSubscriptions}
+          </h2>
+          <p className="text-xs text-[#64748B] mt-0.5">
+            {dt.summarySubtitle}
           </p>
         </div>
 
@@ -198,7 +198,7 @@ function SubscriptionsSection() {
           className="px-5 py-2.5 rounded-xl bg-[#8B7355] hover:bg-[#786247] text-white text-xs font-bold transition-all shadow-xs flex items-center gap-2 self-start sm:self-auto"
         >
           <HiOutlineSparkles className="w-4 h-4" />
-          Browse New Subscriptions
+          {dt.browseNewSubscriptions}
         </Link>
       </div>
 
@@ -214,7 +214,7 @@ function SubscriptionsSection() {
                 <div>
                   <div className="flex items-center justify-between mb-2">
                     <span className="text-[10px] uppercase font-bold text-[#8B7355] tracking-widest">
-                      {sub.billing_period || "Membership"}
+                      {sub.billing_period || dt.membership}
                     </span>
                     <span
                       className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full ${
@@ -233,18 +233,18 @@ function SubscriptionsSection() {
 
                   {sub.sessions_remaining !== undefined && sub.sessions_remaining !== null && (
                     <div className="my-3 p-3 bg-white rounded-xl border border-[#E8E2DC] flex items-center justify-between">
-                      <span className="text-xs text-[#64748B] font-medium">Session Balance:</span>
+                      <span className="text-xs text-[#64748B] font-medium">{dt.sessionBalance}</span>
                       <span className="text-sm font-bold font-displayPlayFair text-[#8B7355]">
-                        {sub.sessions_remaining} {sub.total_sessions ? `/ ${sub.total_sessions}` : ""} Remaining
+                        {sub.sessions_remaining} {sub.total_sessions ? `/ ${sub.total_sessions}` : ""} {dt.remaining}
                       </span>
                     </div>
                   )}
                 </div>
 
                 <div className="pt-4 mt-2 border-t border-[#F1EDE8] flex items-center justify-between text-xs text-[#94A3B8]">
-                  <span>Price: €{sub.price}</span>
+                  <span>{dt.price} €{sub.price}</span>
                   {sub.expires_at && (
-                    <span>Valid until: {formatDisplayDate(sub.expires_at)}</span>
+                    <span>{dt.validUntil} {formatDisplayDate(sub.expires_at, language)}</span>
                   )}
                 </div>
               </div>
@@ -257,16 +257,16 @@ function SubscriptionsSection() {
             <HiOutlineCheckBadge className="w-6 h-6" />
           </div>
           <h3 className="text-base font-bold font-displayPlayFair text-[#1d1a17] mb-1">
-            No Active Subscription Yet
+            {dt.noActiveSubscriptionTitle}
           </h3>
           <p className="text-xs text-[#64748B] max-w-md mx-auto mb-4">
-            Enjoy unlimited sessions, discounted sauna admissions, and complimentary towels with our flexible monthly or 10-session passes.
+            {dt.noActiveSubscriptionDesc}
           </p>
           <Link
             href="/memberships"
             className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-[#8B7355] hover:bg-[#786247] text-white text-xs font-bold transition-all shadow-xs"
           >
-            Explore Membership Plans &rsaquo;
+            {dt.explorePlans}
           </Link>
         </div>
       )}
@@ -275,6 +275,9 @@ function SubscriptionsSection() {
 }
 
 function UpcomingVisitsList({ visits }: { visits: DashboardBookingItem[] }) {
+  const { language } = useLanguage();
+  const dt = dashboardTranslations[language]?.home || dashboardTranslations.en.home;
+
   if (visits.length === 0) return null;
 
   return (
@@ -282,17 +285,17 @@ function UpcomingVisitsList({ visits }: { visits: DashboardBookingItem[] }) {
       <div className="flex items-center justify-between mb-6">
         <div>
           <h3 className="text-xl font-bold font-displayPlayFair text-[#1d1a17]">
-            Scheduled Reservations
+            {dt.scheduledReservations}
           </h3>
           <p className="text-xs text-[#64748B] mt-0.5">
-            Your other planned visits in chronological order
+            {dt.scheduledSubtitle}
           </p>
         </div>
         <Link
           href="/dashboard/my-booking"
           className="text-xs font-bold text-[#8B7355] hover:text-[#1d1a17] transition-colors"
         >
-          View All &rsaquo;
+          {dt.viewAll}
         </Link>
       </div>
 
@@ -305,7 +308,7 @@ function UpcomingVisitsList({ visits }: { visits: DashboardBookingItem[] }) {
             <div className="flex items-center gap-4">
               <div className="w-12 h-12 rounded-2xl bg-white border border-[#F1EDE8] flex flex-col items-center justify-center text-[#8B7355] flex-shrink-0 shadow-xs">
                 <span className="text-[10px] uppercase font-bold leading-tight">
-                  {new Date(booking.date).toLocaleDateString("en-US", { month: "short" })}
+                  {new Date(booking.date).toLocaleDateString(language === "nl" ? "nl-NL" : language === "de" ? "de-DE" : "en-US", { month: "short" })}
                 </span>
                 <span className="text-base font-bold font-displayPlayFair leading-tight text-[#1d1a17]">
                   {new Date(booking.date).getDate()}
@@ -321,7 +324,7 @@ function UpcomingVisitsList({ visits }: { visits: DashboardBookingItem[] }) {
                   </span>
                 </div>
                 <p className="text-xs text-[#64748B] mt-0.5">
-                  Arrival at {formatDisplayTime(booking.time)} • {booking.guests} {booking.guests === 1 ? "Guest" : "Guests"}
+                  {dt.arrivalTime} {formatDisplayTime(booking.time)} • {booking.guests} {booking.guests === 1 ? dt.guest : dt.guests}
                 </p>
               </div>
             </div>
@@ -333,7 +336,7 @@ function UpcomingVisitsList({ visits }: { visits: DashboardBookingItem[] }) {
               <Link
                 href="/dashboard/my-booking"
                 className="p-2 rounded-xl text-[#8B7355] hover:bg-white hover:shadow-xs transition-all"
-                title="View booking"
+                title={dt.viewBooking}
               >
                 <HiOutlineArrowRight className="w-4 h-4" />
               </Link>
@@ -347,6 +350,8 @@ function UpcomingVisitsList({ visits }: { visits: DashboardBookingItem[] }) {
 
 export default function DashboardHome() {
   const { dashboardData, subscriptions, loading } = useDashboard();
+  const { language } = useLanguage();
+  const dt = dashboardTranslations[language]?.home || dashboardTranslations.en.home;
 
   const metrics = dashboardData?.home?.metrics;
 
@@ -372,10 +377,10 @@ export default function DashboardHome() {
     : (dashboardData?.home?.other_upcoming_visits || []);
 
   const nextBookingDateText = metrics?.upcoming_booking_dates && metrics.upcoming_booking_dates.length > 0
-    ? `Next on ${formatDisplayDate(metrics.upcoming_booking_dates[0])}`
+    ? dt.nextOn.replace("{date}", formatDisplayDate(metrics.upcoming_booking_dates[0], language))
     : nextVisit
-    ? `Next on ${formatDisplayDate(nextVisit.date)}`
-    : "No visits scheduled";
+    ? dt.nextOn.replace("{date}", formatDisplayDate(nextVisit.date, language))
+    : dt.noVisitsScheduled;
 
   return (
     <div className="max-w-6xl mx-auto space-y-8">
@@ -383,10 +388,12 @@ export default function DashboardHome() {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-2">
         <div>
           <h1 className="font-displayPlayFair text-3xl md:text-4xl font-bold text-[#1d1a17] mb-1.5">
-            {dashboardData?.profile?.name ? `Welcome back, ${dashboardData.profile.name}` : "Welcome back"}
+            {dashboardData?.profile?.name 
+              ? dt.welcomeBackUser.replace("{name}", dashboardData.profile.name)
+              : dt.welcomeBack}
           </h1>
           <p className="text-sm text-[#64748B]">
-            Here is a summary of your upcoming reservations, wellness subscriptions, and door codes.
+            {dt.summarySubtitle}
           </p>
         </div>
 
@@ -395,13 +402,13 @@ export default function DashboardHome() {
             href="/services"
             className="px-5 py-2.5 rounded-xl bg-[#8B7355] hover:bg-[#786247] text-white text-xs font-bold transition-all shadow-xs flex items-center gap-2"
           >
-            Book New Experience
+            {dt.bookNewExperience}
           </Link>
           <Link
             href="/memberships"
             className="px-5 py-2.5 rounded-xl bg-white border border-[#CFB9A3] hover:bg-[#FCF2E9] text-[#1d1a17] text-xs font-bold transition-all shadow-xs flex items-center gap-2"
           >
-            Memberships
+            {dt.membershipsAndPasses}
           </Link>
         </div>
       </div>
@@ -413,28 +420,28 @@ export default function DashboardHome() {
           {/* ── Analytics Stats Grid ── */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             <StatCard
-              title="Total Bookings"
+              title={dt.totalBookings}
               value={totalBookingsCount}
               subtext="Lifetime reservations"
               icon={RiHistoryLine}
               accent="brand"
             />
             <StatCard
-              title="Upcoming Visits"
+              title={dt.upcomingVisits}
               value={upcomingVisitsCount}
               subtext={nextBookingDateText}
               icon={RiCalendarCheckLine}
               accent="emerald"
             />
             <StatCard
-              title="Active Subscriptions"
+              title={dt.activeSubscriptions}
               value={activeSubscriptionsCount}
-              subtext="Memberships & passes"
+              subtext={dt.membershipsAndPasses}
               icon={HiOutlineCreditCard}
               accent="amber"
             />
             <StatCard
-              title="Sauna Access Codes"
+              title={dt.saunaSessions}
               value={upcomingSaunasCount}
               subtext="Ready for entry"
               icon={HiOutlineKey}
@@ -451,7 +458,7 @@ export default function DashboardHome() {
                 <HiOutlineCalendar className="w-8 h-8" />
               </div>
               <h2 className="text-xl font-bold font-displayPlayFair text-[#1d1a17] mb-2">
-                No Upcoming Visits Scheduled
+                {dt.noVisitsScheduled}
               </h2>
               <p className="text-sm text-[#64748B] max-w-md mx-auto mb-6">
                 Treat yourself to private sauna tranquility, rejuvenating salt therapy, or culinary moments in our lunchroom.
@@ -460,7 +467,7 @@ export default function DashboardHome() {
                 href="/services"
                 className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-[#8B7355] hover:bg-[#786247] text-white text-xs font-bold transition-all shadow-xs"
               >
-                Explore & Reserve &rsaquo;
+                {dt.explorePlans}
               </Link>
             </div>
           )}

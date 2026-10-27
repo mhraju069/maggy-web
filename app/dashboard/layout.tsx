@@ -1,5 +1,7 @@
 "use client";
 import { formatImageUrl } from '@/lib/api/config';
+import { clearAuthSession } from '@/lib/api/token';
+import { authService } from '@/lib/api/services/authService';
 
 import Image from "next/image";
 import Link from "next/link";
@@ -13,37 +15,29 @@ import {
 } from "react-icons/hi";
 import { HiArrowRightOnRectangle } from "react-icons/hi2";
 import { DashboardProvider, useDashboard } from "./DashboardContext";
-
-const NAV = [
-  { href: "/dashboard",              label: "Home",         Icon: HiOutlineHome },
-  { href: "/dashboard/my-booking",   label: "My Booking",   Icon: HiOutlineBookOpen },
-  { href: "/dashboard/access-codes", label: "Access Codes", Icon: HiOutlineKey },
-  { href: "/dashboard/profile",      label: "Profile",      Icon: HiOutlineUser },
-];
-
 import NotificationBell from "@/components/shared/NotificationBell";
+import LanguageSwitcher from "@/components/shared/LanguageSwitcher";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
+import { dashboardTranslations } from "@/lib/i18n/dashboardTranslations";
 
 function DashboardHeader() {
   const { dashboardData } = useDashboard();
-  const router = useRouter();
   const profile = dashboardData?.profile;
   const initial = profile?.name ? profile.name.charAt(0).toUpperCase() : "U";
 
-  const handleLogout = () => {
-    document.cookie = "role=; path=/; max-age=0";
-    router.push("/login");
-  };
-
   return (
     <header className="flex flex-wrap items-center justify-between gap-4 px-8 py-3.5 bg-white border-b border-[#F1EDE8]">
-      {/* Left / Title area (can be empty or subtle) */}
+      {/* Left / Title area */}
       <div className="hidden sm:flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-[#94A3B8]">
         <span></span>
       </div>
 
-      {/* Right side: Notification Bell & Profile */}
+      {/* Right side: Language Switcher, Notification Bell & Profile */}
       <div className="flex items-center gap-4 ml-auto">
-        {/* Notification Bell */}
+        <LanguageSwitcher />
+
+        <div className="h-6 w-px bg-[#E2E8F0] mx-1 hidden sm:block" />
+
         <NotificationBell />
 
         <div className="h-6 w-px bg-[#E2E8F0] mx-1 hidden sm:block" />
@@ -58,21 +52,18 @@ function DashboardHeader() {
               // eslint-disable-next-line @next/next/no-img-element
               <img
                 src={formatImageUrl(profile.image)}
-                alt={profile.name || "Profile"}
+                alt={profile?.name || "User"}
                 className="w-full h-full object-cover"
-                onError={(e) => {
-                  (e.currentTarget as HTMLElement).style.display = "none";
-                }}
               />
             ) : (
               <span>{initial}</span>
             )}
           </div>
-          <div className="text-left">
+          <div className="hidden sm:block text-left">
             <p className="text-sm font-semibold text-[#1d1a17] leading-none">
-              {profile?.name || "Welcome"}
+              {profile?.name || "Member"}
             </p>
-            <p className="text-xs text-[#94A3B8] mt-0.5">
+            <p className="text-xs text-[#94A3B8] mt-0.5 max-w-[150px] truncate">
               {profile?.email || ""}
             </p>
           </div>
@@ -85,10 +76,29 @@ function DashboardHeader() {
 function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
+  const { language } = useLanguage();
+  const dt = dashboardTranslations[language] || dashboardTranslations.en;
 
-  const handleLogout = () => {
-    document.cookie = "role=; path=/; max-age=0";
-    router.push("/login");
+  const NAV = [
+    { href: "/dashboard",              label: dt.sidebar.home,        Icon: HiOutlineHome },
+    { href: "/dashboard/my-booking",   label: dt.sidebar.myBookings,  Icon: HiOutlineBookOpen },
+    { href: "/dashboard/access-codes", label: dt.sidebar.accessCodes, Icon: HiOutlineKey },
+    { href: "/dashboard/profile",      label: dt.sidebar.profile,     Icon: HiOutlineUser },
+  ];
+
+  const handleLogout = async () => {
+    try {
+      await authService.logout();
+    } catch {
+      // ignore
+    } finally {
+      clearAuthSession();
+      if (typeof window !== "undefined") {
+        window.location.href = "/login";
+      } else {
+        router.push("/login");
+      }
+    }
   };
 
   return (
@@ -137,14 +147,14 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
             className="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium text-[#64748B] hover:bg-[#F8F4F0] hover:text-[#1d1a17] transition-colors"
           >
             <HiOutlineGlobe className="w-4 h-4 flex-shrink-0" />
-            View Website
+            {dt.sidebar.viewWebsite}
           </Link>
           <button
             onClick={handleLogout}
             className="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium text-red-500 hover:bg-red-50 transition-colors w-full text-left cursor-pointer"
           >
             <HiArrowRightOnRectangle className="w-4 h-4 flex-shrink-0" />
-            Log Out
+            {dt.sidebar.logout}
           </button>
         </nav>
       </aside>

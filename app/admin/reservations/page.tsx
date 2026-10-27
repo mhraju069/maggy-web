@@ -34,6 +34,8 @@ import {
   MdCelebration,
 } from "react-icons/md";
 import { FaWater } from "react-icons/fa";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
+import { adminTranslations } from "@/lib/i18n/dashboardTranslations";
 
 const SERVICE_TYPE_OPTIONS = [
   { value: "all", label: "All Services" },
@@ -71,6 +73,8 @@ const ORDERING_OPTIONS = [
 ];
 
 export default function AdminBookingsPage() {
+  const { language } = useLanguage();
+  const at = adminTranslations[language]?.reservations || adminTranslations.en.reservations;
   // Data State
   const [bookings, setBookings] = useState<AdminBookingItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -324,10 +328,10 @@ export default function AdminBookingsPage() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-[#E8E2DC]">
         <div>
           <h1 className="font-displayPlayFair text-2xl sm:text-3xl font-bold text-[#1d1a17]">
-            Bookings & Reservations
+            {at.title}
           </h1>
           <p className="text-xs sm:text-sm text-[#475569] mt-0.5">
-            Manage, search, and inspect bookings across all wellness services in real time.
+            {at.subtitle}
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -352,7 +356,7 @@ export default function AdminBookingsPage() {
             <HiOutlineSearch className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#64748B]" />
             <input
               type="text"
-              placeholder="Search by Client Name, Email, Phone, Booking ID, or Service..."
+              placeholder={at.searchPlaceholder}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full pl-9 pr-8 py-2.5 text-xs text-[#0f172a] font-medium border border-[#CBD5E1] rounded-xl focus:outline-hidden focus:border-[#8B7355] focus:ring-1 focus:ring-[#8B7355] bg-white placeholder-[#94A3B8]"

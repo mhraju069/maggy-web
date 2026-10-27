@@ -3,10 +3,10 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { HiOutlineBell, HiOutlineGlobe } from "react-icons/hi";
+import { HiOutlineGlobe } from "react-icons/hi";
 import { HiArrowRightOnRectangle } from "react-icons/hi2";
 import {
-  MdDashboard, MdEventNote,
+  MdEventNote,
   MdMiscellaneousServices,
   MdPayment,
   MdPerson,
@@ -18,34 +18,49 @@ import {
   MdGroup,
 } from "react-icons/md";
 
-import { FaChalkboardTeacher } from "react-icons/fa";
-
-const NAV = [
-  // { href: "/admin",                label: "Dashboard",             Icon: MdDashboard },
-  { href: "/admin/reservations", label: "Reservations", Icon: MdEventNote },
-  { href: "/admin/availability", label: "Availability & Capacity", Icon: MdTune },
-  { href: "/admin/services", label: "Services", Icon: MdMiscellaneousServices },
-  { href: "/admin/subscriptions", label: "Subscriptions", Icon: MdCardMembership },
-  // { href: "/admin/activities",     label: "Activities & Events",   Icon: FaChalkboardTeacher },
-  { href: "/admin/payments", label: "Payments", Icon: MdPayment },
-  { href: "/admin/access-codes", label: "Access Codes", Icon: MdVpnKey },
-  { href: "/admin/exceptions", label: "Exceptions", Icon: MdWarning },
-  { href: "/admin/support-messages", label: "Support Messages", Icon: MdOutlineSupportAgent },
-  { href: "/admin/users", label: "Users", Icon: MdGroup },
-  { href: "/admin/settings", label: "Settings", Icon: MdSettings },
-  { href: "/admin/profile", label: "Profile", Icon: MdPerson },
-];
-
 import { useState, useEffect } from "react";
 import { authService } from "@/lib/api/services/authService";
-import { getStoredUser, setStoredUser } from "@/lib/api/token";
+import { clearAuthSession, getStoredUser } from "@/lib/api/token";
 import { formatImageUrl } from "@/lib/api/config";
 import NotificationBell from "@/components/shared/NotificationBell";
+import LanguageSwitcher from "@/components/shared/LanguageSwitcher";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
+import { adminTranslations } from "@/lib/i18n/dashboardTranslations";
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
-  const logout = () => { document.cookie = "role=; path=/; max-age=0"; router.push("/login"); };
+  const { language } = useLanguage();
+  const at = adminTranslations[language] || adminTranslations.en;
+
+  const NAV = [
+    { href: "/admin/reservations", label: at.sidebar.reservations, Icon: MdEventNote },
+    { href: "/admin/availability", label: at.sidebar.availability, Icon: MdTune },
+    { href: "/admin/services", label: at.sidebar.services, Icon: MdMiscellaneousServices },
+    { href: "/admin/subscriptions", label: at.sidebar.subscriptions, Icon: MdCardMembership },
+    { href: "/admin/payments", label: at.sidebar.payments, Icon: MdPayment },
+    { href: "/admin/access-codes", label: at.sidebar.accessCodes, Icon: MdVpnKey },
+    { href: "/admin/exceptions", label: at.sidebar.exceptions, Icon: MdWarning },
+    { href: "/admin/support-messages", label: at.sidebar.supportMessages, Icon: MdOutlineSupportAgent },
+    { href: "/admin/users", label: at.sidebar.users, Icon: MdGroup },
+    { href: "/admin/settings", label: at.sidebar.settings, Icon: MdSettings },
+    { href: "/admin/profile", label: at.sidebar.profile, Icon: MdPerson },
+  ];
+
+  const logout = async () => {
+    try {
+      await authService.logout();
+    } catch {
+      // ignore
+    } finally {
+      clearAuthSession();
+      if (typeof window !== "undefined") {
+        window.location.href = "/login";
+      } else {
+        router.push("/login");
+      }
+    }
+  };
 
   const [adminUser, setAdminUser] = useState<{ name: string; email: string; image: string | null }>({
     name: "Admin User",
@@ -58,7 +73,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       const cached = getStoredUser();
       if (cached) {
         setAdminUser({
-          name: cached.name || cached.username || "Admin User",
+          name: cached.name || cached.first_name || "Admin User",
           email: cached.email || "admin@haven.com",
           image: cached.image || null,
         });
@@ -66,33 +81,35 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     };
 
     syncProfile();
+    window.addEventListener("user_profile_updated", syncProfile);
+    window.addEventListener("storage", syncProfile);
 
-    // Fetch latest from API
-    authService.getProfile()
+    // Fetch fresh profile from server
+    authService
+      .getProfile()
       .then((user) => {
         if (user) {
-          const updated = {
-            name: user.name || user.username || "Admin User",
+          setAdminUser({
+            name: user.name || "Admin User",
             email: user.email || "admin@haven.com",
             image: user.image || null,
-          };
-          setAdminUser(updated);
-          setStoredUser(user);
+          });
         }
       })
-      .catch((err) => console.warn("Admin header profile fetch:", err));
+      .catch(() => {});
 
-    window.addEventListener("user_profile_updated", syncProfile);
-    return () => window.removeEventListener("user_profile_updated", syncProfile);
+    return () => {
+      window.removeEventListener("user_profile_updated", syncProfile);
+      window.removeEventListener("storage", syncProfile);
+    };
   }, []);
 
   return (
     <div className="min-h-screen flex font-cambria bg-white">
-
-      {/* ── SIDEBAR ── same styling as user dashboard */}
+      {/* ── SIDEBAR ── */}
       <aside className="w-[200px] flex-shrink-0 flex flex-col py-6 px-3 border-r border-[#F1EDE8] bg-white">
-        {/* Logo + admin badge */}
-        <div className="flex flex-col items-center gap-2 mb-8">
+        {/* Logo */}
+        <div className="flex items-center justify-center mb-10">
           <Image
             src="/images/logo.png"
             alt="Haven on Earth"
@@ -100,23 +117,24 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             height={48}
             className="object-contain rounded-full"
           />
-          <span className="text-[10px] bg-[#CFB9A3] text-white px-3 py-0.5 rounded-full font-semibold tracking-wide">
-            Administrator
-          </span>
         </div>
 
         {/* Primary nav */}
-        <nav className="flex flex-col gap-0.5">
+        <nav className="flex flex-col gap-1">
           {NAV.map(({ href, label, Icon }) => {
-            const active = href === "/admin" ? pathname === "/admin" : pathname.startsWith(href);
+            const active =
+              href === "/admin"
+                ? pathname === "/admin"
+                : pathname.startsWith(href);
             return (
               <Link
                 key={href}
                 href={href}
-                className={`flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-colors ${active
-                  ? "bg-[#CFB9A3] text-white"
-                  : "text-[#64748B] hover:bg-[#F8F4F0] hover:text-[#1d1a17]"
-                  }`}
+                className={`flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-colors ${
+                  active
+                    ? "bg-[#CFB9A3] text-white"
+                    : "text-[#64748B] hover:bg-[#F8F4F0] hover:text-[#1d1a17]"
+                }`}
               >
                 <Icon className="w-4 h-4 flex-shrink-0" />
                 {label}
@@ -132,14 +150,14 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             className="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium text-[#64748B] hover:bg-[#F8F4F0] hover:text-[#1d1a17] transition-colors"
           >
             <HiOutlineGlobe className="w-4 h-4 flex-shrink-0" />
-            View Website
+            {at.sidebar.viewWebsite}
           </Link>
           <button
             onClick={logout}
             className="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium text-red-500 hover:bg-red-50 transition-colors w-full text-left cursor-pointer"
           >
             <HiArrowRightOnRectangle className="w-4 h-4 flex-shrink-0" />
-            Log Out
+            {at.sidebar.logout}
           </button>
         </nav>
       </aside>
@@ -148,6 +166,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       <div className="flex-1 flex flex-col bg-[#FCF2E9] min-h-screen">
         {/* Top bar */}
         <header className="flex items-center justify-end gap-4 px-8 py-4 bg-white border-b border-[#F1EDE8]">
+          <LanguageSwitcher />
+
+          <div className="h-6 w-px bg-[#E2E8F0] mx-1 hidden sm:block" />
+
           {/* Real-time Notification Bell */}
           <NotificationBell />
 
@@ -156,6 +178,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 rounded-full bg-[#CFB9A3] flex items-center justify-center text-white font-bold text-sm shadow-xs uppercase overflow-hidden border border-[#E8E2DC]">
               {adminUser.image ? (
+                // eslint-disable-next-line @next/next/no-img-element
                 <img
                   src={formatImageUrl(adminUser.image)}
                   alt={adminUser.name}

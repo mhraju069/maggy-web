@@ -6,12 +6,14 @@ import { HiOutlineClipboardCopy, HiOutlineKey } from "react-icons/hi";
 import { DashboardAccessCodeItem } from "@/lib/api";
 import { useDashboard } from "../DashboardContext";
 import Spinner from "@/components/shared/Spinner";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
+import { dashboardTranslations } from "@/lib/i18n/dashboardTranslations";
 
-function formatDisplayDate(dateStr: string) {
+function formatDisplayDate(dateStr: string, locale: string = "en-US") {
   if (!dateStr) return "";
   try {
     const d = new Date(dateStr);
-    return d.toLocaleDateString("en-US", {
+    return d.toLocaleDateString(locale === "nl" ? "nl-NL" : locale === "de" ? "de-DE" : "en-US", {
       weekday: "long",
       day: "numeric",
       month: "long",
@@ -37,6 +39,8 @@ function formatDisplayTime(timeStr: string) {
 
 function AccessCodeCard({ item }: { item: DashboardAccessCodeItem }) {
   const [copied, setCopied] = useState(false);
+  const { language } = useLanguage();
+  const dt = dashboardTranslations[language]?.accessCodes || dashboardTranslations.en.accessCodes;
 
   const handleCopy = () => {
     if (item.access_code) {
@@ -65,7 +69,7 @@ function AccessCodeCard({ item }: { item: DashboardAccessCodeItem }) {
       </div>
 
       <p className="text-sm text-[#64748B] mb-2">
-        {formatDisplayDate(item.date)} at {formatDisplayTime(item.time)}
+        {formatDisplayDate(item.date, language)} at {formatDisplayTime(item.time)}
       </p>
 
       <div className="flex items-center gap-3 mb-4">
@@ -81,7 +85,7 @@ function AccessCodeCard({ item }: { item: DashboardAccessCodeItem }) {
       <div className="rounded-xl bg-[#7A6348] p-6 flex items-center justify-between mb-4 shadow-sm">
         <div>
           <p className="text-[11px] text-[#D1BC9D] mb-2 uppercase tracking-widest font-semibold">
-            Your Access Code
+            {dt.codeLabel}
           </p>
           <p className="text-3xl font-bold text-white tracking-widest font-mono">
             {item.access_code || item.booking_id}
@@ -99,7 +103,7 @@ function AccessCodeCard({ item }: { item: DashboardAccessCodeItem }) {
       {/* Info note */}
       <div className="bg-[#FDF5F0] rounded-lg px-4 py-3 border border-[#EFE5DC]">
         <p className="text-xs text-[#8b7355]">
-          Your access code becomes active during your reserved time window. Please present it at the entrance door panel.
+          {dt.instruction}
         </p>
       </div>
     </div>
@@ -108,14 +112,16 @@ function AccessCodeCard({ item }: { item: DashboardAccessCodeItem }) {
 
 export default function AccessCodesPage() {
   const { dashboardData, loading } = useDashboard();
+  const { language } = useLanguage();
+  const dt = dashboardTranslations[language]?.accessCodes || dashboardTranslations.en.accessCodes;
   const saunaAccessCodes = dashboardData?.access_codes?.all_sauna || [];
 
   return (
     <div>
       <h1 className="font-displayPlayFair text-3xl font-bold text-[#1d1a17] mb-1">
-        Access Codes
+        {dt.title}
       </h1>
-      <p className="text-sm text-[#64748B] mb-6">Your sauna access information</p>
+      <p className="text-sm text-[#64748B] mb-6">{dt.subtitle}</p>
 
       {loading ? (
         <Spinner message="Loading your access codes..." />
@@ -128,9 +134,9 @@ export default function AccessCodesPage() {
           <div className="w-14 h-14 rounded-full bg-[#F3EDE6] flex items-center justify-center mx-auto mb-4">
             <HiOutlineKey className="w-7 h-7 text-[#8b7355]" />
           </div>
-          <h3 className="text-lg font-semibold text-[#1d1a17] mb-1">No active access codes found</h3>
+          <h3 className="text-lg font-semibold text-[#1d1a17] mb-1">{dt.noCodesTitle}</h3>
           <p className="text-sm text-[#64748B]">
-            You have no upcoming sauna reservations requiring access credentials.
+            {dt.noCodesDesc}
           </p>
         </div>
       )}
