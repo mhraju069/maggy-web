@@ -449,13 +449,13 @@ export default function InformationPage() {
             </h2>
 
             <div className="p-6 rounded-2xl bg-gradient-to-r from-[#FCF2E9] to-[#FBF6F3] border border-[#E8E2DC] mb-6">
-              <span className="text-[10px] font-bold uppercase tracking-widest text-[#8B7355] block mb-1">
+              {/* <span className="text-[10px] font-bold uppercase tracking-widest text-[#8B7355] block mb-1">
                 {storedData.activityDetails.category}
-              </span>
+              </span> */}
               <h3 className="text-2xl font-bold font-displayPlayFair text-[#0F172A] mb-2">
                 {storedData.activityDetails.name}
               </h3>
-              <p className="text-xs text-[#64748B] mb-4 leading-relaxed line-clamp-2">
+              <p className="text-xs text-[#64748B] mb-4 leading-relaxed whitespace-pre-line">
                 {storedData.activityDetails.description}
               </p>
 

@@ -216,7 +216,8 @@ export default function ActivitiesBookingPage() {
         </p>
       </div>
 
-      {/* ── Category Filter Tabs ── */}
+      {/* ── Category Filter Tabs (Commented Out) ── */}
+      {/*
       <div className="flex flex-wrap justify-center gap-2 mb-12">
         {CATEGORIES.map((cat) => (
           <button
@@ -232,6 +233,7 @@ export default function ActivitiesBookingPage() {
           </button>
         ))}
       </div>
+      */}
 
       {/* ── Loading Alert ── */}
       {loading && (
@@ -296,9 +298,9 @@ export default function ActivitiesBookingPage() {
                     }}
                   />
                   <div className="absolute top-3 left-3 flex flex-wrap items-center gap-2">
-                    <span className="px-3 py-1 bg-white/95 backdrop-blur-md rounded-full text-[11px] font-bold text-[#8B7355] shadow-xs">
+                    {/* <span className="px-3 py-1 bg-white/95 backdrop-blur-md rounded-full text-[11px] font-bold text-[#8B7355] shadow-xs">
                       {act.category}
-                    </span>
+                    </span> */}
                     <span
                       className={`px-3 py-1 rounded-full text-[10px] font-bold text-white uppercase tracking-wider ${
                         act.isRecurring ? "bg-[#8B7355]" : "bg-[#B8860B]"
