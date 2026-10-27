@@ -37,13 +37,13 @@ const EventSpacePage = () => {
 
       {/* CTA Section */}
       <CTASection
-        title={t.eventspacePage?.cta?.title || "Request Information"}
+        title={t.eventspacePage?.cta?.title || "Celebrate Your Moment at De 7de Hemel"}
         subtitle={
           t.eventspacePage?.cta?.subtitle ||
-          "Share your vision with us. We'll help create an experience that feels uniquely yours."
+          "From weddings and birthdays to corporate parties or special gatherings. Together, we create a setting that perfectly matches your moment."
         }
-        buttonText={t.eventspacePage?.cta?.button || "Get In Touch"}
-        buttonLink="/contact"
+        buttonText={t.eventspacePage?.cta?.button || "Book Event Space"}
+        buttonLink="/booking/eventspace"
         backgroundColor="#8B7355"
         textColor="#FFFFFF"
       />

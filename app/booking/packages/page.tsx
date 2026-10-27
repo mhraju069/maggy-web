@@ -6,6 +6,7 @@ import { formatImageUrl } from "@/lib/api/config";
 import { bookingService, CreatePackageBookingPayload } from "@/lib/api/services/bookingService";
 import { servicesService, ServicePackage } from "@/lib/api/services/servicesService";
 import { getStoredBookingData, updateStoredBookingData } from "@/lib/bookingStore";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -28,6 +29,10 @@ interface PackageItem {
 
 export default function PackagesBookingPage() {
   const router = useRouter();
+  const { t, language } = useLanguage();
+  const pkgTrans = (t as any)?.bookingFlow?.packages;
+  const btnTrans = (t as any)?.bookingFlow?.buttons;
+  const cm = pkgTrans?.customModal;
   const [selectedId, setSelectedId] = useState<number | null>(null);
   const [packages, setPackages] = useState<PackageItem[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -78,7 +83,7 @@ export default function PackagesBookingPage() {
   useEffect(() => {
     setLoading(true);
     servicesService
-      .getPackages()
+      .getPackages(language)
       .then((apiData) => {
         if (apiData && Array.isArray(apiData) && apiData.length > 0) {
           const mapped: PackageItem[] = apiData.map((item: ServicePackage, idx: number) => {
@@ -162,11 +167,11 @@ export default function PackagesBookingPage() {
       {/* ── Title Section ── */}
       <div className="text-center mb-16 flex flex-col items-center">
         <h1 className="font-displayPlayFair text-5xl text-[#1d1a17] mb-2 uppercase tracking-tight">
-          Wellness Packages
+          {pkgTrans?.title || "Arrangementen & Belevenissen"}
         </h1>
         <DecorativeUnderline />
-        <p className="font-cambria text-sm text-[#475569] mt-6 italic">
-          Thoughtfully curated half-day and full-day wellness journeys combining our finest treatments.
+        <p className="font-cambria text-sm text-[#475569] mt-6 italic max-w-2xl">
+          {pkgTrans?.subtitle || "Combineer onze diensten en maak er een gezellig dagje uit van bij Heaven on Earth."}
         </p>
       </div>
 
@@ -174,7 +179,7 @@ export default function PackagesBookingPage() {
       {loading && (
         <div className="w-full py-24 text-center">
           <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-[#8B7355] border-t-transparent mb-4"></div>
-          <p className="text-[#64748B] font-cambria italic">Loading Wellness Packages...</p>
+          <p className="text-[#64748B] font-cambria italic">{pkgTrans?.loading || "Loading Wellness Packages..."}</p>
         </div>
       )}
 
@@ -185,10 +190,10 @@ export default function PackagesBookingPage() {
             <FaSpa className="w-8 h-8" />
           </div>
           <h3 className="text-2xl font-bold font-displayPlayFair text-[#0F172A] mb-2">
-            No Packages Available
+            {pkgTrans?.noPackagesTitle || "No Packages Available"}
           </h3>
           <p className="text-sm text-[#64748B] font-cambria italic">
-            Currently there are no wellness packages available from the server. Please check back later or explore our individual services.
+            {pkgTrans?.noPackagesDesc || "Currently there are no wellness packages available from the server. Please check back later or explore our individual services."}
           </p>
         </div>
       )}
@@ -197,10 +202,10 @@ export default function PackagesBookingPage() {
       <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-10 pb-6 border-b border-[#E8E2DC]">
         <div>
           <span className="text-xs font-bold uppercase tracking-wider text-[#8B7355] block">
-            Curated Experiences & Bespoke Packages
+            {pkgTrans?.curatedBadge || "Curated Experiences & Bespoke Packages"}
           </span>
           <p className="text-sm text-[#64748B] mt-0.5">
-            Select a signature package below or create your own custom wellness journey.
+            {pkgTrans?.curatedDesc || "Select a signature package below or create your own custom wellness journey."}
           </p>
         </div>
 
@@ -210,7 +215,7 @@ export default function PackagesBookingPage() {
           className="px-6 py-3 rounded-xl border border-[#8B7355] bg-[#FCF2E9] text-[#8B7355] hover:bg-[#8B7355] hover:text-white font-bold text-xs uppercase tracking-wider transition-all shadow-xs flex items-center gap-2 cursor-pointer"
         >
           <FaSlidersH size={13} />
-          <span>Customize Package</span>
+          <span>{pkgTrans?.customizePackageBtn || "Customize Package"}</span>
         </button>
       </div>
 
@@ -239,7 +244,7 @@ export default function PackagesBookingPage() {
             <line x1="19" y1="12" x2="5" y2="12"></line>
             <polyline points="12 19 5 12 12 5"></polyline>
           </svg>
-          Back to Experiences
+          {pkgTrans?.backToExperiences || "Back to Experiences"}
         </Link>
 
         <button
@@ -252,7 +257,7 @@ export default function PackagesBookingPage() {
           }`}
           style={{ fontFamily: "Inter, sans-serif" }}
         >
-          Continue
+          {btnTrans?.continue || "Continue"}
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
             <line x1="5" y1="12" x2="19" y2="12"></line>
             <polyline points="12 5 19 12 12 19"></polyline>
@@ -284,13 +289,13 @@ export default function PackagesBookingPage() {
                 
                 <div>
                   <span className="text-xs font-bold uppercase tracking-widest text-[#8B7355] block mb-1">
-                    Booking Successful • No Payment Required
+                    {cm?.successBadge || "Booking Successful • No Payment Required"}
                   </span>
                   <h3 className="text-3xl font-bold font-displayPlayFair text-[#0F172A]">
-                    Custom Package Confirmed!
+                    {cm?.successTitle || "Custom Package Confirmed!"}
                   </h3>
                   <p className="text-xs text-[#64748B] max-w-md mx-auto mt-2 leading-relaxed">
-                    Your bespoke package reservation has been confirmed and registered in our system. A confirmation email has been dispatched to your address.
+                    {cm?.successDesc || "Your bespoke package reservation has been confirmed and registered in our system. A confirmation email has been dispatched to your address."}
                   </p>
                 </div>
 
@@ -298,7 +303,7 @@ export default function PackagesBookingPage() {
                 <div className="bg-[#FBF6F3] border border-[#E8E2DC] rounded-2xl p-5 max-w-md mx-auto flex items-center justify-between">
                   <div className="text-left">
                     <span className="text-[10px] uppercase font-bold text-[#8B7355] tracking-wider block">
-                      Booking Reference ID
+                      {cm?.bookingRefLabel || "Booking Reference ID"}
                     </span>
                     <span className="text-xl font-bold font-mono text-[#0F172A]">
                       {confirmedData.bookingId}
@@ -318,12 +323,12 @@ export default function PackagesBookingPage() {
                     {copiedRef ? (
                       <>
                         <FaCheck size={11} className="text-emerald-600" />
-                        <span className="text-emerald-700">Copied</span>
+                        <span className="text-emerald-700">{cm?.copiedBtn || "Copied"}</span>
                       </>
                     ) : (
                       <>
                         <FaCopy size={11} className="text-[#64748B]" />
-                        <span>Copy</span>
+                        <span>{cm?.copyBtn || "Copy"}</span>
                       </>
                     )}
                   </button>
@@ -333,24 +338,24 @@ export default function PackagesBookingPage() {
                 <div className="bg-white border border-[#E2E8F0] rounded-2xl p-6 text-left max-w-md mx-auto space-y-4 shadow-2xs text-xs">
                   <div className="grid grid-cols-2 gap-4 pb-4 border-b border-[#F1F5F9]">
                     <div>
-                      <span className="text-[10px] uppercase font-bold text-[#94A3B8] block mb-0.5">Guest</span>
+                      <span className="text-[10px] uppercase font-bold text-[#94A3B8] block mb-0.5">{cm?.guestLabel || "Guest"}</span>
                       <p className="font-semibold text-[#0F172A]">{confirmedData.name}</p>
                       <p className="text-[#64748B] text-[11px] truncate">{confirmedData.email}</p>
                       <p className="text-[#64748B] text-[11px]">{confirmedData.phone}</p>
                     </div>
                     <div>
-                      <span className="text-[10px] uppercase font-bold text-[#94A3B8] block mb-0.5">Session Details</span>
+                      <span className="text-[10px] uppercase font-bold text-[#94A3B8] block mb-0.5">{cm?.sessionDetailsLabel || "Session Details"}</span>
                       <p className="font-semibold text-[#0F172A]">{confirmedData.date}</p>
                       <p className="text-[#64748B]">{confirmedData.guests} {confirmedData.guests === 1 ? "Person" : "Guests"}</p>
                       <span className="inline-block mt-1 px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-700 border border-emerald-200 text-[10px] font-semibold">
-                        Confirmed (Pending Review)
+                        {cm?.statusPending || "Confirmed (Pending Review)"}
                       </span>
                     </div>
                   </div>
 
                   <div>
                     <span className="text-[10px] uppercase font-bold text-[#94A3B8] block mb-2">
-                      Included Experiences
+                      {cm?.includedExperiencesLabel || "Included Experiences"}
                     </span>
                     <div className="flex flex-wrap gap-1.5">
                       {confirmedData.services.map((srv, idx) => (
@@ -367,7 +372,7 @@ export default function PackagesBookingPage() {
                   {confirmedData.notes && (
                     <div className="pt-2 border-t border-[#F1F5F9]">
                       <span className="text-[10px] uppercase font-bold text-[#94A3B8] block mb-0.5">
-                        Notes & Requests
+                        {cm?.notesAndRequestsLabel || "Notes & Requests"}
                       </span>
                       <p className="text-[#475569] text-[11px] italic bg-[#F8FAFC] p-2.5 rounded-xl border border-[#E2E8F0]">
                         {confirmedData.notes}
@@ -387,7 +392,7 @@ export default function PackagesBookingPage() {
                     }}
                     className="px-6 py-3 rounded-xl border border-[#CBD5E1] text-[#475569] hover:bg-[#F8FAFC] font-bold text-xs uppercase tracking-wider transition-all cursor-pointer"
                   >
-                    Done & Close
+                    {cm?.doneAndCloseBtn || "Done & Close"}
                   </button>
 
                   <Link
@@ -395,7 +400,7 @@ export default function PackagesBookingPage() {
                     onClick={() => setShowCustomizeModal(false)}
                     className="px-7 py-3 rounded-xl bg-[#8B7355] text-white hover:bg-[#725e45] font-bold text-xs uppercase tracking-wider transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer"
                   >
-                    <span>View Reservation Page</span>
+                    <span>{cm?.viewReservationBtn || "View Reservation Page"}</span>
                     <BiCheckCircle size={16} />
                   </Link>
                 </div>
@@ -502,13 +507,13 @@ export default function PackagesBookingPage() {
                 <div>
                   <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-[#8B7355] mb-1">
                     <FaSlidersH size={12} />
-                    <span>Bespoke Wellness Arrangement</span>
+                    <span>{cm?.badge || "Bespoke Wellness Arrangement"}</span>
                   </div>
                   <h3 className="text-2xl font-bold font-displayPlayFair text-[#0F172A]">
-                    Design Your Custom Package
+                    {cm?.title || "Design Your Custom Package"}
                   </h3>
                   <p className="text-xs text-[#64748B] mt-1">
-                    Combine your ideal treatments, duration, and preferences. Confirmed directly without advance payment.
+                    {cm?.subtitle || "Combine your ideal treatments, duration, and preferences. Confirmed directly without advance payment."}
                   </p>
                 </div>
 
@@ -529,11 +534,11 @@ export default function PackagesBookingPage() {
                   {/* Package Concept Title */}
                   <div>
                     <label className="block text-xs font-bold text-[#0F172A] mb-1 uppercase tracking-wide">
-                      Package Name or Focus Theme <span className="text-[#94A3B8] font-normal lowercase">(optional)</span>
+                      {cm?.packageNameLabel || "Package Name or Focus Theme"} <span className="text-[#94A3B8] font-normal lowercase">{cm?.optional || "(optional)"}</span>
                     </label>
                     <input
                       type="text"
-                      placeholder="e.g. Couples Rejuvenation Day / Ultimate Detox Retreat"
+                      placeholder={cm?.packagePlaceholder || "e.g. Couples Rejuvenation Day / Ultimate Detox Retreat"}
                       value={customForm.title}
                       onChange={(e) => setCustomForm({ ...customForm, title: e.target.value })}
                       className="w-full p-3.5 bg-white border border-[#E2E8F0] rounded-xl text-sm text-[#0F172A] focus:outline-none focus:ring-2 focus:ring-[#8B7355]"
@@ -544,7 +549,7 @@ export default function PackagesBookingPage() {
                     {/* Number of Guests */}
                     <div>
                       <label className="block text-xs font-bold text-[#0F172A] mb-1 uppercase tracking-wide">
-                        Guests *
+                        {cm?.guestsLabel || "Guests *"}
                       </label>
                       <select
                         value={customForm.guests}
@@ -553,7 +558,7 @@ export default function PackagesBookingPage() {
                       >
                         {[1, 2, 3, 4, 5, 6, 8, 10].map((num) => (
                           <option key={num} value={num}>
-                            {num} {num === 1 ? "Person" : "People"}
+                            {num} {num === 1 ? (cm?.person || "Person") : (cm?.people || "People")}
                           </option>
                         ))}
                       </select>
@@ -562,7 +567,7 @@ export default function PackagesBookingPage() {
                     {/* Preferred Date */}
                     <div>
                       <label className="block text-xs font-bold text-[#0F172A] mb-1 uppercase tracking-wide">
-                        Preferred Date *
+                        {cm?.preferredDateLabel || "Preferred Date *"}
                       </label>
                       <input
                         type="date"
@@ -577,17 +582,17 @@ export default function PackagesBookingPage() {
                     {/* Desired Duration */}
                     <div>
                       <label className="block text-xs font-bold text-[#0F172A] mb-1 uppercase tracking-wide">
-                        Duration *
+                        {cm?.durationLabel || "Duration *"}
                       </label>
                       <select
                         value={customForm.duration}
                         onChange={(e) => setCustomForm({ ...customForm, duration: e.target.value })}
                         className="w-full p-3.5 bg-white border border-[#E2E8F0] rounded-xl text-sm text-[#0F172A] focus:outline-none focus:ring-2 focus:ring-[#8B7355] cursor-pointer"
                       >
-                        <option value="2.5 Hours">2.5 Hours (Mini Escape)</option>
-                        <option value="Half Day (4 Hours)">Half Day (4 Hours)</option>
-                        <option value="Full Day (6-8 Hours)">Full Day (6-8 Hours)</option>
-                        <option value="Weekend Experience">Weekend Experience</option>
+                        <option value="2.5 Hours">{cm?.durations?.mini || "2.5 Hours (Mini Escape)"}</option>
+                        <option value="Half Day (4 Hours)">{cm?.durations?.halfDay || "Half Day (4 Hours)"}</option>
+                        <option value="Full Day (6-8 Hours)">{cm?.durations?.fullDay || "Full Day (6-8 Hours)"}</option>
+                        <option value="Weekend Experience">{cm?.durations?.weekend || "Weekend Experience"}</option>
                       </select>
                     </div>
                   </div>
@@ -595,7 +600,7 @@ export default function PackagesBookingPage() {
                   {/* Experiences Selection */}
                   <div>
                     <label className="block text-xs font-bold text-[#0F172A] mb-2 uppercase tracking-wide">
-                      Select Experiences to Include *
+                      {cm?.selectExperiencesLabel || "Select Experiences to Include *"}
                     </label>
                     <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
                       {[
@@ -624,7 +629,15 @@ export default function PackagesBookingPage() {
                                 : "bg-white border-[#E2E8F0] text-[#475569] hover:border-[#D1B191]"
                             }`}
                           >
-                            <span>{exp}</span>
+                            <span>{
+                              exp === "VIP Sauna" ? (cm?.experiences?.vipSauna || exp) :
+                              exp === "Lunchroom" ? (cm?.experiences?.lunchroom || exp) :
+                              exp === "Yoga Activity" ? (cm?.experiences?.yogaActivity || exp) :
+                              exp === "Sauna" ? (cm?.experiences?.sauna || exp) :
+                              exp === "Salt Room" ? (cm?.experiences?.saltRoom || exp) :
+                              exp === "Activities" ? (cm?.experiences?.activities || exp) :
+                              exp === "Others" ? (cm?.experiences?.others || exp) : exp
+                            }</span>
                             <span className="text-xs">{isChecked ? "✓" : "+"}</span>
                           </button>
                         );
@@ -635,12 +648,12 @@ export default function PackagesBookingPage() {
                     {customForm.treatments.includes("Others") && (
                       <div className="mt-3 animate-fadeIn">
                         <label className="block text-[11px] font-bold text-[#0F172A] mb-1 uppercase tracking-wide">
-                          Specify Other Experiences / Services *
+                          {cm?.specifyOthersLabel || "Specify Other Experiences / Services *"}
                         </label>
                         <input
                           type="text"
                           required
-                          placeholder="e.g. Cold Plunge, Aromatherapy, Sound Bath, Custom Massage..."
+                          placeholder={cm?.specifyOthersPlaceholder || "e.g. Cold Plunge, Aromatherapy, Sound Bath, Custom Massage..."}
                           value={customForm.otherExperienceDetails}
                           onChange={(e) => setCustomForm({ ...customForm, otherExperienceDetails: e.target.value })}
                           className="w-full p-3 bg-[#FCF2E9]/40 border border-[#D1B191] rounded-xl text-xs text-[#0F172A] focus:outline-none focus:ring-2 focus:ring-[#8B7355]"
@@ -653,12 +666,12 @@ export default function PackagesBookingPage() {
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-3 pt-2">
                     <div>
                       <label className="block text-[11px] font-bold text-[#0F172A] mb-1 uppercase tracking-wide">
-                        Your Name *
+                        {cm?.yourNameLabel || "Your Name *"}
                       </label>
                       <input
                         type="text"
                         required
-                        placeholder="e.g. John Doe"
+                        placeholder={cm?.yourNamePlaceholder || "e.g. John Doe"}
                         value={customForm.name}
                         onChange={(e) => setCustomForm({ ...customForm, name: e.target.value })}
                         className="w-full p-3 bg-white border border-[#E2E8F0] rounded-xl text-xs text-[#0F172A] focus:outline-none focus:ring-2 focus:ring-[#8B7355]"
@@ -666,12 +679,12 @@ export default function PackagesBookingPage() {
                     </div>
                     <div>
                       <label className="block text-[11px] font-bold text-[#0F172A] mb-1 uppercase tracking-wide">
-                        Email Address *
+                        {cm?.emailLabel || "Email Address *"}
                       </label>
                       <input
                         type="email"
                         required
-                        placeholder="john@example.com"
+                        placeholder={cm?.emailPlaceholder || "john@example.com"}
                         value={customForm.email}
                         onChange={(e) => setCustomForm({ ...customForm, email: e.target.value })}
                         className="w-full p-3 bg-white border border-[#E2E8F0] rounded-xl text-xs text-[#0F172A] focus:outline-none focus:ring-2 focus:ring-[#8B7355]"
@@ -679,12 +692,12 @@ export default function PackagesBookingPage() {
                     </div>
                     <div>
                       <label className="block text-[11px] font-bold text-[#0F172A] mb-1 uppercase tracking-wide">
-                        Phone Number *
+                        {cm?.phoneLabel || "Phone Number *"}
                       </label>
                       <input
                         type="tel"
                         required
-                        placeholder="+358401234567"
+                        placeholder={cm?.phonePlaceholder || "+358401234567"}
                         value={customForm.phone}
                         onChange={(e) => setCustomForm({ ...customForm, phone: e.target.value })}
                         className="w-full p-3 bg-white border border-[#E2E8F0] rounded-xl text-xs text-[#0F172A] focus:outline-none focus:ring-2 focus:ring-[#8B7355]"
@@ -695,11 +708,11 @@ export default function PackagesBookingPage() {
                   {/* Special Requests */}
                   <div>
                     <label className="block text-[11px] font-bold text-[#0F172A] mb-1 uppercase tracking-wide">
-                      Notes & Special Requests
+                      {cm?.notesLabel || "Notes & Special Requests"}
                     </label>
                     <textarea
                       rows={2}
-                      placeholder="e.g. Afternoon session preferred, dietary requests, anniversary surprises..."
+                      placeholder={cm?.notesPlaceholder || "e.g. Afternoon session preferred, dietary requests, anniversary surprises..."}
                       value={customForm.specialRequests}
                       onChange={(e) => setCustomForm({ ...customForm, specialRequests: e.target.value })}
                       className="w-full p-3 bg-white border border-[#E2E8F0] rounded-xl text-xs text-[#0F172A] focus:outline-none focus:ring-2 focus:ring-[#8B7355] resize-none"
@@ -714,7 +727,7 @@ export default function PackagesBookingPage() {
                     onClick={() => setShowCustomizeModal(false)}
                     className="px-6 py-3 rounded-xl border border-[#CBD5E1] text-[#64748B] hover:bg-[#F8FAFC] font-bold text-xs uppercase tracking-wider transition-all cursor-pointer"
                   >
-                    Cancel
+                    {cm?.cancelBtn || "Cancel"}
                   </button>
 
                   <button
@@ -725,12 +738,12 @@ export default function PackagesBookingPage() {
                     {customSubmitting ? (
                       <>
                         <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                        <span>Confirming...</span>
+                        <span>{cm?.confirmingBtn || "Confirming..."}</span>
                       </>
                     ) : (
                       <>
                         <FaPaperPlane size={12} />
-                        <span>Confirm Custom Booking</span>
+                        <span>{cm?.confirmBtn || "Confirm Custom Booking"}</span>
                       </>
                     )}
                   </button>

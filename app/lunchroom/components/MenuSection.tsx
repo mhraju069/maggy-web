@@ -96,7 +96,7 @@ export default function MenuSection() {
             </div>
 
             {/* Request Menu Link */}
-            <Link
+            {/* <Link
               href="/menu"
               className="inline-flex items-center gap-2 mt-8 text-[#8B7355] hover:text-[#6B5D54] transition-colors"
               style={{ fontFamily: "Cambria, Georgia, serif" }}
@@ -127,7 +127,7 @@ export default function MenuSection() {
                   strokeLinejoin="round"
                 />
               </svg>
-            </Link>
+            </Link> */}
           </div>
         </div>
       </div>

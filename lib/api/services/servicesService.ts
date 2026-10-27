@@ -576,13 +576,13 @@ export const servicesService = {
     return ApiClient.post(ENDPOINTS.SERVICES.EVENTS_INQUIRY, payload, { skipAuth: true });
   },
 
-  async getPackages(): Promise<ServicePackage[]> {
+  async getPackages(lang?: string): Promise<ServicePackage[]> {
     try {
       let res: any;
       try {
-        res = await ApiClient.get<any>(ENDPOINTS.SERVICES.DETAILS("package"), { skipAuth: true });
+        res = await ApiClient.get<any>(ENDPOINTS.SERVICES.DETAILS("package"), { params: lang ? { lang } : undefined, skipAuth: true });
       } catch {
-        res = await ApiClient.get<any>("/services/details/packages/", { skipAuth: true });
+        res = await ApiClient.get<any>("/services/details/packages/", { params: lang ? { lang } : undefined, skipAuth: true });
       }
       if (res?.data && Array.isArray(res.data)) return res.data;
       if (Array.isArray(res)) return res;

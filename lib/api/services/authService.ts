@@ -36,6 +36,11 @@ export const authService = {
       setAuthToken(token, refresh, role);
       if (typeof window !== "undefined" && response.user) {
         localStorage.setItem("user_info", JSON.stringify(response.user));
+        const userLang = (response.user.language || "").toLowerCase();
+        if (userLang && ["en", "nl", "de"].includes(userLang)) {
+          localStorage.setItem("haven_language", userLang);
+          window.dispatchEvent(new Event("languageChange"));
+        }
       }
     }
 
@@ -132,6 +137,11 @@ export const authService = {
       setAuthToken(token, refresh, userRole);
       if (typeof window !== "undefined" && response.user) {
         localStorage.setItem("user_info", JSON.stringify(response.user));
+        const userLang = (response.user.language || "").toLowerCase();
+        if (userLang && ["en", "nl", "de"].includes(userLang)) {
+          localStorage.setItem("haven_language", userLang);
+          window.dispatchEvent(new Event("languageChange"));
+        }
       }
     }
 

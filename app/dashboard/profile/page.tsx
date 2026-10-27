@@ -18,8 +18,6 @@ const LANGUAGES = [
   { code: "en", label: "English" },
   { code: "nl", label: "Dutch (Nederlands)" },
   { code: "de", label: "German (Deutsch)" },
-  { code: "fr", label: "French (Français)" },
-  { code: "es", label: "Spanish (Español)" },
 ];
 
 export default function ProfilePage() {
@@ -129,6 +127,12 @@ export default function ProfilePage() {
               JSON.stringify({ ...parsed, ...updatedUser })
             );
           } catch {}
+        }
+        const newLang = (updatedUser.language || draft.language || "").toLowerCase();
+        if (newLang && ["en", "nl", "de"].includes(newLang)) {
+          localStorage.setItem("haven_language", newLang);
+          window.dispatchEvent(new Event("languageChange"));
+          window.location.reload();
         }
       }
 

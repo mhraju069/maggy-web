@@ -18,7 +18,7 @@ const paymentBadge: Record<PaymentType, { label: string; bg: string }> = {
 interface ArrangementCardProps {
   id: number;
   image: string;
-  rating: number;
+  rating?: number;
   title: string;
   combo: string;
   description: string;
@@ -54,6 +54,8 @@ export default function ArrangementCard({
       {/* Image */}
       <div className="relative w-full h-48">
         <Image src={image} alt={title} fill sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" className="object-cover" />
+        {/* Rating Badge (Removed as requested) */}
+        {/*
         <div
           className="absolute top-3 right-3 flex items-center gap-1.5"
           style={{
@@ -79,6 +81,7 @@ export default function ArrangementCard({
             {rating}
           </span>
         </div>
+        */}
       </div>
 
       {/* Body */}
