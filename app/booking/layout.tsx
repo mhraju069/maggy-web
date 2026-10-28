@@ -26,11 +26,11 @@ export default function BookingLayout({
   return (
     <div className="min-h-screen bg-[#FBF6F3] pt-[88px]">
       <Navbar />
-      <div className="pb-8">
+      <div className="pb-4 sm:pb-8">
         <Stepper activeStep={activeStep} />
       </div>
-      <div className="container mx-auto px-6">
-        <main className="bg-[#FCF2E9] py-16 md:py-24 rounded-[32px] overflow-hidden">
+      <div className="container mx-auto px-3 sm:px-6">
+        <main className="bg-[#FCF2E9] py-8 sm:py-16 md:py-24 rounded-2xl sm:rounded-[32px] overflow-hidden">
           {children}
         </main>
       </div>

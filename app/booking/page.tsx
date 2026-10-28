@@ -42,13 +42,13 @@ const getCategoryHref = (type: string): string => {
 
 const getCategoryIcon = (type: string): React.ReactNode => {
   const t = (type || "").toLowerCase().trim();
-  if (t === "sauna") return <MdOutlineHotTub className="w-6 h-6" />;
-  if (t === "saltroom" || t === "salt_room" || t === "arrangements") return <MdOutlineAutoAwesome className="w-6 h-6" />;
-  if (t === "activity" || t === "activities") return <MdOutlineSelfImprovement className="w-6 h-6" />;
-  if (t === "lunchroom") return <MdOutlineRestaurantMenu className="w-6 h-6" />;
-  if (t === "event" || t === "events" || t === "eventspace") return <MdOutlineEventNote className="w-6 h-6" />;
-  if (t === "package" || t === "packages") return <MdOutlineCardGiftcard className="w-6 h-6" />;
-  return <MdOutlineHotTub className="w-6 h-6" />;
+  if (t === "sauna") return <MdOutlineHotTub className="w-5 h-5 sm:w-6 sm:h-6" />;
+  if (t === "saltroom" || t === "salt_room" || t === "arrangements") return <MdOutlineAutoAwesome className="w-5 h-5 sm:w-6 sm:h-6" />;
+  if (t === "activity" || t === "activities") return <MdOutlineSelfImprovement className="w-5 h-5 sm:w-6 sm:h-6" />;
+  if (t === "lunchroom") return <MdOutlineRestaurantMenu className="w-5 h-5 sm:w-6 sm:h-6" />;
+  if (t === "event" || t === "events" || t === "eventspace") return <MdOutlineEventNote className="w-5 h-5 sm:w-6 sm:h-6" />;
+  if (t === "package" || t === "packages") return <MdOutlineCardGiftcard className="w-5 h-5 sm:w-6 sm:h-6" />;
+  return <MdOutlineHotTub className="w-5 h-5 sm:w-6 sm:h-6" />;
 };
 
 const defaultFallbacks: Record<string, string> = {
@@ -142,33 +142,33 @@ export default function BookingPage() {
   };
 
   return (
-    <div className="w-full px-6 md:px-12">
+    <div className="w-full px-3 sm:px-6 md:px-12">
       {/* ── Title Section ── */}
-      <div className="text-center mb-16 flex flex-col items-center">
-        <h1 className="font-displayPlayFair text-5xl text-[#1d1a17] mb-2">
+      <div className="text-center mb-8 sm:mb-16 flex flex-col items-center">
+        <h1 className="font-displayPlayFair text-3xl sm:text-4xl md:text-5xl text-[#1d1a17] mb-2 px-2">
           {flow?.stepper?.selectExperience || "Choose Your Experience"}
         </h1>
         <DecorativeUnderline />
-        <p className="font-cambria text-sm text-[#475569] mt-6 italic">
+        <p className="font-cambria text-sm text-[#475569] mt-4 sm:mt-6 italic px-4">
           A carefully curated moment, designed around you.
         </p>
       </div>
 
       {/* ── Loading State ── */}
       {loading && (
-        <div className="w-full py-24 text-center">
-          <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-[#8B7355] border-t-transparent mb-4"></div>
+        <div className="w-full py-16 sm:py-24 text-center">
+          <div className="inline-block animate-spin rounded-full h-10 w-10 sm:h-12 sm:w-12 border-4 border-[#8B7355] border-t-transparent mb-4"></div>
           <p className="text-[#64748B] font-cambria italic">{flow?.common?.loading || "Loading Services..."}</p>
         </div>
       )}
 
       {/* ── Empty State ── */}
       {!loading && categories.length === 0 && (
-        <div className="bg-white rounded-[32px] p-12 shadow-sm border border-[#E8E2DC] text-center max-w-2xl mx-auto my-12">
-          <div className="w-16 h-16 bg-[#FCF2E9] rounded-2xl flex items-center justify-center mx-auto mb-4 text-[#8B7355]">
-            <FaSpa className="w-8 h-8" />
+        <div className="bg-white rounded-2xl sm:rounded-[32px] p-6 sm:p-12 shadow-sm border border-[#E8E2DC] text-center max-w-2xl mx-auto my-8 sm:my-12">
+          <div className="w-14 h-14 sm:w-16 sm:h-16 bg-[#FCF2E9] rounded-2xl flex items-center justify-center mx-auto mb-4 text-[#8B7355]">
+            <FaSpa className="w-7 h-7 sm:w-8 sm:h-8" />
           </div>
-          <h3 className="text-2xl font-bold font-displayPlayFair text-[#0F172A] mb-2">
+          <h3 className="text-xl sm:text-2xl font-bold font-displayPlayFair text-[#0F172A] mb-2">
             No Services Available
           </h3>
           <p className="text-sm text-[#64748B] font-cambria italic">
@@ -179,17 +179,17 @@ export default function BookingPage() {
 
       {/* ── Grid ── */}
       {!loading && categories.length > 0 && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-6xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8 max-w-6xl mx-auto">
           {categories.map((cat) => (
             <Link
               key={cat.id}
               href={cat.href}
               onClick={(e) => handleCategoryClick(cat, e)}
-              className="group cursor-pointer"
+              className="group cursor-pointer block"
             >
-              <div className="bg-white rounded-[32px] overflow-hidden shadow-sm hover:shadow-xl transition-all duration-500 border border-[#E8E2DC] flex flex-col h-full">
+              <div className="bg-white rounded-2xl sm:rounded-[32px] overflow-hidden shadow-sm hover:shadow-xl transition-all duration-500 border border-[#E8E2DC] flex flex-col h-full">
                 {/* Image Section */}
-                <div className="relative h-80 w-full overflow-hidden">
+                <div className="relative h-64 sm:h-72 md:h-80 w-full overflow-hidden">
                   <Image
                     src={cat.image}
                     alt={cat.title}
@@ -197,18 +197,22 @@ export default function BookingPage() {
                     sizes="(max-width: 768px) 100vw, 50vw"
                     className="object-cover transition-transform duration-700 group-hover:scale-105"
                   />
-                  <div className="absolute inset-0 bg-black/30 group-hover:bg-black/20 transition-colors duration-500" />
+                  <div className="absolute inset-0 bg-black/40 group-hover:bg-black/25 transition-colors duration-500" />
 
                   {/* Overlay Text */}
-                  <div className="absolute inset-x-0 bottom-0 p-10 text-white">
-                    <div className="flex items-center gap-4">
-                      <div className="flex items-center justify-center">
+                  <div className="absolute inset-x-0 bottom-0 p-5 sm:p-8 md:p-10 text-white">
+                    <div className="flex items-start sm:items-center gap-3 sm:gap-4">
+                      <div className="flex items-center justify-center mt-1 sm:mt-0 shrink-0">
                         {cat.icon}
                       </div>
-                      <div>
-                        <h3 className="font-displayPlayFair text-4xl mb-1 leading-tight">{cat.title}</h3>
+                      <div className="min-w-0 flex-1">
+                        <h3 className="font-displayPlayFair text-2xl sm:text-3xl md:text-4xl mb-1 leading-tight break-words">
+                          {cat.title}
+                        </h3>
                         {cat.slogan && (
-                          <p className="text-sm font-medium opacity-90 tracking-wide uppercase">{cat.slogan}</p>
+                          <p className="text-xs sm:text-sm font-medium opacity-90 tracking-wide uppercase line-clamp-2">
+                            {cat.slogan}
+                          </p>
                         )}
                       </div>
                     </div>
@@ -216,8 +220,8 @@ export default function BookingPage() {
                 </div>
 
                 {/* Description Section */}
-                <div className="p-10 flex-grow">
-                  <p className="font-cambria text-[#475569] text-lg leading-relaxed">
+                <div className="p-5 sm:p-8 md:p-10 flex-grow">
+                  <p className="font-cambria text-[#475569] text-base sm:text-lg leading-relaxed">
                     {cat.description}
                   </p>
                 </div>
@@ -228,10 +232,10 @@ export default function BookingPage() {
       )}
 
       {/* ── Footer Buttons ── */}
-      <div className="max-w-6xl mx-auto mt-16 flex justify-between items-center bg-[#FBF6F3] p-8 rounded-2xl shadow-sm border border-[#E8E2DC]">
+      <div className="max-w-6xl mx-auto mt-8 sm:mt-16 flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-4 bg-[#FBF6F3] p-4 sm:p-8 rounded-2xl shadow-sm border border-[#E8E2DC]">
         <button
           onClick={() => window.history.back()}
-          className="px-10 py-4 rounded-xl border border-[#CFB9A3] text-[#1d1a17] font-bold text-sm hover:bg-[#CFB9A3] hover:bg-opacity-10 transition-all flex items-center gap-3"
+          className="w-full sm:w-auto justify-center px-6 sm:px-10 py-3.5 sm:py-4 rounded-xl border border-[#CFB9A3] text-[#1d1a17] font-bold text-sm hover:bg-[#CFB9A3] hover:bg-opacity-10 transition-all flex items-center gap-3"
           style={{ fontFamily: "Inter, sans-serif" }}
         >
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -243,7 +247,7 @@ export default function BookingPage() {
 
         <button
           disabled
-          className="px-12 py-4 rounded-xl bg-[#D1B191] opacity-50 text-white font-bold text-sm cursor-not-allowed flex items-center gap-3 transition-all shadow-md"
+          className="w-full sm:w-auto justify-center px-6 sm:px-12 py-3.5 sm:py-4 rounded-xl bg-[#D1B191] opacity-50 text-white font-bold text-sm cursor-not-allowed flex items-center gap-3 transition-all shadow-md"
           style={{ fontFamily: "Inter, sans-serif" }}
         >
           {btnTrans?.continue || "Continue"}

@@ -43,9 +43,12 @@ export default function WhatsIncluded({
         </div>
 
         {/* Features Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-5xl mx-auto">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 max-w-5xl mx-auto justify-items-center sm:justify-items-start">
           {features.map((feature, index) => (
-            <div key={index} className="flex items-center gap-4">
+            <div
+              key={index}
+              className="flex flex-col sm:flex-row items-center sm:items-center text-center sm:text-left gap-3 sm:gap-4 w-full max-w-xs sm:max-w-none"
+            >
               <div className="w-14 h-14 rounded-full bg-[#E8DFD5] flex items-center justify-center shrink-0">
                 {feature.icon}
               </div>
