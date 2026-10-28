@@ -500,9 +500,9 @@ export default function GetInTouchSection() {
 
       {/* ── Contact Info Cards ── */}
       <div className="container mx-auto px-6 py-14">
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 md:gap-12 lg:gap-16 max-w-5xl mx-auto">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 md:gap-12 lg:gap-16 max-w-5xl mx-auto text-center sm:text-left justify-items-center sm:justify-items-start">
           {/* Address */}
-          <div className="flex flex-col gap-3">
+          <div className="flex flex-col items-center sm:items-start gap-3 w-full max-w-xs sm:max-w-none">
             <div
               style={{
                 display: "inline-flex",
@@ -549,7 +549,7 @@ export default function GetInTouchSection() {
           </div>
 
           {/* Phone */}
-          <div className="flex flex-col gap-3">
+          <div className="flex flex-col items-center sm:items-start gap-3 w-full max-w-xs sm:max-w-none">
             <div
               style={{
                 display: "inline-flex",
@@ -598,7 +598,7 @@ export default function GetInTouchSection() {
           </div>
 
           {/* Email */}
-          <div className="flex flex-col gap-3">
+          <div className="flex flex-col items-center sm:items-start gap-3 w-full max-w-xs sm:max-w-none">
             <div
               style={{
                 display: "inline-flex",

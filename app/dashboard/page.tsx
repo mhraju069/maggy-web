@@ -397,7 +397,7 @@ export default function DashboardHome() {
           </p>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-2 sm:gap-3">
           <Link
             href="/services"
             className="px-5 py-2.5 rounded-xl bg-[#8B7355] hover:bg-[#786247] text-white text-xs font-bold transition-all shadow-xs flex items-center gap-2"

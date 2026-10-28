@@ -10,12 +10,14 @@ import { ApiError } from "@/lib/api/types";
 import { useDashboard } from "../DashboardContext";
 import Spinner from "@/components/shared/Spinner";
 import { cleanServiceName } from "../page";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
+import { dashboardTranslations } from "@/lib/i18n/dashboardTranslations";
 
-function formatDisplayDate(dateStr: string) {
+function formatDisplayDate(dateStr: string, locale: string = "en-US") {
   if (!dateStr) return "";
   try {
     const d = new Date(dateStr);
-    return d.toLocaleDateString("en-US", {
+    return d.toLocaleDateString(locale === "nl" ? "nl-NL" : locale === "de" ? "de-DE" : "en-US", {
       day: "numeric",
       month: "short",
       year: "numeric",
@@ -38,9 +40,27 @@ function formatDisplayTime(timeStr: string) {
   }
 }
 
+function formatStatus(status?: string, dt?: any): string {
+  if (!status) return dt?.confirmed || "Confirmed";
+  const s = status.toLowerCase().replace(/_/g, " ").trim();
+  if (s.includes("confirmed")) return dt?.confirmed || "Confirmed";
+  if (s.includes("completed")) return dt?.completed || "Completed";
+  if (s.includes("cancelled")) return dt?.cancelled || "Cancelled";
+  if (s.includes("pending")) return dt?.pending || "Pending";
+  return s.charAt(0).toUpperCase() + s.slice(1);
+}
+
+function formatPaymentStatus(paymentStatus?: string): string {
+  if (!paymentStatus) return "";
+  return paymentStatus.replace(/_/g, " ").trim();
+}
+
 export default function MyBookingPage() {
   const [tab, setTab] = useState<"upcoming" | "past">("upcoming");
   const { dashboardData, loading, refreshDashboard } = useDashboard();
+  const { language } = useLanguage();
+  const dt = dashboardTranslations[language]?.myBookings || dashboardTranslations.en.myBookings;
+
   const [cancelBooking, setCancelBooking] = useState<DashboardBookingItem | null>(null);
   const [cancelReason, setCancelReason] = useState("");
   const [cancelling, setCancelling] = useState(false);
@@ -59,7 +79,6 @@ export default function MyBookingPage() {
   };
 
   const handleCloseCancelModal = () => {
-    if (cancelling) return;
     setCancelBooking(null);
     setCancelReason("");
     setCancelError(null);
@@ -70,27 +89,15 @@ export default function MyBookingPage() {
     if (!cancelBooking) return;
     setCancelling(true);
     setCancelError(null);
-    setCancelSuccess(null);
 
+    const bId = cancelBooking.id || cancelBooking.booking_id;
     try {
-      const bookingIdentifier = cancelBooking.booking_id || cancelBooking.id;
-      const res = await bookingService.cancelBooking(bookingIdentifier, {
-        booking_id: cancelBooking.booking_id,
-        reason: cancelReason.trim() || undefined,
-      });
-
-      if (res && res.success !== false) {
-        setCancelSuccess(res);
-        // Refresh dashboard in background to update upcoming / past bookings list
-        await refreshDashboard();
-      } else {
-        setCancelError(res?.message || "Cancellation could not be completed.");
-      }
+      const res = await bookingService.cancelBooking(bId, { reason: cancelReason.trim() });
+      setCancelSuccess(res);
+      await refreshDashboard();
     } catch (err: any) {
       if (err instanceof ApiError) {
-        const errorData = err.data || {};
-        const msg = (errorData.message as string) || (errorData.detail as string) || err.message;
-        setCancelError(msg || "Failed to cancel booking. Please try again.");
+        setCancelError(err.message || "Failed to cancel reservation.");
       } else {
         setCancelError(err?.message || "An unexpected error occurred while cancelling your reservation.");
       }
@@ -100,133 +107,164 @@ export default function MyBookingPage() {
   };
 
   return (
-    <div>
-      <h1 className="font-displayPlayFair text-3xl font-bold text-[#1d1a17] mb-1">
-        My Reservations
-      </h1>
-      <p className="text-sm text-[#64748B] mb-6">
-        View and manage your wellness experiences
-      </p>
+    <div className="max-w-6xl mx-auto space-y-6">
+      <div>
+        <h1 className="font-displayPlayFair text-2xl sm:text-3xl font-bold text-[#1d1a17] mb-1">
+          {dt.title}
+        </h1>
+        <p className="text-sm text-[#64748B]">
+          {dt.subtitle}
+        </p>
+      </div>
 
       {/* Tabs */}
-      <div className="flex gap-2 mb-6">
+      <div className="flex gap-2">
         <button
           onClick={() => setTab("upcoming")}
-          className={`px-5 py-2 rounded-full text-sm font-semibold transition-colors ${
+          className={`px-5 py-2 rounded-full text-sm font-semibold transition-colors cursor-pointer ${
             tab === "upcoming"
-              ? "bg-[#CFB9A3] text-white"
+              ? "bg-[#CFB9A3] text-white shadow-xs"
               : "bg-white text-[#64748B] border border-[#E2E8F0] hover:bg-[#F8F4F0]"
           }`}
         >
-          Upcoming ({upcomingBookings.length})
+          {dt.upcomingTab} ({upcomingBookings.length})
         </button>
         <button
           onClick={() => setTab("past")}
-          className={`px-5 py-2 rounded-full text-sm font-semibold transition-colors ${
+          className={`px-5 py-2 rounded-full text-sm font-semibold transition-colors cursor-pointer ${
             tab === "past"
-              ? "bg-[#CFB9A3] text-white"
+              ? "bg-[#CFB9A3] text-white shadow-xs"
               : "bg-white text-[#64748B] border border-[#E2E8F0] hover:bg-[#F8F4F0]"
           }`}
         >
-          Past ({pastBookings.length})
+          {dt.pastTab} ({pastBookings.length})
         </button>
       </div>
 
       {loading ? (
         <Spinner message="Loading your reservations..." />
       ) : activeBookings.length > 0 ? (
-        activeBookings.map((booking) => (
-          <div key={booking.id || booking.booking_id} className="bg-white rounded-xl p-6 mb-4 border border-[#F1EDE8]">
-            <div className="flex items-center justify-between mb-1">
-              <div className="flex items-center gap-3">
-                <h3 className="text-lg font-semibold text-[#1d1a17] font-displayPlayFair">
-                  {cleanServiceName(booking.service_name)}
-                </h3>
-                <span className="px-2 py-0.5 text-[11px] bg-[#F3EDE6] text-[#8b7355] rounded-full uppercase tracking-wider font-semibold">
-                  {booking.service_type}
-                </span>
-                <BsCheckCircle className="text-green-500 w-4 h-4" />
-              </div>
-              <span className="text-xs text-green-600 font-semibold bg-green-50 px-3 py-1 rounded-full capitalize">
-                {booking.status || "Confirmed"}
-              </span>
-            </div>
-
-            <div className="flex items-center justify-between mb-4">
-              <p className="text-xs text-[#64748B]">
-                ID: <span className="font-mono font-semibold text-[#1d1a17]">{booking.booking_id}</span>
-                {booking.total_price && Number(booking.total_price) > 0 && (
-                  <span className="ml-3 font-medium text-[#8B7355]">Total: €{booking.total_price}</span>
-                )}
-              </p>
-              <p className="text-xs text-[#94A3B8] capitalize">
-                Payment: <span className="text-[#475569] font-medium">{booking.payment_status?.replace(/_/g, " ")}</span>
-              </p>
-            </div>
-
-            <div className="flex flex-wrap items-center gap-8">
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-full bg-[#F3EDE6] flex items-center justify-center">
-                  <HiOutlineCalendar className="w-4 h-4 text-[#8b7355]" />
+        activeBookings.map((booking) => {
+          const isCancelled = booking.status?.toLowerCase().includes("cancelled");
+          return (
+            <div
+              key={booking.id || booking.booking_id}
+              className="bg-white rounded-2xl p-4 sm:p-6 border border-[#F1EDE8] shadow-xs"
+            >
+              {/* Header row: title, type and status badge */}
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-2">
+                <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+                  <h3 className="text-base sm:text-lg font-bold text-[#1d1a17] font-displayPlayFair">
+                    {cleanServiceName(booking.service_name)}
+                  </h3>
+                  <span className="px-2 py-0.5 text-[10px] sm:text-[11px] bg-[#F3EDE6] text-[#8b7355] rounded-full uppercase tracking-wider font-semibold">
+                    {booking.service_type}
+                  </span>
                 </div>
-                <div>
-                  <p className="text-[10px] text-[#94A3B8]">Date</p>
-                  <p className="text-sm font-semibold text-[#1d1a17]">{formatDisplayDate(booking.date)}</p>
+
+                <div className="self-start sm:self-auto">
+                  <span
+                    className={`inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1 rounded-full ${
+                      isCancelled
+                        ? "bg-rose-50 text-rose-700 border border-rose-200"
+                        : "bg-emerald-50 text-emerald-700 border border-emerald-200"
+                    }`}
+                  >
+                    {!isCancelled && <BsCheckCircle className="text-emerald-600 w-3.5 h-3.5 shrink-0" />}
+                    <span>{formatStatus(booking.status, dt)}</span>
+                  </span>
                 </div>
               </div>
 
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-full bg-[#F3EDE6] flex items-center justify-center">
-                  <HiOutlineClock className="w-4 h-4 text-[#8b7355]" />
-                </div>
-                <div>
-                  <p className="text-[10px] text-[#94A3B8]">Time</p>
-                  <p className="text-sm font-semibold text-[#1d1a17]">{formatDisplayTime(booking.time)}</p>
-                </div>
-              </div>
-
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-full bg-[#F3EDE6] flex items-center justify-center">
-                  <HiOutlineUsers className="w-4 h-4 text-[#8b7355]" />
-                </div>
-                <div>
-                  <p className="text-[10px] text-[#94A3B8]">Guests</p>
-                  <p className="text-sm font-semibold text-[#1d1a17]">
-                    {booking.guests} {booking.guests === 1 ? "Guest" : "Guests"}
+              {/* Sub-header: Booking ID & Payment Status */}
+              <div className="flex flex-wrap items-center justify-between gap-2 mb-4 pb-3 border-b border-[#F1EDE8] text-xs">
+                <p className="text-[#64748B]">
+                  {dt.bookingId}: <span className="font-mono font-semibold text-[#1d1a17]">{booking.booking_id}</span>
+                  {booking.total_price && Number(booking.total_price) > 0 && (
+                    <span className="ml-3 font-medium text-[#8B7355]">
+                      {dt.totalPaid}: €{booking.total_price}
+                    </span>
+                  )}
+                </p>
+                {booking.payment_status && (
+                  <p className="text-[#94A3B8]">
+                    Payment:{" "}
+                    <span className="text-[#475569] font-medium capitalize">
+                      {formatPaymentStatus(booking.payment_status)}
+                    </span>
                   </p>
+                )}
+              </div>
+
+              {/* Details grid: Date, Time, Guests */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-9 h-9 rounded-xl bg-[#FCF2E9] flex items-center justify-center text-[#8b7355] shrink-0">
+                    <HiOutlineCalendar className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <p className="text-[10px] uppercase font-bold text-[#94A3B8] tracking-wider">Date</p>
+                    <p className="text-sm font-semibold text-[#1d1a17]">
+                      {formatDisplayDate(booking.date, language)}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-3">
+                  <div className="w-9 h-9 rounded-xl bg-[#FCF2E9] flex items-center justify-center text-[#8b7355] shrink-0">
+                    <HiOutlineClock className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <p className="text-[10px] uppercase font-bold text-[#94A3B8] tracking-wider">Time</p>
+                    <p className="text-sm font-semibold text-[#1d1a17]">
+                      {formatDisplayTime(booking.time)}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-3">
+                  <div className="w-9 h-9 rounded-xl bg-[#FCF2E9] flex items-center justify-center text-[#8b7355] shrink-0">
+                    <HiOutlineUsers className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <p className="text-[10px] uppercase font-bold text-[#94A3B8] tracking-wider">{dt.guestsCount}</p>
+                    <p className="text-sm font-semibold text-[#1d1a17]">
+                      {booking.guests} {booking.guests === 1 ? "Guest" : "Guests"}
+                    </p>
+                  </div>
                 </div>
               </div>
-            </div>
 
-            {tab === "upcoming" && booking.status?.toLowerCase() !== "cancelled" && (
-              <div className="mt-4 pt-3 border-t border-[#F1EDE8] flex items-center justify-between">
-                <button
-                  type="button"
-                  onClick={() => handleOpenCancelModal(booking)}
-                  className="text-sm font-semibold text-[#8b7355] hover:text-red-600 transition-colors cursor-pointer"
-                >
-                  Cancel reservation &rsaquo;
-                </button>
-              </div>
-            )}
-          </div>
-        ))
+              {tab === "upcoming" && !isCancelled && (
+                <div className="mt-4 pt-3 border-t border-[#F1EDE8] flex items-center justify-between">
+                  <button
+                    type="button"
+                    onClick={() => handleOpenCancelModal(booking)}
+                    className="text-xs font-semibold text-[#8b7355] hover:text-red-600 transition-colors cursor-pointer"
+                  >
+                    Cancel reservation &rsaquo;
+                  </button>
+                </div>
+              )}
+            </div>
+          );
+        })
       ) : (
-        <div className="bg-white rounded-xl p-12 text-center border border-[#F1EDE8]">
-          <div className="w-14 h-14 rounded-full bg-[#F3EDE6] flex items-center justify-center mx-auto mb-4">
-            <HiOutlineCalendar className="w-7 h-7 text-[#8b7355]" />
+        <div className="bg-white rounded-2xl p-10 text-center border border-[#F1EDE8] shadow-xs">
+          <div className="w-14 h-14 rounded-2xl bg-[#FCF2E9] flex items-center justify-center mx-auto mb-4 text-[#8b7355]">
+            <HiOutlineCalendar className="w-7 h-7" />
           </div>
-          <h3 className="text-lg font-semibold text-[#1d1a17] mb-1">
-            {tab === "upcoming" ? "No upcoming bookings found" : "No past bookings found"}
+          <h3 className="text-lg font-bold font-displayPlayFair text-[#1d1a17] mb-1">
+            {tab === "upcoming" ? dt.noUpcomingTitle : dt.noPastTitle}
           </h3>
-          <p className="text-sm text-[#64748B] mb-6">
-            {tab === "upcoming" ? "You have no upcoming reservations scheduled." : "Your completed bookings will appear here."}
+          <p className="text-sm text-[#64748B] mb-6 max-w-md mx-auto">
+            {tab === "upcoming" ? dt.noUpcomingDesc : dt.noPastDesc}
           </p>
           <Link
             href="/services"
-            className="inline-block px-6 py-3 bg-[#CFB9A3] hover:bg-[#bfa77f] text-white rounded-full text-sm font-semibold transition-colors"
+            className="inline-block px-6 py-2.5 bg-[#8B7355] hover:bg-[#786247] text-white rounded-xl text-xs font-bold transition-all shadow-xs"
           >
-            + Start New Booking
+            {dt.bookNow}
           </Link>
         </div>
       )}
@@ -298,7 +336,7 @@ export default function MyBookingPage() {
                   <p className="text-[#64748B]">
                     Scheduled:{" "}
                     <span className="font-semibold text-[#1d1a17]">
-                      {formatDisplayDate(cancelBooking.date)} at {formatDisplayTime(cancelBooking.time)}
+                      {formatDisplayDate(cancelBooking.date, language)} at {formatDisplayTime(cancelBooking.time)}
                     </span>
                   </p>
                 </div>

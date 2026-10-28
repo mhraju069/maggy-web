@@ -407,10 +407,10 @@ export default function ReviewPage() {
       </div>
 
       {/* ── Footer Navigation Buttons ── */}
-      <div className="max-w-4xl mx-auto mt-12 flex justify-between items-center bg-[#FBF6F3] p-6 rounded-2xl shadow-sm border border-[#E8E2DC]">
+      <div className="max-w-4xl mx-auto mt-12 flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-4 bg-[#FBF6F3] p-4 sm:p-6 rounded-2xl shadow-sm border border-[#E8E2DC]">
         <button
           onClick={() => window.history.back()}
-          className="px-8 py-3.5 rounded-xl border border-[#CFB9A3] text-[#1d1a17] font-bold text-sm hover:bg-[#CFB9A3]/10 transition-all flex items-center gap-3 cursor-pointer"
+          className="w-full sm:w-auto justify-center px-6 sm:px-8 py-3.5 rounded-xl border border-[#CFB9A3] text-[#1d1a17] font-bold text-sm hover:bg-[#CFB9A3]/10 transition-all flex items-center gap-3 cursor-pointer"
           style={{ fontFamily: "Inter, sans-serif" }}
         >
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">

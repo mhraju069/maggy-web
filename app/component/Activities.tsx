@@ -3,7 +3,7 @@
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 import Image from "next/image";
 import { useState } from "react";
-import { RiArrowLeftLine, RiArrowRightWideLine } from "react-icons/ri";
+import { RiArrowLeftWideLine, RiArrowRightWideLine } from "react-icons/ri";
 
 const slideImages = [
   "/images/home/activities/activity1.png",
@@ -34,9 +34,9 @@ const Activities = () => {
       <button
         onClick={prev}
         aria-label="Previous slide"
-        className="absolute left-4 top-1/2 -translate-y-1/2 z-10 flex items-center justify-center w-14 h-14 rounded-full bg-white/60 hover:bg-white transition text-[#6b5945]"
+        className="absolute left-4 top-1/2 -translate-y-1/2 z-10 flex items-center justify-center w-14 h-14 rounded-full bg-[#CFB9A3] hover:bg-[#bfa890] transition text-[#1d1a17]"
       >
-        <RiArrowLeftLine size={24} />
+        <RiArrowLeftWideLine size={24} />
       </button>
 
       {/* Content row */}
