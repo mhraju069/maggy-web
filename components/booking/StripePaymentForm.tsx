@@ -16,6 +16,8 @@ import { useRouter } from "next/navigation";
 import { BiCheckCircle as BiCheckIcon, BiCreditCard, BiLockAlt, BiShieldQuarter } from "react-icons/bi";
 import { MdOutlinePayments } from "react-icons/md";
 import CancellationPolicyCard from "./CancellationPolicyCard";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
+import { paymentTranslations } from "@/lib/i18n/paymentTranslations";
 
 interface StripePaymentFormProps {
   totalAmount?: number | string;
@@ -66,6 +68,8 @@ function InnerPaymentForm({
   const router = useRouter();
   const stripe = useStripe();
   const elements = useElements();
+  const { language } = useLanguage();
+  const pt = paymentTranslations[language] || paymentTranslations.en;
 
   const [paymentMethod, setPaymentMethod] = useState<"card" | "ideal">("card");
   const [selectedBank, setSelectedBank] = useState<string>("ing");
@@ -468,17 +472,17 @@ function InnerPaymentForm({
           </div>
           <div>
             <span className="text-[10px] font-bold uppercase tracking-widest text-[#8B7355] block">
-              Stripe Official Elements
+              {pt.secureCheckout.badge}
             </span>
             <h3 className="text-xl font-bold font-displayPlayFair text-[#0F172A]">
-              Secure Card Checkout
+              {pt.secureCheckout.title}
             </h3>
           </div>
         </div>
 
         <div className="flex items-center gap-2 bg-[#F8FAFC] px-4 py-2 rounded-xl border border-[#E2E8F0] text-xs font-semibold text-[#64748B]">
           <BiShieldQuarter className="text-[#8B7355]" size={18} />
-          <span>PCI-DSS Certified 256-Bit SSL</span>
+          <span>{pt.secureCheckout.pciBadge}</span>
         </div>
       </div>
 
@@ -492,10 +496,10 @@ function InnerPaymentForm({
               </div>
               <div>
                 <h4 className="font-bold text-[#0F172A] text-base font-displayPlayFair">
-                  Session Included with Pass / Membership
+                  {pt.passIncluded.title}
                 </h4>
                 <p className="text-xs text-[#64748B] mt-0.5">
-                  No payment card is required. 1 session credit will be deducted directly from your account.
+                  {pt.passIncluded.desc}
                 </p>
               </div>
             </div>
@@ -505,7 +509,7 @@ function InnerPaymentForm({
             {/* Payment Method Selector Tabs */}
             <div>
               <label className="block text-xs font-bold text-[#64748B] uppercase tracking-wider mb-3">
-                Select Payment Method
+                {pt.methodSelector.label}
               </label>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -527,8 +531,8 @@ function InnerPaymentForm({
                       <BiCreditCard size={22} />
                     </div>
                     <div>
-                      <span className="font-bold text-sm text-[#0F172A] block">Credit / Debit Card</span>
-                      <span className="text-[11px] text-[#64748B]">Visa, Mastercard, Amex</span>
+                      <span className="font-bold text-sm text-[#0F172A] block">{pt.methodSelector.cardTitle}</span>
+                      <span className="text-[11px] text-[#64748B]">{pt.methodSelector.cardDesc}</span>
                     </div>
                   </div>
 
@@ -559,8 +563,8 @@ function InnerPaymentForm({
                       <MdOutlinePayments size={22} />
                     </div>
                     <div>
-                      <span className="font-bold text-sm text-[#0F172A] block">iDEAL Online Banking</span>
-                      <span className="text-[11px] text-[#64748B]">Dutch Banks (ING, Rabo, ABN)</span>
+                      <span className="font-bold text-sm text-[#0F172A] block">{pt.methodSelector.idealTitle}</span>
+                      <span className="text-[11px] text-[#64748B]">{pt.methodSelector.idealDesc}</span>
                     </div>
                   </div>
 
@@ -580,18 +584,18 @@ function InnerPaymentForm({
                 {/* Cardholder Name */}
                 <div>
                   <label className="block text-xs font-bold text-[#0F172A] mb-1.5 uppercase tracking-wide">
-                    Name on Card
+                    {pt.cardFields.nameOnCard}
                   </label>
                   <input
                     type="text"
-                    placeholder="e.g. John Doe"
+                    placeholder={pt.cardFields.namePlaceholder}
                     value={cardName}
                     onChange={(e) => setCardName(e.target.value)}
                     className="w-full p-3.5 bg-white border border-[#E2E8F0] rounded-xl text-sm text-[#0F172A] focus:outline-none focus:ring-2 focus:ring-[#8B7355]"
                   />
                 </div>
 
-                {/* Stripe Elements: Card Number */}
+                {/* Stripe Elements: {pt.cardFields.cardNumber} */}
                 <div>
                   <label className="block text-xs font-bold text-[#0F172A] mb-1.5 uppercase tracking-wide">
                     Card Number
@@ -605,7 +609,7 @@ function InnerPaymentForm({
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                   <div>
                     <label className="block text-[11px] font-bold text-[#0F172A] mb-1 uppercase tracking-wide">
-                      Expires (MM/YY)
+                      {pt.cardFields.expires}
                     </label>
                     <div className="p-3.5 bg-white border border-[#E2E8F0] rounded-xl focus-within:ring-2 focus-within:ring-[#8B7355]">
                       <CardExpiryElement options={CARD_ELEMENT_OPTIONS} />
@@ -614,7 +618,7 @@ function InnerPaymentForm({
 
                   <div>
                     <label className="block text-[11px] font-bold text-[#0F172A] mb-1 uppercase tracking-wide">
-                      CVC / CVV
+                      {pt.cardFields.cvc}
                     </label>
                     <div className="p-3.5 bg-white border border-[#E2E8F0] rounded-xl focus-within:ring-2 focus-within:ring-[#8B7355]">
                       <CardCvcElement options={CARD_ELEMENT_OPTIONS} />
@@ -623,11 +627,11 @@ function InnerPaymentForm({
 
                   <div>
                     <label className="block text-[11px] font-bold text-[#0F172A] mb-1 uppercase tracking-wide">
-                      Zip / Postal Code
+                      {pt.cardFields.zip}
                     </label>
                     <input
                       type="text"
-                      placeholder="1011 AB"
+                      placeholder={pt.cardFields.zipPlaceholder}
                       value={zip}
                       onChange={(e) => setZip(e.target.value)}
                       className="w-full p-3.5 bg-white border border-[#E2E8F0] rounded-xl text-sm text-[#0F172A] focus:outline-none focus:ring-2 focus:ring-[#8B7355]"
@@ -639,7 +643,7 @@ function InnerPaymentForm({
               /* iDEAL — Bank Selector */
               <div className="p-6 rounded-2xl bg-[#FBF6F3] border border-[#E8E2DC] space-y-4">
                 <label className="block text-xs font-bold text-[#0F172A] uppercase tracking-wide">
-                  Select your Dutch Bank
+                  {pt.idealFields.selectBank}
                 </label>
                 <select
                   value={selectedBank}
@@ -653,7 +657,7 @@ function InnerPaymentForm({
                   ))}
                 </select>
                 <p className="text-xs text-[#64748B] italic">
-                  You will be redirected securely to your bank to authorize the iDEAL transaction.
+                  {pt.idealFields.redirectNotice}
                 </p>
               </div>
             )}
@@ -678,7 +682,7 @@ function InnerPaymentForm({
         <div className="pt-4 flex flex-col md:flex-row items-center justify-between gap-4">
           <div>
             <span className="text-xs text-[#64748B] uppercase font-bold block">
-              {isZeroPayment ? "Total Due Today" : "Total Amount Due"}
+              {isZeroPayment ? pt.totalDueToday : pt.totalAmountDue}
             </span>
             <span className="text-3xl font-bold font-displayPlayFair text-[#8B7355]">
               {isZeroPayment ? "€0.00" : formattedAmount}
@@ -699,17 +703,17 @@ function InnerPaymentForm({
             {processing ? (
               <>
                 <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent" />
-                <span>Confirming Booking...</span>
+                <span>{pt.buttons.confirmingBooking}</span>
               </>
             ) : isZeroPayment ? (
               <>
                 <BiCheckIcon size={20} />
-                <span>Confirm Booking (Deduct Session)</span>
+                <span>{pt.buttons.confirmBookingCredit}</span>
               </>
             ) : (
               <>
                 <BiLockAlt size={18} />
-                <span>Confirm & Pay {formattedAmount}</span>
+                <span>{pt.buttons.confirmAndPay.replace("{amount}", formattedAmount)}</span>
               </>
             )}
           </button>

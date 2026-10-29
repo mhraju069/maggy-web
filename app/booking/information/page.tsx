@@ -286,17 +286,17 @@ export default function InformationPage() {
               <div className="flex items-center gap-2">
                 <BiTimeFive className={`text-lg flex-shrink-0 ${lunchroomIsBlocked || lunchroomIsClosed ? "text-red-700" : ""}`} />
                 {loadingSlots ? (
-                  <span className="italic text-[#94A3B8]">Checking hours for selected date...</span>
+                  <span className="italic text-[#94A3B8]">{infoTrans?.lunchroomCheckingNotice || "Checking hours for selected date..."}</span>
                 ) : lunchroomIsBlocked ? (
-                  <span><strong>Lunchroom:</strong> {lunchroomBlockMessage || "This date is blocked. No slots available."}</span>
+                  <span><strong>Lunchroom:</strong> {lunchroomBlockMessage || infoTrans?.lunchroomBlockedNotice || "This date is blocked. No slots available."}</span>
                 ) : lunchroomIsClosed ? (
-                  <span><strong>Lunchroom:</strong> Closed on this date — please select another date</span>
+                  <span><strong>Lunchroom:</strong> {infoTrans?.lunchroomClosedNotice || "Closed on this date — please select another date"}</span>
                 ) : lunchroomOpenTime && lunchroomCloseTime ? (
                   <span>
-                    <strong>Lunchroom Opening Hours:</strong> {lunchroomOpenTime} – {lunchroomCloseTime}
+                    <strong>{infoTrans?.lunchroomOpeningHoursLabel || "Lunchroom Opening Hours:"}</strong> {lunchroomOpenTime} – {lunchroomCloseTime}
                   </span>
                 ) : (
-                  <span><strong>Lunchroom Opening Hours:</strong> Select a date to see hours</span>
+                  <span><strong>{infoTrans?.lunchroomOpeningHoursLabel || "Lunchroom Opening Hours:"}</strong> {infoTrans?.lunchroomSelectDateNotice || "Select a date to see hours"}</span>
                 )}
               </div>
               {!lunchroomIsClosed && !lunchroomIsBlocked && (
@@ -393,17 +393,17 @@ export default function InformationPage() {
               <div className="flex items-center gap-2">
                 <BiTimeFive className={`text-lg flex-shrink-0 ${lunchroomIsBlocked || lunchroomIsClosed ? "text-red-700" : ""}`} />
                 {loadingSlots ? (
-                  <span className="italic text-[#94A3B8]">Checking lunchroom hours for your booking date...</span>
+                  <span className="italic text-[#94A3B8]">{infoTrans?.lunchroomCheckingNotice || "Checking lunchroom hours for your booking date..."}</span>
                 ) : lunchroomIsBlocked ? (
-                  <span><strong>Lunchroom:</strong> {lunchroomBlockMessage || "This date is blocked. No slots available."}</span>
+                  <span><strong>Lunchroom:</strong> {lunchroomBlockMessage || infoTrans?.lunchroomBlockedNotice || "This date is blocked. No slots available."}</span>
                 ) : lunchroomIsClosed ? (
-                  <span><strong>Lunchroom:</strong> Closed on your selected date — please change the booking date</span>
+                  <span><strong>Lunchroom:</strong> {infoTrans?.lunchroomClosedNotice || "Closed on your selected date — please change the booking date"}</span>
                 ) : lunchroomOpenTime && lunchroomCloseTime ? (
                   <span>
-                    <strong>Lunchroom Opening Hours:</strong> {lunchroomOpenTime} – {lunchroomCloseTime}
+                    <strong>{infoTrans?.lunchroomOpeningHoursLabel || "Lunchroom Opening Hours:"}</strong> {lunchroomOpenTime} – {lunchroomCloseTime}
                   </span>
                 ) : (
-                  <span><strong>Lunchroom Opening Hours:</strong> Based on your package date</span>
+                  <span><strong>{infoTrans?.lunchroomOpeningHoursLabel || "Lunchroom Opening Hours:"}</strong> {infoTrans?.lunchroomPackageNotice || "Based on your package date"}</span>
                 )}
               </div>
               {!lunchroomIsClosed && !lunchroomIsBlocked && (

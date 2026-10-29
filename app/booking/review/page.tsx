@@ -11,10 +11,11 @@ import { useEffect, useState } from "react";
 import { FaCakeCandles, FaGift, FaHeart } from "react-icons/fa6";
 import { MdOutlineRestaurantMenu } from "react-icons/md";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
+import { paymentTranslations } from "@/lib/i18n/paymentTranslations";
 
 export default function ReviewPage() {
   const router = useRouter();
-  const { t } = useLanguage();
+  const { language, t } = useLanguage();
   const flow = (t as any)?.bookingFlow;
   const revTrans = flow?.review;
   const btnTrans = flow?.buttons;
@@ -114,7 +115,7 @@ export default function ReviewPage() {
                 <span className="text-xs text-[#94A3B8] uppercase block mb-1">{revTrans?.selectedExperience || "Selected Experience"}</span>
                 <h3 className="text-3xl font-bold text-[#0F172A] font-displayPlayFair flex items-center gap-3">
                   <MdOutlineRestaurantMenu className="text-[#8B7355]" />
-                  {data.serviceName || "Lunchroom Table Reservation"}
+                  {(data.serviceName?.toLowerCase().includes("lunchroom") ? revTrans?.lunchroomTableReservation : data.serviceName) || revTrans?.lunchroomTableReservation || "Lunchroom Table Reservation"}
                 </h3>
               </div>
 
@@ -122,7 +123,7 @@ export default function ReviewPage() {
                 <div>
                   <span className="text-xs text-[#94A3B8] uppercase block mb-1">{revTrans?.date || "Date"}</span>
                   <p className="text-lg font-bold text-[#0F172A]">
-                    {data.date ? new Date(data.date).toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric", year: "numeric" }) : "Not selected"}
+                    {data.date ? new Date(data.date).toLocaleDateString(language === "nl" ? "nl-NL" : language === "de" ? "de-DE" : "en-US", { weekday: "short", month: "short", day: "numeric", year: "numeric" }) : (revTrans?.notSelected || "Not selected")}
                   </p>
                 </div>
                 {!isPackage && (
@@ -135,14 +136,14 @@ export default function ReviewPage() {
                         ? `${data.activityDetails.startTime} - ${data.activityDetails.endTime}`
                         : data.timeSlot
                         ? data.timeSlot
-                        : "Not selected"}
+                        : (revTrans?.notSelected || "Not selected")}
                     </p>
                   </div>
                 )}
                 <div>
                   <span className="text-xs text-[#94A3B8] uppercase block mb-1">{revTrans?.numberOfPeople || "Number of People"}</span>
                   <p className="text-lg font-bold text-[#0F172A]">
-                    {data.guestsCount} {data.guestsCount === 1 ? "Person" : "People"}
+                    {data.guestsCount} {data.guestsCount === 1 ? (revTrans?.person || "Person") : (revTrans?.people || "People")}
                   </p>
                 </div>
               </div>

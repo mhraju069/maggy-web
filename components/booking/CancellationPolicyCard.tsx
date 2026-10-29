@@ -2,6 +2,8 @@
 
 import React, { useState } from "react";
 import { BiCheckCircle, BiInfoCircle, BiShieldQuarter, BiX } from "react-icons/bi";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
+import { paymentTranslations } from "@/lib/i18n/paymentTranslations";
 
 interface CancellationPolicyCardProps {
   accepted: boolean;
@@ -14,6 +16,11 @@ export default function CancellationPolicyCard({
   onAcceptedChange,
   serviceName,
 }: CancellationPolicyCardProps) {
+  const { language } = useLanguage();
+  const pt = paymentTranslations[language] || paymentTranslations.en;
+  const cardT = pt.policyCard;
+  const modalT = pt.policyModal;
+
   const [modalOpen, setModalOpen] = useState(false);
   const [tempAccepted, setTempAccepted] = useState(accepted);
 
@@ -38,10 +45,12 @@ export default function CancellationPolicyCard({
             </div>
             <div>
               <h3 className="font-bold text-base text-[#0F172A] font-displayPlayFair">
-                Cancellation, Rescheduling & Refund Policy
+                {cardT.title}
               </h3>
               <p className="text-xs text-[#64748B] mt-0.5">
-                Cancellations or changes are permitted up to <strong>24 hours</strong> before your scheduled time.
+                {cardT.subtitlePrefix}
+                <strong>{cardT.subtitleHighlight}</strong>
+                {cardT.subtitleSuffix}
               </p>
             </div>
           </div>
@@ -51,7 +60,7 @@ export default function CancellationPolicyCard({
             onClick={handleOpenModal}
             className="px-4 py-2.5 rounded-xl border border-[#8B7355] text-[#8B7355] hover:bg-[#8B7355] hover:text-white font-bold text-xs transition-all shadow-2xs whitespace-nowrap self-start sm:self-auto cursor-pointer"
           >
-            {accepted ? "Review Policy" : "Read Policy"}
+            {accepted ? cardT.reviewPolicyBtn : cardT.readPolicyBtn}
           </button>
         </div>
 
@@ -77,18 +86,20 @@ export default function CancellationPolicyCard({
             <span className="text-xs font-medium">
               {accepted ? (
                 <span className="font-semibold text-[#15803D]">
-                  Policy acknowledged & accepted (24h requirement agreed)
+                  {cardT.acknowledgedText}
                 </span>
               ) : (
                 <span>
-                  Please click to <strong>read and accept</strong> the cancellation & refund policy
+                  {cardT.unacknowledgedPrefix}
+                  <strong>{cardT.unacknowledgedAction}</strong>
+                  {cardT.unacknowledgedSuffix}
                 </span>
               )}
             </span>
           </div>
 
           <span className="text-xs font-bold text-[#8B7355] underline">
-            {accepted ? "Change" : "Open Policy"}
+            {accepted ? cardT.changePolicyLink : cardT.openPolicyLink}
           </span>
         </div>
       </div>
@@ -105,10 +116,10 @@ export default function CancellationPolicyCard({
                 </div>
                 <div>
                   <h3 className="font-bold text-base md:text-lg text-[#0F172A] font-displayPlayFair">
-                    Cancellation, Rescheduling & Refund Policy
+                    {modalT.title}
                   </h3>
                   <p className="text-[11px] text-[#64748B]">
-                    Please read through our terms carefully before accepting.
+                    {modalT.subtitle}
                   </p>
                 </div>
               </div>
@@ -133,30 +144,33 @@ export default function CancellationPolicyCard({
                 <BiInfoCircle size={20} className="flex-shrink-0 mt-0.5" />
                 <div className="text-xs leading-normal">
                   <strong className="font-bold block text-[#0F172A] mb-0.5">
-                    Important Notice:
+                    {modalT.importantNoticeTitle}
                   </strong>
-                  Please cancel or reschedule at least <strong>24 hours</strong> before your scheduled session to avoid losing your booked session or credit. Late cancellations and missed appointments will result in the booked session or credit being considered used, including for members and session-pass holders.
+                  {modalT.importantNoticeBody}
                 </div>
               </div>
 
               {/* Section 1 */}
               <div className="p-4 rounded-xl bg-white border border-[#E8E2DC] space-y-2">
                 <h4 className="font-bold text-xs uppercase tracking-wider text-[#0F172A]">
-                  1. Cancellation and Rescheduling Policy
+                  {modalT.sec1Title}
                 </h4>
                 <p className="text-xs text-[#334155]">
-                  Customers may cancel or reschedule a wellness reservation up to{" "}
-                  <strong>24 hours before the scheduled start time</strong>.
+                  {modalT.sec1Intro}
+                  <strong>{modalT.sec1IntroBold}</strong>
                 </p>
                 <ul className="list-disc list-inside space-y-1.5 pl-1 text-[11px] text-[#64748B]">
                   <li>
-                    <strong className="text-[#334155]">More than 24 hours before the session:</strong> Customers may cancel or reschedule their reservation in accordance with the applicable refund, credit, and booking policies.
+                    <strong className="text-[#334155]">{modalT.sec1Point1Title}</strong>{" "}
+                    {modalT.sec1Point1Body}
                   </li>
                   <li>
-                    <strong className="text-[#334155]">Within 24 hours of the session:</strong> Cancellations and rescheduling are no longer permitted free of charge. The applicable late cancellation policy will apply.
+                    <strong className="text-[#334155]">{modalT.sec1Point2Title}</strong>{" "}
+                    {modalT.sec1Point2Body}
                   </li>
                   <li>
-                    <strong className="text-[#334155]">At or after the scheduled start time:</strong> Cancellations or changes are not permitted under the standard cancellation policy.
+                    <strong className="text-[#334155]">{modalT.sec1Point3Title}</strong>{" "}
+                    {modalT.sec1Point3Body}
                   </li>
                 </ul>
               </div>
@@ -164,20 +178,23 @@ export default function CancellationPolicyCard({
               {/* Section 2 */}
               <div className="p-4 rounded-xl bg-white border border-[#E8E2DC] space-y-2">
                 <h4 className="font-bold text-xs uppercase tracking-wider text-[#0F172A]">
-                  2. Policy for Members and Session-Pass Holders
+                  {modalT.sec2Title}
                 </h4>
                 <p className="text-xs text-[#334155]">
-                  The same 24-hour cancellation and rescheduling policy applies to all members and session-pass holders.
+                  {modalT.sec2Intro}
                 </p>
                 <ul className="list-disc list-inside space-y-1.5 pl-1 text-[11px] text-[#64748B]">
                   <li>
-                    <strong className="text-[#334155]">Timely cancellation (more than 24 hours in advance):</strong> The session or credit used for the booking will be returned to the customer's account and made available for future bookings, subject to the applicable membership or session-pass terms.
+                    <strong className="text-[#334155]">{modalT.sec2Point1Title}</strong>{" "}
+                    {modalT.sec2Point1Body}
                   </li>
                   <li>
-                    <strong className="text-[#334155]">Late cancellation (within 24 hours):</strong> The booked session or credit will be considered used and will not be restored.
+                    <strong className="text-[#334155]">{modalT.sec2Point2Title}</strong>{" "}
+                    {modalT.sec2Point2Body}
                   </li>
                   <li>
-                    <strong className="text-[#334155]">No-show:</strong> If a customer fails to attend the booked session without cancelling in accordance with the policy, the session or credit will be considered used and will not be restored.
+                    <strong className="text-[#334155]">{modalT.sec2Point3Title}</strong>{" "}
+                    {modalT.sec2Point3Body}
                   </li>
                 </ul>
               </div>
@@ -185,20 +202,20 @@ export default function CancellationPolicyCard({
               {/* Section 3 */}
               <div className="p-4 rounded-xl bg-white border border-[#E8E2DC] space-y-2">
                 <h4 className="font-bold text-xs uppercase tracking-wider text-[#0F172A]">
-                  3. Refunds and Credits
+                  {modalT.sec3Title}
                 </h4>
                 <p className="text-xs text-[#64748B] leading-relaxed">
-                  Refunds, credits, and the restoration of sessions are subject to the applicable payment, membership, and session-pass terms. A timely cancellation does not automatically guarantee a monetary refund. Eligible refunds or credits will be processed according to the rules applicable to the original booking and payment method.
+                  {modalT.sec3Body}
                 </p>
               </div>
 
               {/* Section 4 */}
               <div className="p-4 rounded-xl bg-white border border-[#E8E2DC] space-y-2">
                 <h4 className="font-bold text-xs uppercase tracking-wider text-[#0F172A]">
-                  4. Booking Confirmation and Customer Acknowledgment
+                  {modalT.sec4Title}
                 </h4>
                 <p className="text-xs text-[#64748B] leading-relaxed">
-                  The cancellation and rescheduling policy will be clearly displayed during the booking process and included in the booking confirmation. By completing a reservation, customers acknowledge that they have read and accepted the applicable cancellation, rescheduling, refund, and credit rules.
+                  {modalT.sec4Body}
                 </p>
               </div>
             </div>
@@ -217,11 +234,11 @@ export default function CancellationPolicyCard({
                   className="mt-0.5 h-4 w-4 rounded border-gray-300 text-[#8B7355] focus:ring-[#8B7355] cursor-pointer"
                 />
                 <span className="text-xs text-[#0F172A] leading-snug">
-                  I have read, understood, and accept the{" "}
+                  {modalT.agreeCheckboxLabel1}
                   <strong className="text-[#8B7355]">
-                    Cancellation, Rescheduling & Refund Policy
+                    {modalT.agreeCheckboxBold}
                   </strong>
-                  , including the 24-hour notice requirement.
+                  {modalT.agreeCheckboxLabel2}
                 </span>
               </label>
 
@@ -231,7 +248,7 @@ export default function CancellationPolicyCard({
                   onClick={() => setModalOpen(false)}
                   className="px-5 py-2.5 rounded-xl border border-[#CBD5E1] text-[#64748B] hover:text-[#0F172A] hover:bg-[#F1F5F9] font-bold text-xs transition-colors cursor-pointer"
                 >
-                  Cancel
+                  {modalT.cancelBtn}
                 </button>
                 <button
                   type="button"
@@ -243,7 +260,7 @@ export default function CancellationPolicyCard({
                       : "bg-[#CBD5E1] text-[#64748B] cursor-not-allowed shadow-none"
                   }`}
                 >
-                  Confirm & Continue
+                  {modalT.confirmBtn}
                 </button>
               </div>
             </div>
