@@ -22,6 +22,9 @@ const playfair = Playfair_Display({
 export const metadata: Metadata = {
   title: "Heaven on Earth | Wellness, Sauna, Lunchroom & Events",
   description: "Where heavenly food, relaxation, wellness, and special moments come together. Enjoy our cosy restaurant, relaxing sauna, and beautiful event spaces.",
+  verification: {
+    google: "SEZr6Iks_rKo_wWjwBPcN4NMy07LYjx2Z6eMYpkGYvA",
+  },
   icons: {
     icon: [
       { url: "/images/logo.png" },
