@@ -1,0 +1,16 @@
+# *
+User-agent: *
+Allow: /
+
+# Disallow private user and admin routes
+Disallow: /admin
+Disallow: /admin/
+Disallow: /dashboard
+Disallow: /dashboard/
+Disallow: /api/
+Disallow: /verify-otp
+Disallow: /reset-password
+
+# Sitemap
+Sitemap: https://heaven-on-earth.nl/sitemap.xml
+
