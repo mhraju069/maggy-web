@@ -20,6 +20,8 @@ const playfair = Playfair_Display({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://heaven-on-earth.nl"),
+  alternates: { canonical: "./" },
   title: "Heaven on Earth | Wellness, Sauna, Lunchroom & Events",
   description: "Where heavenly food, relaxation, wellness, and special moments come together. Enjoy our cosy restaurant, relaxing sauna, and beautiful event spaces.",
   verification: {
