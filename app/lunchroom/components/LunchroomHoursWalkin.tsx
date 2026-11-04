@@ -112,6 +112,22 @@ export default function LunchroomHoursWalkin() {
                     <p className="text-xs text-[#64748B] mt-0.5">
                       {h?.walkInsCard?.tableBookingDesc || "Reserve a table online for guaranteed seating and personalized special requests."}
                     </p>
+                    <div className="flex flex-wrap gap-x-4 gap-y-2 mt-3 text-xs font-semibold">
+                      <a className="text-[#8B7355] underline underline-offset-2" href="tel:+31723030548">
+                        {h?.walkInsCard?.tableBookingPhoneLabel || "Call us"}: 072-3030548
+                      </a>
+                      <a
+                        className="text-[#8B7355] underline underline-offset-2"
+                        href="https://wa.me/31723030548"
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        {h?.walkInsCard?.tableBookingWhatsappLabel || "WhatsApp us"}
+                      </a>
+                    </div>
+                    <p className="text-xs text-[#64748B] mt-2">
+                      {h?.walkInsCard?.tableBookingWelcome || "We look forward to welcoming you to Heaven on Earth!"}
+                    </p>
                   </div>
                 </div>
               </div>

@@ -3,6 +3,7 @@
 import DecorativeUnderline from "@/components/shared/DecorativeUnderline";
 import { servicesService, ServiceSlotsResponse } from "@/lib/api";
 import { getStoredBookingData, updateStoredBookingData } from "@/lib/bookingStore";
+import { getMinimumLunchroomDate } from "@/lib/dateUtils";
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { BiCheckCircle, BiInfoCircle, BiTimeFive } from "react-icons/bi";
@@ -81,7 +82,6 @@ export default function ChooseTimePage() {
     }
   }, [isPrivateSauna, isSharedSauna]);
 
-  const [date, setDate] = useState(storedData.date || "");
   const [selectedTime, setSelectedTime] = useState<string | null>(storedData.timeSlot || null);
   const [guests, setGuests] = useState(String(storedData.guestsCount || (isPrivateSauna ? 2 : 1)));
   const [dayError, setDayError] = useState<string | null>(null);
@@ -101,6 +101,11 @@ export default function ChooseTimePage() {
   const packageIncludesLunchroom = isPackage && normalizedServices.some((s) => s.includes("lunchroom") || s === "lunch");
   const packageIncludesActivity = isPackage && normalizedServices.some((s) => s.includes("activity") || s.includes("activities"));
   const packageIncludesSaltRoom = isPackage && normalizedServices.some((s) => s.includes("saltroom") || s === "salt");
+  const minimumReservationDate = isLunchroom || packageIncludesLunchroom ? getMinimumLunchroomDate() : undefined;
+  const initialDate = storedData.date && minimumReservationDate && storedData.date < minimumReservationDate
+    ? ""
+    : storedData.date || "";
+  const [date, setDate] = useState(initialDate);
 
   // Package Sub-service choices state
   const [pkgSaunaSlot, setPkgSaunaSlot] = useState<string | null>(
@@ -252,9 +257,37 @@ export default function ChooseTimePage() {
   useEffect(() => {
     const data = getStoredBookingData();
     setStoredData(data);
-    if (data.date) {
-      setDate(data.date);
-      fetchSlots(data.date, data.serviceType || "sauna");
+    const dataServices = data.packageSelections?.includedServices || [];
+    const dataIncludesLunchroom = data.serviceType === "lunchroom" ||
+      data.serviceName?.toLowerCase().includes("lunchroom") ||
+      ((data.serviceType === "package" || data.serviceType === "packages") && dataServices.some((service) =>
+        service.toLowerCase().replace(/[\s_-]+/g, "") === "lunchroom"
+      ));
+    const minimumDate = dataIncludesLunchroom ? getMinimumLunchroomDate() : undefined;
+    const sameDayIsBlocked = Boolean(data.date && minimumDate && data.date < minimumDate);
+    const selectedDate = sameDayIsBlocked ? "" : data.date || "";
+
+    setDate(selectedDate);
+    if (sameDayIsBlocked) {
+      setSelectedTime(null);
+      setPkgSaunaSlot(null);
+      setPkgSaltRoomSlot(null);
+      setPkgSelectedActivityId(null);
+      setPkgLunchTime("12:30");
+      updateStoredBookingData({
+        date: "",
+        timeSlot: "",
+        packageSelections: {
+          ...data.packageSelections,
+          saunaSlot: undefined,
+          saltRoomSlot: undefined,
+          lunchroomTime: "",
+          activitySession: undefined,
+        },
+      });
+    }
+    if (selectedDate) {
+      fetchSlots(selectedDate, data.serviceType || "sauna");
     }
     if (data.timeSlot) setSelectedTime(data.timeSlot);
     if (data.guestsCount) {
@@ -267,9 +300,20 @@ export default function ChooseTimePage() {
     const refreshSlots = () => {
       const latest = getStoredBookingData();
       setStoredData(latest);
-      if (latest.date) {
-        setDate(latest.date);
-        fetchSlots(latest.date, latest.serviceType || "sauna");
+      const latestServices = latest.packageSelections?.includedServices || [];
+      const latestIncludesLunchroom = latest.serviceType === "lunchroom" ||
+        latest.serviceName?.toLowerCase().includes("lunchroom") ||
+        ((latest.serviceType === "package" || latest.serviceType === "packages") && latestServices.some((service) =>
+          service.toLowerCase().replace(/[\s_-]+/g, "") === "lunchroom"
+        ));
+      const minimumDate = latestIncludesLunchroom ? getMinimumLunchroomDate() : undefined;
+      const selectedDate = latest.date && minimumDate && latest.date < minimumDate ? "" : latest.date || "";
+      setDate(selectedDate);
+      if (latest.date !== selectedDate) {
+        updateStoredBookingData({ date: selectedDate, timeSlot: "" });
+      }
+      if (selectedDate) {
+        fetchSlots(selectedDate, latest.serviceType || "sauna");
       }
     };
     const handlePageShow = (event: PageTransitionEvent) => {
@@ -286,6 +330,7 @@ export default function ChooseTimePage() {
   }, [fetchSlots]);
 
   const handleDateChange = (newDate: string) => {
+    if (newDate && minimumReservationDate && newDate < minimumReservationDate) return;
     setDate(newDate);
     setSelectedTime(null);
     setPkgSaunaSlot(null);
@@ -712,6 +757,7 @@ export default function ChooseTimePage() {
               <input
                 type="date"
                 value={date}
+                min={minimumReservationDate}
                 disabled={isSaltRoom}
                 onChange={(e) => !isSaltRoom && handleDateChange(e.target.value)}
                 className={`w-full p-4 border rounded-xl focus:outline-none focus:ring-2 focus:ring-[#D1B191] text-[#475569] ${

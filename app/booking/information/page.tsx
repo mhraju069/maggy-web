@@ -3,6 +3,7 @@
 import DecorativeUnderline from "@/components/shared/DecorativeUnderline";
 import { CelebrationData, getStoredBookingData, updateStoredBookingData } from "@/lib/bookingStore";
 import { servicesService } from "@/lib/api";
+import { getMinimumLunchroomDate } from "@/lib/dateUtils";
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 import { BiTimeFive } from "react-icons/bi";
@@ -11,10 +12,10 @@ import { FaCakeCandles, FaGift, FaHeart } from "react-icons/fa6";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 
 function generateTimeSlots(openTime?: string, closeTime?: string, intervalMinutes = 60): string[] {
-  if (!openTime || !closeTime) return ["09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00"];
+  if (!openTime || !closeTime) return [];
   const [startH, startM] = openTime.split(":").map(Number);
   const [endH, endM] = closeTime.split(":").map(Number);
-  if (isNaN(startH) || isNaN(endH)) return ["09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00"];
+  if (isNaN(startH) || isNaN(endH)) return [];
   const startMinutes = startH * 60 + (startM || 0);
   const endMinutes = endH * 60 + (endM || 0);
   const slots: string[] = [];
@@ -23,7 +24,7 @@ function generateTimeSlots(openTime?: string, closeTime?: string, intervalMinute
     const mm = String(m % 60).padStart(2, "0");
     slots.push(`${hh}:${mm}`);
   }
-  return slots.length > 0 ? slots : ["09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00"];
+  return slots;
 }
 
 function formatTime12h(time24: string): string {
@@ -77,6 +78,7 @@ export default function InformationPage() {
       s.toLowerCase().includes("lunchroom")
     ) ?? true // if includedServices not set, assume lunchroom included in package
   );
+  const minimumReservationDate = isLunchroom || hasPackageLunchroom ? getMinimumLunchroomDate() : undefined;
 
   const [date, setDate] = useState("");
   const [timeSlot, setTimeSlot] = useState("12:00");
@@ -97,8 +99,18 @@ export default function InformationPage() {
   useEffect(() => {
     const data = getStoredBookingData();
     setStoredData(data);
-    setDate(data.date || "");
-    setTimeSlot(data.timeSlot || "12:00");
+    const dataIncludesLunchroom = data.serviceType === "lunchroom" ||
+      data.serviceName?.toLowerCase().includes("lunchroom") ||
+      (data.serviceType === "package" && (
+        data.packageSelections?.includedServices?.some((service) => service.toLowerCase().includes("lunchroom")) ?? true
+      ));
+    const sameDayIsBlocked = Boolean(
+      dataIncludesLunchroom && data.date && data.date < getMinimumLunchroomDate()
+    );
+    const selectedDate = sameDayIsBlocked ? "" : data.date || "";
+
+    setDate(selectedDate);
+    setTimeSlot(sameDayIsBlocked ? "" : data.timeSlot || "12:00");
     setGuestsCount(data.guestsCount || (data.serviceType === "activity" ? 1 : 2));
     setFormData({
       name: data.name || "",
@@ -112,11 +124,27 @@ export default function InformationPage() {
     // Fetch lunchroom slots on mount if date already selected
     const isLunch = data.serviceType === "lunchroom" || data.serviceName?.toLowerCase().includes("lunchroom");
     const isPkg = data.serviceType === "package";
-    if ((isLunch || isPkg) && data.date) {
-      fetchLunchroomSlots(data.date);
+    const packageIncludesLunchroom = data.packageSelections?.includedServices?.some((service) =>
+      service.toLowerCase().includes("lunchroom")
+    ) ?? true;
+    if (sameDayIsBlocked) {
+      setPkgLunchroomTime("");
+      updateStoredBookingData({
+        date: "",
+        timeSlot: "",
+        ...(isPkg ? {
+          packageSelections: {
+            ...data.packageSelections,
+            lunchroomTime: "",
+          },
+        } : {}),
+      });
+    }
+    if ((isLunch || (isPkg && packageIncludesLunchroom)) && selectedDate) {
+      fetchLunchroomSlots(selectedDate);
     }
     // Restore package lunchroom time
-    if (isPkg && data.packageSelections?.lunchroomTime) {
+    if (isPkg && data.packageSelections?.lunchroomTime && !sameDayIsBlocked) {
       setPkgLunchroomTime(data.packageSelections.lunchroomTime);
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -175,6 +203,7 @@ export default function InformationPage() {
   }, []);
 
   const handleDateChange = (newDate: string) => {
+    if (newDate && minimumReservationDate && newDate < minimumReservationDate) return;
     setDate(newDate);
     updateStoredBookingData({ date: newDate });
     if ((isLunchroom || isPackage) && newDate) {
@@ -245,10 +274,11 @@ export default function InformationPage() {
     });
   };
 
+  const lunchroomArrivalTimes = generateTimeSlots(lunchroomOpenTime, lunchroomCloseTime, 60);
   const isFormValid = isLunchroom
-    ? Boolean(formData.name && formData.email && formData.phone && date && timeSlot && !lunchroomIsClosed && !lunchroomIsBlocked && !loadingSlots)
+    ? Boolean(formData.name && formData.email && formData.phone && date && lunchroomArrivalTimes.includes(timeSlot) && !lunchroomIsClosed && !lunchroomIsBlocked && !loadingSlots)
     : isPackage && hasPackageLunchroom
-    ? Boolean(formData.name && formData.email && formData.phone && pkgLunchroomTime && !lunchroomIsClosed && !lunchroomIsBlocked && !loadingSlots)
+    ? Boolean(formData.name && formData.email && formData.phone && lunchroomArrivalTimes.includes(pkgLunchroomTime) && !lunchroomIsClosed && !lunchroomIsBlocked && !loadingSlots)
     : Boolean(formData.name && formData.email && formData.phone);
 
   return (
@@ -308,6 +338,33 @@ export default function InformationPage() {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {(isLunchroom || hasPackageLunchroom) && (
+                <div className="md:col-span-3 rounded-xl border border-[#E8E2DC] bg-[#FCF2E9]/60 p-3 sm:p-4 text-xs text-[#475569]">
+                  <h3 className="font-bold text-sm text-[#0F172A]">
+                    {infoTrans?.sameDayReservationTitle || "Planning to visit us today? ✨"}
+                  </h3>
+                  <p className="mt-1">
+                    {infoTrans?.sameDayReservationText || "To reserve for today, call or WhatsApp us to check if a table is available."}
+                  </p>
+                  <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 font-semibold">
+                    <a className="text-[#8B7355] underline underline-offset-2" href="tel:+31723030548">
+                      📞 072-3030548
+                    </a>
+                    <a
+                      className="text-[#8B7355] underline underline-offset-2"
+                      href="https://wa.me/31723030548"
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      {infoTrans?.sameDayWhatsApp || "WhatsApp"}
+                    </a>
+                  </div>
+                  <p className="mt-2 text-[#64748B]">
+                    {infoTrans?.sameDayReservationWelcome || "We look forward to welcoming you to Heaven on Earth!"}
+                  </p>
+                </div>
+              )}
+
               {/* Date */}
               <div>
                 <label
@@ -319,6 +376,7 @@ export default function InformationPage() {
                 <input
                   type="date"
                   value={date}
+                  min={minimumReservationDate}
                   onChange={(e) => handleDateChange(e.target.value)}
                   className="w-full p-4 border border-[#E2E8F0] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#D1B191] text-[#475569] font-medium"
                 />
@@ -340,8 +398,10 @@ export default function InformationPage() {
                 >
                   {lunchroomIsBlocked ? (
                     <option value="" disabled>Date Blocked - No Slots</option>
+                  ) : lunchroomArrivalTimes.length === 0 ? (
+                    <option value="" disabled>{infoTrans?.lunchroomNoArrivalTimes || "No arrival times available for this date"}</option>
                   ) : (
-                    generateTimeSlots(lunchroomOpenTime, lunchroomCloseTime, 60).map((t) => (
+                    lunchroomArrivalTimes.map((t) => (
                       <option key={t} value={t}>{formatTime12h(t)}</option>
                     ))
                   )}
@@ -428,7 +488,10 @@ export default function InformationPage() {
                 className="w-full p-4 border border-[#E2E8F0] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#D1B191] text-[#475569] font-medium bg-white cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <option value="" disabled>{infoTrans?.selectArrivalTimePrompt || "Select arrival time..."}</option>
-                {!lunchroomIsBlocked && generateTimeSlots(lunchroomOpenTime, lunchroomCloseTime, 60).map((t) => (
+                {lunchroomArrivalTimes.length === 0 && !lunchroomIsBlocked && (
+                  <option value="" disabled>{infoTrans?.lunchroomNoArrivalTimes || "No arrival times available for this date"}</option>
+                )}
+                {!lunchroomIsBlocked && lunchroomArrivalTimes.map((t) => (
                   <option key={t} value={t}>{formatTime12h(t)}</option>
                 ))}
               </select>
