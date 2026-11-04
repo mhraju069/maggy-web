@@ -3302,6 +3302,13 @@ export default function AdminEditServicePage({ params }: PageProps) {
                     <div className="flex flex-wrap gap-2">
                       {["private_sauna", "shared_sauna", "saltroom", "activity", "lunchroom"].map((svc) => {
                         const included = packageForm.included_packages.includes(svc);
+                        const serviceLabels: Record<string, string> = {
+                          private_sauna: "VIP Sauna",
+                          shared_sauna: "Sauna",
+                          saltroom: "Saltroom",
+                          activity: "Activity",
+                          lunchroom: "Lunchroom",
+                        };
                         return (
                           <button
                             key={svc}
@@ -3321,7 +3328,7 @@ export default function AdminEditServicePage({ params }: PageProps) {
                             }`}
                           >
                             {included ? "✓ " : "+ "}
-                            {svc.replace(/_/g, " ")}
+                            {serviceLabels[svc] || svc}
                           </button>
                         );
                       })}

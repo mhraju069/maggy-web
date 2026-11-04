@@ -155,6 +155,7 @@ export default function PackagesBookingPage() {
       totalAmount: selectedPkg.rawPriceNum,
       isCustomPackage: false,
       packageSelections: {
+        packageId: selectedPkg.id,
         includedServices: selectedPkg.subServicesList,
       },
     });

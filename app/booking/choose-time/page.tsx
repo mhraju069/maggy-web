@@ -140,28 +140,13 @@ export default function ChooseTimePage() {
   const includedServices: string[] = storedData.packageSelections?.includedServices || [];
   const normalizedServices = includedServices.map((s) => s.toLowerCase().replace(/[\s_-]+/g, ""));
 
-  const hasPrivateSauna = normalizedServices.some((s) => s.includes("privatesauna") || (s.includes("private") && s.includes("sauna")));
-  const hasSharedSauna = normalizedServices.some((s) => s.includes("sharedsauna") || (s.includes("shared") && s.includes("sauna")));
-  const hasGenericSauna = normalizedServices.some((s) => s === "sauna") || (!hasPrivateSauna && !hasSharedSauna && includedServices.length === 0);
-  const packageIncludesSauna = isPackage && (hasPrivateSauna || hasSharedSauna || hasGenericSauna || !includedServices.length);
-
-  const packageIncludesLunchroom = isPackage && (
-    normalizedServices.some((s) => s.includes("lunchroom") || s.includes("lunch")) ||
-    serviceNameLower.includes("lunchroom") ||
-    !includedServices.length
-  );
-
-  const packageIncludesActivity = isPackage && (
-    normalizedServices.some((s) => s.includes("activity") || s.includes("activities")) ||
-    serviceNameLower.includes("activity") ||
-    !includedServices.length
-  );
-
-  const packageIncludesSaltRoom = isPackage && (
-    normalizedServices.some((s) => s.includes("salt") || s.includes("saltroom")) ||
-    serviceNameLower.includes("salt") ||
-    Boolean(packageSlots?.data?.saltroom?.slots?.length)
-  );
+  const hasPrivateSauna = normalizedServices.some((s) => s.includes("privatesauna") || s === "vipsauna");
+  const hasSharedSauna = normalizedServices.some((s) => s.includes("sharedsauna") || s === "normalsauna");
+  const hasGenericSauna = normalizedServices.includes("sauna");
+  const packageIncludesSauna = isPackage && (hasPrivateSauna || hasSharedSauna || hasGenericSauna);
+  const packageIncludesLunchroom = isPackage && normalizedServices.some((s) => s.includes("lunchroom") || s === "lunch");
+  const packageIncludesActivity = isPackage && normalizedServices.some((s) => s.includes("activity") || s.includes("activities"));
+  const packageIncludesSaltRoom = isPackage && normalizedServices.some((s) => s.includes("saltroom") || s === "salt");
 
   // Package Sub-service choices state
   const [pkgSaunaSlot, setPkgSaunaSlot] = useState<string | null>(
@@ -214,7 +199,9 @@ export default function ChooseTimePage() {
       return;
     }
 
-    const currentKey = `${typeVal}_${dateVal}`;
+    const stored = getStoredBookingData();
+    const packageId = stored.packageSelections?.packageId;
+    const currentKey = `${typeVal}_${dateVal}_${packageId || ""}`;
     if (fetchingRef.current && lastFetchedKeyRef.current === currentKey) {
       return;
     }
@@ -226,22 +213,33 @@ export default function ChooseTimePage() {
       const isPkg = (typeVal || "").toLowerCase().includes("package");
       if (isPkg) {
         const currentStored = getStoredBookingData();
-        const inc = currentStored.packageSelections?.includedServices || [];
-        const norm = inc.map((s) => s.toLowerCase().replace(/[\s_-]+/g, ""));
-        const shouldGetSalt = norm.some((s) => s.includes("salt")) || (currentStored.serviceName || "").toLowerCase().includes("salt");
-
-        const [pkgRes, saltRes] = await Promise.all([
-          servicesService.getPackageSlots(dateVal).catch((err) => {
-            console.error("Error fetching package slots:", err);
-            return null;
-          }),
-          shouldGetSalt
-            ? servicesService.getServiceSlots("saltroom", dateVal).catch((err) => {
-                console.error("Error fetching salt room slots:", err);
-                return null;
-              })
-            : Promise.resolve(null),
-        ]);
+        const selectedPackageId = currentStored.packageSelections?.packageId;
+        const pkgRes: Awaited<ReturnType<typeof servicesService.getPackageSlots>> = selectedPackageId
+          ? await servicesService.getPackageSlots(dateVal, selectedPackageId).catch((err) => {
+              console.error("Error fetching package slots:", err);
+              return {
+                success: false,
+                is_blocked: false,
+          is_closed: false,
+                date: dateVal,
+                service_type: "package",
+                open_time: "",
+                close_time: "",
+                data: {},
+                message: err?.message || "Could not load slots for this package.",
+              };
+            })
+          : {
+              success: false,
+              is_blocked: false,
+            is_closed: false,
+              date: dateVal,
+              service_type: "package",
+                open_time: "",
+                close_time: "",
+              data: {},
+              message: "Package details are missing. Please go back and select the package again.",
+            };
 
         if (pkgRes) {
           setPackageSlots(pkgRes);
@@ -252,13 +250,7 @@ export default function ChooseTimePage() {
           }
         }
 
-        let slots: any[] = [];
-        if (pkgRes?.data?.saltroom?.slots && Array.isArray(pkgRes.data.saltroom.slots)) {
-          slots = pkgRes.data.saltroom.slots;
-        } else if (saltRes) {
-          const raw = (saltRes?.data as any)?.slots || (saltRes as any)?.slots || [];
-          if (Array.isArray(raw)) slots = raw;
-        }
+        const slots = Array.isArray(pkgRes?.data?.saltroom?.slots) ? pkgRes.data.saltroom.slots : [];
         setSaltRoomSlotsList(slots);
       } else {
         const isSalt = typeVal === "salt_room" || typeVal === "saltroom";
@@ -497,12 +489,25 @@ export default function ChooseTimePage() {
     ? packageSlots.data.activities
     : (packageSlots?.data?.activities as any)?.activities || [];
   const isPackageActivitiesClosed = Boolean((packageSlots?.data?.activities as any)?.is_closed);
+  const packageSaunaData = packageSlots?.data?.sauna || (
+    packageSlots?.data?.private_sauna || packageSlots?.data?.shared_sauna
+      ? {
+          private_sauna: packageSlots.data.private_sauna,
+          shared_sauna: packageSlots.data.shared_sauna,
+          is_closed:
+            (!hasPrivateSauna || Boolean(packageSlots.data.private_sauna?.is_closed)) &&
+            (!hasSharedSauna || Boolean(packageSlots.data.shared_sauna?.is_closed)),
+        }
+      : undefined
+  );
 
   const isPackageFormValid = isPackage
     ? Boolean(
         date &&
-        (!packageSlots || (!packageSlots.is_blocked && !packageSlots.is_closed)) &&
-        (!packageIncludesSauna || !packageSlots?.data?.sauna || packageSlots.data.sauna.is_closed || pkgSaunaSlot) &&
+        packageSlots?.success &&
+        Object.keys(packageSlots.data || {}).length > 0 &&
+        (!packageSlots.is_blocked && !packageSlots.is_closed) &&
+        (!packageIncludesSauna || !packageSaunaData || packageSaunaData.is_closed || pkgSaunaSlot) &&
         (!packageIncludesSaltRoom || saltRoomSlotsList.length === 0 || packageSlots?.data?.saltroom?.is_closed || pkgSaltRoomSlot) &&
         (!packageIncludesActivity || packageActivitiesList.length === 0 || isPackageActivitiesClosed || pkgSelectedActivityId)
       )
@@ -573,7 +578,7 @@ export default function ChooseTimePage() {
 
   // Dynamic Sequential Step Numbering
   let stepIndex = 0;
-  const saunaStepNumber = packageIncludesSauna && packageSlots?.data?.sauna ? ++stepIndex : 0;
+  const saunaStepNumber = packageIncludesSauna && packageSaunaData ? ++stepIndex : 0;
   const lunchStepNumber = packageIncludesLunchroom ? ++stepIndex : 0;
   const saltRoomStepNumber = packageIncludesSaltRoom ? ++stepIndex : 0;
   const activityStepNumber = packageIncludesActivity ? ++stepIndex : 0;
@@ -776,23 +781,30 @@ export default function ChooseTimePage() {
                 </div>
               )}
 
+              {!loadingApiSlots && packageSlots && !packageSlots.is_blocked && Object.keys(packageSlots.data || {}).length === 0 && (
+                <div className="p-5 rounded-2xl bg-amber-50 border border-amber-200 text-amber-900 text-sm flex items-start gap-3">
+                  <BiInfoCircle size={20} className="text-amber-700 flex-shrink-0 mt-0.5" />
+                  <p>{packageSlots.message || "No booking services are available for this package."}</p>
+                </div>
+              )}
+
               {!loadingApiSlots && !packageSlots?.is_blocked && !packageSlots?.is_closed && date && (
                 <>
                   {/* 1. Sauna Sub-Service Slots (If included in package) */}
-                  {packageIncludesSauna && packageSlots?.data?.sauna && (
+                  {packageIncludesSauna && packageSaunaData && (
                     <div className="bg-[#FAF7F2] rounded-2xl p-6 border border-[#E8E2DC]">
                       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
                         <div className="flex items-center gap-2">
-                          <span className={`w-8 h-8 rounded-lg ${packageSlots.data.sauna.is_closed ? "bg-gray-400" : "bg-[#8B7355]"} text-white flex items-center justify-center font-bold text-sm`}>
+                          <span className={`w-8 h-8 rounded-lg ${packageSaunaData.is_closed ? "bg-gray-400" : "bg-[#8B7355]"} text-white flex items-center justify-center font-bold text-sm`}>
                             {saunaStepNumber}
                           </span>
                           <h4 className="font-bold text-[#0F172A] text-base font-displayPlayFair">
                             {pkgSaunaType === "shared" ? (ctTrans?.sharedSaunaTimeSlot || "Sauna Session Time Slot") : (ctTrans?.saunaTimeSlot || "VIP Sauna Session Time Slot")}
                           </h4>
                         </div>
-                        {!packageSlots.data.sauna.is_closed &&
-                          packageSlots.data.sauna.private_sauna &&
-                          packageSlots.data.sauna.shared_sauna &&
+                        {!packageSaunaData.is_closed &&
+                          packageSaunaData.private_sauna &&
+                          packageSaunaData.shared_sauna &&
                           ((hasPrivateSauna && hasSharedSauna) || hasGenericSauna) && (
                             <div className="flex bg-white rounded-lg p-1 border border-[#E8E2DC] text-xs font-semibold">
                               <button
@@ -826,11 +838,11 @@ export default function ChooseTimePage() {
                       </div>
 
                       {/* VIP Sauna Slots */}
-                      {pkgSaunaType === "private" && packageSlots.data.sauna.private_sauna?.slots && (
+                      {pkgSaunaType === "private" && packageSaunaData.private_sauna?.slots && (
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-3">
                           {(() => {
-                            const p3Slots = packageSlots.data.sauna.private_sauna.slots["3_hours"] || [];
-                            const p4Slots = packageSlots.data.sauna.private_sauna.slots["4_hours"] || [];
+                            const p3Slots = packageSaunaData.private_sauna?.slots?.["3_hours"] || [];
+                            const p4Slots = packageSaunaData.private_sauna?.slots?.["4_hours"] || [];
                             const allSlots = [...p3Slots, ...p4Slots];
 
                             if (allSlots.length === 0) {
@@ -875,9 +887,9 @@ export default function ChooseTimePage() {
                       )}
 
                       {/* Sauna Slots */}
-                      {pkgSaunaType === "shared" && packageSlots.data.sauna.shared_sauna?.slots && (
+                      {pkgSaunaType === "shared" && packageSaunaData.shared_sauna?.slots && (
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-3">
-                          {packageSlots.data.sauna.shared_sauna.slots.map((slot: any, idx: number) => {
+                          {packageSaunaData.shared_sauna.slots.map((slot: any, idx: number) => {
                             const label = `${slot.start_time} - ${slot.end_time}`;
                             const isSel = pkgSaunaSlot === label;
                             const isSoldOut = slot.is_fully_booked || !slot.is_available || slot.remaining_capacity === 0;

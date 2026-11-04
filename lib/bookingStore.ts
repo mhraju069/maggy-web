@@ -37,6 +37,7 @@ export interface ActivityBookingDetails {
 }
 
 export interface PackageSubServiceSelections {
+  packageId?: number;
   includedServices?: string[];
   saunaSlot?: {
     type: "private" | "shared";

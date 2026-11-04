@@ -299,29 +299,37 @@ export interface ActivitySlotData {
   is_available: boolean;
 }
 
-export interface PackageSlotsResponseData {
-  sauna?: {
-    is_available?: boolean;
-    is_closed?: boolean;
-    open_time?: string;
-    close_time?: string;
-    private_sauna?: {
-      open_time?: string;
-      close_time?: string;
-      is_closed?: boolean;
-      slots?: {
-        "3_hours"?: PrivateSaunaSlot[];
-        "4_hours"?: PrivateSaunaSlot[];
-      };
-    };
-    shared_sauna?: {
-      open_time?: string;
-      close_time?: string;
-      is_closed?: boolean;
-      max_capacity_per_slot?: number;
-      slots?: SharedSaunaSlot[];
-    };
+export interface PackagePrivateSaunaSlotsData {
+  open_time?: string;
+  close_time?: string;
+  is_closed?: boolean;
+  slots?: {
+    "3_hours"?: PrivateSaunaSlot[];
+    "4_hours"?: PrivateSaunaSlot[];
   };
+}
+
+export interface PackageSharedSaunaSlotsData {
+  open_time?: string;
+  close_time?: string;
+  is_closed?: boolean;
+  max_capacity_per_slot?: number;
+  slots?: SharedSaunaSlot[];
+}
+
+export interface PackageSaunaSlotsData {
+  is_available?: boolean;
+  is_closed?: boolean;
+  open_time?: string;
+  close_time?: string;
+  private_sauna?: PackagePrivateSaunaSlotsData;
+  shared_sauna?: PackageSharedSaunaSlotsData;
+}
+
+export interface PackageSlotsResponseData {
+  sauna?: PackageSaunaSlotsData;
+  private_sauna?: PackagePrivateSaunaSlotsData;
+  shared_sauna?: PackageSharedSaunaSlotsData;
   lunchroom?: LunchroomSlotData;
   activities?: {
     is_available?: boolean;
@@ -695,8 +703,9 @@ export const servicesService = {
     });
   },
 
-  async getPackageSlots(date: string, subType?: string): Promise<PackageSlotsResponse> {
+  async getPackageSlots(date: string, packageId: number, subType?: string): Promise<PackageSlotsResponse> {
     const params: Record<string, string> = { type: "package", date };
+    params.package_id = String(packageId);
     if (subType) params.sub_type = subType;
     return ApiClient.get<PackageSlotsResponse>("/services/slots/", {
       skipAuth: true,
