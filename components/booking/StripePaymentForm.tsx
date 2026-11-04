@@ -463,7 +463,7 @@ function InnerPaymentForm({
   };
 
   return (
-    <div className="bg-white rounded-[28px] p-8 md:p-10 border border-[#E8E2DC] shadow-sm space-y-8">
+    <div className="min-w-0 bg-white rounded-2xl sm:rounded-[28px] p-4 sm:p-8 md:p-10 border border-[#E8E2DC] shadow-sm space-y-6 sm:space-y-8">
       {/* Header Banner & Security */}
       <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 pb-6 border-b border-[#E8E2DC]/80">
         <div className="flex items-center gap-4">
@@ -580,7 +580,7 @@ function InnerPaymentForm({
             </div>
 
             {paymentMethod === "card" ? (
-              <div className="space-y-4 p-6 rounded-2xl bg-[#FBF6F3] border border-[#E8E2DC]">
+              <div className="space-y-4 p-4 sm:p-6 rounded-2xl bg-[#FBF6F3] border border-[#E8E2DC]">
                 {/* Cardholder Name */}
                 <div>
                   <label className="block text-xs font-bold text-[#0F172A] mb-1.5 uppercase tracking-wide">
@@ -641,7 +641,7 @@ function InnerPaymentForm({
               </div>
             ) : (
               /* iDEAL — Bank Selector */
-              <div className="p-6 rounded-2xl bg-[#FBF6F3] border border-[#E8E2DC] space-y-4">
+              <div className="p-4 sm:p-6 rounded-2xl bg-[#FBF6F3] border border-[#E8E2DC] space-y-4">
                 <label className="block text-xs font-bold text-[#0F172A] uppercase tracking-wide">
                   {pt.idealFields.selectBank}
                 </label>

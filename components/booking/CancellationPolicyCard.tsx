@@ -37,7 +37,7 @@ export default function CancellationPolicyCard({
   return (
     <>
       {/* ── Summary Card on Booking Review ── */}
-      <div className="rounded-2xl border border-[#E8E2DC] bg-[#FAF7F2] p-5 shadow-sm space-y-4">
+      <div className="w-full min-w-0 rounded-2xl border border-[#E8E2DC] bg-[#FAF7F2] p-4 sm:p-5 shadow-sm space-y-4">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="flex items-start gap-3">
             <div className="w-10 h-10 rounded-xl bg-[#8B7355]/15 text-[#8B7355] flex items-center justify-center flex-shrink-0 mt-0.5">
@@ -67,13 +67,13 @@ export default function CancellationPolicyCard({
         {/* Status indicator bar */}
         <div
           onClick={handleOpenModal}
-          className={`flex items-center justify-between p-3.5 rounded-xl border transition-all cursor-pointer select-none ${
+          className={`w-full min-w-0 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 p-3.5 rounded-xl border transition-all cursor-pointer select-none ${
             accepted
               ? "bg-[#F0FDF4] border-[#86EFAC] text-[#15803D]"
               : "bg-white border-[#E8E2DC] hover:border-[#8B7355]/60 text-[#64748B]"
           }`}
         >
-          <div className="flex items-center gap-2.5">
+          <div className="min-w-0 flex items-start gap-2.5">
             <div
               className={`w-5 h-5 rounded-full flex items-center justify-center border ${
                 accepted
@@ -83,7 +83,7 @@ export default function CancellationPolicyCard({
             >
               <BiCheckCircle size={16} />
             </div>
-            <span className="text-xs font-medium">
+            <span className="min-w-0 flex-1 text-xs font-medium break-words">
               {accepted ? (
                 <span className="font-semibold text-[#15803D]">
                   {cardT.acknowledgedText}
@@ -98,7 +98,7 @@ export default function CancellationPolicyCard({
             </span>
           </div>
 
-          <span className="text-xs font-bold text-[#8B7355] underline">
+          <span className="self-start sm:self-auto text-xs font-bold text-[#8B7355] underline shrink-0">
             {accepted ? cardT.changePolicyLink : cardT.openPolicyLink}
           </span>
         </div>

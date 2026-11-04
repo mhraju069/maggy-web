@@ -263,29 +263,29 @@ export default function SaunaBookingPage() {
 
       {/* ── Sauna Type Selector ── */}
       <div className="max-w-4xl mx-auto mb-10 flex justify-center">
-        <div className="inline-flex p-1.5 bg-white rounded-2xl border border-[#E8E2DC] shadow-xs">
+        <div className="grid w-full max-w-xl grid-cols-2 p-1.5 bg-white rounded-2xl border border-[#E8E2DC] shadow-xs sm:inline-flex sm:w-auto sm:max-w-none">
           <button
             type="button"
             onClick={() => setSelectedSaunaType("private")}
-            className={`px-8 py-3.5 rounded-xl font-bold text-sm transition-all flex items-center gap-2 ${
+            className={`min-w-0 justify-center px-2 py-3 sm:px-8 sm:py-3.5 rounded-xl font-bold text-xs sm:text-sm leading-tight text-center transition-all flex items-center gap-2 ${
               selectedSaunaType === "private"
                 ? "bg-[#8B7355] text-white shadow-md"
                 : "text-[#64748B] hover:text-[#0F172A]"
             }`}
           >
-            <FaSpa size={18} />
+            <FaSpa size={18} className="shrink-0" />
             {sTrans?.privateTab || "VIP Sauna (Exclusive Group)"}
           </button>
           <button
             type="button"
             onClick={() => setSelectedSaunaType("shared")}
-            className={`px-8 py-3.5 rounded-xl font-bold text-sm transition-all flex items-center gap-2 ${
+            className={`min-w-0 justify-center px-2 py-3 sm:px-8 sm:py-3.5 rounded-xl font-bold text-xs sm:text-sm leading-tight text-center transition-all flex items-center gap-2 ${
               selectedSaunaType === "shared"
                 ? "bg-[#8B7355] text-white shadow-md"
                 : "text-[#64748B] hover:text-[#0F172A]"
             }`}
           >
-            <FaHotTub size={18} />
+            <FaHotTub size={18} className="shrink-0" />
             {sTrans?.sharedTab || "Sauna"}
           </button>
         </div>
@@ -293,7 +293,7 @@ export default function SaunaBookingPage() {
 
       {/* ── VIP Sauna Configurator ── */}
       {selectedSaunaType === "private" ? (
-        <div className="max-w-4xl mx-auto bg-white rounded-[32px] p-8 md:p-10 shadow-sm border border-[#E8E2DC] space-y-10">
+        <div className="max-w-4xl mx-auto bg-white rounded-2xl sm:rounded-[32px] p-4 sm:p-8 md:p-10 shadow-sm border border-[#E8E2DC] space-y-8 sm:space-y-10">
           {/* Badge & Banner */}
           <div className="p-6 rounded-2xl bg-[#FCF2E9] border border-[#E8E2DC] flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
             <div className="flex items-center gap-4">
@@ -522,21 +522,21 @@ export default function SaunaBookingPage() {
         </div>
       ) : (
         /* ── Sauna Configurator ── */
-        <div className="max-w-4xl mx-auto bg-white rounded-[32px] p-8 md:p-10 shadow-sm border border-[#E8E2DC] space-y-8">
+        <div className="max-w-4xl mx-auto bg-white rounded-2xl sm:rounded-[32px] p-4 sm:p-8 md:p-10 shadow-sm border border-[#E8E2DC] space-y-8">
           {/* Header Banner */}
           <div className="p-6 rounded-2xl bg-[#FCF2E9] border border-[#E8E2DC] flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-            <div className="flex items-center gap-4">
+            <div className="flex min-w-0 items-start gap-3 sm:gap-4">
               <div className="w-12 h-12 rounded-2xl bg-[#8B7355] text-white flex items-center justify-center flex-shrink-0 shadow-xs">
                 <FaHotTub size={22} />
               </div>
-              <div>
+              <div className="min-w-0 flex-1">
                 <span className="text-[11px] font-bold uppercase tracking-widest text-[#8B7355] block">
                   {sTrans?.sharedSessionAccess || "Shared Session Access"}
                 </span>
-                <h3 className="text-xl font-bold font-displayPlayFair text-[#0F172A]">
+                <h3 className="text-lg sm:text-xl font-bold font-displayPlayFair text-[#0F172A] break-words">
                   {sTrans?.sharedBannerTitle || "Sauna Experience"}
                 </h3>
-                <p className="text-xs text-[#64748B] mt-0.5">
+                <p className="text-xs text-[#64748B] mt-0.5 break-words">
                   {sTrans?.sharedDesc
                     ? sTrans.sharedDesc.replace("{max}", String(sharedMaxPerson))
                     : `Different customers can book the same 1.5-hour session. Max ${sharedMaxPerson} people per session.`}
@@ -544,7 +544,7 @@ export default function SaunaBookingPage() {
               </div>
             </div>
 
-            <div className="flex items-center gap-2 bg-white px-4 py-2 rounded-xl border border-[#D1B191]/60 text-xs font-bold text-[#8B7355] flex-shrink-0">
+            <div className="flex items-center gap-2 bg-white px-3 sm:px-4 py-2 rounded-xl border border-[#D1B191]/60 text-xs font-bold text-[#8B7355] flex-shrink-0 self-start sm:self-auto whitespace-nowrap">
               <BiTimeFive size={16} />
               <span>{sTrans?.onePointFiveHours || "1.5 Hours"}</span>
             </div>
@@ -578,7 +578,7 @@ export default function SaunaBookingPage() {
                 ? sTrans.selectPlaces.replace("{max}", String(sharedMaxPerson))
                 : `Number of Places / Guests (1 to ${sharedMaxPerson})`}
             </label>
-            <div className="grid grid-cols-6 gap-3">
+            <div className="grid grid-cols-3 sm:grid-cols-6 gap-2 sm:gap-3">
               {sharedGuestOptions.map((num) => (
                 <button
                   key={num}
@@ -602,19 +602,19 @@ export default function SaunaBookingPage() {
           </div>
 
           {/* Price Calculation Summary */}
-          <div className="p-6 rounded-2xl bg-[#FBF6F3] border border-[#E8E2DC] flex justify-between items-center">
-            <div>
+          <div className="p-4 sm:p-6 rounded-2xl bg-[#FBF6F3] border border-[#E8E2DC] flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+            <div className="min-w-0">
               <span className="text-xs font-bold uppercase tracking-widest text-[#8B7355] block">
                 {sTrans?.totalAmountDue || "Total Amount Due"}
               </span>
-              <span className="text-[11px] text-[#64748B]">
+              <span className="text-[11px] text-[#64748B] break-words">
                 {sTrans?.guestsCalcNote
                   ? sTrans.guestsCalcNote.replace("{count}", String(guestsCount)).replace("{price}", String(sharedPricePerson))
                   : `${guestsCount} guest(s) × €${sharedPricePerson} (1.5h session)`}
               </span>
             </div>
-            <div className="text-right">
-              <span className="text-4xl font-bold font-displayPlayFair text-[#8B7355]">
+            <div className="text-left sm:text-right self-end sm:self-auto">
+              <span className="text-3xl sm:text-4xl font-bold font-displayPlayFair text-[#8B7355]">
                 €{currentTotalPrice}
               </span>
             </div>

@@ -167,7 +167,7 @@ export default function PackagesBookingPage() {
     <div className="w-full px-6 md:px-12 max-w-7xl mx-auto">
       {/* ── Title Section ── */}
       <div className="text-center mb-16 flex flex-col items-center">
-        <h1 className="font-displayPlayFair text-5xl text-[#1d1a17] mb-2 uppercase tracking-tight">
+        <h1 className="font-displayPlayFair text-3xl sm:text-5xl text-[#1d1a17] mb-2 uppercase tracking-tight leading-tight break-words max-w-full">
           {pkgTrans?.title || "Arrangementen & Belevenissen"}
         </h1>
         <DecorativeUnderline />
@@ -268,8 +268,8 @@ export default function PackagesBookingPage() {
 
       {/* ── 🌟 Customize Package Modal ── */}
       {showCustomizeModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fadeIn">
-          <div className="bg-white rounded-[32px] border border-[#E8E2DC] shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto p-8 md:p-10 relative">
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-black/60 backdrop-blur-sm animate-fadeIn">
+          <div className="bg-white rounded-t-2xl sm:rounded-[32px] border border-[#E8E2DC] shadow-2xl max-w-2xl w-full max-h-[92dvh] sm:max-h-[90vh] overflow-y-auto p-5 sm:p-8 md:p-10 relative">
             {/* Close Button */}
             <button
               type="button"
@@ -722,11 +722,11 @@ export default function PackagesBookingPage() {
                 </div>
 
                 {/* Modal Buttons */}
-                <div className="flex justify-end gap-3 pt-3 border-t border-[#F1F5F9]">
+                <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-3 pt-3 border-t border-[#F1F5F9]">
                   <button
                     type="button"
                     onClick={() => setShowCustomizeModal(false)}
-                    className="px-6 py-3 rounded-xl border border-[#CBD5E1] text-[#64748B] hover:bg-[#F8FAFC] font-bold text-xs uppercase tracking-wider transition-all cursor-pointer"
+                    className="w-full sm:w-auto justify-center px-6 py-3 rounded-xl border border-[#CBD5E1] text-[#64748B] hover:bg-[#F8FAFC] font-bold text-xs uppercase tracking-wider transition-all cursor-pointer"
                   >
                     {cm?.cancelBtn || "Cancel"}
                   </button>
@@ -734,7 +734,7 @@ export default function PackagesBookingPage() {
                   <button
                     type="submit"
                     disabled={customSubmitting}
-                    className="px-8 py-3 rounded-xl bg-[#8B7355] text-white hover:bg-[#725e45] font-bold text-xs uppercase tracking-wider transition-all shadow-md flex items-center gap-2 cursor-pointer"
+                    className="w-full sm:w-auto justify-center px-6 sm:px-8 py-3 rounded-xl bg-[#8B7355] text-white hover:bg-[#725e45] font-bold text-xs uppercase tracking-wider transition-all shadow-md flex items-center gap-2 cursor-pointer"
                   >
                     {customSubmitting ? (
                       <>

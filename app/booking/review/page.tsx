@@ -92,7 +92,7 @@ export default function ReviewPage() {
     <div className="w-full px-6 md:px-12">
       {/* ── Title Section ── */}
       <div className="text-center mb-16 flex flex-col items-center">
-        <h1 className="font-displayPlayFair text-5xl text-[#1d1a17] mb-2 leading-tight">
+        <h1 className="font-displayPlayFair text-3xl sm:text-5xl text-[#1d1a17] mb-2 leading-tight break-words">
           {revTrans?.title || "Review & Confirm"}
         </h1>
         <DecorativeUnderline />
@@ -103,7 +103,7 @@ export default function ReviewPage() {
 
       {/* ── Content Card ── */}
       <div className="max-w-4xl mx-auto bg-white rounded-[32px] overflow-hidden shadow-sm border border-[#E8E2DC]">
-        <div className="p-10 space-y-10">
+        <div className="p-5 sm:p-10 space-y-8 sm:space-y-10">
           {/* Services Information */}
           <section>
             <h2 className="text-xs font-bold text-[#64748B] uppercase tracking-[0.2em] mb-8" style={{ fontFamily: "Inter, sans-serif" }}>
@@ -113,8 +113,8 @@ export default function ReviewPage() {
             <div className="space-y-6">
               <div>
                 <span className="text-xs text-[#94A3B8] uppercase block mb-1">{revTrans?.selectedExperience || "Selected Experience"}</span>
-                <h3 className="text-3xl font-bold text-[#0F172A] font-displayPlayFair flex items-center gap-3">
-                  <MdOutlineRestaurantMenu className="text-[#8B7355]" />
+                <h3 className="min-w-0 text-2xl sm:text-3xl font-bold text-[#0F172A] font-displayPlayFair flex items-start gap-2 sm:gap-3 break-words">
+                  <MdOutlineRestaurantMenu className="text-[#8B7355] shrink-0 mt-1" />
                   {(data.serviceName?.toLowerCase().includes("lunchroom") ? revTrans?.lunchroomTableReservation : data.serviceName) || revTrans?.lunchroomTableReservation || "Lunchroom Table Reservation"}
                 </h3>
               </div>

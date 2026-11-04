@@ -1272,7 +1272,7 @@ export default function ChooseTimePage() {
                             type="button"
                             disabled={isSoldOut}
                             onClick={() => handleTimeSelect(label)}
-                            className={`p-4 rounded-xl border text-left transition-all flex items-center justify-between ${
+                            className={`min-w-0 p-4 rounded-xl border text-left transition-all flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 ${
                               isSelected
                                 ? "bg-[#FCF2E9] border-[#8B7355] shadow-md ring-2 ring-[#8B7355]/20"
                                 : isSoldOut
@@ -1280,7 +1280,7 @@ export default function ChooseTimePage() {
                                 : "bg-white border-[#E2E8F0] hover:border-[#D1B191]"
                             }`}
                           >
-                            <div>
+                            <div className="min-w-0">
                               <span className="text-base font-bold font-displayPlayFair text-[#0F172A] block">
                                 {label}
                               </span>
@@ -1289,17 +1289,17 @@ export default function ChooseTimePage() {
                               </span>
                             </div>
 
-                            <div className="text-right flex flex-col items-end">
+                            <div className="w-full sm:w-auto text-left sm:text-right flex flex-col items-start sm:items-end gap-1">
                               {isFullyBooked ? (
-                                <span className="px-2.5 py-1 bg-rose-100 text-rose-700 text-[10px] font-bold rounded-full">
+                                <span className="max-w-full px-2.5 py-1 bg-rose-100 text-rose-700 text-[10px] font-bold rounded-full whitespace-normal">
                                   Fully Booked
                                 </span>
                               ) : isNotEnoughCapacity ? (
-                                <span className="px-2.5 py-1 bg-amber-100 text-amber-800 text-[10px] font-bold rounded-full border border-amber-300">
+                                <span className="max-w-full px-2.5 py-1 bg-amber-100 text-amber-800 text-[10px] font-bold rounded-full border border-amber-300 whitespace-normal">
                                   Only {slot.remaining_capacity} {slot.remaining_capacity === 1 ? "place" : "places"} left
                                 </span>
                               ) : (
-                                <span className={`px-2.5 py-1 text-[10px] font-bold rounded-full border ${
+                                <span className={`max-w-full px-2.5 py-1 text-[10px] font-bold rounded-full border whitespace-normal ${
                                   slot.remaining_capacity <= 2 ? "bg-amber-100 text-amber-800 border-amber-300" : "bg-emerald-50 text-emerald-700 border-emerald-300"
                                 }`}>
                                   {slot.remaining_capacity} {slot.remaining_capacity === 1 ? "place" : "places"} remaining

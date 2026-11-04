@@ -11,7 +11,7 @@ const Header = () => {
       <section className="flex flex-col-reverse lg:flex-row justify-between items-center mt-20 pt-10 lg:pt-20 gap-10 lg:gap-0">
         <div className="left w-full lg:w-auto text-center lg:text-left">
           <h4 className="text-kicker">{t.header.kicker}</h4>
-          <h2 className="text-hero max-w-2xl text-4xl sm:text-5xl lg:text-7xl my-6">
+          <h2 className="text-hero max-w-full lg:max-w-2xl text-3xl sm:text-5xl lg:text-7xl leading-tight break-words my-6">
             {t.header.title[0]} <br /> {t.header.title[1]} <br />{" "}
             {t.header.title[2]}
           </h2>
