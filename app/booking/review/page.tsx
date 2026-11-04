@@ -113,7 +113,7 @@ export default function ReviewPage() {
             <div className="space-y-6">
               <div>
                 <span className="text-xs text-[#94A3B8] uppercase block mb-1">{revTrans?.selectedExperience || "Selected Experience"}</span>
-                <h3 className="min-w-0 text-2xl sm:text-3xl font-bold text-[#0F172A] font-displayPlayFair flex items-start gap-2 sm:gap-3 break-words">
+                <h3 className="min-w-0 text-2xl sm:text-3xl font-bold text-[#0F172A] font-displayPlayFair flex flex-col md:flex-row items-start gap-2 sm:gap-3 break-words">
                   <MdOutlineRestaurantMenu className="text-[#8B7355] shrink-0 mt-1" />
                   {(data.serviceName?.toLowerCase().includes("lunchroom") ? revTrans?.lunchroomTableReservation : data.serviceName) || revTrans?.lunchroomTableReservation || "Lunchroom Table Reservation"}
                 </h3>

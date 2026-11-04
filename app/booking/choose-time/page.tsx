@@ -771,7 +771,7 @@ export default function ChooseTimePage() {
                 <>
                   {/* 1. Sauna Sub-Service Slots (If included in package) */}
                   {packageIncludesSauna && packageSaunaData && (
-                    <div className="bg-[#FAF7F2] rounded-2xl p-6 border border-[#E8E2DC]">
+                    <div className="">
                       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
                         <div className="flex items-center gap-2">
                           <span className={`w-8 h-8 rounded-lg ${packageSaunaData.is_closed ? "bg-gray-400" : "bg-[#8B7355]"} text-white flex items-center justify-center font-bold text-sm`}>
@@ -882,7 +882,7 @@ export default function ChooseTimePage() {
                                   setPkgSaunaSlot(label);
                                   savePackageSelections(label);
                                 }}
-                                className={`p-3.5 rounded-xl border text-left transition-all flex items-center justify-between ${
+                                className={`p-3.5 rounded-xl border text-left transition-all flex flex-col md:flex-row items-center justify-between ${
                                   isSel
                                     ? "bg-[#FCF2E9] border-[#8B7355] shadow-sm ring-2 ring-[#8B7355]/20"
                                     : isSoldOut
@@ -913,7 +913,7 @@ export default function ChooseTimePage() {
 
                   {/* 2. Lunchroom Timing (If included) */}
                   {packageIncludesLunchroom && (
-                    <div className="bg-[#FAF7F2] rounded-2xl p-6 border border-[#E8E2DC]">
+                    <div className="">
                       <div className="flex items-center gap-2 mb-3">
                         <span className={`w-8 h-8 rounded-lg ${packageSlots?.data?.lunchroom?.is_closed ? "bg-gray-400" : "bg-[#8B7355]"} text-white flex items-center justify-center font-bold text-sm`}>
                           {lunchStepNumber}
@@ -968,7 +968,7 @@ export default function ChooseTimePage() {
 
                   {/* 3. Salt Room Timing (If included in package) */}
                   {packageIncludesSaltRoom && (
-                    <div className="bg-[#FAF7F2] rounded-2xl p-6 border border-[#E8E2DC]">
+                    <div className="">
                       <div className="flex items-center gap-2 mb-4">
                         <span className={`w-8 h-8 rounded-lg ${packageSlots?.data?.saltroom?.is_closed ? "bg-gray-400" : "bg-[#8B7355]"} text-white flex items-center justify-center font-bold text-sm`}>
                           {saltRoomStepNumber}
@@ -1057,7 +1057,7 @@ export default function ChooseTimePage() {
 
                   {/* 4. Activities on this date (If included in package) */}
                   {packageIncludesActivity && (
-                    <div className="bg-[#FAF7F2] rounded-2xl p-6 border border-[#E8E2DC]">
+                    <div className="">
                       <div className="flex items-center gap-2 mb-3">
                         <span className={`w-8 h-8 rounded-lg ${isPackageActivitiesClosed ? "bg-gray-400" : "bg-[#8B7355]"} text-white flex items-center justify-center font-bold text-sm`}>
                           {activityStepNumber}

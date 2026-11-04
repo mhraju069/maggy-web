@@ -296,7 +296,7 @@ export default function SaunaBookingPage() {
         <div className="max-w-4xl mx-auto bg-white rounded-2xl sm:rounded-[32px] p-4 sm:p-8 md:p-10 shadow-sm border border-[#E8E2DC] space-y-8 sm:space-y-10">
           {/* Badge & Banner */}
           <div className="p-6 rounded-2xl bg-[#FCF2E9] border border-[#E8E2DC] flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-            <div className="flex items-center gap-4">
+            <div className="flex flex-col md:flex-row items-center gap-4">
               <div className="w-12 h-12 rounded-2xl bg-[#8B7355] text-white flex items-center justify-center flex-shrink-0 shadow-xs">
                 <FaSpa size={22} />
               </div>
@@ -512,7 +512,7 @@ export default function SaunaBookingPage() {
                 </span>
               </div>
               <div className="text-right">
-                <span className="text-4xl font-bold font-displayPlayFair text-[#8B7355]">
+                <span className="text-2xl sm:text-4xl font-bold font-displayPlayFair text-[#8B7355]">
                   €{currentTotalPrice}
                 </span>
               </div>
@@ -525,7 +525,7 @@ export default function SaunaBookingPage() {
         <div className="max-w-4xl mx-auto bg-white rounded-2xl sm:rounded-[32px] p-4 sm:p-8 md:p-10 shadow-sm border border-[#E8E2DC] space-y-8">
           {/* Header Banner */}
           <div className="p-6 rounded-2xl bg-[#FCF2E9] border border-[#E8E2DC] flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-            <div className="flex min-w-0 items-start gap-3 sm:gap-4">
+            <div className="flex min-w-0 items-start gap-3 flex-col md:flex-row sm:gap-4">
               <div className="w-12 h-12 rounded-2xl bg-[#8B7355] text-white flex items-center justify-center flex-shrink-0 shadow-xs">
                 <FaHotTub size={22} />
               </div>
@@ -602,7 +602,7 @@ export default function SaunaBookingPage() {
           </div>
 
           {/* Price Calculation Summary */}
-          <div className="p-4 sm:p-6 rounded-2xl bg-[#FBF6F3] border border-[#E8E2DC] flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+          <div className="p-4 sm:p-6 rounded-2xl bg-[#FBF6F3] border border-[#E8E2DC] flex sm:flex-row justify-between items-start sm:items-center gap-3">
             <div className="min-w-0">
               <span className="text-xs font-bold uppercase tracking-widest text-[#8B7355] block">
                 {sTrans?.totalAmountDue || "Total Amount Due"}
@@ -614,7 +614,7 @@ export default function SaunaBookingPage() {
               </span>
             </div>
             <div className="text-left sm:text-right self-end sm:self-auto">
-              <span className="text-3xl sm:text-4xl font-bold font-displayPlayFair text-[#8B7355]">
+              <span className="text-2xl sm:text-4xl font-bold font-displayPlayFair text-[#8B7355]">
                 €{currentTotalPrice}
               </span>
             </div>
