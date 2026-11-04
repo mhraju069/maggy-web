@@ -68,6 +68,7 @@ export default function SaunaBookingPage() {
       return;
     }
     setLoadingSlots(true);
+    setSlotsData(null);
     try {
       const res = await servicesService.getServiceSlots("sauna", dateVal);
       setSlotsData(res);
@@ -99,6 +100,7 @@ export default function SaunaBookingPage() {
   const fetchServices = useCallback(async () => {
     setLoading(true);
     setError(null);
+    setSaunaData(null);
     try {
       const data = await servicesService.getSaunaServices();
       setSaunaData(data);
@@ -112,6 +114,28 @@ export default function SaunaBookingPage() {
   useEffect(() => {
     fetchServices();
   }, [fetchServices]);
+
+  useEffect(() => {
+    const refreshFromBookingState = () => {
+      const stored = getStoredBookingData();
+      if (stored.date) {
+        setSelectedDate(stored.date);
+        fetchSlotsForDate(stored.date);
+      }
+      fetchServices();
+    };
+    const handlePageShow = (event: PageTransitionEvent) => {
+      if (event.persisted) refreshFromBookingState();
+    };
+    const handlePopState = () => refreshFromBookingState();
+
+    window.addEventListener("pageshow", handlePageShow);
+    window.addEventListener("popstate", handlePopState);
+    return () => {
+      window.removeEventListener("pageshow", handlePageShow);
+      window.removeEventListener("popstate", handlePopState);
+    };
+  }, [fetchServices, fetchSlotsForDate]);
 
   // Dynamic pricing calculated from API
   const rawData = (saunaData as any)?.data || saunaData;

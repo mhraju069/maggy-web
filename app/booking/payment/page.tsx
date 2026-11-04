@@ -38,7 +38,7 @@ export default function PaymentPage() {
           totalAmount={data.totalAmount || data.price || 250}
           serviceName={data.serviceName}
           onSuccess={() => {
-            window.location.href = "/booking/confirmation";
+            window.location.replace("/booking/confirmation");
           }}
         />
 
