@@ -66,7 +66,7 @@ export default function SaunaOfferings() {
                         href="/wellness/saltroom"
                         className="inline-flex items-center justify-center px-4 py-2.5 bg-[#8B7355] text-white font-serif font-bold text-sm rounded-lg hover:bg-[#725e44] transition-colors"
                       >
-                        Explore Salt Room
+                        {t.wellnessPage?.cta?.exploreSaltRoom || "Explore Salt Room"}
                       </Link>
                       <Link
                         href="/booking/arrangements"

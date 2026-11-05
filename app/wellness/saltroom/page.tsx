@@ -11,7 +11,7 @@ import { BiCheckCircle, BiCreditCard, BiInfoCircle, BiTimeFive } from "react-ico
 import { FaCalendarAlt, FaInfinity, FaUsers } from "react-icons/fa";
 
 export default function SaltRoomPage() {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
 
   const [saltServices, setSaltServices] = useState<SaltroomServicesData | null>(null);
   const [plansData, setPlansData] = useState<PlansAndPassesResponse | null>(null);
@@ -64,27 +64,18 @@ export default function SaltRoomPage() {
 
   const dynamicCapacity = (primarySaltItem as any)?.max_capacity || (primarySaltItem as any)?.capacity || 2;
   const dynamicPrice = primarySaltItem?.price_per_person
-    ? `€${parseFloat(String(primarySaltItem.price_per_person)).toFixed(0)} / Person`
-    : "€25 / Person";
+    ? parseFloat(String(primarySaltItem.price_per_person)).toFixed(0)
+    : "25";
 
-  // Parse duration from API or features
-  const dynamicDuration = useMemo(() => {
-    if ((primarySaltItem as any)?.duration_minutes || (primarySaltItem as any)?.duration) {
-      return `${(primarySaltItem as any)?.duration_minutes || (primarySaltItem as any)?.duration} Mins`;
+  const formattedOpenTime = useMemo(() => {
+    const [hourText, minuteText] = slotsOpenTime.slice(0, 5).split(":");
+    const hour = Number(hourText);
+    if (!Number.isFinite(hour) || !minuteText) return slotsOpenTime;
+    if (language === "en") {
+      return `${String(hour % 12 || 12).padStart(2, "0")}:${minuteText} ${hour >= 12 ? "PM" : "AM"}`;
     }
-    if (primarySaltItem?.features && primarySaltItem.features.length > 0) {
-      for (const f of primarySaltItem.features) {
-        const text = (f as any).feature || (f as any).feature_en || "";
-        const match = text.match(/(\d+(?:\.\d+)?)\s*[- ]*(hour|hr|minute|min)/i);
-        if (match) {
-          const val = match[1];
-          const unit = match[2].toLowerCase().startsWith("h") ? "Hour" : "Mins";
-          return `${val} ${unit}`;
-        }
-      }
-    }
-    return "1 Hour";
-  }, [primarySaltItem]);
+    return `${String(hour).padStart(2, "0")}:${minuteText}`;
+  }, [language, slotsOpenTime]);
 
   // Dynamic Plans from paymentsService or servicesService fallback
   const sessionPass = useMemo(() => {
@@ -152,15 +143,21 @@ export default function SaltRoomPage() {
       <section className="py-20 bg-[#FCF2E9]">
         <div className="container mx-auto px-6 max-w-6xl">
           <div className="text-center max-w-3xl mx-auto mb-16">
-            <span className="text-xs font-bold uppercase tracking-widest text-[#8B7355] block mb-2">
-              {t.saltRoomPage?.sanctuary?.badge || "Therapeutic Halotherapy Sanctuary"}
-            </span>
-            <h2 className="text-4xl md:text-5xl font-bold font-displayPlayFair text-[#0F172A] mb-4">
-              {t.saltRoomPage?.sanctuary?.title || "Breathe Deeply. Restore Vitality."}
+            {t.saltRoomPage?.sanctuary?.badge && (
+              <span className="text-xs font-bold uppercase tracking-widest text-[#8B7355] block mb-2">
+                {t.saltRoomPage.sanctuary.badge}
+              </span>
+            )}
+     
+            <h2 className="text-4xl md:text-5xl font-bold font-displayPlayFair text-[#0F172A] mb-6">
+              {t.saltRoomPage?.sanctuary?.title || "A breath of fresh air for your body and mind."}
             </h2>
             <p className="text-[#475569] text-lg font-serif leading-relaxed">
               {t.saltRoomPage?.sanctuary?.description ||
-                "Step into our calming salt room micro-climate. Microscopic salt aerosol particles purify your airway, soothe skin conditions, and transport you into profound stillness."}
+                "Experience the power of natural salt therapy. During a session, you inhale fine salt particles, which may help relieve respiratory symptoms. The calming environment also provides a wonderful opportunity to relax and unwind."}
+            </p>
+            <p className="text-[#475569] text-lg font-serif leading-relaxed mt-4">
+              {t.saltRoomPage?.sanctuary?.closing || "Treat yourself to a moment of pure relaxation."}
             </p>
           </div>
 
@@ -173,9 +170,8 @@ export default function SaltRoomPage() {
               <h3 className="font-bold text-[#0F172A] text-lg font-displayPlayFair mb-1">
                 {t.saltRoomPage?.sanctuary?.capacityTitle || "Capacity"}
               </h3>
-              <p className="text-sm font-semibold text-[#8B7355]">Max {dynamicCapacity} People / Session</p>
-              <p className="text-xs text-[#64748B] mt-1">
-                {t.saltRoomPage?.sanctuary?.capacitySubtitle || "Intimate, tranquil setting"}
+              <p className="text-sm font-semibold text-[#8B7355]">
+                {(t.saltRoomPage?.sanctuary?.capacityValue || "Maximum {count} people").replace("{count}", String(dynamicCapacity))}
               </p>
             </div>
 
@@ -186,9 +182,8 @@ export default function SaltRoomPage() {
               <h3 className="font-bold text-[#0F172A] text-lg font-displayPlayFair mb-1">
                 {t.saltRoomPage?.sanctuary?.durationTitle || "Duration"}
               </h3>
-              <p className="text-sm font-semibold text-[#8B7355]">{dynamicDuration} Session</p>
-              <p className="text-xs text-[#64748B] mt-1">
-                {t.saltRoomPage?.sanctuary?.durationSubtitle || "Deep relaxation"}
+              <p className="text-sm font-semibold text-[#8B7355]">
+                {t.saltRoomPage?.sanctuary?.durationValue || "60 minutes"}
               </p>
             </div>
 
@@ -199,9 +194,8 @@ export default function SaltRoomPage() {
               <h3 className="font-bold text-[#0F172A] text-lg font-displayPlayFair mb-1">
                 {t.saltRoomPage?.sanctuary?.sessionTitle || "Single Session"}
               </h3>
-              <p className="text-sm font-semibold text-[#8B7355]">{dynamicPrice}</p>
-              <p className="text-xs text-[#64748B] mt-1">
-                {t.saltRoomPage?.sanctuary?.sessionSubtitle || "Per hour session"}
+              <p className="text-sm font-semibold text-[#8B7355]">
+                {(t.saltRoomPage?.sanctuary?.priceValue || "€{price} per person").replace("{price}", dynamicPrice)}
               </p>
             </div>
 
@@ -212,9 +206,8 @@ export default function SaltRoomPage() {
               <h3 className="font-bold text-[#0F172A] text-lg font-displayPlayFair mb-1">
                 {t.saltRoomPage?.sanctuary?.firstStartTitle || "First Start Time"}
               </h3>
-              <p className="text-sm font-semibold text-[#8B7355]">{slotsOpenTime}</p>
-              <p className="text-xs text-[#64748B] mt-1">
-                {t.saltRoomPage?.sanctuary?.sessionsUntil || "Sessions until"} {slotsCloseTime}
+              <p className="text-sm font-semibold text-[#8B7355]">
+                {(t.saltRoomPage?.sanctuary?.openingHoursValue || "From {time}").replace("{time}", formattedOpenTime)}
               </p>
             </div>
           </div>

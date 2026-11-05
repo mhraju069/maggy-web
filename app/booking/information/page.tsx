@@ -71,7 +71,7 @@ export default function InformationPage() {
 
   const [storedData, setStoredData] = useState(getStoredBookingData());
   const isLunchroom = storedData.serviceType === "lunchroom" || storedData.serviceName.toLowerCase().includes("lunchroom");
-  const isActivity = storedData.serviceType === "activity" || Boolean(storedData.activityDetails);
+  const isActivity = storedData.serviceType === "activity";
   const isPackage = storedData.serviceType === "package";
   const hasPackageLunchroom = isPackage && (
     storedData.packageSelections?.includedServices?.some((s) =>

@@ -31,7 +31,7 @@ export default function ReviewPage() {
 
   const celebration = data.celebration;
   const isLunchroom = data.serviceType === "lunchroom" || data.serviceName.toLowerCase().includes("lunchroom");
-  const isActivity = data.serviceType === "activity" || Boolean(data.activityDetails);
+  const isActivity = data.serviceType === "activity";
   const isPackage = data.serviceType === "package" || data.serviceType === "packages";
   const pkgSelections = data.packageSelections;
 
@@ -251,10 +251,14 @@ export default function ReviewPage() {
 
               {!isLunchroom && data.price && data.price !== "€0" && data.price !== "$0" && (
                 <div className="pt-4 border-t border-[#F1F5F9]">
-                  <span className="text-xs text-[#94A3B8] uppercase block mb-1">Total Calculated Investment</span>
+                  <span className="text-xs text-[#94A3B8] uppercase block mb-1">
+                    {revTrans?.totalCalculatedInvestment || "Total Calculated Investment"}
+                  </span>
                   <div className="flex items-baseline gap-2">
                     <span className="text-4xl font-bold text-[#8B7355] font-displayPlayFair">{data.price}</span>
-                    <span className="text-xs text-[#94A3B8] italic">All inclusive pricing</span>
+                    <span className="text-xs text-[#94A3B8] italic">
+                      {revTrans?.allInclusivePricing || "All-inclusive pricing"}
+                    </span>
                   </div>
                 </div>
               )}
@@ -289,7 +293,7 @@ export default function ReviewPage() {
               {data.requests && (
                 <div>
                   <span className="text-xs text-[#94A3B8] uppercase block mb-1">{revTrans?.specialRequests || "Comments / Special Requests"}</span>
-                  <p className="text-sm font-medium text-[#475569] bg-[#F8FAFC] p-4 rounded-xl border border-[#E2E8F0]">
+                  <p className="text-base font-medium text-[#475569] pb-4 rounded-xl">
                     {data.requests}
                   </p>
                 </div>
@@ -357,10 +361,14 @@ export default function ReviewPage() {
                 serviceName="Lunchroom Table Reservation"
               />
 
-              <div className="p-6 rounded-2xl bg-[#FCF2E9] border border-[#E8E2DC] flex flex-col md:flex-row items-center justify-between gap-4">
+              <div className="py-6 rounded-2xl flex flex-col md:flex-row items-center justify-between gap-4">
                 <div>
-                  <h4 className="text-base font-bold text-[#0F172A] font-displayPlayFair">Free Table Reservation</h4>
-                  <p className="text-xs text-[#64748B] mt-1">No payment or card required. Pay directly at the Lunchroom when dining.</p>
+                  <h4 className="text-base font-bold text-[#0F172A] font-displayPlayFair">
+                    {revTrans?.freeTableReservationTitle || "Free Table Reservation"}
+                  </h4>
+                  <p className="text-xs text-[#64748B] mt-1">
+                    {revTrans?.freeTableReservationDescription || "No payment or card required. Pay directly at the Lunchroom when dining."}
+                  </p>
                 </div>
                 <button
                   type="button"
@@ -377,10 +385,10 @@ export default function ReviewPage() {
                   {loading ? (
                     <>
                       <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                      <span>Confirming Reservation...</span>
+                      <span>{revTrans?.confirmingReservation || "Confirming Reservation..."}</span>
                     </>
                   ) : (
-                    <span>Confirm Table Reservation</span>
+                    <span>{revTrans?.confirmTableReservation || "Confirm Table Reservation"}</span>
                   )}
                 </button>
               </div>

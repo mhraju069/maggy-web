@@ -305,7 +305,7 @@ export default function SaunaBookingPage() {
                   {sTrans?.exclusiveReservation || "Exclusive Reservation"}
                 </span>
                 <h3 className="text-xl font-bold font-displayPlayFair text-[#0F172A]">
-                  {sTrans?.privateBannerTitle || "VIP Sauna Sanctuary"}
+                  {sTrans?.privateBannerTitle || "VIP Sauna"}
                 </h3>
                 <p className="text-xs text-[#64748B] mt-0.5">
                   {sTrans?.privateBannerDesc || "Booked exclusively by your group (2 to 6 people). Includes private sauna, jacuzzi & lounge."}

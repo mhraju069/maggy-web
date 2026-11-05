@@ -42,6 +42,7 @@ export default function ChooseTimePage() {
   const isPackage = serviceTypeLower === "package" || serviceTypeLower === "packages";
   const isLunchroom = !isPackage && (serviceTypeLower === "lunchroom" || serviceNameLower.includes("lunchroom"));
   const isSaltRoom = !isPackage && !isLunchroom && serviceTypeLower !== "sauna" && (serviceTypeLower === "salt_room" || serviceTypeLower === "saltroom" || storedData.isSaltRoom || serviceNameLower.includes("salt"));
+  const isSaltRoomPlanBooking = isSaltRoom && storedData.passType !== "single";
   const isSharedSauna = !isPackage && !isLunchroom && !isSaltRoom && (storedData.isSharedSauna || (serviceTypeLower === "sauna" && (serviceNameLower.includes("shared") || (!serviceNameLower.includes("private") && storedData.isSharedSauna))));
   const isPrivateSauna = !isPackage && !isLunchroom && !isSaltRoom && !isSharedSauna;
 
@@ -83,8 +84,17 @@ export default function ChooseTimePage() {
   }, [isPrivateSauna, isSharedSauna]);
 
   const [selectedTime, setSelectedTime] = useState<string | null>(storedData.timeSlot || null);
-  const [guests, setGuests] = useState(String(storedData.guestsCount || (isPrivateSauna ? 2 : 1)));
+  const [guests, setGuests] = useState(String(
+    isSaltRoomPlanBooking ? 1 : storedData.guestsCount || (isPrivateSauna ? 2 : 1)
+  ));
   const [dayError, setDayError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (isSaltRoomPlanBooking && guests !== "1") {
+      setGuests("1");
+      updateStoredBookingData({ guestsCount: 1 });
+    }
+  }, [guests, isSaltRoomPlanBooking]);
 
   const [apiSlots, setApiSlots] = useState<ServiceSlotsResponse | null>(null);
   const [packageSlots, setPackageSlots] = useState<any | null>(null);
@@ -433,6 +443,7 @@ export default function ChooseTimePage() {
   };
 
   const handleGuestsChange = (g: string) => {
+    if (isSaltRoomPlanBooking) return;
     const gCount = parseInt(g, 10) || (isPrivateSauna ? 2 : 1);
     setGuests(g);
 
@@ -746,8 +757,7 @@ export default function ChooseTimePage() {
                 {ctTrans?.dateLabel || "Date"}
               </label>
               {isSaltRoom ? (
-                <span className="text-xs text-[#8B7355] font-semibold bg-[#FCF2E9] px-2.5 py-1 rounded-md border border-[#E8E2DC]">
-                  {ctTrans?.dateLocked || "🔒 Date locked from previous step"}
+                <span className="">
                 </span>
               ) : isLunchroom ? (
                 <span className="text-xs text-[#8B7355] font-semibold">{ctTrans?.lunchroomAvailableDays || "Available: Wed – Sun"}</span>
@@ -1448,7 +1458,8 @@ export default function ChooseTimePage() {
             <select
               value={guests}
               onChange={(e) => handleGuestsChange(e.target.value)}
-              className="w-full p-4 border border-[#E2E8F0] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#D1B191] text-[#475569] bg-white cursor-pointer"
+              disabled={isSaltRoomPlanBooking}
+              className="w-full p-4 border border-[#E2E8F0] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#D1B191] text-[#475569] bg-white cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
               style={{
                 appearance: "none",
                 backgroundImage:

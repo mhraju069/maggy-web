@@ -142,7 +142,11 @@ export default function ConfirmationPage() {
               <span className="text-[10px] text-[#94A3B8] uppercase tracking-widest block mb-1" style={{ fontFamily: "Inter, sans-serif" }}>
                 {confTrans?.experience || "Experience"}
               </span>
-              <h3 className="text-2xl font-bold text-[#0F172A] font-displayPlayFair">{data.serviceName || "Wellness Experience"}</h3>
+              <h3 className="text-2xl font-bold text-[#0F172A] font-displayPlayFair">
+                {isLunchroom
+                  ? revTrans?.lunchroomTableReservation || "Lunchroom Table Reservation"
+                  : data.serviceName || "Wellness Experience"}
+              </h3>
               <p className="text-base font-medium text-[#475569] mt-1">
                 {data.date
                   ? new Date(data.date).toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric", year: "numeric" })
@@ -214,9 +218,9 @@ export default function ConfirmationPage() {
           )}
 
           {/* Access / Opening Hours Note */}
-          <div className="bg-[#8B735B]/90 p-8 rounded-2xl text-white relative overflow-hidden group">
+          <div className="py-8 relative overflow-hidden group">
             <div className="relative z-10">
-              <h4 className="text-xl font-bold font-displayPlayFair mb-2">
+              <h4 className="text-2xl font-bold font-displayPlayFair mb-2">
                 {isSaltRoom
                   ? (confTrans?.saltRoomReminderTitle || "Salt Room Session Reminder")
                   : isLunchroom

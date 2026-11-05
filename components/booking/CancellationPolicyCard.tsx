@@ -37,7 +37,7 @@ export default function CancellationPolicyCard({
   return (
     <>
       {/* ── Summary Card on Booking Review ── */}
-      <div className="w-full min-w-0 rounded-2xl border border-[#E8E2DC] bg-[#FAF7F2] p-4 sm:p-5 shadow-sm space-y-4">
+      <div className="w-full min-w-0 rounded-2xl space-y-4">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="flex flex-col md:flex-row items-start gap-3">
             <div className="w-10 h-10 rounded-xl bg-[#8B7355]/15 text-[#8B7355] flex items-center justify-center flex-shrink-0 mt-0.5">
@@ -55,13 +55,6 @@ export default function CancellationPolicyCard({
             </div>
           </div>
 
-          <button
-            type="button"
-            onClick={handleOpenModal}
-            className="px-4 py-2.5 rounded-xl border border-[#8B7355] text-[#8B7355] hover:bg-[#8B7355] hover:text-white font-bold text-xs transition-all shadow-2xs whitespace-nowrap self-start sm:self-auto cursor-pointer"
-          >
-            {accepted ? cardT.reviewPolicyBtn : cardT.readPolicyBtn}
-          </button>
         </div>
 
         {/* Status indicator bar */}

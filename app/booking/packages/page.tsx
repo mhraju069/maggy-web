@@ -606,10 +606,9 @@ export default function PackagesBookingPage() {
                     <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
                       {[
                         "VIP Sauna",
-                        "Lunchroom",
-                        "Yoga Activity",
                         "Sauna",
                         "Salt Room",
+                        "Lunchroom",
                         "Activities",
                         "Others",
                       ].map((exp) => {
@@ -633,7 +632,6 @@ export default function PackagesBookingPage() {
                             <span>{
                               exp === "VIP Sauna" ? (cm?.experiences?.vipSauna || exp) :
                               exp === "Lunchroom" ? (cm?.experiences?.lunchroom || exp) :
-                              exp === "Yoga Activity" ? (cm?.experiences?.yogaActivity || exp) :
                               exp === "Sauna" ? (cm?.experiences?.sauna || exp) :
                               exp === "Salt Room" ? (cm?.experiences?.saltRoom || exp) :
                               exp === "Activities" ? (cm?.experiences?.activities || exp) :
@@ -744,7 +742,7 @@ export default function PackagesBookingPage() {
                     ) : (
                       <>
                         <FaPaperPlane size={12} />
-                        <span>{cm?.confirmBtn || "Confirm Custom Booking"}</span>
+                        <span>{cm?.confirmBtn || "Submit Request"}</span>
                       </>
                     )}
                   </button>

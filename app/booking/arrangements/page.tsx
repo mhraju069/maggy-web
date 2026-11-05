@@ -289,6 +289,12 @@ export default function SaltRoomBookingPage() {
     }
   }, [saltOptions, selectedOption]);
 
+  useEffect(() => {
+    if (selectedOption !== "single" && guestsCount > 1) {
+      setGuestsCount(1);
+    }
+  }, [selectedOption, guestsCount]);
+
   // Resolve membership objects from both new API (weekly_subscription, unlimited_subscription, pass) and existing API
   const weeklySubObj = userMembership?.weekly_subscription || (
     (userMembership?.subscription?.plan_type?.toLowerCase() === "weekly" ||
@@ -804,10 +810,14 @@ export default function SaltRoomBookingPage() {
               <button
                 key={num}
                 type="button"
-                disabled={!date || isDateBlocked}
-                onClick={() => (!date || isDateBlocked ? null : setGuestsCount(num))}
+                disabled={!date || isDateBlocked || (selectedOption !== "single" && num > 1)}
+                onClick={() =>
+                  !date || isDateBlocked || (selectedOption !== "single" && num > 1)
+                    ? null
+                    : setGuestsCount(num)
+                }
                 className={`py-4 rounded-xl border font-bold text-center transition-all ${
-                  !date || isDateBlocked
+                  !date || isDateBlocked || (selectedOption !== "single" && num > 1)
                     ? "opacity-50 cursor-not-allowed bg-gray-50 border-gray-200 text-[#94A3B8]"
                     : guestsCount === num
                     ? "bg-[#8B7355] border-[#8B7355] text-white shadow-md scale-[1.02]"
