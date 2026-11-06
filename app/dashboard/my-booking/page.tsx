@@ -12,6 +12,7 @@ import Spinner from "@/components/shared/Spinner";
 import { cleanServiceName } from "../page";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 import { dashboardTranslations } from "@/lib/i18n/dashboardTranslations";
+import { formatTime24h } from "@/lib/dateUtils";
 
 function formatDisplayDate(dateStr: string, locale: string = "en-US") {
   if (!dateStr) return "";
@@ -24,19 +25,6 @@ function formatDisplayDate(dateStr: string, locale: string = "en-US") {
     });
   } catch {
     return dateStr;
-  }
-}
-
-function formatDisplayTime(timeStr: string) {
-  if (!timeStr) return "";
-  try {
-    const [h, m] = timeStr.split(":");
-    const hours = parseInt(h, 10);
-    const period = hours >= 12 ? "PM" : "AM";
-    const h12 = hours % 12 || 12;
-    return `${h12}:${m || "00"} ${period}`;
-  } catch {
-    return timeStr;
   }
 }
 
@@ -217,7 +205,7 @@ export default function MyBookingPage() {
                   <div>
                     <p className="text-[10px] uppercase font-bold text-[#94A3B8] tracking-wider">Time</p>
                     <p className="text-sm font-semibold text-[#1d1a17]">
-                      {formatDisplayTime(booking.time)}
+                      {formatTime24h(booking.time)}
                     </p>
                   </div>
                 </div>
@@ -336,7 +324,7 @@ export default function MyBookingPage() {
                   <p className="text-[#64748B]">
                     Scheduled:{" "}
                     <span className="font-semibold text-[#1d1a17]">
-                      {formatDisplayDate(cancelBooking.date, language)} at {formatDisplayTime(cancelBooking.time)}
+                      {formatDisplayDate(cancelBooking.date, language)} at {formatTime24h(cancelBooking.time)}
                     </span>
                   </p>
                 </div>

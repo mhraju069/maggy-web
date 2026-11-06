@@ -3,7 +3,7 @@
 import DecorativeUnderline from "@/components/shared/DecorativeUnderline";
 import { CelebrationData, getStoredBookingData, updateStoredBookingData } from "@/lib/bookingStore";
 import { servicesService } from "@/lib/api";
-import { getMinimumLunchroomDate } from "@/lib/dateUtils";
+import { formatTime24h, getMinimumLunchroomDate } from "@/lib/dateUtils";
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 import { BiTimeFive } from "react-icons/bi";
@@ -25,15 +25,6 @@ function generateTimeSlots(openTime?: string, closeTime?: string, intervalMinute
     slots.push(`${hh}:${mm}`);
   }
   return slots;
-}
-
-function formatTime12h(time24: string): string {
-  const [hStr, mStr] = time24.split(":");
-  const h = parseInt(hStr, 10);
-  const m = parseInt(mStr || "0", 10);
-  const period = h >= 12 ? "PM" : "AM";
-  const h12 = h % 12 === 0 ? 12 : h % 12;
-  return `${String(h12).padStart(2, "0")}:${String(m).padStart(2, "0")} ${period}`;
 }
 
 const occasionOptions = [
@@ -402,7 +393,7 @@ export default function InformationPage() {
                     <option value="" disabled>{infoTrans?.lunchroomNoArrivalTimes || "No arrival times available for this date"}</option>
                   ) : (
                     lunchroomArrivalTimes.map((t) => (
-                      <option key={t} value={t}>{formatTime12h(t)}</option>
+                      <option key={t} value={t}>{formatTime24h(t)}</option>
                     ))
                   )}
                 </select>
@@ -492,7 +483,7 @@ export default function InformationPage() {
                   <option value="" disabled>{infoTrans?.lunchroomNoArrivalTimes || "No arrival times available for this date"}</option>
                 )}
                 {!lunchroomIsBlocked && lunchroomArrivalTimes.map((t) => (
-                  <option key={t} value={t}>{formatTime12h(t)}</option>
+                  <option key={t} value={t}>{formatTime24h(t)}</option>
                 ))}
               </select>
               <p className="text-[11px] text-[#64748B] mt-2">

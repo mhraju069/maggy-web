@@ -14,6 +14,7 @@ import {
   HiOutlineCheckCircle,
 } from "react-icons/hi";
 import { bookingService } from "@/lib/api/services/bookingService";
+import { formatTime24h } from "@/lib/dateUtils";
 
 export interface BookingModalData {
   booking_id?: string;
@@ -59,19 +60,6 @@ function formatDate(dateStr?: string) {
     });
   } catch {
     return dateStr;
-  }
-}
-
-function formatTime(timeStr?: string) {
-  if (!timeStr) return "N/A";
-  try {
-    const [h, m] = timeStr.split(":");
-    const hours = parseInt(h, 10);
-    const period = hours >= 12 ? "PM" : "AM";
-    const h12 = hours % 12 || 12;
-    return `${h12}:${m || "00"} ${period}`;
-  } catch {
-    return timeStr;
   }
 }
 
@@ -230,7 +218,7 @@ export default function BookingDetailsModal({
                   <HiOutlineClock className="w-4 h-4 mx-auto text-[#8B6E4E] mb-1" />
                   <p className="text-[10px] text-[#94A3B8] uppercase">Time</p>
                   <p className="text-xs font-semibold text-[#1d1a17] mt-0.5">
-                    {formatTime(currentData?.time)}
+                    {formatTime24h(currentData?.time) || "N/A"}
                   </p>
                 </div>
 

@@ -8,6 +8,7 @@ import { useDashboard } from "../DashboardContext";
 import Spinner from "@/components/shared/Spinner";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 import { dashboardTranslations } from "@/lib/i18n/dashboardTranslations";
+import { formatTime24h } from "@/lib/dateUtils";
 
 function formatDisplayDate(dateStr: string, locale: string = "en-US") {
   if (!dateStr) return "";
@@ -21,19 +22,6 @@ function formatDisplayDate(dateStr: string, locale: string = "en-US") {
     });
   } catch {
     return dateStr;
-  }
-}
-
-function formatDisplayTime(timeStr: string) {
-  if (!timeStr) return "";
-  try {
-    const [h, m] = timeStr.split(":");
-    const hours = parseInt(h, 10);
-    const period = hours >= 12 ? "PM" : "AM";
-    const h12 = hours % 12 || 12;
-    return `${h12}:${m || "00"} ${period}`;
-  } catch {
-    return timeStr;
   }
 }
 
@@ -69,7 +57,7 @@ function AccessCodeCard({ item }: { item: DashboardAccessCodeItem }) {
       </div>
 
       <p className="text-sm text-[#64748B] mb-2">
-        {formatDisplayDate(item.date, language)} at {formatDisplayTime(item.time)}
+        {formatDisplayDate(item.date, language)} at {formatTime24h(item.time)}
       </p>
 
       <div className="flex items-center gap-3 mb-4">

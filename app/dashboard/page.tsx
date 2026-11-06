@@ -18,6 +18,7 @@ import { useDashboard } from "./DashboardContext";
 import Spinner from "@/components/shared/Spinner";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 import { dashboardTranslations } from "@/lib/i18n/dashboardTranslations";
+import { formatTime24h } from "@/lib/dateUtils";
 
 function formatDisplayDate(dateStr: string, locale: string = "en-US") {
   if (!dateStr) return "";
@@ -31,19 +32,6 @@ function formatDisplayDate(dateStr: string, locale: string = "en-US") {
     });
   } catch {
     return dateStr;
-  }
-}
-
-function formatDisplayTime(timeStr: string) {
-  if (!timeStr) return "";
-  try {
-    const [h, m] = timeStr.split(":");
-    const hours = parseInt(h, 10);
-    const period = hours >= 12 ? "PM" : "AM";
-    const h12 = hours % 12 || 12;
-    return `${h12}:${m || "00"} ${period}`;
-  } catch {
-    return timeStr;
   }
 }
 
@@ -156,7 +144,7 @@ function NextVisitHighlight({ booking }: { booking: DashboardBookingItem }) {
           </div>
           <div>
             <p className="text-[10px] uppercase font-bold text-[#94A3B8] tracking-wider">{dt.arrivalTime}</p>
-            <p className="text-sm font-bold text-[#1d1a17]">{formatDisplayTime(booking.time)}</p>
+            <p className="text-sm font-bold text-[#1d1a17]">{formatTime24h(booking.time)}</p>
           </div>
         </div>
 
@@ -324,7 +312,7 @@ function UpcomingVisitsList({ visits }: { visits: DashboardBookingItem[] }) {
                   </span>
                 </div>
                 <p className="text-xs text-[#64748B] mt-0.5">
-                  {dt.arrivalTime} {formatDisplayTime(booking.time)} • {booking.guests} {booking.guests === 1 ? dt.guest : dt.guests}
+                  {dt.arrivalTime} {formatTime24h(booking.time)} • {booking.guests} {booking.guests === 1 ? dt.guest : dt.guests}
                 </p>
               </div>
             </div>
