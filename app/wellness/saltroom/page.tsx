@@ -308,22 +308,17 @@ export default function SaltRoomPage() {
                     ))
                   ) : (
                     <>
-                      <li className="flex items-start gap-2">
-                        <BiCheckCircle className="text-[#8B7355] text-base flex-shrink-0" />
-                        <span>Linked directly to your customer account</span>
-                      </li>
-                      <li className="flex items-start gap-2">
-                        <BiCheckCircle className="text-[#8B7355] text-base flex-shrink-0" />
-                        <span>Automatically deducts 1 session when booking</span>
-                      </li>
-                      <li className="flex items-start gap-2">
-                        <BiCheckCircle className="text-[#8B7355] text-base flex-shrink-0" />
-                        <span>View remaining session balance anytime in account</span>
-                      </li>
-                      <li className="flex items-start gap-2">
-                        <BiCheckCircle className="text-[#8B7355] text-base flex-shrink-0" />
-                        <span>Valid for 1 year after purchase date</span>
-                      </li>
+                      {((t as any)?.commonUI?.saltRoomFeatures?.pass || [
+                        "Linked directly to your customer account",
+                        "Automatically deducts 1 session when booking",
+                        "View remaining session balance anytime in account",
+                        "Valid for 1 year after purchase date",
+                      ]).map((featText: string, i: number) => (
+                        <li key={i} className="flex items-start gap-2">
+                          <BiCheckCircle className="text-[#8B7355] text-base flex-shrink-0" />
+                          <span>{featText}</span>
+                        </li>
+                      ))}
                     </>
                   )}
                 </ul>
@@ -368,22 +363,17 @@ export default function SaltRoomPage() {
                     ))
                   ) : (
                     <>
-                      <li className="flex items-start gap-2">
-                        <BiCheckCircle className="text-[#8B7355] text-base flex-shrink-0" />
-                        <span>1 session per week included</span>
-                      </li>
-                      <li className="flex items-start gap-2">
-                        <BiCheckCircle className="text-[#8B7355] text-base flex-shrink-0" />
-                        <span>Maximum 4 included sessions per 4-week period</span>
-                      </li>
-                      <li className="flex items-start gap-2">
-                        <BiCheckCircle className="text-[#8B7355] text-base flex-shrink-0" />
-                        <span>Automatic member recognition upon sign in</span>
-                      </li>
-                      <li className="flex items-start gap-2">
-                        <BiCheckCircle className="text-[#8B7355] text-base flex-shrink-0" />
-                        <span>Online advance session reservation</span>
-                      </li>
+                      {((t as any)?.commonUI?.saltRoomFeatures?.weekly || [
+                        "1 session per week included",
+                        "Maximum 4 included sessions per 4-week period",
+                        "Automatic member recognition upon sign in",
+                        "Online advance session reservation",
+                      ]).map((featText: string, i: number) => (
+                        <li key={i} className="flex items-start gap-2">
+                          <BiCheckCircle className="text-[#8B7355] text-base flex-shrink-0" />
+                          <span>{featText}</span>
+                        </li>
+                      ))}
                     </>
                   )}
                 </ul>
@@ -428,22 +418,17 @@ export default function SaltRoomPage() {
                     ))
                   ) : (
                     <>
-                      <li className="flex items-start gap-2">
-                        <BiCheckCircle className="text-emerald-400 text-base flex-shrink-0" />
-                        <span>Unlimited use within available capacity</span>
-                      </li>
-                      <li className="flex items-start gap-2">
-                        <BiCheckCircle className="text-emerald-400 text-base flex-shrink-0" />
-                        <span>Each session reserved in advance</span>
-                      </li>
-                      <li className="flex items-start gap-2">
-                        <BiCheckCircle className="text-emerald-400 text-base flex-shrink-0" />
-                        <span>Maximum {saltUnlimited?.max_reservations || 10} future active reservations</span>
-                      </li>
-                      <li className="flex items-start gap-2">
-                        <BiCheckCircle className="text-emerald-400 text-base flex-shrink-0" />
-                        <span>Priority booking access for prime hours</span>
-                      </li>
+                      {((t as any)?.commonUI?.saltRoomFeatures?.unlimited || [
+                        "Unlimited use within available capacity",
+                        "Each session reserved in advance",
+                        "Maximum {max} future active reservations",
+                        "Priority booking access for prime hours",
+                      ]).map((featText: string, i: number) => (
+                        <li key={i} className="flex items-start gap-2">
+                          <BiCheckCircle className="text-emerald-400 text-base flex-shrink-0" />
+                          <span>{featText.replace("{max}", String(saltUnlimited?.max_reservations || 10))}</span>
+                        </li>
+                      ))}
                     </>
                   )}
                 </ul>

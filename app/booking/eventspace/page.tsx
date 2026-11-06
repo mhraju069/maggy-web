@@ -163,7 +163,7 @@ export default function EventSpaceInquiryPage() {
                   .replace("{event}", confirmationEventType)
                   .replace("{date}", confirmationDate)
                   .replace("{guests}", String(expectedGuests))
-              : <>Thank you, <span className="font-bold text-[#0F172A] not-italic">{name}</span>! We have received your inquiry for a <span className="font-bold text-[#8B7355] not-italic">{confirmationEventType}</span> on <span className="font-bold text-[#0F172A] not-italic">{confirmationDate}</span> for {expectedGuests} guests.</>}
+              : `${name} - ${confirmationEventType} - ${confirmationDate} - ${expectedGuests}`}
           </p>
 
           <div className="w-full bg-[#FCF2E9] rounded-2xl p-6 border border-[#E8E2DC] text-left max-w-lg space-y-3 text-xs text-[#475569]">

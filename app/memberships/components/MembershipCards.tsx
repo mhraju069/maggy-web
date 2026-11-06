@@ -528,14 +528,16 @@ const MembershipCards = () => {
           <div className="w-full flex flex-col items-center justify-center py-24 space-y-4">
             <div className="w-12 h-12 rounded-full border-4 border-[#E8E2DC] border-t-[#8B7355] animate-spin" />
             <p className="text-sm font-semibold text-[#8B7355] tracking-wide animate-pulse">
-              Loading passes & membership plans...
+              {(t as any)?.commonUI?.membershipsModal?.loadingPlans || "Loading passes & membership plans..."}
             </p>
           </div>
         ) : plans.length === 0 ? (
           <div className="w-full text-center py-16 px-6 bg-white rounded-3xl border border-[#E8E2DC] shadow-xs max-w-lg">
-            <p className="text-xl font-bold font-displayPlayFair text-[#0F172A] mb-2">No Plans Available</p>
+            <p className="text-xl font-bold font-displayPlayFair text-[#0F172A] mb-2">
+              {(t as any)?.commonUI?.membershipsModal?.noPlansTitle || "No Plans Available"}
+            </p>
             <p className="text-sm text-[#64748B] font-cambria italic">
-              Currently there are no passes or membership plans available at this moment. Please check back later.
+              {(t as any)?.commonUI?.membershipsModal?.noPlansDesc || "Currently there are no passes or membership plans available at this moment. Please check back later."}
             </p>
           </div>
         ) : (
@@ -765,6 +767,7 @@ function MembershipCheckoutModal({
   onClose,
   onSuccess,
 }: MembershipCheckoutModalProps) {
+  const { t } = useLanguage();
   const stripe = useStripe();
   const elements = useElements();
 
@@ -1002,12 +1005,12 @@ function MembershipCheckoutModal({
                 {copiedCode ? (
                   <>
                     <FaCheck size={11} className="text-emerald-600" />
-                    <span className="text-emerald-700">Copied</span>
+                    <span className="text-emerald-700">{(t as any)?.commonUI?.membershipsModal?.copied || "Copied"}</span>
                   </>
                 ) : (
                   <>
                     <FaCopy size={11} className="text-[#64748B]" />
-                    <span>Copy</span>
+                    <span>{(t as any)?.commonUI?.membershipsModal?.copy || "Copy"}</span>
                   </>
                 )}
               </button>
@@ -1016,33 +1019,33 @@ function MembershipCheckoutModal({
             {/* Plan Summary */}
             <div className="bg-white border border-[#E2E8F0] rounded-2xl p-5 text-left max-w-md mx-auto space-y-3 text-xs">
               <div className="flex justify-between items-center pb-3 border-b border-[#F1F5F9]">
-                <span className="text-[#64748B]">Plan:</span>
+                <span className="text-[#64748B]">{(t as any)?.commonUI?.membershipsModal?.plan || "Plan:"}</span>
                 <span className="font-bold text-[#0F172A]">{selectedPlan.name}</span>
               </div>
               <div className="flex justify-between items-center pb-3 border-b border-[#F1F5F9]">
-                <span className="text-[#64748B]">Amount Paid:</span>
+                <span className="text-[#64748B]">{(t as any)?.commonUI?.membershipsModal?.amountPaid || "Amount Paid:"}</span>
                 <span className="font-bold text-[#8B7355]">{selectedPlan.price} {selectedPlan.perPeriod}</span>
               </div>
               <div className="flex justify-between items-center pb-3 border-b border-[#F1F5F9]">
-                <span className="text-[#64748B]">Validity:</span>
+                <span className="text-[#64748B]">{(t as any)?.commonUI?.membershipsModal?.validity || "Validity:"}</span>
                 <span className="font-semibold text-[#0F172A]">
                   {purchaseResult?.end_date
-                    ? `Valid until ${new Date(purchaseResult.end_date).toLocaleDateString()}`
-                    : selectedPlan.validityText || "Indefinite"}
+                    ? ((t as any)?.commonUI?.membershipsModal?.validUntil || "Valid until {date}").replace("{date}", new Date(purchaseResult.end_date).toLocaleDateString())
+                    : selectedPlan.validityText || (t as any)?.commonUI?.membershipsModal?.indefinite || "Indefinite"}
                 </span>
               </div>
               <div className="flex justify-between items-center pb-3 border-b border-[#F1F5F9]">
-                <span className="text-[#64748B]">Session Allowance:</span>
+                <span className="text-[#64748B]">{(t as any)?.commonUI?.membershipsModal?.sessionAllowance || "Session Allowance:"}</span>
                 <span className="font-semibold text-[#0F172A]">
                   {purchaseResult?.total_sessions === 0
-                    ? "Unlimited sessions"
-                    : `${purchaseResult?.remaining_sessions ?? selectedPlan.totalSessions ?? 10} sessions available`}
+                    ? ((t as any)?.commonUI?.membershipsModal?.unlimitedSessions || "Unlimited sessions")
+                    : ((t as any)?.commonUI?.membershipsModal?.sessionsAvailable || "{count} sessions available").replace("{count}", String(purchaseResult?.remaining_sessions ?? selectedPlan.totalSessions ?? 10))}
                 </span>
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-[#64748B]">Status:</span>
+                <span className="text-[#64748B]">{(t as any)?.commonUI?.membershipsModal?.status || "Status:"}</span>
                 <span className="px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-700 font-semibold border border-emerald-200">
-                  Active
+                  {(t as any)?.commonUI?.membershipsModal?.active || "Active"}
                 </span>
               </div>
             </div>
@@ -1061,7 +1064,7 @@ function MembershipCheckoutModal({
                 onClick={onClose}
                 className="px-7 py-3 rounded-xl bg-[#8B7355] text-white hover:bg-[#725e45] font-bold text-xs uppercase tracking-wider transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer"
               >
-                <span>Book Salt Room Session</span>
+                <span>{(t as any)?.commonUI?.membershipsModal?.bookSession || (t as any)?.saltRoomPage?.bookSession || "Book Salt Room Session"}</span>
                 <ArrowIcon color="#FFFFFF" />
               </Link>
             </div>
@@ -1071,7 +1074,7 @@ function MembershipCheckoutModal({
             <div>
               <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-[#8B7355] mb-1">
                 <BiShieldQuarter size={14} />
-                <span>Secure Membership Checkout</span>
+                <span>{(t as any)?.commonUI?.membershipsModal?.checkoutTitle || "Secure Membership Checkout"}</span>
               </div>
               <h3 className="text-2xl font-bold font-displayPlayFair text-[#0F172A]">
                 Activate {selectedPlan.name}
@@ -1090,7 +1093,9 @@ function MembershipCheckoutModal({
                 <h4 className="text-base font-bold text-[#0F172A] font-displayPlayFair">
                   {selectedPlan.name}
                 </h4>
-                <p className="text-[11px] text-[#64748B]">Salt Room Halotherapy</p>
+                <p className="text-[11px] text-[#64748B]">
+                  {(t as any)?.commonUI?.membershipsModal?.saltRoomHalotherapy || "Salt Room Halotherapy"}
+                </p>
               </div>
               <div className="text-right">
                 <span className="text-2xl font-bold text-[#8B7355] font-displayPlayFair block">
@@ -1149,7 +1154,7 @@ function MembershipCheckoutModal({
                     }`}
                 >
                   <FaCreditCard size={14} />
-                  <span>Credit Card</span>
+                  <span>{(t as any)?.commonUI?.membershipsModal?.creditCard || "Credit Card"}</span>
                 </button>
 
                 <button
@@ -1161,7 +1166,7 @@ function MembershipCheckoutModal({
                     }`}
                 >
                   <MdOutlinePayments size={16} />
-                  <span>iDEAL</span>
+                  <span>{(t as any)?.commonUI?.membershipsModal?.ideal || "iDEAL"}</span>
                 </button>
               </div>
             </div>
@@ -1170,7 +1175,9 @@ function MembershipCheckoutModal({
             {paymentMethod === "card" ? (
               <div className="space-y-3 pt-1">
                 <div>
-                  <label className="block text-[11px] text-[#64748B] mb-1 font-medium">Name on Card *</label>
+                  <label className="block text-[11px] text-[#64748B] mb-1 font-medium">
+                    {(t as any)?.commonUI?.membershipsModal?.nameOnCard || "Name on Card *"}
+                  </label>
                   <input
                     type="text"
                     required
@@ -1182,7 +1189,9 @@ function MembershipCheckoutModal({
                 </div>
 
                 <div>
-                  <label className="block text-[11px] text-[#64748B] mb-1 font-medium">Card Number *</label>
+                  <label className="block text-[11px] text-[#64748B] mb-1 font-medium">
+                    {(t as any)?.commonUI?.membershipsModal?.cardNumber || "Card Number *"}
+                  </label>
                   <div className="p-3 bg-white border border-[#E2E8F0] rounded-xl focus-within:ring-2 focus-within:ring-[#8B7355]">
                     <CardNumberElement options={CARD_ELEMENT_OPTIONS} />
                   </div>
@@ -1190,19 +1199,25 @@ function MembershipCheckoutModal({
 
                 <div className="grid grid-cols-3 gap-3">
                   <div>
-                    <label className="block text-[11px] text-[#64748B] mb-1 font-medium">Expiry *</label>
+                    <label className="block text-[11px] text-[#64748B] mb-1 font-medium">
+                      {(t as any)?.commonUI?.membershipsModal?.expiry || "Expiry *"}
+                    </label>
                     <div className="p-3 bg-white border border-[#E2E8F0] rounded-xl focus-within:ring-2 focus-within:ring-[#8B7355]">
                       <CardExpiryElement options={CARD_ELEMENT_OPTIONS} />
                     </div>
                   </div>
                   <div>
-                    <label className="block text-[11px] text-[#64748B] mb-1 font-medium">CVC *</label>
+                    <label className="block text-[11px] text-[#64748B] mb-1 font-medium">
+                      {(t as any)?.commonUI?.membershipsModal?.cvc || "CVC *"}
+                    </label>
                     <div className="p-3 bg-white border border-[#E2E8F0] rounded-xl focus-within:ring-2 focus-within:ring-[#8B7355]">
                       <CardCvcElement options={CARD_ELEMENT_OPTIONS} />
                     </div>
                   </div>
                   <div>
-                    <label className="block text-[11px] text-[#64748B] mb-1 font-medium">Postal Code</label>
+                    <label className="block text-[11px] text-[#64748B] mb-1 font-medium">
+                      {(t as any)?.commonUI?.membershipsModal?.postalCode || "Postal Code"}
+                    </label>
                     <input
                       type="text"
                       placeholder="1012 AB"
@@ -1215,7 +1230,9 @@ function MembershipCheckoutModal({
               </div>
             ) : (
               <div className="space-y-2 pt-1">
-                <label className="block text-[11px] text-[#64748B] font-medium">Select Your Bank *</label>
+                <label className="block text-[11px] text-[#64748B] font-medium">
+                  {(t as any)?.commonUI?.membershipsModal?.selectBank || "Select Your Bank *"}
+                </label>
                 <select
                   value={selectedBank}
                   onChange={(e) => setSelectedBank(e.target.value)}
@@ -1233,7 +1250,7 @@ function MembershipCheckoutModal({
             {/* Trust Badge */}
             <div className="flex items-center justify-center gap-2 text-[11px] text-[#64748B] pt-1">
               <FaLock size={10} className="text-[#8B7355]" />
-              <span>256-Bit SSL Encrypted • Instant Activation</span>
+              <span>{(t as any)?.commonUI?.membershipsModal?.sslEncrypted || "256-Bit SSL Encrypted • Instant Activation"}</span>
             </div>
 
             {/* Submit Button */}
@@ -1243,7 +1260,7 @@ function MembershipCheckoutModal({
                 onClick={onClose}
                 className="px-6 py-3 rounded-xl border border-[#CBD5E1] text-[#64748B] hover:bg-[#F8FAFC] font-bold text-xs uppercase tracking-wider transition-all cursor-pointer"
               >
-                Cancel
+                {(t as any)?.commonUI?.membershipsModal?.cancel || "Cancel"}
               </button>
 
               <button
@@ -1254,7 +1271,7 @@ function MembershipCheckoutModal({
                 {isProcessing ? (
                   <>
                     <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                    <span>Processing...</span>
+                    <span>{(t as any)?.commonUI?.membershipsModal?.processing || "Processing..."}</span>
                   </>
                 ) : (
                   <>

@@ -372,17 +372,19 @@ export default function Footer() {
               {loadingPolicy ? (
                 <div className="py-16 text-center space-y-3">
                   <div className="w-6 h-6 border-2 border-[#8B7355] border-t-transparent rounded-full animate-spin mx-auto" />
-                  <p className="text-xs text-[#64748B]">Loading policy details...</p>
+                  <p className="text-xs text-[#64748B]">
+                    {(t as any)?.commonUI?.policies?.loading || "Loading policy details..."}
+                  </p>
                 </div>
               ) : activeTab === "privacy" ? (
                 <div className="space-y-5">
                   <div className="flex items-center justify-between pb-3 border-b border-[#E8E2DC]">
                     <h2 className="text-xl font-bold font-displayPlayFair text-[#1d1a17]">
-                      Privacy Policy
+                      {(t as any)?.commonUI?.policies?.privacyTitle || "Privacy Policy"}
                     </h2>
                     {privacyData?.effective_date && (
                       <span className="text-xs text-[#8B7355] bg-white px-3 py-1 rounded-full border border-[#E8E2DC] font-medium">
-                        Effective: {privacyData.effective_date}
+                        {((t as any)?.commonUI?.policies?.effective || "Effective: {date}").replace("{date}", privacyData.effective_date)}
                       </span>
                     )}
                   </div>
@@ -390,35 +392,45 @@ export default function Footer() {
                   <div className="space-y-4 text-[#334155]">
                     {privacyData?.info_we_collect && (
                       <div className="bg-white p-4 rounded-2xl border border-[#E8E2DC]">
-                        <h3 className="font-bold text-sm text-[#1d1a17] mb-1.5">1. Information We Collect</h3>
+                        <h3 className="font-bold text-sm text-[#1d1a17] mb-1.5">
+                          {(t as any)?.commonUI?.policies?.infoWeCollect || "1. Information We Collect"}
+                        </h3>
                         <p className="whitespace-pre-line text-xs text-[#475569]">{privacyData.info_we_collect}</p>
                       </div>
                     )}
 
                     {privacyData?.how_we_use_data && (
                       <div className="bg-white p-4 rounded-2xl border border-[#E8E2DC]">
-                        <h3 className="font-bold text-sm text-[#1d1a17] mb-1.5">2. How We Use Your Information</h3>
+                        <h3 className="font-bold text-sm text-[#1d1a17] mb-1.5">
+                          {(t as any)?.commonUI?.policies?.howWeUseData || "2. How We Use Your Information"}
+                        </h3>
                         <p className="whitespace-pre-line text-xs text-[#475569]">{privacyData.how_we_use_data}</p>
                       </div>
                     )}
 
                     {privacyData?.child_safety && (
                       <div className="bg-white p-4 rounded-2xl border border-[#E8E2DC]">
-                        <h3 className="font-bold text-sm text-[#1d1a17] mb-1.5">3. Child & Minor Safety</h3>
+                        <h3 className="font-bold text-sm text-[#1d1a17] mb-1.5">
+                          {(t as any)?.commonUI?.policies?.childSafety || "3. Child & Minor Safety"}
+                        </h3>
                         <p className="whitespace-pre-line text-xs text-[#475569]">{privacyData.child_safety}</p>
                       </div>
                     )}
 
                     {privacyData?.user_rights && (
                       <div className="bg-white p-4 rounded-2xl border border-[#E8E2DC]">
-                        <h3 className="font-bold text-sm text-[#1d1a17] mb-1.5">4. Your Data Protection Rights</h3>
+                        <h3 className="font-bold text-sm text-[#1d1a17] mb-1.5">
+                          {(t as any)?.commonUI?.policies?.userRights || "4. Your Data Protection Rights"}
+                        </h3>
                         <p className="whitespace-pre-line text-xs text-[#475569]">{privacyData.user_rights}</p>
                       </div>
                     )}
 
                     {privacyData?.security && (
                       <div className="bg-white p-4 rounded-2xl border border-[#E8E2DC]">
-                        <h3 className="font-bold text-sm text-[#1d1a17] mb-1.5">5. Data Security</h3>
+                        <h3 className="font-bold text-sm text-[#1d1a17] mb-1.5">
+                          {(t as any)?.commonUI?.policies?.security || "5. Data Security"}
+                        </h3>
                         <p className="whitespace-pre-line text-xs text-[#475569]">{privacyData.security}</p>
                       </div>
                     )}
@@ -428,11 +440,11 @@ export default function Footer() {
                 <div className="space-y-5">
                   <div className="flex items-center justify-between pb-3 border-b border-[#E8E2DC]">
                     <h2 className="text-xl font-bold font-displayPlayFair text-[#1d1a17]">
-                      Terms & Conditions
+                      {(t as any)?.commonUI?.policies?.termsTitle || "Terms & Conditions"}
                     </h2>
                     {termsData?.effective_date && (
                       <span className="text-xs text-[#8B7355] bg-white px-3 py-1 rounded-full border border-[#E8E2DC] font-medium">
-                        Effective: {termsData.effective_date}
+                        {((t as any)?.commonUI?.policies?.effective || "Effective: {date}").replace("{date}", termsData.effective_date)}
                       </span>
                     )}
                   </div>
@@ -440,42 +452,54 @@ export default function Footer() {
                   <div className="space-y-4 text-[#334155]">
                     {termsData?.acceptance_of_terms && (
                       <div className="bg-white p-4 rounded-2xl border border-[#E8E2DC]">
-                        <h3 className="font-bold text-sm text-[#1d1a17] mb-1.5">1. Acceptance of Terms</h3>
+                        <h3 className="font-bold text-sm text-[#1d1a17] mb-1.5">
+                          {(t as any)?.commonUI?.policies?.acceptanceOfTerms || "1. Acceptance of Terms"}
+                        </h3>
                         <p className="whitespace-pre-line text-xs text-[#475569]">{termsData.acceptance_of_terms}</p>
                       </div>
                     )}
 
                     {termsData?.user_responsibilities && (
                       <div className="bg-white p-4 rounded-2xl border border-[#E8E2DC]">
-                        <h3 className="font-bold text-sm text-[#1d1a17] mb-1.5">2. Guest Responsibilities & Conduct</h3>
+                        <h3 className="font-bold text-sm text-[#1d1a17] mb-1.5">
+                          {(t as any)?.commonUI?.policies?.userResponsibilities || "2. Guest Responsibilities & Conduct"}
+                        </h3>
                         <p className="whitespace-pre-line text-xs text-[#475569]">{termsData.user_responsibilities}</p>
                       </div>
                     )}
 
                     {termsData?.ticket_purchase && (
                       <div className="bg-white p-4 rounded-2xl border border-[#E8E2DC]">
-                        <h3 className="font-bold text-sm text-[#1d1a17] mb-1.5">3. Bookings, Passes & Payments</h3>
+                        <h3 className="font-bold text-sm text-[#1d1a17] mb-1.5">
+                          {(t as any)?.commonUI?.policies?.ticketPurchase || "3. Bookings, Passes & Payments"}
+                        </h3>
                         <p className="whitespace-pre-line text-xs text-[#475569]">{termsData.ticket_purchase}</p>
                       </div>
                     )}
 
                     {termsData?.refund_policy && (
                       <div className="bg-white p-4 rounded-2xl border border-[#E8E2DC]">
-                        <h3 className="font-bold text-sm text-[#1d1a17] mb-1.5">4. Cancellation & Refund Policy</h3>
+                        <h3 className="font-bold text-sm text-[#1d1a17] mb-1.5">
+                          {(t as any)?.commonUI?.policies?.refundPolicy || "4. Cancellation & Refund Policy"}
+                        </h3>
                         <p className="whitespace-pre-line text-xs text-[#475569]">{termsData.refund_policy}</p>
                       </div>
                     )}
 
                     {termsData?.limitation_of_liability && (
                       <div className="bg-white p-4 rounded-2xl border border-[#E8E2DC]">
-                        <h3 className="font-bold text-sm text-[#1d1a17] mb-1.5">5. Limitation of Liability</h3>
+                        <h3 className="font-bold text-sm text-[#1d1a17] mb-1.5">
+                          {(t as any)?.commonUI?.policies?.limitationOfLiability || "5. Limitation of Liability"}
+                        </h3>
                         <p className="whitespace-pre-line text-xs text-[#475569]">{termsData.limitation_of_liability}</p>
                       </div>
                     )}
 
                     {termsData?.changes_to_terms && (
                       <div className="bg-white p-4 rounded-2xl border border-[#E8E2DC]">
-                        <h3 className="font-bold text-sm text-[#1d1a17] mb-1.5">6. Modifications to Terms</h3>
+                        <h3 className="font-bold text-sm text-[#1d1a17] mb-1.5">
+                          {(t as any)?.commonUI?.policies?.changesToTerms || "6. Modifications to Terms"}
+                        </h3>
                         <p className="whitespace-pre-line text-xs text-[#475569]">{termsData.changes_to_terms}</p>
                       </div>
                     )}

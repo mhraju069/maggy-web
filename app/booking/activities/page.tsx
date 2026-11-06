@@ -386,7 +386,7 @@ export default function ActivitiesBookingPage() {
                   {/* Price & Selection Indicator */}
                   <div className="flex justify-between items-center pt-3 border-t border-[#F1F5F9]">
                     <span className="text-2xl font-bold font-displayPlayFair text-[#8B7355]">
-                      €{act.price} <span className="text-xs text-[#64748B] font-normal">/ person</span>
+                      €{act.price} <span className="text-xs text-[#64748B] font-normal">{(t as any)?.commonUI?.perPerson || "/ person"}</span>
                     </span>
 
                     <div

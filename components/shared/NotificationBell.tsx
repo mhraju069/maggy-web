@@ -17,6 +17,7 @@ import {
   NotificationItem,
 } from "@/lib/api/services/notificationService";
 import BookingDetailsModal, { BookingModalData } from "./BookingDetailsModal";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
 
 interface NotificationBellProps {
   className?: string;
@@ -25,6 +26,8 @@ interface NotificationBellProps {
 
 export default function NotificationBell({ className = "", scope }: NotificationBellProps) {
   const router = useRouter();
+  const { t } = useLanguage();
+  const notifTrans = (t as any)?.commonUI?.notifications || {};
   const [isOpen, setIsOpen] = useState(false);
   const [unreadCount, setUnreadCount] = useState<number>(0);
   const [notifications, setNotifications] = useState<NotificationItem[]>([]);
@@ -312,10 +315,10 @@ export default function NotificationBell({ className = "", scope }: Notification
           {/* Header */}
           <div className="p-4 border-b border-[#F1EDE8] flex items-center justify-between bg-white">
             <div className="flex items-center gap-2">
-              <h3 className="font-semibold text-[#1d1a17] text-base">Notifications</h3>
+              <h3 className="font-semibold text-[#1d1a17] text-base">{notifTrans.title || "Notifications"}</h3>
               {unreadCount > 0 && (
                 <span className="bg-[#CFB9A3]/20 text-[#8B6E4E] text-xs font-semibold px-2 py-0.5 rounded-full">
-                  {unreadCount} new
+                  {(notifTrans.newCount || "{count} new").replace("{count}", String(unreadCount))}
                 </span>
               )}
             </div>
@@ -325,7 +328,7 @@ export default function NotificationBell({ className = "", scope }: Notification
                 className="text-xs text-[#8B6E4E] hover:text-[#72573a] font-medium flex items-center gap-1 hover:underline cursor-pointer"
               >
                 <HiOutlineCheck className="w-3.5 h-3.5" />
-                Mark all as read
+                {notifTrans.markAllAsRead || "Mark all as read"}
               </button>
             )}
           </div>
@@ -340,7 +343,7 @@ export default function NotificationBell({ className = "", scope }: Notification
                   : "border-transparent text-[#64748B] hover:text-[#1d1a17]"
               }`}
             >
-              All ({notifications.length})
+              {notifTrans.all || "All"} ({notifications.length})
             </button>
             <button
               onClick={() => setFilter("unread")}
@@ -350,7 +353,7 @@ export default function NotificationBell({ className = "", scope }: Notification
                   : "border-transparent text-[#64748B] hover:text-[#1d1a17]"
               }`}
             >
-              Unread ({unreadCount})
+              {notifTrans.unread || "Unread"} ({unreadCount})
             </button>
           </div>
 
@@ -359,14 +362,14 @@ export default function NotificationBell({ className = "", scope }: Notification
             {loading && notifications.length === 0 ? (
               <div className="py-12 flex flex-col items-center justify-center text-[#94A3B8]">
                 <div className="w-6 h-6 border-2 border-[#CFB9A3] border-t-transparent rounded-full animate-spin mb-2" />
-                <span className="text-xs">Loading notifications...</span>
+                <span className="text-xs">{notifTrans.loading || "Loading notifications..."}</span>
               </div>
             ) : displayedNotifications.length === 0 ? (
               <div className="py-12 px-4 flex flex-col items-center justify-center text-center text-[#94A3B8]">
                 <HiOutlineInbox className="w-10 h-10 mb-2 stroke-1 text-[#CBD5E1]" />
-                <p className="text-sm font-medium text-[#64748B]">No notifications found</p>
+                <p className="text-sm font-medium text-[#64748B]">{notifTrans.emptyTitle || "No notifications found"}</p>
                 <p className="text-xs text-[#94A3B8] mt-1">
-                  {filter === "unread" ? "You have read all your notifications." : "You're all caught up!"}
+                  {filter === "unread" ? (notifTrans.allReadMsg || "You have read all your notifications.") : (notifTrans.allCaughtUp || "You're all caught up!")}
                 </p>
               </div>
             ) : (
@@ -421,7 +424,7 @@ export default function NotificationBell({ className = "", scope }: Notification
 
                     {item.link && (
                       <div className="mt-2 flex items-center gap-1 text-[11px] text-[#8B6E4E] font-medium">
-                        <span>View details</span>
+                        <span>{notifTrans.viewDetails || "View details"}</span>
                         <HiOutlineExternalLink className="w-3 h-3" />
                       </div>
                     )}
@@ -431,7 +434,7 @@ export default function NotificationBell({ className = "", scope }: Notification
                   {!item.is_read && (
                     <button
                       onClick={(e) => handleMarkAsRead(item, e)}
-                      title="Mark as read"
+                      title={notifTrans.markAllAsRead || "Mark as read"}
                       className="opacity-0 group-hover:opacity-100 p-1 hover:bg-[#E8E2DC] rounded text-[#64748B] hover:text-[#1d1a17] transition-all cursor-pointer"
                     >
                       <HiOutlineCheck className="w-3.5 h-3.5" />
@@ -445,7 +448,7 @@ export default function NotificationBell({ className = "", scope }: Notification
           {/* Footer */}
           <div className="p-2.5 border-t border-[#F1EDE8] bg-[#FAF7F4] text-center">
             <span className="text-[11px] text-[#94A3B8]">
-              {isWsConnected ? "● Real-time updates active" : "○ Real-time connecting..."}
+              {isWsConnected ? (notifTrans.realtimeActive || "● Real-time updates active") : (notifTrans.realtimeConnecting || "○ Real-time connecting...")}
             </span>
           </div>
         </div>
