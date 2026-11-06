@@ -713,7 +713,7 @@ function InnerPaymentForm({
             ) : (
               <>
                 <BiLockAlt size={18} />
-                <span>{pt.buttons.confirmAndPay.replace("{amount}", formattedAmount)}</span>
+                <span>{pt.buttons.confirmAndPay}</span>
               </>
             )}
           </button>

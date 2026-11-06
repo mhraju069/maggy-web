@@ -125,7 +125,7 @@ export const paymentTranslations: Record<Language, PaymentTranslations> = {
     totalAmountDue: "Total Amount Due",
     buttons: {
       confirmBookingCredit: "Confirm Booking (Deduct Session)",
-      confirmAndPay: "Confirm & Pay {amount}",
+      confirmAndPay: "Confirm & Pay",
       confirmingBooking: "Confirming Booking...",
     },
     errors: {
@@ -213,7 +213,7 @@ export const paymentTranslations: Record<Language, PaymentTranslations> = {
     totalAmountDue: "Totaalbedrag",
     buttons: {
       confirmBookingCredit: "Boeking Bevestigen (Sessie Afschrijven)",
-      confirmAndPay: "Bevestigen & Betalen {amount}",
+      confirmAndPay: "Bevestigen & Betalen",
       confirmingBooking: "Boeking Bevestigen...",
     },
     errors: {
@@ -301,7 +301,7 @@ export const paymentTranslations: Record<Language, PaymentTranslations> = {
     totalAmountDue: "Gesamtbetrag",
     buttons: {
       confirmBookingCredit: "Buchung Bestätigen (Guthaben Abbuchen)",
-      confirmAndPay: "Bestätigen & Zahlen {amount}",
+      confirmAndPay: "Bestätigen & Zahlen",
       confirmingBooking: "Buchung wird bestätigt...",
     },
     errors: {
