@@ -298,17 +298,17 @@ export default function SaltRoomBookingPage() {
   // Resolve membership objects from both new API (weekly_subscription, unlimited_subscription, pass) and existing API
   const weeklySubObj = userMembership?.weekly_subscription || (
     (userMembership?.subscription?.plan_type?.toLowerCase() === "weekly" ||
-     userMembership?.subscription?.type?.toLowerCase() === "weekly" ||
-     userMembership?.subscription?.name?.toLowerCase().includes("week"))
+      userMembership?.subscription?.type?.toLowerCase() === "weekly" ||
+      userMembership?.subscription?.name?.toLowerCase().includes("week"))
       ? userMembership.subscription
       : null
   );
 
   const unlimitedSubObj = userMembership?.unlimited_subscription || (
     (userMembership?.subscription?.plan_type?.toLowerCase() === "unlimited" ||
-     userMembership?.subscription?.type?.toLowerCase() === "unlimited" ||
-     userMembership?.subscription?.is_unlimited ||
-     userMembership?.subscription?.name?.toLowerCase().includes("unlimited"))
+      userMembership?.subscription?.type?.toLowerCase() === "unlimited" ||
+      userMembership?.subscription?.is_unlimited ||
+      userMembership?.subscription?.name?.toLowerCase().includes("unlimited"))
       ? userMembership.subscription
       : null
   );
@@ -481,7 +481,7 @@ export default function SaltRoomBookingPage() {
           <div className="w-16 h-16 bg-[#FCF2E9] rounded-2xl flex items-center justify-center mx-auto mb-4 text-[#8B7355]">
             <FaSpa className="w-8 h-8" />
           </div>
-          <h3 className="text-2xl font-bold font-displayPlayFair text-[#0F172A] mb-2">
+          <h3 className="text-xl md:text-2xl font-bold font-displayPlayFair text-[#0F172A] mb-2">
             No Service Available
           </h3>
           <p className="text-sm text-[#64748B] font-cambria italic">
@@ -571,7 +571,7 @@ export default function SaltRoomBookingPage() {
       )}
 
       {/* ── Key Parameters Banner ── */}
-      <div className="mb-10 bg-white rounded-2xl p-6 border border-[#E8E2DC] shadow-xs grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
+      <div className="mb-10 rounded-2xl grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
         <div className="p-4 rounded-xl bg-[#FCF2E9] border border-[#E8E2DC]">
           <span className="text-xs text-[#8B7355] font-bold uppercase tracking-wider block mb-1">
             {saltTrans?.maxCapacity || "Max Capacity"}
@@ -608,7 +608,7 @@ export default function SaltRoomBookingPage() {
       </div>
 
       {/* ── Main Options Grid ── */}
-      <div className="bg-white rounded-[32px] p-8 md:p-10 shadow-sm border border-[#E8E2DC] space-y-10 mb-10">
+      <div className="space-y-10 mb-10">
         {/* ── 1. Date Selection (Picker) ── */}
         <div>
           <div className="mb-3 flex flex-col items-start gap-1 sm:flex-row sm:items-center sm:justify-between">
@@ -625,9 +625,8 @@ export default function SaltRoomBookingPage() {
               value={date}
               min={new Date().toISOString().split("T")[0]}
               onChange={(e) => handleDateChange(e.target.value)}
-              className={`w-full p-4 border rounded-xl focus:outline-none focus:ring-2 focus:ring-[#D1B191] text-[#0F172A] bg-white cursor-pointer font-medium ${
-                isDateBlocked ? "border-rose-400 bg-rose-50/20" : "border-[#E2E8F0]"
-              }`}
+              className={`w-full p-4 border rounded-xl focus:outline-none focus:ring-2 focus:ring-[#D1B191] text-[#0F172A] bg-white cursor-pointer font-medium ${isDateBlocked ? "border-rose-400 bg-rose-50/20" : "border-[#E2E8F0]"
+                }`}
             />
             {loadingDateSlots && (
               <span className="absolute right-12 top-4 text-xs text-[#8B7355] italic flex items-center gap-1">
@@ -664,7 +663,7 @@ export default function SaltRoomBookingPage() {
         {/* ── 2. Select Booking Option or Membership ── */}
         <div>
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
-            <label className="block text-sm font-bold text-[#0F172A] uppercase tracking-wider" style={{ fontFamily: "Inter, sans-serif" }}>
+            <label className="block text-xl  font-bold text-[#0F172A] uppercase tracking-wider" style={{ fontFamily: "Inter, sans-serif" }}>
               {saltTrans?.selectBookingOption || "2. Select Booking Option or Membership"}
             </label>
             {!date && (
@@ -677,7 +676,7 @@ export default function SaltRoomBookingPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {saltOptions.map((opt) => {
               const isSelected = selectedOption === opt.id;
-              
+
               // Check if option is disabled due to user membership limits on this date
               let isOptionDisabledForDate = false;
               let unavailableReasonText: string | null = null;
@@ -711,17 +710,16 @@ export default function SaltRoomBookingPage() {
                   type="button"
                   disabled={isButtonDisabled}
                   onClick={() => !isButtonDisabled && setSelectedOption(opt.id)}
-                  className={`p-6 rounded-2xl border transition-all text-left flex flex-col justify-between ${
-                    !date
-                      ? "opacity-50 cursor-not-allowed bg-gray-50 border-gray-200"
-                      : isDateBlocked
+                  className={`p-6 rounded-2xl border transition-all text-left flex flex-col justify-between ${!date
+                    ? "opacity-50 cursor-not-allowed bg-gray-50 border-gray-200"
+                    : isDateBlocked
                       ? "opacity-50 cursor-not-allowed bg-gray-50 border-gray-200"
                       : isOptionDisabledForDate
-                      ? "opacity-60 cursor-not-allowed bg-amber-50/40 border-amber-200"
-                      : isSelected
-                      ? "bg-[#FCF2E9] border-[#8B7355] shadow-md ring-2 ring-[#8B7355]/20"
-                      : "bg-white border-[#E2E8F0] hover:border-[#D1B191]"
-                  }`}
+                        ? "opacity-60 cursor-not-allowed bg-amber-50/40 border-amber-200"
+                        : isSelected
+                          ? "bg-[#FCF2E9] border-[#8B7355] shadow-md ring-2 ring-[#8B7355]/20"
+                          : "bg-white border-[#E2E8F0] hover:border-[#D1B191]"
+                    }`}
                 >
                   <div>
                     <div className="flex items-center justify-between mb-2">
@@ -739,9 +737,8 @@ export default function SaltRoomBookingPage() {
                           </span>
                         ) : null}
                         <div
-                          className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${
-                            isSelected && !isButtonDisabled ? "border-[#8B7355] bg-[#8B7355] text-white" : "border-[#CBD5E1]"
-                          }`}
+                          className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${isSelected && !isButtonDisabled ? "border-[#8B7355] bg-[#8B7355] text-white" : "border-[#CBD5E1]"
+                            }`}
                         >
                           {isSelected && !isButtonDisabled && <BiCheckCircle size={16} />}
                         </div>
@@ -793,10 +790,8 @@ export default function SaltRoomBookingPage() {
         {/* ── 3. Guest Count Selector ── */}
         <div>
           <div className="flex justify-between items-center mb-4">
-            <label className="block text-sm font-bold text-[#0F172A] uppercase tracking-wider" style={{ fontFamily: "Inter, sans-serif" }}>
-              {saltTrans?.numberOfGuests
-                ? saltTrans.numberOfGuests.replace("{max}", String(dynamicMaxCapacity))
-                : `3. Number of Guests (Maximum ${dynamicMaxCapacity} ${dynamicMaxCapacity === 1 ? "person" : "people"} per session)`}
+            <label className="block text-xl  font-bold text-[#0F172A] uppercase tracking-wider" style={{ fontFamily: "Inter, sans-serif" }}>
+               Number of Guests
             </label>
             <span className="text-xs font-semibold text-[#8B7355]">
               {saltTrans?.strictCapacity
@@ -816,13 +811,12 @@ export default function SaltRoomBookingPage() {
                     ? null
                     : setGuestsCount(num)
                 }
-                className={`py-4 rounded-xl border font-bold text-center transition-all ${
-                  !date || isDateBlocked || (selectedOption !== "single" && num > 1)
-                    ? "opacity-50 cursor-not-allowed bg-gray-50 border-gray-200 text-[#94A3B8]"
-                    : guestsCount === num
+                className={`py-4 rounded-xl border font-bold text-center transition-all ${!date || isDateBlocked || (selectedOption !== "single" && num > 1)
+                  ? "opacity-50 cursor-not-allowed bg-gray-50 border-gray-200 text-[#94A3B8]"
+                  : guestsCount === num
                     ? "bg-[#8B7355] border-[#8B7355] text-white shadow-md scale-[1.02]"
                     : "bg-white border-[#E2E8F0] text-[#475569] hover:border-[#D1B191]"
-                }`}
+                  }`}
               >
                 <span className="block text-xl font-displayPlayFair">
                   {num === 1
@@ -833,8 +827,8 @@ export default function SaltRoomBookingPage() {
                   {selectedOption === "single"
                     ? `€${(num * singlePriceNum).toFixed(0)}`
                     : isSelectedOptionCovered
-                    ? (saltTrans?.coveredZero || "Covered (€0)")
-                    : (saltTrans?.includedInPlan || "Included in plan")}
+                      ? (saltTrans?.coveredZero || "Covered (€0)")
+                      : (saltTrans?.includedInPlan || "Included in plan")}
                 </span>
               </button>
             ))}
@@ -857,10 +851,10 @@ export default function SaltRoomBookingPage() {
                 {isSelectedOptionCovered
                   ? (saltTrans?.coveredActiveNote || "✓ Active subscription / pass detected & valid — €0 due today.")
                   : selectedOption === "single"
-                  ? (saltTrans?.standardPriceNote
+                    ? (saltTrans?.standardPriceNote
                       ? saltTrans.standardPriceNote.replace("{price}", singlePriceNum.toFixed(0)).replace("{count}", String(guestsCount))
                       : `€${singlePriceNum.toFixed(0)} × ${guestsCount} guest(s)`)
-                  : (saltTrans?.noMembershipNote || "No active membership for this option — standard price applies.")}
+                    : (saltTrans?.noMembershipNote || "No active membership for this option — standard price applies.")}
               </p>
             </div>
 
@@ -874,10 +868,10 @@ export default function SaltRoomBookingPage() {
                     €{selectedOption === "single"
                       ? (guestsCount * singlePriceNum).toFixed(0)
                       : selectedOption === "10_session_pass"
-                      ? (parseFloat(String(sessionPass?.price || 0)) || 0).toFixed(0)
-                      : selectedOption === "once_a_week"
-                      ? (parseFloat(String(weeklyPlan?.price || 0)) || 0).toFixed(0)
-                      : (parseFloat(String(unlimitedPlan?.price || 0)) || 0).toFixed(0)}
+                        ? (parseFloat(String(sessionPass?.price || 0)) || 0).toFixed(0)
+                        : selectedOption === "once_a_week"
+                          ? (parseFloat(String(weeklyPlan?.price || 0)) || 0).toFixed(0)
+                          : (parseFloat(String(unlimitedPlan?.price || 0)) || 0).toFixed(0)}
                   </span>
                 )}
                 <span className="text-4xl font-bold font-displayPlayFair text-[#8B7355]">
@@ -907,20 +901,19 @@ export default function SaltRoomBookingPage() {
           type="button"
           disabled={!date || isDateBlocked}
           onClick={handleContinue}
-          className={`w-full sm:w-auto justify-center px-6 sm:px-10 py-3.5 sm:py-4 rounded-xl font-bold text-sm flex items-center gap-3 transition-all ${
-            !date || isDateBlocked
-              ? "bg-[#E2E8F0] text-[#94A3B8] border border-[#CBD5E1] cursor-not-allowed shadow-none opacity-80"
-              : "bg-[#8B7355] hover:bg-[#786247] text-white shadow-md hover:shadow-lg transform hover:-translate-y-0.5 cursor-pointer"
-          }`}
+          className={`w-full sm:w-auto justify-center px-6 sm:px-10 py-3.5 sm:py-4 rounded-xl font-bold text-sm flex items-center gap-3 transition-all ${!date || isDateBlocked
+            ? "bg-[#E2E8F0] text-[#94A3B8] border border-[#CBD5E1] cursor-not-allowed shadow-none opacity-80"
+            : "bg-[#8B7355] hover:bg-[#786247] text-white shadow-md hover:shadow-lg transform hover:-translate-y-0.5 cursor-pointer"
+            }`}
           style={{ fontFamily: "Inter, sans-serif" }}
         >
           {!date
             ? (saltTrans?.btnSelectDatePrompt || "Please Select a Date to Continue")
             : isDateBlocked
-            ? (saltTrans?.btnDateBlocked || "Date Blocked — Select Another Date")
-            : isSelectedOptionCovered
-            ? (saltTrans?.btnBookFree || "Book with Membership / Pass (Free)")
-            : (saltTrans?.btnContinueToTime || "Continue to Choose Time")}
+              ? (saltTrans?.btnDateBlocked || "Date Blocked — Select Another Date")
+              : isSelectedOptionCovered
+                ? (saltTrans?.btnBookFree || "Book with Membership / Pass (Free)")
+                : (saltTrans?.btnContinueToTime || "Continue to Choose Time")}
           {date && !isDateBlocked && (
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
               <line x1="5" y1="12" x2="19" y2="12"></line>

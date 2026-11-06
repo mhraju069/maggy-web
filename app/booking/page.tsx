@@ -82,22 +82,22 @@ export default function BookingPage() {
               language === "nl"
                 ? item.title_nl || item.title
                 : language === "de"
-                ? item.title_de || item.title
-                : item.title_en || item.title;
+                  ? item.title_de || item.title
+                  : item.title_en || item.title;
 
             const localizedSubtitle =
               language === "nl"
                 ? item.subtitle_nl || item.subtitle || item.slogan || ""
                 : language === "de"
-                ? item.subtitle_de || item.subtitle || item.slogan || ""
-                : item.subtitle_en || item.subtitle || item.slogan || "";
+                  ? item.subtitle_de || item.subtitle || item.slogan || ""
+                  : item.subtitle_en || item.subtitle || item.slogan || "";
 
             const localizedDesc =
               language === "nl"
                 ? item.description_nl || item.description || ""
                 : language === "de"
-                ? item.description_de || item.description || ""
-                : item.description_en || item.description || "";
+                  ? item.description_de || item.description || ""
+                  : item.description_en || item.description || "";
 
             return {
               id: item.id || item.type,
@@ -168,7 +168,7 @@ export default function BookingPage() {
           <div className="w-14 h-14 sm:w-16 sm:h-16 bg-[#FCF2E9] rounded-2xl flex items-center justify-center mx-auto mb-4 text-[#8B7355]">
             <FaSpa className="w-7 h-7 sm:w-8 sm:h-8" />
           </div>
-          <h3 className="text-xl sm:text-2xl font-bold font-displayPlayFair text-[#0F172A] mb-2">
+          <h3 className="text-xl sm:text-xl md:text-2xl font-bold font-displayPlayFair text-[#0F172A] mb-2">
             No Services Available
           </h3>
           <p className="text-sm text-[#64748B] font-cambria italic">

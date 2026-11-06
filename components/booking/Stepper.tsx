@@ -22,7 +22,7 @@ const Stepper: React.FC<StepperProps> = ({ activeStep }) => {
   return (
     <div className="mx-auto container px-4 sm:px-6 py-4 sm:py-8">
       {/* Mobile view (< sm) */}
-      <div className="sm:hidden bg-white rounded-2xl border border-[#E8E2DC] shadow-sm p-4">
+      <div className="sm:hidden rounded-2xl">
         <div className="flex items-center justify-between mb-3">
           <span className="text-xs font-semibold uppercase tracking-wider text-[#D1B191]">
             Step {activeStep} of {steps.length}
@@ -55,7 +55,7 @@ const Stepper: React.FC<StepperProps> = ({ activeStep }) => {
       </div>
 
       {/* Desktop / Tablet view (>= sm) */}
-      <div className="hidden sm:block bg-white rounded-[24px] border border-[#E8E2DC] shadow-sm p-6 lg:p-10">
+      <div className="hidden sm:block rounded-[24px]  p-6 lg:p-10">
         <div className="flex justify-between items-center">
           {steps.map((step, index) => {
             const isActive = activeStep === step.id;

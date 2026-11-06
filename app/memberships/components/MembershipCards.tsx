@@ -200,7 +200,7 @@ const MembershipCards = () => {
     }
   }, []);
 
-  
+
   const getLocalizedName = (item: any) => {
     if (!item) return "";
     if (language === "nl") return item.name_nl || item.name || item.name_en || "";
@@ -1076,7 +1076,7 @@ function MembershipCheckoutModal({
                 <BiShieldQuarter size={14} />
                 <span>{(t as any)?.commonUI?.membershipsModal?.checkoutTitle || "Secure Membership Checkout"}</span>
               </div>
-              <h3 className="text-2xl font-bold font-displayPlayFair text-[#0F172A]">
+              <h3 className="text-xl md:text-2xl font-bold font-displayPlayFair text-[#0F172A]">
                 Activate {selectedPlan.name}
               </h3>
               <p className="text-xs text-[#64748B] mt-1">
@@ -1149,8 +1149,8 @@ function MembershipCheckoutModal({
                   type="button"
                   onClick={() => setPaymentMethod("card")}
                   className={`p-3.5 rounded-xl border flex items-center justify-center gap-2 text-xs font-bold transition-all cursor-pointer ${paymentMethod === "card"
-                      ? "bg-[#FCF2E9] border-[#8B7355] text-[#8B7355] shadow-xs"
-                      : "bg-white border-[#E2E8F0] text-[#64748B] hover:border-[#CBD5E1]"
+                    ? "bg-[#FCF2E9] border-[#8B7355] text-[#8B7355] shadow-xs"
+                    : "bg-white border-[#E2E8F0] text-[#64748B] hover:border-[#CBD5E1]"
                     }`}
                 >
                   <FaCreditCard size={14} />
@@ -1161,8 +1161,8 @@ function MembershipCheckoutModal({
                   type="button"
                   onClick={() => setPaymentMethod("ideal")}
                   className={`p-3.5 rounded-xl border flex items-center justify-center gap-2 text-xs font-bold transition-all cursor-pointer ${paymentMethod === "ideal"
-                      ? "bg-[#FCF2E9] border-[#8B7355] text-[#8B7355] shadow-xs"
-                      : "bg-white border-[#E2E8F0] text-[#64748B] hover:border-[#CBD5E1]"
+                    ? "bg-[#FCF2E9] border-[#8B7355] text-[#8B7355] shadow-xs"
+                    : "bg-white border-[#E2E8F0] text-[#64748B] hover:border-[#CBD5E1]"
                     }`}
                 >
                   <MdOutlinePayments size={16} />

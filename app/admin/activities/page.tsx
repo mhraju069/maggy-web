@@ -137,11 +137,10 @@ export default function AdminActivitiesPage() {
             <button
               key={type}
               onClick={() => setFilterType(type)}
-              className={`px-4 py-2 rounded-xl text-xs font-bold capitalize transition-all ${
-                filterType === type
+              className={`px-4 py-2 rounded-xl text-xs font-bold capitalize transition-all ${filterType === type
                   ? "bg-[#8B7355] text-white"
                   : "bg-[#F8FAFC] text-[#64748B] hover:bg-[#F1F5F9]"
-              }`}
+                }`}
             >
               {type === "all" ? "All Activities" : type === "recurring" ? "Recurring Classes" : "One-Time Events"}
             </button>
@@ -166,9 +165,8 @@ export default function AdminActivitiesPage() {
                   {act.category}
                 </span>
                 <span
-                  className={`px-2.5 py-0.5 text-[10px] font-bold rounded-full ${
-                    act.isRecurring ? "bg-blue-100 text-blue-700" : "bg-purple-100 text-purple-700"
-                  }`}
+                  className={`px-2.5 py-0.5 text-[10px] font-bold rounded-full ${act.isRecurring ? "bg-blue-100 text-blue-700" : "bg-purple-100 text-purple-700"
+                    }`}
                 >
                   {act.isRecurring ? "Recurring" : "One-Time"}
                 </span>
@@ -227,7 +225,7 @@ export default function AdminActivitiesPage() {
         <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
           <div className="bg-white rounded-3xl max-w-2xl w-full p-8 shadow-2xl border border-[#E8E2DC] space-y-6 my-8">
             <div className="flex justify-between items-center pb-4 border-b border-[#E8E2DC]">
-              <h2 className="text-2xl font-bold font-displayPlayFair text-[#0F172A]">
+              <h2 className="text-xl md:text-2xl font-bold font-displayPlayFair text-[#0F172A]">
                 {editingId ? "Edit Activity / Class" : "Create New Activity / Event"}
               </h2>
               <button

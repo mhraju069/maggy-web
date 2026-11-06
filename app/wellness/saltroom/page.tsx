@@ -148,7 +148,7 @@ export default function SaltRoomPage() {
                 {t.saltRoomPage.sanctuary.badge}
               </span>
             )}
-     
+
             <h2 className="text-4xl md:text-5xl font-bold font-displayPlayFair text-[#0F172A] mb-6">
               {t.saltRoomPage?.sanctuary?.title || "A breath of fresh air for your body and mind."}
             </h2>
@@ -286,7 +286,7 @@ export default function SaltRoomPage() {
                 <span className="text-xs font-bold text-[#8B7355] uppercase tracking-wider block mb-1">
                   {t.saltRoomPage?.memberships?.passBadge || "Session Pass"}
                 </span>
-                <h3 className="text-2xl font-bold font-displayPlayFair text-[#0F172A] mb-2">
+                <h3 className="text-xl md:text-2xl font-bold font-displayPlayFair text-[#0F172A] mb-2">
                   {sessionPass?.name || "10-Session Pass"}
                 </h3>
                 <div className="flex items-baseline gap-2 mb-4">
@@ -341,7 +341,7 @@ export default function SaltRoomPage() {
                 <span className="text-xs font-bold text-[#8B7355] uppercase tracking-wider block mb-1">
                   {t.saltRoomPage?.memberships?.weeklyBadge || "Weekly Membership"}
                 </span>
-                <h3 className="text-2xl font-bold font-displayPlayFair text-[#0F172A] mb-2">
+                <h3 className="text-xl md:text-2xl font-bold font-displayPlayFair text-[#0F172A] mb-2">
                   {saltWeekly?.name || "Once-a-Week"}
                 </h3>
                 <div className="flex items-baseline gap-2 mb-4">

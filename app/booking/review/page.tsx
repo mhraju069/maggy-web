@@ -99,7 +99,7 @@ export default function ReviewPage() {
   };
 
   return (
-    <div className="w-full px-6 md:px-12">
+    <div className="w-full  md:px-12">
       {/* ── Title Section ── */}
       <div className="text-center mb-16 flex flex-col items-center">
         <h1 className="font-displayPlayFair text-3xl sm:text-5xl text-[#1d1a17] mb-2 leading-tight break-words">
@@ -112,7 +112,7 @@ export default function ReviewPage() {
       </div>
 
       {/* ── Content Card ── */}
-      <div className="max-w-4xl mx-auto bg-white rounded-[32px] overflow-hidden shadow-sm border border-[#E8E2DC]">
+      <div className="max-w-4xl mx-auto ">
         <div className="p-5 sm:p-10 space-y-8 sm:space-y-10">
           {/* Services Information */}
           <section>

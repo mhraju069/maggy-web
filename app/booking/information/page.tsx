@@ -138,7 +138,7 @@ export default function InformationPage() {
     if (isPkg && data.packageSelections?.lunchroomTime && !sameDayIsBlocked) {
       setPkgLunchroomTime(data.packageSelections.lunchroomTime);
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const fetchLunchroomSlots = useCallback(async (selectedDate: string) => {
@@ -269,8 +269,8 @@ export default function InformationPage() {
   const isFormValid = isLunchroom
     ? Boolean(formData.name && formData.email && formData.phone && date && lunchroomArrivalTimes.includes(timeSlot) && !lunchroomIsClosed && !lunchroomIsBlocked && !loadingSlots)
     : isPackage && hasPackageLunchroom
-    ? Boolean(formData.name && formData.email && formData.phone && lunchroomArrivalTimes.includes(pkgLunchroomTime) && !lunchroomIsClosed && !lunchroomIsBlocked && !loadingSlots)
-    : Boolean(formData.name && formData.email && formData.phone);
+      ? Boolean(formData.name && formData.email && formData.phone && lunchroomArrivalTimes.includes(pkgLunchroomTime) && !lunchroomIsClosed && !lunchroomIsBlocked && !loadingSlots)
+      : Boolean(formData.name && formData.email && formData.phone);
 
   return (
     <div className="w-full px-6 md:px-12">
@@ -290,7 +290,7 @@ export default function InformationPage() {
         {/* Table Reservation Details Card (Lunchroom Only) */}
         {/* Standalone Lunchroom Table Reservation Details Card */}
         {isLunchroom && (
-          <div className="bg-white rounded-[32px] p-10 shadow-sm border border-[#E8E2DC]">
+          <div className="">
             <h2
               className="text-xs font-bold text-[#64748B] uppercase tracking-[0.2em] mb-6"
               style={{ fontFamily: "Inter, sans-serif" }}
@@ -299,11 +299,10 @@ export default function InformationPage() {
             </h2>
 
             {/* Opening Hours Banner */}
-            <div className={`mb-6 p-4 rounded-2xl border flex flex-col md:flex-row md:items-center justify-between gap-3 text-xs ${
-              lunchroomIsBlocked || lunchroomIsClosed
-                ? "bg-red-50 border-red-200 text-red-900"
-                : "bg-[#FCF2E9]/70 border-[#E8E2DC]/80 text-[#8B7355]"
-            }`}>
+            <div className={`mb-6 p-4 rounded-2xl border flex flex-col md:flex-row md:items-center justify-between gap-3 text-xs ${lunchroomIsBlocked || lunchroomIsClosed
+              ? "bg-red-50 border-red-200 text-red-900"
+              : "bg-[#FCF2E9]/70 border-[#E8E2DC]/80 text-[#8B7355]"
+              }`}>
               <div className="flex items-center gap-2">
                 <BiTimeFive className={`text-lg flex-shrink-0 ${lunchroomIsBlocked || lunchroomIsClosed ? "text-red-700" : ""}`} />
                 {loadingSlots ? (
@@ -427,7 +426,7 @@ export default function InformationPage() {
 
         {/* Package Lunchroom Arrival Time Card */}
         {isPackage && hasPackageLunchroom && (
-          <div className="bg-white rounded-[32px] p-10 shadow-sm border border-[#E8E2DC]">
+          <div className="">
             <h2
               className="text-xs font-bold text-[#64748B] uppercase tracking-[0.2em] mb-6"
               style={{ fontFamily: "Inter, sans-serif" }}
@@ -436,11 +435,10 @@ export default function InformationPage() {
             </h2>
 
             {/* Opening Hours Banner */}
-            <div className={`mb-6 p-4 rounded-2xl border flex flex-col md:flex-row md:items-center justify-between gap-3 text-xs ${
-              lunchroomIsBlocked || lunchroomIsClosed
-                ? "bg-red-50 border-red-200 text-red-900"
-                : "bg-[#FCF2E9]/70 border-[#E8E2DC]/80 text-[#8B7355]"
-            }`}>
+            <div className={`mb-6 p-4 rounded-2xl border flex flex-col md:flex-row md:items-center justify-between gap-3 text-xs ${lunchroomIsBlocked || lunchroomIsClosed
+              ? "bg-red-50 border-red-200 text-red-900"
+              : "bg-[#FCF2E9]/70 border-[#E8E2DC]/80 text-[#8B7355]"
+              }`}>
               <div className="flex items-center gap-2">
                 <BiTimeFive className={`text-lg flex-shrink-0 ${lunchroomIsBlocked || lunchroomIsClosed ? "text-red-700" : ""}`} />
                 {loadingSlots ? (
@@ -494,7 +492,7 @@ export default function InformationPage() {
         )}
 
         {isActivity && storedData.activityDetails && (
-          <div className="bg-white rounded-[32px] p-10 shadow-sm border border-[#E8E2DC]">
+          <div className="">
             <h2
               className="text-xs font-bold text-[#64748B] uppercase tracking-[0.2em] mb-6"
               style={{ fontFamily: "Inter, sans-serif" }}
@@ -506,7 +504,7 @@ export default function InformationPage() {
               {/* <span className="text-[10px] font-bold uppercase tracking-widest text-[#8B7355] block mb-1">
                 {storedData.activityDetails.category}
               </span> */}
-              <h3 className="text-2xl font-bold font-displayPlayFair text-[#0F172A] mb-2">
+              <h3 className="text-xl md:text-2xl font-bold font-displayPlayFair text-[#0F172A] mb-2">
                 {storedData.activityDetails.name}
               </h3>
               <p className="text-xs text-[#64748B] mb-4 leading-relaxed whitespace-pre-line">
@@ -606,7 +604,7 @@ export default function InformationPage() {
         )}
 
         {/* Contact Details Card */}
-        <div className="bg-white rounded-[32px] p-10 shadow-sm border border-[#E8E2DC]">
+        <div className="">
           <h2
             className="text-xs font-bold text-[#64748B] uppercase tracking-[0.2em] mb-8"
             style={{ fontFamily: "Inter, sans-serif" }}
@@ -689,7 +687,7 @@ export default function InformationPage() {
 
         {/* ── Celebration Details Card (Lunchroom Only) ── */}
         {isLunchroom && (
-          <div className="bg-white rounded-[32px] p-10 shadow-sm border border-[#E8E2DC] transition-all">
+          <div className=" transition-all">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
               <div className="flex items-center gap-4">
                 <div className="w-12 h-12 rounded-2xl bg-[#FCF2E9] flex items-center justify-center text-[#8B7355] flex-shrink-0">
@@ -710,22 +708,20 @@ export default function InformationPage() {
                 <button
                   type="button"
                   onClick={() => toggleCelebrating(true)}
-                  className={`px-6 py-2.5 rounded-lg text-xs font-bold transition-all ${
-                    celebration.isCelebrating
-                      ? "bg-[#8B7355] text-white shadow-sm"
-                      : "text-[#64748B] hover:text-[#0F172A]"
-                  }`}
+                  className={`px-6 py-2.5 rounded-lg text-xs font-bold transition-all ${celebration.isCelebrating
+                    ? "bg-[#8B7355] text-white shadow-sm"
+                    : "text-[#64748B] hover:text-[#0F172A]"
+                    }`}
                 >
                   {infoTrans?.yesCelebrationBtn || "Yes 🎉"}
                 </button>
                 <button
                   type="button"
                   onClick={() => toggleCelebrating(false)}
-                  className={`px-6 py-2.5 rounded-lg text-xs font-bold transition-all ${
-                    !celebration.isCelebrating
-                      ? "bg-[#8B7355] text-white shadow-sm"
-                      : "text-[#64748B] hover:text-[#0F172A]"
-                  }`}
+                  className={`px-6 py-2.5 rounded-lg text-xs font-bold transition-all ${!celebration.isCelebrating
+                    ? "bg-[#8B7355] text-white shadow-sm"
+                    : "text-[#64748B] hover:text-[#0F172A]"
+                    }`}
                 >
                   {infoTrans?.noCelebrationBtn || "No"}
                 </button>
@@ -761,18 +757,18 @@ export default function InformationPage() {
                         const occKey = occ.toLowerCase().includes("birth")
                           ? "birthday"
                           : occ.toLowerCase().includes("anniv")
-                          ? "anniversary"
-                          : occ.toLowerCase().includes("grad")
-                          ? "graduation"
-                          : occ.toLowerCase().includes("promo")
-                          ? "promotion"
-                          : occ.toLowerCase().includes("baby")
-                          ? "babyShower"
-                          : occ.toLowerCase().includes("engage")
-                          ? "engagement"
-                          : occ.toLowerCase().includes("retire")
-                          ? "retirement"
-                          : "other";
+                            ? "anniversary"
+                            : occ.toLowerCase().includes("grad")
+                              ? "graduation"
+                              : occ.toLowerCase().includes("promo")
+                                ? "promotion"
+                                : occ.toLowerCase().includes("baby")
+                                  ? "babyShower"
+                                  : occ.toLowerCase().includes("engage")
+                                    ? "engagement"
+                                    : occ.toLowerCase().includes("retire")
+                                      ? "retirement"
+                                      : "other";
                         const localizedOcc = infoTrans?.occasions?.[occKey] || occ;
                         return (
                           <option key={occ} value={occ}>
@@ -888,11 +884,10 @@ export default function InformationPage() {
 
         <Link
           href="/booking/review"
-          className={`w-full sm:w-auto justify-center px-6 sm:px-12 py-3.5 sm:py-4 rounded-xl font-bold text-sm flex items-center gap-3 transition-all ${
-            isFormValid
-              ? "bg-[#8B7355] hover:bg-[#786247] text-white shadow-md hover:shadow-lg transform hover:-translate-y-0.5 cursor-pointer"
-              : "bg-[#E2E8F0] text-[#94A3B8] border border-[#CBD5E1] cursor-not-allowed pointer-events-none shadow-none opacity-80"
-          }`}
+          className={`w-full sm:w-auto justify-center px-6 sm:px-12 py-3.5 sm:py-4 rounded-xl font-bold text-sm flex items-center gap-3 transition-all ${isFormValid
+            ? "bg-[#8B7355] hover:bg-[#786247] text-white shadow-md hover:shadow-lg transform hover:-translate-y-0.5 cursor-pointer"
+            : "bg-[#E2E8F0] text-[#94A3B8] border border-[#CBD5E1] cursor-not-allowed pointer-events-none shadow-none opacity-80"
+            }`}
           style={{ fontFamily: "Inter, sans-serif" }}
         >
           {btnTrans?.continue || "Continue"}

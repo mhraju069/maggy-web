@@ -31,11 +31,11 @@ export default function LunchroomHoursWalkin() {
           <div className="bg-white rounded-[28px] p-8 md:p-10 border border-[#E8E2DC] shadow-sm flex flex-col justify-between hover:shadow-md transition-all">
             <div>
               <div className="flex items-center gap-4 mb-6">
-                 <div className="w-12 h-12 rounded-2xl bg-[#FCF2E9] flex items-center justify-center text-[#8B7355]">
+                <div className="w-12 h-12 rounded-2xl bg-[#FCF2E9] flex items-center justify-center text-[#8B7355]">
                   <BiTimeFive size={24} />
                 </div>
                 <div>
-                  <h3 className="text-2xl font-bold font-displayPlayFair text-[#0F172A]">
+                  <h3 className="text-xl md:text-2xl font-bold font-displayPlayFair text-[#0F172A]">
                     {h?.openingHoursCard?.title || "Opening Hours"}
                   </h3>
                   <p className="text-xs text-[#64748B] tracking-wide">
@@ -81,7 +81,7 @@ export default function LunchroomHoursWalkin() {
                   <FaWalking size={22} />
                 </div>
                 <div>
-                  <h3 className="text-2xl font-bold font-displayPlayFair text-[#0F172A]">
+                  <h3 className="text-xl md:text-2xl font-bold font-displayPlayFair text-[#0F172A]">
                     {h?.walkInsCard?.title || "Walk-Ins & Table Booking"}
                   </h3>
                   <p className="text-xs text-[#64748B] tracking-wide">

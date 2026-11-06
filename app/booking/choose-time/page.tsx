@@ -188,30 +188,30 @@ export default function ChooseTimePage() {
         const selectedPackageId = currentStored.packageSelections?.packageId;
         const pkgRes: Awaited<ReturnType<typeof servicesService.getPackageSlots>> = selectedPackageId
           ? await servicesService.getPackageSlots(dateVal, selectedPackageId).catch((err) => {
-              console.error("Error fetching package slots:", err);
-              return {
-                success: false,
-                is_blocked: false,
-          is_closed: false,
-                date: dateVal,
-                service_type: "package",
-                open_time: "",
-                close_time: "",
-                data: {},
-                message: err?.message || "Could not load slots for this package.",
-              };
-            })
-          : {
+            console.error("Error fetching package slots:", err);
+            return {
               success: false,
               is_blocked: false,
-            is_closed: false,
+              is_closed: false,
               date: dateVal,
               service_type: "package",
-                open_time: "",
-                close_time: "",
+              open_time: "",
+              close_time: "",
               data: {},
-              message: "Package details are missing. Please go back and select the package again.",
+              message: err?.message || "Could not load slots for this package.",
             };
+          })
+          : {
+            success: false,
+            is_blocked: false,
+            is_closed: false,
+            date: dateVal,
+            service_type: "package",
+            open_time: "",
+            close_time: "",
+            data: {},
+            message: "Package details are missing. Please go back and select the package again.",
+          };
 
         if (pkgRes) {
           setPackageSlots(pkgRes);
@@ -387,16 +387,16 @@ export default function ChooseTimePage() {
       const activeSub = slotMembership.subscription;
       const weeklySub = slotMembership.weekly_subscription || (
         (activeSub?.plan_type?.toLowerCase() === "weekly" ||
-         activeSub?.type?.toLowerCase() === "weekly" ||
-         activeSub?.name?.toLowerCase().includes("week"))
+          activeSub?.type?.toLowerCase() === "weekly" ||
+          activeSub?.name?.toLowerCase().includes("week"))
           ? activeSub
           : null
       );
       const unlimitedSub = slotMembership.unlimited_subscription || (
         (activeSub?.plan_type?.toLowerCase() === "unlimited" ||
-         activeSub?.type?.toLowerCase() === "unlimited" ||
-         activeSub?.is_unlimited ||
-         activeSub?.name?.toLowerCase().includes("unlimited"))
+          activeSub?.type?.toLowerCase() === "unlimited" ||
+          activeSub?.is_unlimited ||
+          activeSub?.name?.toLowerCase().includes("unlimited"))
           ? activeSub
           : null
       );
@@ -506,19 +506,19 @@ export default function ChooseTimePage() {
   const maxSelectableGuests = isPrivateSauna
     ? 6
     : isSaltRoom
-    ? 2
-    : selectedSlotObj
-    ? Math.min(6, Math.max(1, selectedSlotObj.remaining_capacity))
-    : 6;
+      ? 2
+      : selectedSlotObj
+        ? Math.min(6, Math.max(1, selectedSlotObj.remaining_capacity))
+        : 6;
 
   const minSelectableGuests = isPrivateSauna ? 2 : 1;
 
   const guestOptions = isPrivateSauna
     ? [2, 3, 4, 5, 6]
     : Array.from(
-        { length: Math.max(1, maxSelectableGuests - minSelectableGuests + 1) },
-        (_, i) => minSelectableGuests + i
-      );
+      { length: Math.max(1, maxSelectableGuests - minSelectableGuests + 1) },
+      (_, i) => minSelectableGuests + i
+    );
 
   const packageActivitiesList: any[] = Array.isArray(packageSlots?.data?.activities)
     ? packageSlots.data.activities
@@ -527,25 +527,25 @@ export default function ChooseTimePage() {
   const packageSaunaData = packageSlots?.data?.sauna || (
     packageSlots?.data?.private_sauna || packageSlots?.data?.shared_sauna
       ? {
-          private_sauna: packageSlots.data.private_sauna,
-          shared_sauna: packageSlots.data.shared_sauna,
-          is_closed:
-            (!hasPrivateSauna || Boolean(packageSlots.data.private_sauna?.is_closed)) &&
-            (!hasSharedSauna || Boolean(packageSlots.data.shared_sauna?.is_closed)),
-        }
+        private_sauna: packageSlots.data.private_sauna,
+        shared_sauna: packageSlots.data.shared_sauna,
+        is_closed:
+          (!hasPrivateSauna || Boolean(packageSlots.data.private_sauna?.is_closed)) &&
+          (!hasSharedSauna || Boolean(packageSlots.data.shared_sauna?.is_closed)),
+      }
       : undefined
   );
 
   const isPackageFormValid = isPackage
     ? Boolean(
-        date &&
-        packageSlots?.success &&
-        Object.keys(packageSlots.data || {}).length > 0 &&
-        (!packageSlots.is_blocked && !packageSlots.is_closed) &&
-        (!packageIncludesSauna || !packageSaunaData || packageSaunaData.is_closed || pkgSaunaSlot) &&
-        (!packageIncludesSaltRoom || saltRoomSlotsList.length === 0 || packageSlots?.data?.saltroom?.is_closed || pkgSaltRoomSlot) &&
-        (!packageIncludesActivity || packageActivitiesList.length === 0 || isPackageActivitiesClosed || pkgSelectedActivityId)
-      )
+      date &&
+      packageSlots?.success &&
+      Object.keys(packageSlots.data || {}).length > 0 &&
+      (!packageSlots.is_blocked && !packageSlots.is_closed) &&
+      (!packageIncludesSauna || !packageSaunaData || packageSaunaData.is_closed || pkgSaunaSlot) &&
+      (!packageIncludesSaltRoom || saltRoomSlotsList.length === 0 || packageSlots?.data?.saltroom?.is_closed || pkgSaltRoomSlot) &&
+      (!packageIncludesActivity || packageActivitiesList.length === 0 || isPackageActivitiesClosed || pkgSelectedActivityId)
+    )
     : false;
 
   const isSingleServiceClosed = Boolean(apiSlots?.is_closed || (apiSlots?.data as any)?.is_closed || (apiSlots?.data as any)?.is_available === false);
@@ -655,11 +655,10 @@ export default function ChooseTimePage() {
 
       {/* ── Lunchroom Banner ── */}
       {!isPackage && isLunchroom && (
-        <div className="max-w-4xl mx-auto mb-8 bg-white rounded-2xl p-6 border border-[#E8E2DC] shadow-xs flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+        <div className="max-w-4xl mx-auto mb-8 rounded-2xl flex flex-col md:flex-row items-center md:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${
-              isSingleServiceClosed ? "bg-rose-100 text-rose-700" : "bg-[#FCF2E9] text-[#8B7355]"
-            }`}>
+            <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${isSingleServiceClosed ? "bg-rose-100 text-rose-700" : "bg-[#FCF2E9] text-[#8B7355]"
+              }`}>
               <BiTimeFive size={20} />
             </div>
             <div>
@@ -668,8 +667,8 @@ export default function ChooseTimePage() {
                 {isSingleServiceClosed
                   ? (ctTrans?.closedOnDay || "Closed on this selected day")
                   : apiSlots?.open_time && apiSlots?.close_time
-                  ? (ctTrans?.hoursForDate ? ctTrans.hoursForDate.replace("{open}", apiSlots.open_time).replace("{close}", apiSlots.close_time) : `Hours for selected date: ${apiSlots.open_time} – ${apiSlots.close_time}`)
-                  : (ctTrans?.flexibleDining || "Flexible dining during opening hours")}
+                    ? (ctTrans?.hoursForDate ? ctTrans.hoursForDate.replace("{open}", apiSlots.open_time).replace("{close}", apiSlots.close_time) : `Hours for selected date: ${apiSlots.open_time} – ${apiSlots.close_time}`)
+                    : (ctTrans?.flexibleDining || "Flexible dining during opening hours")}
               </p>
             </div>
           </div>
@@ -683,11 +682,8 @@ export default function ChooseTimePage() {
 
       {/* ── Salt Room Banner ── */}
       {!isPackage && isSaltRoom && (
-        <div className="max-w-4xl mx-auto mb-8 bg-white rounded-2xl p-6 border border-[#E8E2DC] shadow-xs flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+        <div className="max-w-4xl mx-auto mb-8 rounded-2xl flex flex-col md:flex-row items-center md:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-[#FCF2E9] flex items-center justify-center text-[#8B7355] flex-shrink-0">
-              <FaSpa size={18} />
-            </div>
             <div>
               <div className="flex items-center gap-2">
                 <h4 className="font-bold text-[#0F172A] text-sm">
@@ -717,11 +713,11 @@ export default function ChooseTimePage() {
             </div>
           </div>
 
-          <div className="flex flex-col items-end gap-1 flex-shrink-0">
+          <div className="flex flex-col gap-1 flex-shrink-0 sm:items-center md:items-end">
             <span className="px-3 py-1 bg-[#8B7355] text-white text-xs font-bold rounded-lg shadow-xs">
               Max 2 People / Session
             </span>
-            <span className="text-[11px] text-[#64748B] font-semibold">
+            <span className="text-[11px] text-[#64748B] font-semibold text-center">
               Hours: {saltRoomSlotData.openTime || "09:00"} – {saltRoomSlotData.closeTime || "21:00"}
             </span>
           </div>
@@ -730,11 +726,8 @@ export default function ChooseTimePage() {
 
       {/* ── VIP Sauna Banner ── */}
       {!isPackage && isPrivateSauna && (
-        <div className="max-w-4xl mx-auto mb-8 bg-white rounded-2xl p-6 border border-[#E8E2DC] shadow-xs flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+        <div className="max-w-4xl mx-auto mb-8 rounded-2xl flex flex-col md:flex-row items-center md:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-[#FCF2E9] flex items-center justify-center text-[#8B7355] flex-shrink-0">
-              <BiTimeFive size={20} />
-            </div>
             <div>
               <h4 className="font-bold text-[#0F172A] text-sm">
                 VIP Sauna ({storedData.durationHours || 3} Hours Session)
@@ -748,12 +741,12 @@ export default function ChooseTimePage() {
       )}
 
       {/* ── Content Card ── */}
-      <div className="max-w-4xl mx-auto bg-white rounded-[32px] p-8 md:p-10 shadow-sm border border-[#E8E2DC]">
+      <div className="max-w-4xl mx-auto">
         <div className="space-y-10">
           {/* Date Picker */}
           <div>
             <div className="flex justify-between items-center mb-4">
-              <label className="block text-sm font-bold text-[#0F172A] uppercase tracking-wider" style={{ fontFamily: "Inter, sans-serif" }}>
+              <label className="block text-xl  font-bold text-[#0F172A] uppercase tracking-wider" style={{ fontFamily: "Inter, sans-serif" }}>
                 {ctTrans?.dateLabel || "Date"}
               </label>
               {isSaltRoom ? (
@@ -770,13 +763,12 @@ export default function ChooseTimePage() {
                 min={minimumReservationDate}
                 disabled={isSaltRoom}
                 onChange={(e) => !isSaltRoom && handleDateChange(e.target.value)}
-                className={`w-full p-4 border rounded-xl focus:outline-none focus:ring-2 focus:ring-[#D1B191] text-[#475569] ${
-                  isSaltRoom
-                    ? "bg-[#F8FAFC] border-[#E2E8F0] opacity-80 cursor-not-allowed font-medium text-[#1E293B]"
-                    : dayError
+                className={`w-full p-4 border rounded-xl focus:outline-none focus:ring-2 focus:ring-[#D1B191] text-[#475569] ${isSaltRoom
+                  ? "bg-[#F8FAFC] border-[#E2E8F0] opacity-80 cursor-not-allowed font-medium text-[#1E293B]"
+                  : dayError
                     ? "border-red-400 bg-red-50/30 cursor-pointer"
                     : "border-[#E2E8F0] cursor-pointer"
-                }`}
+                  }`}
               />
             </div>
             {dayError && (
@@ -849,9 +841,8 @@ export default function ChooseTimePage() {
                                   setPkgSaunaSlot(null);
                                   savePackageSelections(null, "private");
                                 }}
-                                className={`px-3 py-1 rounded-md transition-all ${
-                                  pkgSaunaType === "private" ? "bg-[#8B7355] text-white shadow-xs" : "text-[#64748B]"
-                                }`}
+                                className={`px-3 py-1 rounded-md transition-all ${pkgSaunaType === "private" ? "bg-[#8B7355] text-white shadow-xs" : "text-[#64748B]"
+                                  }`}
                               >
                                 {ctTrans?.privateSaunaBtn || "VIP Sauna"}
                               </button>
@@ -862,9 +853,8 @@ export default function ChooseTimePage() {
                                   setPkgSaunaSlot(null);
                                   savePackageSelections(null, "shared");
                                 }}
-                                className={`px-3 py-1 rounded-md transition-all ${
-                                  pkgSaunaType === "shared" ? "bg-[#8B7355] text-white shadow-xs" : "text-[#64748B]"
-                                }`}
+                                className={`px-3 py-1 rounded-md transition-all ${pkgSaunaType === "shared" ? "bg-[#8B7355] text-white shadow-xs" : "text-[#64748B]"
+                                  }`}
                               >
                                 {ctTrans?.sharedSaunaBtn || "Sauna"}
                               </button>
@@ -901,11 +891,10 @@ export default function ChooseTimePage() {
                                     setPkgSaunaSlot(label);
                                     savePackageSelections(label);
                                   }}
-                                  className={`p-3.5 rounded-xl border text-left transition-all flex items-center justify-between ${
-                                    isSel
-                                      ? "bg-[#FCF2E9] border-[#8B7355] shadow-sm ring-2 ring-[#8B7355]/20"
-                                      : "bg-white border-[#E2E8F0] hover:border-[#D1B191]"
-                                  }`}
+                                  className={`p-3.5 rounded-xl border text-left transition-all flex items-center justify-between ${isSel
+                                    ? "bg-[#FCF2E9] border-[#8B7355] shadow-sm ring-2 ring-[#8B7355]/20"
+                                    : "bg-white border-[#E2E8F0] hover:border-[#D1B191]"
+                                    }`}
                                 >
                                   <div>
                                     <span className="text-sm font-bold text-[#0F172A] block">{label}</span>
@@ -938,13 +927,12 @@ export default function ChooseTimePage() {
                                   setPkgSaunaSlot(label);
                                   savePackageSelections(label);
                                 }}
-                                className={`p-3.5 rounded-xl border text-left transition-all flex flex-col md:flex-row items-center justify-between ${
-                                  isSel
-                                    ? "bg-[#FCF2E9] border-[#8B7355] shadow-sm ring-2 ring-[#8B7355]/20"
-                                    : isSoldOut
+                                className={`p-3.5 rounded-xl border text-left transition-all flex flex-col md:flex-row items-center justify-between ${isSel
+                                  ? "bg-[#FCF2E9] border-[#8B7355] shadow-sm ring-2 ring-[#8B7355]/20"
+                                  : isSoldOut
                                     ? "bg-gray-50 border-gray-200 opacity-60 cursor-not-allowed"
                                     : "bg-white border-[#E2E8F0] hover:border-[#D1B191]"
-                                }`}
+                                  }`}
                               >
                                 <div>
                                   <span className="text-sm font-bold text-[#0F172A] block">{label}</span>
@@ -1006,11 +994,10 @@ export default function ChooseTimePage() {
                                     setPkgLunchTime(timeStr);
                                     savePackageSelections(undefined, undefined, timeStr);
                                   }}
-                                  className={`py-3 px-4 rounded-xl border font-bold text-sm transition-all ${
-                                    isSel
-                                      ? "bg-[#8B7355] text-white border-[#8B7355] shadow-xs"
-                                      : "bg-white border-[#E2E8F0] text-[#475569] hover:border-[#D1B191]"
-                                  }`}
+                                  className={`py-3 px-4 rounded-xl border font-bold text-sm transition-all ${isSel
+                                    ? "bg-[#8B7355] text-white border-[#8B7355] shadow-xs"
+                                    : "bg-white border-[#E2E8F0] text-[#475569] hover:border-[#D1B191]"
+                                    }`}
                                 >
                                   {timeStr}
                                 </button>
@@ -1054,8 +1041,8 @@ export default function ChooseTimePage() {
                             const remainingCap = typeof slot.remaining_capacity === "number"
                               ? slot.remaining_capacity
                               : typeof slot.available_capacity === "number"
-                              ? slot.available_capacity
-                              : 2;
+                                ? slot.available_capacity
+                                : 2;
                             const isSoldOut = slot.is_fully_booked || !slot.is_available || slot.is_booked || remainingCap <= 0;
                             const sessionMinutes = slot.duration_minutes || 45;
                             const durationTag = ctTrans?.minuteSessionTag ? ctTrans.minuteSessionTag.replace("{mins}", String(sessionMinutes)) : `${sessionMinutes}-minute salt room session`;
@@ -1069,13 +1056,12 @@ export default function ChooseTimePage() {
                                   setPkgSaltRoomSlot(label);
                                   savePackageSelections(undefined, undefined, undefined, undefined, label);
                                 }}
-                                className={`p-3.5 rounded-xl border text-left transition-all flex items-center justify-between ${
-                                  isSel
-                                    ? "bg-[#FCF2E9] border-[#8B7355] shadow-sm ring-2 ring-[#8B7355]/20"
-                                    : isSoldOut
+                                className={`p-3.5 rounded-xl border text-left transition-all flex items-center justify-between ${isSel
+                                  ? "bg-[#FCF2E9] border-[#8B7355] shadow-sm ring-2 ring-[#8B7355]/20"
+                                  : isSoldOut
                                     ? "bg-gray-50 border-gray-200 opacity-60 cursor-not-allowed"
                                     : "bg-white border-[#E2E8F0] hover:border-[#D1B191]"
-                                }`}
+                                  }`}
                               >
                                 <div>
                                   <span className="text-sm font-bold text-[#0F172A] block">{label}</span>
@@ -1141,13 +1127,12 @@ export default function ChooseTimePage() {
                                   setPkgSelectedActivityId(act.id);
                                   savePackageSelections(undefined, undefined, undefined, act.id);
                                 }}
-                                className={`w-full p-4 rounded-xl border text-left transition-all flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 ${
-                                  isSel
-                                    ? "bg-[#FCF2E9] border-[#8B7355] shadow-sm ring-2 ring-[#8B7355]/20"
-                                    : isSoldOut
+                                className={`w-full p-4 rounded-xl border text-left transition-all flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 ${isSel
+                                  ? "bg-[#FCF2E9] border-[#8B7355] shadow-sm ring-2 ring-[#8B7355]/20"
+                                  : isSoldOut
                                     ? "bg-gray-50 border-gray-200 opacity-60 cursor-not-allowed"
                                     : "bg-white border-[#E2E8F0] hover:border-[#D1B191]"
-                                }`}
+                                  }`}
                               >
                                 <div>
                                   <h5 className="font-bold text-[#0F172A] text-base">{act.title}</h5>
@@ -1190,20 +1175,20 @@ export default function ChooseTimePage() {
           ) : (
             <div>
               <div className="flex justify-between items-center mb-4">
-                <label className="block text-sm font-bold text-[#0F172A] uppercase tracking-wider" style={{ fontFamily: "Inter, sans-serif" }}>
+                <label className="block text-xl  font-bold text-[#0F172A] uppercase tracking-wider" style={{ fontFamily: "Inter, sans-serif" }}>
                   {isSaltRoom
                     ? "Select Salt Room Session (1 Hour Session)"
                     : isSharedSauna
-                    ? "Select Shared Session Slot (1.5 Hours)"
-                    : "Time Slot"}
+                      ? "Select Shared Session Slot (1.5 Hours)"
+                      : "Time Slot"}
                 </label>
                 {isLunchroom && (
                   <span className="text-xs text-[#64748B]">
                     {isSingleServiceClosed
                       ? "Closed on this date"
                       : apiSlots?.open_time && apiSlots?.close_time
-                      ? `Operating hours: ${apiSlots.open_time} – ${apiSlots.close_time}`
-                      : "Operating hours unavailable"}
+                        ? `Operating hours: ${apiSlots.open_time} – ${apiSlots.close_time}`
+                        : "Operating hours unavailable"}
                   </span>
                 )}
               </div>
@@ -1260,13 +1245,12 @@ export default function ChooseTimePage() {
                             type="button"
                             disabled={isSoldOut}
                             onClick={() => handleTimeSelect(slotKey)}
-                            className={`p-3.5 rounded-xl border text-left transition-all flex flex-col justify-between ${
-                              isSelected
-                                ? "bg-[#FCF2E9] border-[#8B7355] shadow-md ring-2 ring-[#8B7355]/20"
-                                : isSoldOut
+                            className={`p-3.5 rounded-xl border text-left transition-all flex flex-col justify-between ${isSelected
+                              ? "bg-[#FCF2E9] border-[#8B7355] shadow-md ring-2 ring-[#8B7355]/20"
+                              : isSoldOut
                                 ? "bg-gray-50 border-gray-200 opacity-60 cursor-not-allowed"
                                 : "bg-white border-[#E2E8F0] hover:border-[#D1B191]"
-                            }`}
+                              }`}
                           >
                             <div className="flex items-center justify-between w-full mb-1">
                               <span className="text-base font-bold font-displayPlayFair text-[#0F172A]">
@@ -1282,11 +1266,10 @@ export default function ChooseTimePage() {
                                 </span>
                               ) : (
                                 <span
-                                  className={`px-2 py-0.5 text-[9px] font-bold rounded-full border ${
-                                    remaining === 1
-                                      ? "bg-amber-100 text-amber-800 border-amber-300"
-                                      : "bg-emerald-50 text-emerald-700 border-emerald-300"
-                                  }`}
+                                  className={`px-2 py-0.5 text-[9px] font-bold rounded-full border ${remaining === 1
+                                    ? "bg-amber-100 text-amber-800 border-amber-300"
+                                    : "bg-emerald-50 text-emerald-700 border-emerald-300"
+                                    }`}
                                 >
                                   {remaining} {remaining === 1 ? "spot left" : "spots left"}
                                 </span>
@@ -1328,13 +1311,12 @@ export default function ChooseTimePage() {
                             type="button"
                             disabled={isSoldOut}
                             onClick={() => handleTimeSelect(label)}
-                            className={`min-w-0 p-4 rounded-xl border text-left transition-all flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 ${
-                              isSelected
-                                ? "bg-[#FCF2E9] border-[#8B7355] shadow-md ring-2 ring-[#8B7355]/20"
-                                : isSoldOut
+                            className={`min-w-0 p-4 rounded-xl border text-left transition-all flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 ${isSelected
+                              ? "bg-[#FCF2E9] border-[#8B7355] shadow-md ring-2 ring-[#8B7355]/20"
+                              : isSoldOut
                                 ? "bg-gray-50 border-gray-200 opacity-60 cursor-not-allowed"
                                 : "bg-white border-[#E2E8F0] hover:border-[#D1B191]"
-                            }`}
+                              }`}
                           >
                             <div className="min-w-0">
                               <span className="text-base font-bold font-displayPlayFair text-[#0F172A] block">
@@ -1355,9 +1337,8 @@ export default function ChooseTimePage() {
                                   Only {slot.remaining_capacity} {slot.remaining_capacity === 1 ? "place" : "places"} left
                                 </span>
                               ) : (
-                                <span className={`max-w-full px-2.5 py-1 text-[10px] font-bold rounded-full border whitespace-normal ${
-                                  slot.remaining_capacity <= 2 ? "bg-amber-100 text-amber-800 border-amber-300" : "bg-emerald-50 text-emerald-700 border-emerald-300"
-                                }`}>
+                                <span className={`max-w-full px-2.5 py-1 text-[10px] font-bold rounded-full border whitespace-normal ${slot.remaining_capacity <= 2 ? "bg-amber-100 text-amber-800 border-amber-300" : "bg-emerald-50 text-emerald-700 border-emerald-300"
+                                  }`}>
                                   {slot.remaining_capacity} {slot.remaining_capacity === 1 ? "place" : "places"} remaining
                                 </span>
                               )}
@@ -1395,11 +1376,10 @@ export default function ChooseTimePage() {
                           key={i}
                           type="button"
                           onClick={() => handleTimeSelect(label)}
-                          className={`p-4 rounded-xl border text-left transition-all flex flex-col justify-between ${
-                            isSelected
-                              ? "bg-[#FCF2E9] border-[#8B7355] shadow-md ring-2 ring-[#8B7355]/20"
-                              : "bg-white border-[#E2E8F0] hover:border-[#D1B191]"
-                          }`}
+                          className={`p-4 rounded-xl border text-left transition-all flex flex-col justify-between ${isSelected
+                            ? "bg-[#FCF2E9] border-[#8B7355] shadow-md ring-2 ring-[#8B7355]/20"
+                            : "bg-white border-[#E2E8F0] hover:border-[#D1B191]"
+                            }`}
                         >
                           <div className="flex items-center justify-between">
                             <span className="text-base font-bold font-displayPlayFair text-[#0F172A]">
@@ -1428,11 +1408,10 @@ export default function ChooseTimePage() {
                         key={time}
                         type="button"
                         onClick={() => handleTimeSelect(time)}
-                        className={`py-4 rounded-xl border transition-all font-medium text-sm ${
-                          selectedTime === time
-                            ? "bg-[#D1B191] border-[#D1B191] text-white shadow-md shadow-[#D1B191]/20 font-bold scale-[1.02]"
-                            : "bg-white border-[#E2E8F0] text-[#475569] hover:border-[#D1B191]"
-                        }`}
+                        className={`py-4 rounded-xl border transition-all font-medium text-sm ${selectedTime === time
+                          ? "bg-[#D1B191] border-[#D1B191] text-white shadow-md shadow-[#D1B191]/20 font-bold scale-[1.02]"
+                          : "bg-white border-[#E2E8F0] text-[#475569] hover:border-[#D1B191]"
+                          }`}
                         style={{ fontFamily: "Inter, sans-serif" }}
                       >
                         {time}
@@ -1447,12 +1426,8 @@ export default function ChooseTimePage() {
           {/* Guests Picker */}
           <div>
             <div className="flex justify-between items-center mb-4">
-              <label className="block text-sm font-bold text-[#0F172A] uppercase tracking-wider" style={{ fontFamily: "Inter, sans-serif" }}>
-                {ctTrans?.numberOfPeoplePlaces || "Number of People / Places"} {isSaltRoom && "(Max 2)"}
-              </label>
-              {isSaltRoom && (
-                <span className="text-xs font-semibold text-[#8B7355]">{ctTrans?.saltRoomLimitTag || "Salt Room limit: Max 2 guests"}</span>
-              )}
+              <label className="block text-xl  font-bold text-[#0F172A] uppercase tracking-wider" style={{ fontFamily: "Inter, sans-serif" }}>
+                Number of People </label> 
             </div>
 
             <select
@@ -1471,8 +1446,8 @@ export default function ChooseTimePage() {
             >
               {guestOptions.map((n) => {
                 const label = n === 1
-                  ? (ctTrans?.personPlaceOption ? ctTrans.personPlaceOption.replace("{count}", "1") : "1 Person / Place")
-                  : (ctTrans?.peoplePlacesOption ? ctTrans.peoplePlacesOption.replace("{count}", String(n)) : `${n} People / Places`);
+                  ? (ctTrans?.personPlaceOption ? ctTrans.personPlaceOption.replace("{count}", "1") : "1 Person")
+                  : (ctTrans?.peoplePlacesOption ? ctTrans.peoplePlacesOption.replace("{count}", String(n)) : `${n} Peoples`);
                 return (
                   <option key={n} value={n}>
                     {label} {!isPackage && `(${calculateOptionPrice(n)})`}
@@ -1500,11 +1475,10 @@ export default function ChooseTimePage() {
 
         <Link
           href="/booking/information"
-          className={`w-full sm:w-auto justify-center px-6 sm:px-12 py-3.5 sm:py-4 rounded-xl font-bold text-sm flex items-center gap-3 transition-all ${
-            isFormValid
-              ? "bg-[#8B7355] hover:bg-[#786247] text-white shadow-md hover:shadow-lg transform hover:-translate-y-0.5 cursor-pointer"
-              : "bg-[#E2E8F0] text-[#94A3B8] border border-[#CBD5E1] cursor-not-allowed pointer-events-none shadow-none opacity-80"
-          }`}
+          className={`w-full sm:w-auto justify-center px-6 sm:px-12 py-3.5 sm:py-4 rounded-xl font-bold text-sm flex items-center gap-3 transition-all ${isFormValid
+            ? "bg-[#8B7355] hover:bg-[#786247] text-white shadow-md hover:shadow-lg transform hover:-translate-y-0.5 cursor-pointer"
+            : "bg-[#E2E8F0] text-[#94A3B8] border border-[#CBD5E1] cursor-not-allowed pointer-events-none shadow-none opacity-80"
+            }`}
           style={{ fontFamily: "Inter, sans-serif" }}
         >
           {btnTrans?.continue || "Continue"}

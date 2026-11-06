@@ -190,7 +190,7 @@ export default function PackagesBookingPage() {
           <div className="w-16 h-16 bg-[#FCF2E9] rounded-2xl flex items-center justify-center mx-auto mb-4 text-[#8B7355]">
             <FaSpa className="w-8 h-8" />
           </div>
-          <h3 className="text-2xl font-bold font-displayPlayFair text-[#0F172A] mb-2">
+          <h3 className="text-xl md:text-2xl font-bold font-displayPlayFair text-[#0F172A] mb-2">
             {pkgTrans?.noPackagesTitle || "No Packages Available"}
           </h3>
           <p className="text-sm text-[#64748B] font-cambria italic">
@@ -251,11 +251,10 @@ export default function PackagesBookingPage() {
         <button
           onClick={handleContinue}
           disabled={!selectedId || packages.length === 0}
-          className={`w-full sm:w-auto justify-center px-6 sm:px-12 py-3.5 sm:py-4 rounded-xl text-white font-bold text-sm flex items-center gap-3 transition-all shadow-lg ${
-            selectedId && packages.length > 0
+          className={`w-full sm:w-auto justify-center px-6 sm:px-12 py-3.5 sm:py-4 rounded-xl text-white font-bold text-sm flex items-center gap-3 transition-all shadow-lg ${selectedId && packages.length > 0
               ? "bg-[#D1B191] hover:bg-[#C4A484] shadow-lg transform translate-y-[-2px]"
               : "bg-[#D1B191] opacity-50 cursor-not-allowed"
-          }`}
+            }`}
           style={{ fontFamily: "Inter, sans-serif" }}
         >
           {btnTrans?.continue || "Continue"}
@@ -287,7 +286,7 @@ export default function PackagesBookingPage() {
                 <div className="w-20 h-20 bg-[#FCF2E9] rounded-3xl flex items-center justify-center mx-auto text-[#8B7355] border border-[#E8E2DC] shadow-sm">
                   <BiCheckCircle size={44} />
                 </div>
-                
+
                 <div>
                   <span className="text-xs font-bold uppercase tracking-widest text-[#8B7355] block mb-1">
                     {cm?.successBadge || "Booking Successful • No Payment Required"}
@@ -510,7 +509,7 @@ export default function PackagesBookingPage() {
                     <FaSlidersH size={12} />
                     <span>{cm?.badge || "Bespoke Wellness Arrangement"}</span>
                   </div>
-                  <h3 className="text-2xl font-bold font-displayPlayFair text-[#0F172A]">
+                  <h3 className="text-xl md:text-2xl font-bold font-displayPlayFair text-[#0F172A]">
                     {cm?.title || "Design Your Custom Package"}
                   </h3>
                   <p className="text-xs text-[#64748B] mt-1">
@@ -623,19 +622,18 @@ export default function PackagesBookingPage() {
                                 : [...customForm.treatments, exp];
                               setCustomForm({ ...customForm, treatments: updated });
                             }}
-                            className={`p-3 rounded-xl border text-left text-xs font-medium transition-all flex items-center justify-between cursor-pointer ${
-                              isChecked
+                            className={`p-3 rounded-xl border text-left text-xs font-medium transition-all flex items-center justify-between cursor-pointer ${isChecked
                                 ? "bg-[#FCF2E9] border-[#8B7355] text-[#8B7355] font-bold"
                                 : "bg-white border-[#E2E8F0] text-[#475569] hover:border-[#D1B191]"
-                            }`}
+                              }`}
                           >
                             <span>{
                               exp === "VIP Sauna" ? (cm?.experiences?.vipSauna || exp) :
-                              exp === "Lunchroom" ? (cm?.experiences?.lunchroom || exp) :
-                              exp === "Sauna" ? (cm?.experiences?.sauna || exp) :
-                              exp === "Salt Room" ? (cm?.experiences?.saltRoom || exp) :
-                              exp === "Activities" ? (cm?.experiences?.activities || exp) :
-                              exp === "Others" ? (cm?.experiences?.others || exp) : exp
+                                exp === "Lunchroom" ? (cm?.experiences?.lunchroom || exp) :
+                                  exp === "Sauna" ? (cm?.experiences?.sauna || exp) :
+                                    exp === "Salt Room" ? (cm?.experiences?.saltRoom || exp) :
+                                      exp === "Activities" ? (cm?.experiences?.activities || exp) :
+                                        exp === "Others" ? (cm?.experiences?.others || exp) : exp
                             }</span>
                             <span className="text-xs">{isChecked ? "✓" : "+"}</span>
                           </button>

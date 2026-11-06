@@ -237,7 +237,7 @@ export default function SaunaBookingPage() {
           <div className="w-16 h-16 bg-[#FCF2E9] rounded-2xl flex items-center justify-center mx-auto mb-4 text-[#8B7355]">
             <FaSpa className="w-8 h-8" />
           </div>
-          <h3 className="text-2xl font-bold font-displayPlayFair text-[#0F172A] mb-2">
+          <h3 className="text-xl md:text-2xl font-bold font-displayPlayFair text-[#0F172A] mb-2">
             {flow?.emptyState?.title || "No Service Available"}
           </h3>
           <p className="text-sm text-[#64748B] font-cambria italic">
@@ -267,11 +267,10 @@ export default function SaunaBookingPage() {
           <button
             type="button"
             onClick={() => setSelectedSaunaType("private")}
-            className={`min-w-0 justify-center px-2 py-3 sm:px-8 sm:py-3.5 rounded-xl font-bold text-xs sm:text-sm leading-tight text-center transition-all flex items-center gap-2 ${
-              selectedSaunaType === "private"
-                ? "bg-[#8B7355] text-white shadow-md"
-                : "text-[#64748B] hover:text-[#0F172A]"
-            }`}
+            className={`min-w-0 justify-center px-2 py-3 sm:px-8 sm:py-3.5 rounded-xl font-bold text-xs sm:text-sm leading-tight text-center transition-all flex items-center gap-2 ${selectedSaunaType === "private"
+              ? "bg-[#8B7355] text-white shadow-md"
+              : "text-[#64748B] hover:text-[#0F172A]"
+              }`}
           >
             <FaSpa size={18} className="shrink-0" />
             {sTrans?.privateTab || "VIP Sauna (Exclusive Group)"}
@@ -279,11 +278,10 @@ export default function SaunaBookingPage() {
           <button
             type="button"
             onClick={() => setSelectedSaunaType("shared")}
-            className={`min-w-0 justify-center px-2 py-3 sm:px-8 sm:py-3.5 rounded-xl font-bold text-xs sm:text-sm leading-tight text-center transition-all flex items-center gap-2 ${
-              selectedSaunaType === "shared"
-                ? "bg-[#8B7355] text-white shadow-md"
-                : "text-[#64748B] hover:text-[#0F172A]"
-            }`}
+            className={`min-w-0 justify-center px-2 py-3 sm:px-8 sm:py-3.5 rounded-xl font-bold text-xs sm:text-sm leading-tight text-center transition-all flex items-center gap-2 ${selectedSaunaType === "shared"
+              ? "bg-[#8B7355] text-white shadow-md"
+              : "text-[#64748B] hover:text-[#0F172A]"
+              }`}
           >
             <FaHotTub size={18} className="shrink-0" />
             {sTrans?.sharedTab || "Sauna"}
@@ -293,13 +291,10 @@ export default function SaunaBookingPage() {
 
       {/* ── VIP Sauna Configurator ── */}
       {selectedSaunaType === "private" ? (
-        <div className="max-w-4xl mx-auto bg-white rounded-2xl sm:rounded-[32px] p-4 sm:p-8 md:p-10 shadow-sm border border-[#E8E2DC] space-y-8 sm:space-y-10">
+        <div className="max-w-4xl mx-auto rounded-2xl sm:rounded-[32px] space-y-8 sm:space-y-10">
           {/* Badge & Banner */}
           <div className="p-6 rounded-2xl bg-[#FCF2E9] border border-[#E8E2DC] flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
             <div className="flex flex-col md:flex-row items-center gap-4">
-              <div className="w-12 h-12 rounded-2xl bg-[#8B7355] text-white flex items-center justify-center flex-shrink-0 shadow-xs">
-                <FaSpa size={22} />
-              </div>
               <div>
                 <span className="text-[11px] font-bold uppercase tracking-widest text-[#8B7355] block">
                   {sTrans?.exclusiveReservation || "Exclusive Reservation"}
@@ -326,17 +321,16 @@ export default function SaunaBookingPage() {
               <button
                 type="button"
                 onClick={() => setDurationHours(3)}
-                className={`p-6 rounded-2xl border transition-all text-left flex items-start justify-between ${
-                  durationHours === 3
-                    ? "bg-[#FCF2E9] border-[#8B7355] shadow-md ring-2 ring-[#8B7355]/20"
-                    : "bg-white border-[#E2E8F0] hover:border-[#D1B191]"
-                }`}
+                className={`p-6 rounded-2xl border transition-all text-left flex items-start justify-between ${durationHours === 3
+                  ? "bg-[#FCF2E9] border-[#8B7355] shadow-md ring-2 ring-[#8B7355]/20"
+                  : "bg-white border-[#E2E8F0] hover:border-[#D1B191]"
+                  }`}
               >
                 <div>
                   <span className="text-xs font-bold uppercase tracking-widest text-[#8B7355] block mb-1">
                     {sTrans?.popularChoice || "Popular Choice"}
                   </span>
-                  <h4 className="text-2xl font-bold font-displayPlayFair text-[#0F172A]">
+                  <h4 className="text-xl md:text-2xl font-bold font-displayPlayFair text-[#0F172A]">
                     {sTrans?.threeHours || "3 Hours Session"}
                   </h4>
                   <p className="text-xs text-[#64748B] mt-1">
@@ -346,9 +340,8 @@ export default function SaunaBookingPage() {
                   </p>
                 </div>
                 <div
-                  className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${
-                    durationHours === 3 ? "border-[#8B7355] bg-[#8B7355] text-white" : "border-[#CBD5E1]"
-                  }`}
+                  className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${durationHours === 3 ? "border-[#8B7355] bg-[#8B7355] text-white" : "border-[#CBD5E1]"
+                    }`}
                 >
                   {durationHours === 3 && <BiCheckCircle size={16} />}
                 </div>
@@ -357,17 +350,16 @@ export default function SaunaBookingPage() {
               <button
                 type="button"
                 onClick={() => setDurationHours(4)}
-                className={`p-6 rounded-2xl border transition-all text-left flex items-start justify-between ${
-                  durationHours === 4
-                    ? "bg-[#FCF2E9] border-[#8B7355] shadow-md ring-2 ring-[#8B7355]/20"
-                    : "bg-white border-[#E2E8F0] hover:border-[#D1B191]"
-                }`}
+                className={`p-6 rounded-2xl border transition-all text-left flex items-start justify-between ${durationHours === 4
+                  ? "bg-[#FCF2E9] border-[#8B7355] shadow-md ring-2 ring-[#8B7355]/20"
+                  : "bg-white border-[#E2E8F0] hover:border-[#D1B191]"
+                  }`}
               >
                 <div>
                   <span className="text-xs font-bold uppercase tracking-widest text-[#8B7355] block mb-1">
                     {sTrans?.extendedRelaxation || "Extended Relaxation"}
                   </span>
-                  <h4 className="text-2xl font-bold font-displayPlayFair text-[#0F172A]">
+                  <h4 className="text-xl md:text-2xl font-bold font-displayPlayFair text-[#0F172A]">
                     {sTrans?.fourHours || "4 Hours Session"}
                   </h4>
                   <p className="text-xs text-[#64748B] mt-1">
@@ -377,9 +369,8 @@ export default function SaunaBookingPage() {
                   </p>
                 </div>
                 <div
-                  className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${
-                    durationHours === 4 ? "border-[#8B7355] bg-[#8B7355] text-white" : "border-[#CBD5E1]"
-                  }`}
+                  className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${durationHours === 4 ? "border-[#8B7355] bg-[#8B7355] text-white" : "border-[#CBD5E1]"
+                    }`}
                 >
                   {durationHours === 4 && <BiCheckCircle size={16} />}
                 </div>
@@ -391,7 +382,7 @@ export default function SaunaBookingPage() {
           <div>
             <div className="flex justify-between items-center mb-4">
               <label
-                className="block text-sm font-bold text-[#0F172A] uppercase tracking-wider"
+                className="block text-xl  font-bold text-[#0F172A] uppercase tracking-wider"
                 style={{ fontFamily: "Inter, sans-serif" }}
               >
                 {sTrans?.selectGuests || "2. Number of Guests (2 to 6 People)"}
@@ -405,17 +396,16 @@ export default function SaunaBookingPage() {
               </span>
             </div>
 
-            <div className="grid grid-cols-5 gap-3">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
               {[2, 3, 4, 5, 6].map((num) => (
                 <button
                   key={num}
                   type="button"
                   onClick={() => setGuestsCount(num)}
-                  className={`py-4 rounded-xl border font-bold text-center transition-all ${
-                    guestsCount === num
-                      ? "bg-[#8B7355] border-[#8B7355] text-white shadow-md scale-[1.03]"
-                      : "bg-white border-[#E2E8F0] text-[#475569] hover:border-[#D1B191]"
-                  }`}
+                  className={`py-4 rounded-xl border font-bold text-center transition-all ${guestsCount === num
+                    ? "bg-[#8B7355] border-[#8B7355] text-white shadow-md scale-[1.03]"
+                    : "bg-white border-[#E2E8F0] text-[#475569] hover:border-[#D1B191]"
+                    }`}
                 >
                   <span className="block text-lg font-displayPlayFair">{num}</span>
                   <span className="text-[10px] uppercase font-mono tracking-tight opacity-90">
@@ -443,17 +433,15 @@ export default function SaunaBookingPage() {
                       key={extra.id}
                       type="button"
                       onClick={() => toggleExtra(extra)}
-                      className={`p-4 rounded-xl border transition-all text-left flex items-center justify-between ${
-                        isSelected
-                          ? "bg-[#FCF2E9] border-[#8B7355] shadow-xs"
-                          : "bg-white border-[#E2E8F0] hover:border-[#D1B191]"
-                      }`}
+                      className={`p-4 rounded-xl border transition-all text-left flex items-center justify-between ${isSelected
+                        ? "bg-[#FCF2E9] border-[#8B7355] shadow-xs"
+                        : "bg-white border-[#E2E8F0] hover:border-[#D1B191]"
+                        }`}
                     >
                       <div className="flex items-center gap-3">
                         <div
-                          className={`w-5 h-5 rounded-md border flex items-center justify-center text-xs ${
-                            isSelected ? "bg-[#8B7355] border-[#8B7355] text-white" : "border-[#CBD5E1]"
-                          }`}
+                          className={`w-5 h-5 rounded-md border flex items-center justify-center text-xs ${isSelected ? "bg-[#8B7355] border-[#8B7355] text-white" : "border-[#CBD5E1]"
+                            }`}
                         >
                           {isSelected && "✓"}
                         </div>
@@ -512,7 +500,7 @@ export default function SaunaBookingPage() {
                 </span>
               </div>
               <div className="text-right">
-                <span className="text-2xl sm:text-4xl font-bold font-displayPlayFair text-[#8B7355]">
+                <span className="text-xl sm:text-4xl font-bold font-displayPlayFair text-[#8B7355]">
                   €{currentTotalPrice}
                 </span>
               </div>
@@ -526,9 +514,6 @@ export default function SaunaBookingPage() {
           {/* Header Banner */}
           <div className="p-6 rounded-2xl bg-[#FCF2E9] border border-[#E8E2DC] flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
             <div className="flex min-w-0 items-start gap-3 flex-col md:flex-row sm:gap-4">
-              <div className="w-12 h-12 rounded-2xl bg-[#8B7355] text-white flex items-center justify-center flex-shrink-0 shadow-xs">
-                <FaHotTub size={22} />
-              </div>
               <div className="min-w-0 flex-1">
                 <span className="text-[11px] font-bold uppercase tracking-widest text-[#8B7355] block">
                   {sTrans?.sharedSessionAccess || "Shared Session Access"}
@@ -584,11 +569,10 @@ export default function SaunaBookingPage() {
                   key={num}
                   type="button"
                   onClick={() => setGuestsCount(num)}
-                  className={`py-3.5 rounded-xl border font-bold text-center transition-all ${
-                    guestsCount === num
-                      ? "bg-[#8B7355] border-[#8B7355] text-white shadow-md scale-[1.03]"
-                      : "bg-white border-[#E2E8F0] text-[#475569] hover:border-[#D1B191]"
-                  }`}
+                  className={`py-3.5 rounded-xl border font-bold text-center transition-all ${guestsCount === num
+                    ? "bg-[#8B7355] border-[#8B7355] text-white shadow-md scale-[1.03]"
+                    : "bg-white border-[#E2E8F0] text-[#475569] hover:border-[#D1B191]"
+                    }`}
                 >
                   <span className="block text-base font-displayPlayFair">{num}</span>
                   <span className="text-[10px] uppercase font-mono">
@@ -614,7 +598,7 @@ export default function SaunaBookingPage() {
               </span>
             </div>
             <div className="text-left sm:text-right self-end sm:self-auto">
-              <span className="text-2xl sm:text-4xl font-bold font-displayPlayFair text-[#8B7355]">
+              <span className="text-xl sm:text-4xl font-bold font-displayPlayFair text-[#8B7355]">
                 €{currentTotalPrice}
               </span>
             </div>

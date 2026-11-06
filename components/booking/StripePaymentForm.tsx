@@ -463,7 +463,7 @@ function InnerPaymentForm({
   };
 
   return (
-    <div className="min-w-0 bg-white rounded-2xl sm:rounded-[28px] space-y-6 sm:space-y-8">
+    <div className="min-w-0 rounded-2xl sm:rounded-[28px] space-y-6 sm:space-y-8">
       {/* Header Banner & Security */}
       <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 pb-6 border-b border-[#E8E2DC]/80">
         <div className="flex items-center gap-4">
