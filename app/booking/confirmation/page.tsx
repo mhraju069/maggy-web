@@ -10,7 +10,7 @@ import { FaCakeCandles } from "react-icons/fa6";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 
 export default function ConfirmationPage() {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const flow = (t as any)?.bookingFlow;
   const confTrans = flow?.confirmation;
   const revTrans = flow?.review;
@@ -149,7 +149,10 @@ export default function ConfirmationPage() {
               </h3>
               <p className="text-base font-medium text-[#475569] mt-1">
                 {data.date
-                  ? new Date(data.date).toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric", year: "numeric" })
+                  ? new Date(data.date).toLocaleDateString(
+                      language === "nl" ? "nl-NL" : language === "de" ? "de-DE" : "en-US",
+                      { weekday: "long", month: "long", day: "numeric", year: "numeric" },
+                    )
                   : "Upcoming Date"}{" "}
                 • {data.guestsCount} {data.guestsCount === 1 ? (revTrans?.numberOfPeople ? "1" : "Person") : "People"}
               </p>
@@ -240,7 +243,7 @@ export default function ConfirmationPage() {
           {/* Confirmation Info */}
           <div className="pt-2">
             <span className="text-[10px] text-[#94A3B8] uppercase tracking-widest block mb-1" style={{ fontFamily: "Inter, sans-serif" }}>
-              {confTrans?.emailConfirmationNotice || "Confirmation Email Sent To"}
+              {confTrans?.confirmationEmailSentTo || "Confirmation Email Sent To"}
             </span>
             <p className="text-base font-bold text-[#0F172A]">{data.email || "Your email"}</p>
           </div>

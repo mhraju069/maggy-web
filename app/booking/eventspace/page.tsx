@@ -29,7 +29,7 @@ const EVENT_TYPES = [
 
 export default function EventSpaceInquiryPage() {
   const router = useRouter();
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const flow = (t as any)?.bookingFlow;
   const esTrans = flow?.eventspace;
   const btnTrans = flow?.buttons;
@@ -124,6 +124,24 @@ export default function EventSpaceInquiryPage() {
     }
   };
 
+  const selectedEventType = EVENT_TYPES.find((type) => type.id === eventType);
+  const localizedEventType =
+    (esTrans?.eventTypes as Record<string, string> | undefined)?.[selectedEventType?.key || ""] ||
+    selectedEventType?.label ||
+    eventType;
+  const confirmationEventType =
+    eventType === "Other events" && otherEventDetails.trim()
+      ? otherEventDetails.trim()
+      : localizedEventType;
+  const dateLocale = language === "nl" ? "nl-NL" : language === "de" ? "de-DE" : "en-US";
+  const confirmationDate = preferredDate
+    ? new Date(`${preferredDate}T12:00:00`).toLocaleDateString(dateLocale, {
+        day: "numeric",
+        month: "long",
+        year: "numeric",
+      })
+    : preferredDate;
+
   if (submitted) {
     return (
       <div className="w-full px-6 md:px-12 max-w-4xl mx-auto py-16">
@@ -142,22 +160,22 @@ export default function EventSpaceInquiryPage() {
             {esTrans?.inquirySuccessDesc
               ? esTrans.inquirySuccessDesc
                   .replace("{name}", name)
-                  .replace("{event}", eventType)
-                  .replace("{date}", preferredDate)
+                  .replace("{event}", confirmationEventType)
+                  .replace("{date}", confirmationDate)
                   .replace("{guests}", String(expectedGuests))
-              : <>Thank you, <span className="font-bold text-[#0F172A] not-italic">{name}</span>! We have received your inquiry for a <span className="font-bold text-[#8B7355] not-italic">{eventType}</span> on <span className="font-bold text-[#0F172A] not-italic">{preferredDate}</span> for {expectedGuests} guests.</>}
+              : <>Thank you, <span className="font-bold text-[#0F172A] not-italic">{name}</span>! We have received your inquiry for a <span className="font-bold text-[#8B7355] not-italic">{confirmationEventType}</span> on <span className="font-bold text-[#0F172A] not-italic">{confirmationDate}</span> for {expectedGuests} guests.</>}
           </p>
 
           <div className="w-full bg-[#FCF2E9] rounded-2xl p-6 border border-[#E8E2DC] text-left max-w-lg space-y-3 text-xs text-[#475569]">
-            <div className="flex justify-between items-center pb-2 border-b border-[#E8E2DC]">
+            <div className="flex flex-col items-start gap-2 border-b border-[#E8E2DC] pb-2 sm:flex-row sm:items-center sm:justify-between">
               <p className="font-bold text-[#8B7355] uppercase tracking-wider text-[11px]">{esTrans?.bookingReference || "Booking Reference"}</p>
-              <span className="font-bold font-mono text-base text-[#0F172A]">{bookingRef}</span>
+              <span className="max-w-full break-all font-bold font-mono text-base text-[#0F172A] sm:text-right">{bookingRef}</span>
             </div>
-            <div className="grid grid-cols-2 gap-2 pt-1">
-              <div><span className="font-semibold">{esTrans?.eventTypeLabel || "Event Type:"}</span> {eventType === "Other events" && otherEventDetails ? otherEventDetails : eventType}</div>
-              <div><span className="font-semibold">{esTrans?.dateLabel || "Date:"}</span> {preferredDate}</div>
-              <div><span className="font-semibold">{esTrans?.timeLabel || "Time:"}</span> {startTime} - {endTime}</div>
-              <div><span className="font-semibold">{esTrans?.guestsLabel || "Guests:"}</span> {expectedGuests}</div>
+            <div className="grid grid-cols-1 gap-2 pt-1 sm:grid-cols-2">
+              <div className="min-w-0 break-words"><span className="font-semibold">{esTrans?.eventTypeLabel || "Event Type:"}</span> {confirmationEventType}</div>
+              <div className="min-w-0 break-words"><span className="font-semibold">{esTrans?.dateLabel || "Date:"}</span> {confirmationDate}</div>
+              <div className="min-w-0 break-words"><span className="font-semibold">{esTrans?.timeLabel || "Time:"}</span> {startTime} - {endTime}</div>
+              <div className="min-w-0 break-words"><span className="font-semibold">{esTrans?.guestsLabel || "Guests:"}</span> {expectedGuests}</div>
             </div>
             {foodPreference && <div><span className="font-semibold">{esTrans?.foodLabel || "Food:"}</span> {foodPreference}</div>}
             {drinkPreference && <div><span className="font-semibold">{esTrans?.drinksLabel || "Drinks:"}</span> {drinkPreference}</div>}
@@ -224,7 +242,7 @@ export default function EventSpaceInquiryPage() {
             <p className="text-xs text-[#64748B]">{esTrans?.selectEventTypeSub || "Choose the occasion you are planning to host"}</p>
           </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+          <div className="grid auto-rows-fr grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
             {EVENT_TYPES.map((type) => {
               const isSelected = eventType === type.id;
               return (
@@ -232,9 +250,9 @@ export default function EventSpaceInquiryPage() {
                   key={type.id}
                   type="button"
                   onClick={() => setEventType(type.id)}
-                  className={`py-3.5 px-4 rounded-2xl border text-center font-bold text-sm transition-all ${
+                  className={`flex h-full min-h-20 w-full min-w-0 items-center justify-center whitespace-normal break-words rounded-2xl border px-3 py-3 text-center font-bold text-sm leading-snug transition-colors ${
                     isSelected
-                      ? "bg-[#8B7355] border-[#8B7355] text-white shadow-md scale-[1.02]"
+                      ? "bg-[#8B7355] border-[#8B7355] text-white shadow-md"
                       : "bg-white border-[#E2E8F0] text-[#0F172A] hover:border-[#D1B191]"
                   }`}
                 >

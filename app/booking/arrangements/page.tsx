@@ -611,11 +611,11 @@ export default function SaltRoomBookingPage() {
       <div className="bg-white rounded-[32px] p-8 md:p-10 shadow-sm border border-[#E8E2DC] space-y-10 mb-10">
         {/* ── 1. Date Selection (Picker) ── */}
         <div>
-          <div className="flex justify-between items-center mb-3">
-            <label className="block text-sm font-bold text-[#0F172A] uppercase tracking-wider" style={{ fontFamily: "Inter, sans-serif" }}>
+          <div className="mb-3 flex flex-col items-start gap-1 sm:flex-row sm:items-center sm:justify-between">
+            <label className="block min-w-0 text-sm font-bold text-[#0F172A] uppercase tracking-wider" style={{ fontFamily: "Inter, sans-serif" }}>
               {saltTrans?.selectReservationDate || "1. Select Reservation Date"}
             </label>
-            <span className="text-xs text-[#8B7355] font-semibold">
+            <span className="max-w-full whitespace-normal text-xs font-semibold text-[#8B7355] sm:text-right">
               {saltTrans?.operatingHours || "Operating hours: 09:00 – 21:00"}
             </span>
           </div>

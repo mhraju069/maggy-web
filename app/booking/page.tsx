@@ -150,7 +150,7 @@ export default function BookingPage() {
         </h1>
         <DecorativeUnderline />
         <p className="font-cambria text-sm text-[#475569] mt-4 sm:mt-6 italic px-4">
-          A carefully curated moment, designed around you.
+          {flow?.stepper?.selectExperienceSubtitle || "A carefully curated moment, designed around you."}
         </p>
       </div>
 
