@@ -14,7 +14,9 @@ import {
   HiOutlineCheckCircle,
 } from "react-icons/hi";
 import { bookingService } from "@/lib/api/services/bookingService";
-import { formatTime24h } from "@/lib/dateUtils";
+import { formatDisplayDate, formatTime24h } from "@/lib/dateUtils";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
+import { dashboardTranslations } from "@/lib/i18n/dashboardTranslations";
 
 export interface BookingModalData {
   booking_id?: string;
@@ -69,6 +71,9 @@ export default function BookingDetailsModal({
   isOpen,
   onClose,
 }: BookingDetailsModalProps) {
+  const { language, t } = useLanguage();
+  const cUI = (t as any)?.commonUI?.detailsModal || {};
+  const dt = dashboardTranslations[language]?.myBookings || dashboardTranslations.en.myBookings;
   const [loading, setLoading] = useState<boolean>(false);
   const [details, setDetails] = useState<BookingModalData | null>(initialData || null);
   const [error, setError] = useState<string | null>(null);
@@ -161,7 +166,7 @@ export default function BookingDetailsModal({
             </div>
             <div>
               <h3 className="text-lg font-bold text-[#1d1a17] font-displayPlayFair leading-tight">
-                Reservation Details
+                {cUI.title || "Reservation Details"}
               </h3>
               <p className="text-xs text-[#8B6E4E] font-mono mt-0.5">
                 Ref: #{bookingRef}
@@ -171,7 +176,7 @@ export default function BookingDetailsModal({
           <button
             onClick={onClose}
             className="p-2 rounded-xl text-[#94A3B8] hover:text-[#1d1a17] hover:bg-[#E8E2DC]/50 transition-colors cursor-pointer"
-            aria-label="Close"
+            aria-label={cUI.close || "Close"}
           >
             <HiOutlineX className="w-5 h-5" />
           </button>
@@ -182,7 +187,7 @@ export default function BookingDetailsModal({
           {loading && !currentData ? (
             <div className="py-12 flex flex-col items-center justify-center text-[#94A3B8]">
               <div className="w-8 h-8 border-3 border-[#CFB9A3] border-t-transparent rounded-full animate-spin mb-3" />
-              <p className="text-sm">Loading reservation details...</p>
+              <p className="text-sm">{cUI.loadingReservation || "Loading reservation details..."}</p>
             </div>
           ) : (
             <>
@@ -190,7 +195,7 @@ export default function BookingDetailsModal({
               <div className="bg-[#FAF7F4] rounded-2xl p-4 border border-[#E8E2DC] flex items-center justify-between">
                 <div>
                   <span className="text-[10px] font-semibold tracking-wider text-[#8B6E4E] uppercase">
-                    Service
+                    {cUI.service || "Service"}
                   </span>
                   <h4 className="text-base font-bold text-[#1d1a17] capitalize">
                     {serviceName}
@@ -208,15 +213,15 @@ export default function BookingDetailsModal({
               <div className="grid grid-cols-3 gap-3">
                 <div className="bg-[#FDFBF7] p-3 rounded-xl border border-[#F1EDE8] text-center">
                   <HiOutlineCalendar className="w-4 h-4 mx-auto text-[#8B6E4E] mb-1" />
-                  <p className="text-[10px] text-[#94A3B8] uppercase">Date</p>
+                  <p className="text-[10px] text-[#94A3B8] uppercase">{cUI.date || "Date"}</p>
                   <p className="text-xs font-semibold text-[#1d1a17] mt-0.5">
-                    {formatDate(currentData?.date)}
+                    {formatDisplayDate(currentData?.date, language)}
                   </p>
                 </div>
 
                 <div className="bg-[#FDFBF7] p-3 rounded-xl border border-[#F1EDE8] text-center">
                   <HiOutlineClock className="w-4 h-4 mx-auto text-[#8B6E4E] mb-1" />
-                  <p className="text-[10px] text-[#94A3B8] uppercase">Time</p>
+                  <p className="text-[10px] text-[#94A3B8] uppercase">{cUI.time || "Time"}</p>
                   <p className="text-xs font-semibold text-[#1d1a17] mt-0.5">
                     {formatTime24h(currentData?.time) || "N/A"}
                   </p>
@@ -224,10 +229,10 @@ export default function BookingDetailsModal({
 
                 <div className="bg-[#FDFBF7] p-3 rounded-xl border border-[#F1EDE8] text-center">
                   <HiOutlineUsers className="w-4 h-4 mx-auto text-[#8B6E4E] mb-1" />
-                  <p className="text-[10px] text-[#94A3B8] uppercase">Capacity</p>
+                  <p className="text-[10px] text-[#94A3B8] uppercase">{cUI.capacity || "Capacity"}</p>
                   <p className="text-xs font-semibold text-[#1d1a17] mt-0.5">
                     {currentData?.guests || currentData?.capacity || 1}{" "}
-                    {(currentData?.guests || currentData?.capacity) === 1 ? "Person" : "Persons"}
+                    {(currentData?.guests || currentData?.capacity) === 1 ? (cUI.person || "Person") : (cUI.persons || "Persons")}
                   </p>
                 </div>
               </div>
@@ -236,7 +241,7 @@ export default function BookingDetailsModal({
               {(currentData?.name || currentData?.email || currentData?.phone) && (
                 <div className="border-t border-[#F1EDE8] pt-4">
                   <h5 className="text-xs font-bold uppercase tracking-wider text-[#94A3B8] mb-3">
-                    Guest Information
+                    {cUI.guestInformation || "Guest Information"}
                   </h5>
                   <div className="space-y-2 text-xs">
                     {currentData.name && (
@@ -264,7 +269,7 @@ export default function BookingDetailsModal({
               {/* Access Code (if present) */}
               {currentData?.access_code && (
                 <div className="bg-[#FAF7F4] p-3 rounded-xl border border-[#E8E2DC] flex items-center justify-between text-xs">
-                  <span className="font-semibold text-[#64748B]">Access Code:</span>
+                  <span className="font-semibold text-[#64748B]">{cUI.accessCode || "Access Code:"}</span>
                   <span className="font-mono font-bold text-[#8B6E4E] tracking-widest text-sm bg-white px-3 py-1 rounded-lg border border-[#E8E2DC]">
                     {currentData.access_code}
                   </span>
@@ -274,12 +279,12 @@ export default function BookingDetailsModal({
               {/* Payment Details */}
               <div className="border-t border-[#F1EDE8] pt-4">
                 <h5 className="text-xs font-bold uppercase tracking-wider text-[#94A3B8] mb-3">
-                  Payment Details
+                  {cUI.paymentDetails || "Payment Details"}
                 </h5>
                 <div className="flex items-center justify-between bg-[#FDFBF7] p-3 rounded-xl border border-[#F1EDE8] text-xs">
                   <div className="flex items-center gap-2">
                     <HiOutlineCurrencyEuro className="w-4 h-4 text-[#8B6E4E]" />
-                    <span className="text-[#64748B]">Status:</span>
+                    <span className="text-[#64748B]">{cUI.status || "Status"}:</span>
                     <span className="font-semibold text-[#1d1a17] capitalize">
                       {paymentStatus.replace(/_/g, " ")}
                     </span>
@@ -296,13 +301,13 @@ export default function BookingDetailsModal({
               {(currentData?.special_request || currentData?.celebration_type || currentData?.name_of_celebrant) && (
                 <div className="border-t border-[#F1EDE8] pt-4">
                   <h5 className="text-xs font-bold uppercase tracking-wider text-[#94A3B8] mb-2">
-                    Additional Notes
+                    {cUI.additionalNotes || "Additional Notes"}
                   </h5>
                   {currentData.celebration_type && (
                     <p className="text-xs text-[#64748B] mb-1">
-                      <span className="font-semibold text-[#1d1a17]">Celebration:</span>{" "}
+                      <span className="font-semibold text-[#1d1a17]">{cUI.celebration || "Celebration"}:</span>{" "}
                       {currentData.celebration_type}
-                      {currentData.name_of_celebrant ? ` for ${currentData.name_of_celebrant}` : ""}
+                      {currentData.name_of_celebrant ? ` ${cUI.forPerson || "for"} ${currentData.name_of_celebrant}` : ""}
                     </p>
                   )}
                   {currentData.special_request && (
@@ -328,7 +333,7 @@ export default function BookingDetailsModal({
             onClick={onClose}
             className="px-5 py-2 bg-[#CFB9A3] hover:bg-[#bfa77f] text-white text-xs font-semibold rounded-full transition-colors cursor-pointer"
           >
-            Close
+            {cUI.close || "Close"}
           </button>
         </div>
       </div>

@@ -792,7 +792,7 @@ export default function ChooseTimePage() {
               {loadingApiSlots && (
                 <div className="p-8 text-center text-xs text-[#64748B] italic">
                   <div className="inline-block animate-spin rounded-full h-6 w-6 border-2 border-[#8B7355] border-t-transparent mr-2 align-middle"></div>
-                  Loading package sub-services and slots for {date}...
+                  {(ctTrans?.loadingPackageSlots || "Loading package sub-services and slots for {date}...").replace("{date}", date)}
                 </div>
               )}
 
@@ -800,8 +800,8 @@ export default function ChooseTimePage() {
                 <div className="p-6 rounded-2xl bg-rose-50 border border-rose-200 text-rose-700 text-sm font-bold flex items-center gap-3">
                   <BiInfoCircle size={22} className="flex-shrink-0" />
                   <div>
-                    <h5 className="font-bold">Date Blocked</h5>
-                    <p className="text-xs font-normal mt-0.5">{packageSlots.message || "This date is currently blocked for package reservations."}</p>
+                    <h5 className="font-bold">{ctTrans?.dateBlocked || "Date Blocked"}</h5>
+                    <p className="text-xs font-normal mt-0.5">{packageSlots.message || ctTrans?.packageDateBlockedMsg || "This date is currently blocked for package reservations."}</p>
                   </div>
                 </div>
               )}
@@ -810,8 +810,8 @@ export default function ChooseTimePage() {
                 <div className="p-6 rounded-2xl bg-amber-50 border border-amber-200 text-amber-900 text-sm font-semibold flex items-start gap-3">
                   <BiInfoCircle size={22} className="text-amber-700 flex-shrink-0 mt-0.5" />
                   <div>
-                    <h5 className="font-bold text-base text-amber-950">Package Closed on this Date</h5>
-                    <p className="text-xs text-amber-800 mt-1">{packageSlots.message || "Packages are closed on this date. Please pick another date."}</p>
+                    <h5 className="font-bold text-base text-amber-950">{ctTrans?.packageClosedOnDate || "Package Closed on this Date"}</h5>
+                    <p className="text-xs text-amber-800 mt-1">{packageSlots.message || ctTrans?.packageClosedMessage || "Packages are closed on this date. Please pick another date."}</p>
                   </div>
                 </div>
               )}
@@ -819,7 +819,7 @@ export default function ChooseTimePage() {
               {!loadingApiSlots && packageSlots && !packageSlots.is_blocked && Object.keys(packageSlots.data || {}).length === 0 && (
                 <div className="p-5 rounded-2xl bg-amber-50 border border-amber-200 text-amber-900 text-sm flex items-start gap-3">
                   <BiInfoCircle size={20} className="text-amber-700 flex-shrink-0 mt-0.5" />
-                  <p>{packageSlots.message || "No booking services are available for this package."}</p>
+                  <p>{packageSlots.message || ctTrans?.noBookingServicesForPackage || "No booking services are available for this package."}</p>
                 </div>
               )}
 
@@ -1211,7 +1211,7 @@ export default function ChooseTimePage() {
               {loadingApiSlots && (
                 <div className="p-8 text-center text-xs text-[#64748B] italic">
                   <div className="inline-block animate-spin rounded-full h-6 w-6 border-2 border-[#8B7355] border-t-transparent mr-2 align-middle"></div>
-                  Checking live available slots for {date}...
+                  {ctTrans?.checkingLiveSlots?.replace("{date}", date) || `Checking live available slots for ${date}...`}
                 </div>
               )}
 
@@ -1219,8 +1219,8 @@ export default function ChooseTimePage() {
                 <div className="p-6 rounded-2xl bg-rose-50 border border-rose-200 text-rose-700 text-sm font-bold flex items-center gap-3">
                   <BiInfoCircle size={22} className="flex-shrink-0" />
                   <div>
-                    <h5 className="font-bold">Date Blocked</h5>
-                    <p className="text-xs font-normal mt-0.5">{apiSlots.message || "No slots available. This date is blocked by administration."}</p>
+                    <h5 className="font-bold">{ctTrans?.dateBlocked || "Date Blocked"}</h5>
+                    <p className="text-xs font-normal mt-0.5">{apiSlots.message || ctTrans?.dateBlockedMsg || "No slots available. This date is blocked by administration."}</p>
                   </div>
                 </div>
               )}
@@ -1229,9 +1229,9 @@ export default function ChooseTimePage() {
                 <div className="p-6 rounded-2xl bg-amber-50 border border-amber-200 text-amber-900 text-sm font-semibold flex items-start gap-3">
                   <BiInfoCircle size={22} className="text-amber-700 flex-shrink-0 mt-0.5" />
                   <div>
-                    <h5 className="font-bold text-base text-amber-950">Service Closed on this Date</h5>
+                    <h5 className="font-bold text-base text-amber-950">{ctTrans?.serviceClosedOnDate || "Service Closed on this Date"}</h5>
                     <p className="text-xs text-amber-800 mt-1">
-                      {(apiSlots?.data as any)?.info || apiSlots?.message || `${storedData.serviceName || "This service"} is closed on ${date}. Please select another date.`}
+                      {(apiSlots?.data as any)?.info || apiSlots?.message || (ctTrans?.serviceClosedMessage || "{service} is closed on {date}. Please select another date.").replace("{service}", storedData.serviceName || "This service").replace("{date}", date)}
                     </p>
                   </div>
                 </div>
@@ -1421,7 +1421,7 @@ export default function ChooseTimePage() {
                       60
                     );
                     if (lunchroomSlots.length === 0) {
-                      return <p className="col-span-full text-xs text-amber-800">No Lunchroom arrival times are available for this date.</p>;
+                      return <p className="col-span-full text-xs text-amber-800">{ctTrans?.lunchroomNoArrivalTimes || "No Lunchroom arrival times are available for this date."}</p>;
                     }
                     return lunchroomSlots.map((time) => (
                       <button

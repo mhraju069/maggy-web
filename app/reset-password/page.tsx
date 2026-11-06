@@ -9,11 +9,15 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useState } from "react";
 import { HiOutlineKey, HiOutlineLockClosed, HiOutlineMail } from "react-icons/hi";
 import { IoEyeOutline } from "react-icons/io5";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
+import { authTranslations } from "@/lib/i18n/authTranslations";
 
 function ResetPasswordForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const initialEmail = searchParams.get("email") || "";
+  const { language } = useLanguage();
+  const tAuth = authTranslations[language]?.resetPassword || authTranslations.en.resetPassword;
 
   const [email, setEmail] = useState(initialEmail);
   const [otpCode, setOtpCode] = useState("");
@@ -27,7 +31,7 @@ function ResetPasswordForm() {
 
   const handleResendOtp = async () => {
     if (!email.trim()) {
-      setError("Please provide your email address to resend OTP.");
+      setError(tAuth.errors.enterEmail);
       return;
     }
     setError(null);
@@ -35,13 +39,13 @@ function ResetPasswordForm() {
     try {
       const res = await authService.forgotPassword({ email: email.trim() });
       if (res.status !== false) {
-        setSuccess("A new reset OTP code has been sent to your email.");
+        setSuccess(tAuth.resendSuccess);
       } else {
-        setError(res.log || "Failed to resend OTP.");
+        setError(res.log || tAuth.errors.failed);
       }
     } catch (err: unknown) {
       const msg = parseApiErrorMessage((err as { data?: unknown })?.data || err);
-      setError(msg || "Failed to resend OTP.");
+      setError(msg || tAuth.errors.failed);
     } finally {
       setResending(false);
     }
@@ -53,19 +57,19 @@ function ResetPasswordForm() {
     setSuccess(null);
 
     if (!email.trim()) {
-      setError("Please enter your registered email address.");
+      setError(tAuth.errors.enterEmail);
       return;
     }
     if (!otpCode.trim() || otpCode.trim().length !== 4) {
-      setError("Please enter the 4-digit verification code sent to your email.");
+      setError(tAuth.errors.enterOtp);
       return;
     }
     if (newPassword.length < 6) {
-      setError("New password must be at least 6 characters.");
+      setError(tAuth.errors.minPassword);
       return;
     }
     if (newPassword !== confirmPassword) {
-      setError("Passwords do not match.");
+      setError(tAuth.errors.passwordMismatch);
       return;
     }
 
@@ -79,16 +83,16 @@ function ResetPasswordForm() {
       });
 
       if (response.status !== false) {
-        setSuccess(response.log || "Password reset successful! Redirecting to login…");
+        setSuccess(response.log || tAuth.successMsg);
         setTimeout(() => {
           router.push("/login");
         }, 1500);
       } else {
-        setError(response.log || "Failed to reset password. Please check your OTP code.");
+        setError(response.log || tAuth.errors.failed);
       }
     } catch (err: unknown) {
       const msg = parseApiErrorMessage((err as { data?: unknown })?.data || err);
-      setError(msg || "Failed to reset password.");
+      setError(msg || tAuth.errors.failed);
     } finally {
       setLoading(false);
     }
@@ -111,11 +115,11 @@ function ResetPasswordForm() {
           />
           <div className="absolute inset-0 bg-black/30" />
           <div className="absolute inset-0 flex flex-col justify-center items-center text-center p-10 text-white">
-            <h2 className="font-displayPlayFair text-4xl lg:text-5xl leading-[1.2] mb-5">
-              Secure Your <br /> Credentials.
+            <h2 className="font-displayPlayFair text-4xl lg:text-5xl leading-[1.2] mb-5 whitespace-pre-line">
+              {tAuth.heroTitle}
             </h2>
             <p className="text-sm leading-relaxed opacity-90 max-w-sm mb-5">
-              Set a strong, new password to restore your private access to Haven on Earth.
+              {tAuth.heroSubtitle}
             </p>
             <div className="w-12 h-px bg-white/60" />
           </div>
@@ -126,10 +130,10 @@ function ResetPasswordForm() {
           <div className="w-full max-w-[480px]">
             <div className="mb-6">
               <h1 className="font-displayPlayFair text-[32px] font-bold text-[#1d1a17] mb-2 leading-tight">
-                Reset Password
+                {tAuth.title}
               </h1>
               <p className="text-sm text-[#64748B] font-light">
-                Enter the 4-digit code sent to your email along with your new password.
+                {tAuth.subtitle}
               </p>
             </div>
 
@@ -140,7 +144,7 @@ function ResetPasswordForm() {
                   htmlFor="email"
                   className="text-[11px] font-medium text-[#1d1a17] uppercase tracking-wide"
                 >
-                  Email Address
+                  {tAuth.emailLabel}
                 </label>
                 <div className="relative">
                   <span className="absolute inset-y-0 left-3 flex items-center text-[#94A3B8] pointer-events-none">
@@ -150,7 +154,7 @@ function ResetPasswordForm() {
                     id="email"
                     type="email"
                     required
-                    placeholder="user@example.com"
+                    placeholder={tAuth.emailPlaceholder}
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     className="w-full pl-9 pr-3 py-2.5 border border-[#E2E8F0] rounded-sm text-sm text-[#1d1a17] placeholder:text-[#94A3B8] focus:outline-none focus:border-[#8b7355] transition-colors"
@@ -165,7 +169,7 @@ function ResetPasswordForm() {
                     htmlFor="otp"
                     className="text-[11px] font-medium text-[#1d1a17] uppercase tracking-wide"
                   >
-                    4-Digit OTP Code
+                    {tAuth.otpLabel}
                   </label>
                   <button
                     type="button"
@@ -173,7 +177,7 @@ function ResetPasswordForm() {
                     disabled={resending}
                     className="text-xs text-[#8b7355] hover:underline disabled:opacity-50"
                   >
-                    {resending ? "Sending…" : "Resend Code"}
+                    {resending ? tAuth.sending : tAuth.resendCode}
                   </button>
                 </div>
                 <div className="relative">
@@ -185,7 +189,7 @@ function ResetPasswordForm() {
                     type="text"
                     required
                     maxLength={4}
-                    placeholder="e.g. 4829"
+                    placeholder={tAuth.otpPlaceholder}
                     value={otpCode}
                     onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, ""))}
                     className="w-full pl-9 pr-3 py-2.5 border border-[#E2E8F0] rounded-sm text-sm font-mono tracking-widest text-[#1d1a17] placeholder:text-[#94A3B8] focus:outline-none focus:border-[#8b7355] transition-colors"
@@ -199,7 +203,7 @@ function ResetPasswordForm() {
                   htmlFor="new_password"
                   className="text-[11px] font-medium text-[#1d1a17] uppercase tracking-wide"
                 >
-                  New Password
+                  {tAuth.newPasswordLabel}
                 </label>
                 <div className="relative">
                   <span className="absolute inset-y-0 left-3 flex items-center text-[#94A3B8] pointer-events-none">
@@ -209,7 +213,7 @@ function ResetPasswordForm() {
                     id="new_password"
                     type={showPassword ? "text" : "password"}
                     required
-                    placeholder="Min. 6 characters"
+                    placeholder={tAuth.newPasswordPlaceholder}
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
                     className="w-full pl-9 pr-10 py-2.5 border border-[#E2E8F0] rounded-sm text-sm text-[#1d1a17] focus:outline-none focus:border-[#8b7355] transition-colors"
@@ -230,7 +234,7 @@ function ResetPasswordForm() {
                   htmlFor="confirm_password"
                   className="text-[11px] font-medium text-[#1d1a17] uppercase tracking-wide"
                 >
-                  Confirm New Password
+                  {tAuth.confirmPasswordLabel}
                 </label>
                 <div className="relative">
                   <span className="absolute inset-y-0 left-3 flex items-center text-[#94A3B8] pointer-events-none">
@@ -240,7 +244,7 @@ function ResetPasswordForm() {
                     id="confirm_password"
                     type={showPassword ? "text" : "password"}
                     required
-                    placeholder="Repeat new password"
+                    placeholder={tAuth.confirmPasswordPlaceholder}
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     className="w-full pl-9 pr-3 py-2.5 border border-[#E2E8F0] rounded-sm text-sm text-[#1d1a17] focus:outline-none focus:border-[#8b7355] transition-colors"
@@ -269,7 +273,7 @@ function ResetPasswordForm() {
                 className="w-full flex items-center justify-center gap-2 py-3.5 mt-2 bg-[#CFB9A3] hover:bg-[#bfa77f] disabled:opacity-70 text-white text-xs font-bold uppercase tracking-widest rounded-sm transition-colors cursor-pointer"
                 style={{ boxShadow: "0 0 20px 0 rgba(202,117,33,0.30)" }}
               >
-                {loading ? "Updating Password…" : "Reset Password"}
+                {loading ? tAuth.resettingPassword : tAuth.resetPasswordButton}
                 {!loading && (
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
                     <path
@@ -285,12 +289,12 @@ function ResetPasswordForm() {
 
               {/* Back to Login link */}
               <p className="text-center text-xs text-[#64748B] pt-4 border-t border-[#f1f5f9]">
-                Already know your password?{" "}
+                {tAuth.rememberPassword}{" "}
                 <Link
                   href="/login"
                   className="text-[#CFB9A3] hover:text-[#8b7355] font-semibold ml-0.5 transition-colors"
                 >
-                  Back to Log In
+                  {tAuth.backToLogin}
                 </Link>
               </p>
             </form>

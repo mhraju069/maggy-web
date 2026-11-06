@@ -14,6 +14,7 @@ export default function ConfirmationPage() {
   const flow = (t as any)?.bookingFlow;
   const confTrans = flow?.confirmation;
   const revTrans = flow?.review;
+  const infoTrans = flow?.information;
   const btnTrans = flow?.buttons;
   const [data, setData] = useState<BookingData | null>(null);
   const [bookingRef, setBookingRef] = useState<string>("");
@@ -154,7 +155,7 @@ export default function ConfirmationPage() {
                       { weekday: "long", month: "long", day: "numeric", year: "numeric" },
                     )
                   : "Upcoming Date"}{" "}
-                • {data.guestsCount} {data.guestsCount === 1 ? (revTrans?.numberOfPeople ? "1" : "Person") : "People"}
+                • {data.guestsCount} {data.guestsCount === 1 ? revTrans?.person || "Person" : revTrans?.people || "People"}
               </p>
             </div>
 
@@ -167,7 +168,7 @@ export default function ConfirmationPage() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
                   {data.packageSelections.saunaSlot && (
                     <div className="p-3 bg-[#FAF7F2] rounded-xl border border-[#E8E2DC]">
-                      <span className="text-[10px] uppercase font-bold text-[#8B7355] block">Sauna Session</span>
+                      <span className="text-[10px] uppercase font-bold text-[#8B7355] block">{revTrans?.saunaSession || "Sauna Session"}</span>
                       <p className="font-bold text-[#0F172A] text-xs mt-0.5">
                         {data.packageSelections.saunaSlot.startTime} – {data.packageSelections.saunaSlot.endTime}
                       </p>
@@ -176,16 +177,16 @@ export default function ConfirmationPage() {
 
                   {data.packageSelections.lunchroomTime && (
                     <div className="p-3 bg-[#FAF7F2] rounded-xl border border-[#E8E2DC]">
-                      <span className="text-[10px] uppercase font-bold text-[#8B7355] block">Lunchroom Dining</span>
+                      <span className="text-[10px] uppercase font-bold text-[#8B7355] block">{revTrans?.lunchroomDining || "Lunchroom Dining"}</span>
                       <p className="font-bold text-[#0F172A] text-xs mt-0.5">
-                        {data.packageSelections.lunchroomTime} Arrival
+                        {data.packageSelections.lunchroomTime} {infoTrans?.arrivalSuffix || "Arrival"}
                       </p>
                     </div>
                   )}
 
                   {data.packageSelections.saltRoomSlot && (
                     <div className="p-3 bg-[#FAF7F2] rounded-xl border border-[#E8E2DC]">
-                      <span className="text-[10px] uppercase font-bold text-[#8B7355] block">Salt Room Session</span>
+                      <span className="text-[10px] uppercase font-bold text-[#8B7355] block">{revTrans?.saltRoomSession || "Salt Room Session"}</span>
                       <p className="font-bold text-[#0F172A] text-xs mt-0.5">
                         {data.packageSelections.saltRoomSlot.startTime} – {data.packageSelections.saltRoomSlot.endTime}
                       </p>
@@ -194,7 +195,7 @@ export default function ConfirmationPage() {
 
                   {data.packageSelections.activitySession && (
                     <div className="p-3 bg-[#FAF7F2] rounded-xl border border-[#E8E2DC]">
-                      <span className="text-[10px] uppercase font-bold text-[#8B7355] block">Activity Session</span>
+                      <span className="text-[10px] uppercase font-bold text-[#8B7355] block">{revTrans?.activitySession || "Activity Session"}</span>
                       <p className="font-bold text-[#0F172A] text-xs mt-0.5">
                         {data.packageSelections.activitySession.title} ({data.packageSelections.activitySession.startTime} – {data.packageSelections.activitySession.endTime})
                       </p>

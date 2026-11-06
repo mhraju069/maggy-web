@@ -9,10 +9,14 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
 import { FiArrowRight, FiShield } from "react-icons/fi";
 import { HiOutlineMail } from "react-icons/hi";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
+import { authTranslations } from "@/lib/i18n/authTranslations";
 
 function VerifyOtpContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { language } = useLanguage();
+  const tAuth = authTranslations[language]?.verifyOtp || authTranslations.en.verifyOtp;
 
   const [email, setEmail] = useState("");
   const [otpCode, setOtpCode] = useState("");
@@ -33,7 +37,7 @@ function VerifyOtpContent() {
     setSuccessMessage(null);
 
     if (!email.trim() || !otpCode.trim()) {
-      setError("Please enter both email and OTP code.");
+      setError(tAuth.errors.fillAll);
       return;
     }
 
@@ -46,9 +50,9 @@ function VerifyOtpContent() {
       });
 
       if (response.status === false) {
-        setError(parseApiErrorMessage(response) || "OTP verification failed. Please check your code.");
+        setError(parseApiErrorMessage(response) || tAuth.errors.failed);
       } else {
-        const msg = response.log || "OTP verified successfully. Please log in to continue.";
+        const msg = response.log || tAuth.successMsg;
         setSuccessMessage(msg);
         const redirectParam = searchParams.get("redirect");
         setTimeout(() => {
@@ -57,7 +61,7 @@ function VerifyOtpContent() {
       }
     } catch (err: unknown) {
       const msg = parseApiErrorMessage((err as { data?: unknown })?.data || err);
-      setError(msg);
+      setError(msg || tAuth.errors.failed);
     } finally {
       setLoading(false);
     }
@@ -77,11 +81,11 @@ function VerifyOtpContent() {
         <div className="absolute inset-0 bg-black/30" />
 
         <div className="relative z-10 max-w-md">
-          <h2 className="text-4xl lg:text-5xl font-displayPlayFair leading-[1.2] mb-8">
-            Account <br /> Verification.
+          <h2 className="text-4xl lg:text-5xl font-displayPlayFair leading-[1.2] mb-8 whitespace-pre-line">
+            {tAuth.heroTitle}
           </h2>
           <p className="text-base lg:text-lg leading-relaxed font-light mb-6">
-            Enter the activation code sent to your registered email to complete your registration.
+            {tAuth.heroSubtitle}
           </p>
           <div className="w-16 h-[1.5px] bg-white/60" />
         </div>
@@ -94,10 +98,10 @@ function VerifyOtpContent() {
             <FiShield className="w-6 h-6" />
           </div>
           <h1 className="text-3xl lg:text-4xl font-displayPlayFair font-bold text-[#1d1a17] mb-3">
-            Verify Email OTP
+            {tAuth.title}
           </h1>
           <p className="text-base text-[#8b7355] font-light">
-            Check your inbox for the activation code.
+            {tAuth.subtitle}
           </p>
         </div>
 
@@ -105,7 +109,7 @@ function VerifyOtpContent() {
           {/* Email Address */}
           <div className="space-y-2">
             <label className="text-[13px] text-[#1d1a17] font-medium" htmlFor="email">
-              Email Address
+              {tAuth.emailLabel}
             </label>
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-[#9d8b7a]">
@@ -117,7 +121,7 @@ function VerifyOtpContent() {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="you@example.com"
+                placeholder={tAuth.emailPlaceholder}
                 className="w-full pl-10 pr-4 py-3 border border-[#E2E8F0] rounded-sm focus:outline-none focus:border-[#8b7355] text-sm text-[#1d1a17]"
               />
             </div>
@@ -126,7 +130,7 @@ function VerifyOtpContent() {
           {/* OTP Code */}
           <div className="space-y-2">
             <label className="text-[13px] text-[#1d1a17] font-medium" htmlFor="otp_code">
-              OTP Code
+              {tAuth.otpLabel}
             </label>
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-[#9d8b7a]">
@@ -138,7 +142,7 @@ function VerifyOtpContent() {
                 required
                 value={otpCode}
                 onChange={(e) => setOtpCode(e.target.value)}
-                placeholder="Enter OTP code"
+                placeholder={tAuth.otpPlaceholder}
                 className="w-full pl-10 pr-4 py-3 border border-[#E2E8F0] rounded-sm focus:outline-none focus:border-[#8b7355] text-sm font-mono text-[#1d1a17] tracking-widest placeholder:tracking-normal"
               />
             </div>
@@ -165,7 +169,7 @@ function VerifyOtpContent() {
               disabled={loading}
               className="w-full flex items-center justify-center space-x-2 py-4 bg-[#D1BC9D] hover:bg-[#8B7355] disabled:opacity-60 text-white font-bold rounded-sm transition-colors uppercase tracking-widest text-sm"
             >
-              <span>{loading ? "Verifying..." : "Verify OTP"}</span>
+              <span>{loading ? tAuth.verifying : tAuth.verifyButton}</span>
               {!loading && <FiArrowRight className="w-4 h-4" />}
             </button>
           </div>
@@ -173,9 +177,9 @@ function VerifyOtpContent() {
           {/* Link back to Signup / Login */}
           <div className="text-center pt-6 space-y-2">
             <p className="text-[#9d8b7a] text-sm">
-              Didn&apos;t receive code or need to re-register?{" "}
+              {tAuth.didNotReceive}{" "}
               <Link href="/signup" className="text-[#d1bc9d] hover:underline font-medium ml-1">
-                Sign Up Again
+                {tAuth.signUpAgain}
               </Link>
             </p>
           </div>
@@ -185,12 +189,18 @@ function VerifyOtpContent() {
   );
 }
 
+function VerifyOtpFallback() {
+  const { language } = useLanguage();
+  const tAuth = authTranslations[language]?.verifyOtp || authTranslations.en.verifyOtp;
+  return <div className="p-8 text-center text-[#8b7355]">{tAuth.loadingForm}</div>;
+}
+
 export default function VerifyOtpPage() {
   return (
     <div className="bg-white min-h-screen flex flex-col font-cambria">
       <Navbar />
       <main className="flex-grow flex items-center justify-center py-16 px-4 md:px-6">
-        <Suspense fallback={<div className="p-8 text-center text-[#8b7355]">Loading verification form...</div>}>
+        <Suspense fallback={<VerifyOtpFallback />}>
           <VerifyOtpContent />
         </Suspense>
       </main>

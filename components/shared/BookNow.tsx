@@ -1,5 +1,8 @@
+"use client";
+
 import Link from "next/link";
 import { FaArrowRightLong } from "react-icons/fa6";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
 
 type BookNowProps = {
   href?: string;
@@ -11,10 +14,11 @@ const baseClasses =
   "group inline-flex items-center justify-center gap-3 rounded-sm bg-[#CFB9A3] px-6 xl:px-8 py-3.5 text-base font-bold text-[#0F172A] whitespace-nowrap shrink-0 shadow-[0_0_20px_rgba(202,117,33,0.30)] transition-transform duration-200 ease-out hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.99] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#CFB9A3]/60";
 
 const BookNow = ({ href, className, label }: BookNowProps) => {
+  const { t } = useLanguage();
   const classes = className ? `${baseClasses} ${className}` : baseClasses;
   const content = (
     <>
-      {label || "Reserve Now"}
+      {label || (t as any)?.commonUI?.reserveNow || t?.navbar?.bookNow || "Reserve Now"}
       <FaArrowRightLong className="h-5 w-5 text-[#0F172A]" aria-hidden="true" />
     </>
   );

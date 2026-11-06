@@ -5,10 +5,13 @@ import DecorativeUnderline from "@/components/shared/DecorativeUnderline";
 import { getStoredBookingData, updateStoredBookingData } from "@/lib/bookingStore";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
 import { FaCreditCard, FaLock } from "react-icons/fa";
 import { MdOutlinePayments } from "react-icons/md";
 
 export default function PaymentPage() {
+  const { t } = useLanguage();
+  const paymentTrans = (t as any)?.bookingFlow?.paymentPage;
   const [method, setMethod] = useState<string>("ideal");
   const [data, setData] = useState(getStoredBookingData());
 
@@ -27,9 +30,13 @@ export default function PaymentPage() {
     <div className="w-full px-6 md:px-12">
       {/* ── Title Section ── */}
       <div className="text-center mb-16 flex flex-col items-center">
-        <h1 className="font-displayPlayFair text-5xl text-[#1d1a17] mb-2 leading-tight">Secure Payment</h1>
+        <h1 className="font-displayPlayFair text-5xl text-[#1d1a17] mb-2 leading-tight">
+          {paymentTrans?.title || "Secure Payment"}
+        </h1>
         <DecorativeUnderline />
-        <p className="font-cambria text-sm text-[#475569] mt-6 italic tracking-wide">Complete your booking with confidence via iDEAL or Credit Card.</p>
+        <p className="font-cambria text-sm text-[#475569] mt-6 italic tracking-wide">
+          {paymentTrans?.subtitle || "Complete your booking with confidence via iDEAL or Credit Card."}
+        </p>
       </div>
 
       {/* ── Content Card ── */}
@@ -53,11 +60,11 @@ export default function PaymentPage() {
             <line x1="19" y1="12" x2="5" y2="12"></line>
             <polyline points="12 19 5 12 12 5"></polyline>
           </svg>
-          Back to Details
+          {paymentTrans?.backToDetails || "Back to Details"}
         </button>
 
         <span className="text-xs text-[#8B7355] font-semibold italic hidden sm:inline">
-          Authorize and submit payment using the secure form above ↑
+          {paymentTrans?.paymentHint || "Authorize and submit payment using the secure form above ↑"}
         </span>
       </div>
     </div>

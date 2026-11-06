@@ -1,8 +1,11 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
 
 const VideoSection = () => {
+  const { t } = useLanguage();
+  const cUI = (t as any)?.commonUI;
   const videoRef = useRef<HTMLVideoElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
 
@@ -57,7 +60,7 @@ const VideoSection = () => {
       {/* Play / Pause Toggle Button */}
       <button
         onClick={togglePlay}
-        aria-label={isPlaying ? "Pause video" : "Play video"}
+        aria-label={isPlaying ? (cUI?.videoPause || "Pause video") : (cUI?.videoPlay || "Play video")}
         className="relative z-10 flex items-center justify-center w-20 h-20 rounded-full bg-white/80 hover:bg-white text-gray-900 shadow-2xl transition-all transform hover:scale-110 focus:outline-none cursor-pointer group"
       >
         {isPlaying ? (

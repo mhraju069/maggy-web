@@ -440,7 +440,7 @@ export default function EventSpaceInquiryPage() {
               <input
                 type="text"
                 required
-                placeholder="John Doe"
+                placeholder={esTrans?.fullNamePlaceholder || "John Doe"}
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 className="w-full px-4 py-3 rounded-xl border border-[#E2E8F0] text-sm text-[#0F172A] focus:outline-none focus:border-[#8B7355]"
@@ -455,7 +455,7 @@ export default function EventSpaceInquiryPage() {
               <input
                 type="tel"
                 required
-                placeholder="+1 (555) 000-0000"
+                placeholder={esTrans?.phonePlaceholder || "+1 (555) 000-0000"}
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
                 className="w-full px-4 py-3 rounded-xl border border-[#E2E8F0] text-sm text-[#0F172A] focus:outline-none focus:border-[#8B7355]"
@@ -470,7 +470,7 @@ export default function EventSpaceInquiryPage() {
               <input
                 type="email"
                 required
-                placeholder="john@example.com"
+                placeholder={esTrans?.emailPlaceholder || "john@example.com"}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="w-full px-4 py-3 rounded-xl border border-[#E2E8F0] text-sm text-[#0F172A] focus:outline-none focus:border-[#8B7355]"

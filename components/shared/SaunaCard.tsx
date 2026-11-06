@@ -5,6 +5,7 @@ import Link from "next/link";
 import { FiClock } from "react-icons/fi";
 import { IoFolderOutline } from "react-icons/io5";
 import { LuUsers } from "react-icons/lu";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
 
 interface SaunaCardProps {
   title: string;
@@ -33,6 +34,7 @@ export default function SaunaCard({
   onClick,
   isSelected,
 }: SaunaCardProps) {
+  const { t } = useLanguage();
   const content = (
     <div
       onClick={onClick}
@@ -134,12 +136,14 @@ export default function SaunaCard({
 
         {/* Price Section */}
         <div className="pt-6 border-t border-[#E2E8F0] flex items-center justify-between">
-          <span className="text-sm font-bold text-[#64748B] uppercase tracking-wider" style={{ fontFamily: "Inter, sans-serif" }}>Investment</span>
+          <span className="text-sm font-bold text-[#64748B] uppercase tracking-wider" style={{ fontFamily: "Inter, sans-serif" }}>
+            {(t as any)?.commonUI?.investment || "Investment"}
+          </span>
           <span
             style={{ fontFamily: "var(--font-playfair)" }}
             className="text-4xl font-bold text-[#0F172A]"
           >
-            ${price}
+            €{price}
           </span>
         </div>
       </div>

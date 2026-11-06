@@ -9,11 +9,15 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useState } from "react";
 import { FiArrowRight } from "react-icons/fi";
 import { HiOutlineEye, HiOutlineLockClosed, HiOutlineMail, HiOutlineUser } from "react-icons/hi";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
+import { authTranslations } from "@/lib/i18n/authTranslations";
 
 function SignupForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const redirectUrl = searchParams.get("redirect");
+  const { language } = useLanguage();
+  const tAuth = authTranslations[language]?.signup || authTranslations.en.signup;
 
   const [showPassword, setShowPassword] = useState(false);
   const [name, setName] = useState("");
@@ -27,7 +31,7 @@ function SignupForm() {
     setError(null);
 
     if (!name.trim() || !email.trim() || !password) {
-      setError("Please fill in all fields.");
+      setError(tAuth.errors.fillAll);
       return;
     }
 
@@ -45,11 +49,11 @@ function SignupForm() {
         // Redirect to OTP verification page with email parameter
         router.push(`/verify-otp?email=${encodeURIComponent(userEmail)}${redirectUrl ? `&redirect=${encodeURIComponent(redirectUrl)}` : ""}`);
       } else {
-        setError(parseApiErrorMessage(response) || "Registration failed.");
+        setError(parseApiErrorMessage(response) || tAuth.errors.failed);
       }
     } catch (err: unknown) {
       const msg = parseApiErrorMessage((err as { data?: unknown })?.data || err);
-      setError(msg);
+      setError(msg || tAuth.errors.failed);
     } finally {
       setLoading(false);
     }
@@ -74,11 +78,11 @@ function SignupForm() {
             <div className="absolute inset-0 bg-black/30" />
 
             <div className="relative z-10 max-w-md">
-              <h2 className="text-4xl lg:text-5xl font-displayPlayFair leading-[1.2] mb-8">
-                Welcome to the <br /> Circle of Stillness.
+              <h2 className="text-4xl lg:text-5xl font-displayPlayFair leading-[1.2] mb-8 whitespace-pre-line">
+                {tAuth.heroTitle}
               </h2>
               <p className="text-base lg:text-lg leading-relaxed font-light mb-6">
-                Membership unlocks exclusive arrangements, priority reservations, and personalized wellness concierge services.
+                {tAuth.heroSubtitle}
               </p>
               <div className="w-16 h-[1.5px] bg-white/60" />
             </div>
@@ -88,10 +92,10 @@ function SignupForm() {
           <div className="flex flex-col justify-center p-8 md:p-16 lg:px-24 bg-white">
             <div className="mb-10">
               <h1 className="text-3xl lg:text-4xl font-displayPlayFair font-bold text-[#1d1a17] mb-3">
-                Member Access
+                {tAuth.title}
               </h1>
               <p className="text-base text-[#8b7355] font-light">
-                Create your account. Your Heaven awaits.
+                {tAuth.subtitle}
               </p>
             </div>
 
@@ -99,7 +103,7 @@ function SignupForm() {
               {/* Full Name */}
               <div className="space-y-2">
                 <label className="text-[13px] text-[#1d1a17] font-medium" htmlFor="name">
-                  Full Name
+                  {tAuth.fullNameLabel}
                 </label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-[#9d8b7a]">
@@ -111,7 +115,7 @@ function SignupForm() {
                     required
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    placeholder="Enter your name"
+                    placeholder={tAuth.fullNamePlaceholder}
                     className="w-full pl-10 pr-4 py-3 border border-[#E2E8F0] rounded-sm focus:outline-none focus:border-[#8b7355] text-sm text-[#1d1a17] placeholder:text-[#9d8b7a]/50"
                   />
                 </div>
@@ -120,7 +124,7 @@ function SignupForm() {
               {/* Email Address */}
               <div className="space-y-2">
                 <label className="text-[13px] text-[#1d1a17] font-medium" htmlFor="email">
-                  Email Address
+                  {tAuth.emailLabel}
                 </label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-[#9d8b7a]">
@@ -132,7 +136,7 @@ function SignupForm() {
                     required
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    placeholder="you@example.com"
+                    placeholder={tAuth.emailPlaceholder}
                     className="w-full pl-10 pr-4 py-3 border border-[#E2E8F0] rounded-sm focus:outline-none focus:border-[#8b7355] text-sm text-[#1d1a17] placeholder:text-[#9d8b7a]/50"
                   />
                 </div>
@@ -141,7 +145,7 @@ function SignupForm() {
               {/* Password */}
               <div className="space-y-2">
                 <label className="text-[13px] text-[#1d1a17] font-medium" htmlFor="password">
-                  Password
+                  {tAuth.passwordLabel}
                 </label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-[#9d8b7a]">
@@ -153,7 +157,7 @@ function SignupForm() {
                     required
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    placeholder="********"
+                    placeholder={tAuth.passwordPlaceholder}
                     className="w-full pl-10 pr-12 py-3 border border-[#E2E8F0] rounded-sm focus:outline-none focus:border-[#8b7355] text-sm text-[#1d1a17]"
                   />
                   <button
@@ -180,7 +184,7 @@ function SignupForm() {
                   disabled={loading}
                   className="w-full flex items-center justify-center space-x-2 py-4 bg-[#D1BC9D] hover:bg-[#8B7355] disabled:opacity-60 text-white font-bold rounded-sm transition-colors uppercase tracking-widest text-sm"
                 >
-                  <span>{loading ? "Registering..." : "Sign Up"}</span>
+                  <span>{loading ? tAuth.creatingAccount : tAuth.createAccountButton}</span>
                   {!loading && <FiArrowRight className="w-4 h-4" />}
                 </button>
               </div>
@@ -188,12 +192,12 @@ function SignupForm() {
               {/* Redirect to Login */}
               <div className="text-center pt-6">
                 <p className="text-[#9d8b7a] text-sm">
-                  Already have an account?{" "}
+                  {tAuth.hasAccount}{" "}
                   <Link
                     href={`/login${redirectUrl ? `?redirect=${encodeURIComponent(redirectUrl)}` : ""}`}
                     className="text-[#d1bc9d] hover:underline font-medium ml-1"
                   >
-                    Log In
+                    {tAuth.signInLink}
                   </Link>
                 </p>
               </div>

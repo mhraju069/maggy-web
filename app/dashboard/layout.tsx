@@ -25,6 +25,8 @@ import { dashboardTranslations } from "@/lib/i18n/dashboardTranslations";
 
 function DashboardHeader({ onToggleSidebar }: { onToggleSidebar: () => void }) {
   const { dashboardData } = useDashboard();
+  const { language } = useLanguage();
+  const dt = dashboardTranslations[language] || dashboardTranslations.en;
   const profile = dashboardData?.profile;
   const initial = profile?.name ? profile.name.charAt(0).toUpperCase() : "U";
 
@@ -35,14 +37,14 @@ function DashboardHeader({ onToggleSidebar }: { onToggleSidebar: () => void }) {
         <button
           type="button"
           onClick={onToggleSidebar}
-          aria-label="Toggle navigation menu"
+          aria-label={dt.sidebar.toggleNavigation}
           className="lg:hidden p-2 rounded-xl text-[#1d1a17] hover:bg-[#F8F4F0] border border-[#E8E2DC] transition-colors focus:outline-none"
         >
           <HiOutlineMenu className="w-5 h-5" />
         </button>
 
         <div className="hidden sm:flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-[#94A3B8]">
-          <span>Member Portal</span>
+          <span>{dt.sidebar.memberPortal}</span>
         </div>
       </div>
 
@@ -66,7 +68,7 @@ function DashboardHeader({ onToggleSidebar }: { onToggleSidebar: () => void }) {
               // eslint-disable-next-line @next/next/no-img-element
               <img
                 src={formatImageUrl(profile.image)}
-                alt={profile?.name || "User"}
+                alt={profile?.name || dt.sidebar.userAlt}
                 className="w-full h-full object-cover"
               />
             ) : (
@@ -75,7 +77,7 @@ function DashboardHeader({ onToggleSidebar }: { onToggleSidebar: () => void }) {
           </div>
           <div className="hidden md:block text-left">
             <p className="text-sm font-semibold text-[#1d1a17] leading-none">
-              {profile?.name || "Member"}
+              {profile?.name || dt.sidebar.member}
             </p>
             <p className="text-xs text-[#94A3B8] mt-0.5 max-w-[130px] truncate">
               {profile?.email || ""}
@@ -154,7 +156,7 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
           <button
             type="button"
             onClick={() => setSidebarOpen(false)}
-            aria-label="Close navigation menu"
+            aria-label={dt.sidebar.closeNavigation}
             className="lg:hidden p-1.5 rounded-lg text-[#64748B] hover:text-[#1d1a17] hover:bg-[#F8F4F0]"
           >
             <HiOutlineX className="w-5 h-5" />

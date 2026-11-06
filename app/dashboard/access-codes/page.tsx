@@ -29,6 +29,17 @@ function AccessCodeCard({ item }: { item: DashboardAccessCodeItem }) {
   const [copied, setCopied] = useState(false);
   const { language } = useLanguage();
   const dt = dashboardTranslations[language]?.accessCodes || dashboardTranslations.en.accessCodes;
+  const bookingDt = dashboardTranslations[language]?.myBookings || dashboardTranslations.en.myBookings;
+  const normalizedStatus = item.status?.toLowerCase() || "confirmed";
+  const statusLabel = normalizedStatus.includes("confirm")
+    ? bookingDt.confirmed
+    : normalizedStatus.includes("complete")
+    ? bookingDt.completed
+    : normalizedStatus.includes("cancel")
+    ? bookingDt.cancelled
+    : normalizedStatus.includes("pending")
+    ? bookingDt.pending
+    : item.status || dt.confirmed;
 
   const handleCopy = () => {
     if (item.access_code) {
@@ -49,7 +60,7 @@ function AccessCodeCard({ item }: { item: DashboardAccessCodeItem }) {
             {title}
           </h3>
           <span className="px-2 py-0.5 text-[11px] bg-[#F3EDE6] text-[#8b7355] rounded-full uppercase tracking-wider font-semibold">
-            {item.sauna_type}
+            {item.sauna_type?.toLowerCase() === "private" ? dt.private : dt.shared}
           </span>
           <BsCheckCircle className="text-green-500 w-4 h-4" />
         </div>
@@ -57,15 +68,15 @@ function AccessCodeCard({ item }: { item: DashboardAccessCodeItem }) {
       </div>
 
       <p className="text-sm text-[#64748B] mb-2">
-        {formatDisplayDate(item.date, language)} at {formatTime24h(item.time)}
+        {formatDisplayDate(item.date, language)} {dt.at} {formatTime24h(item.time)}
       </p>
 
       <div className="flex items-center gap-3 mb-4">
         <span className="inline-block text-xs text-green-600 font-semibold bg-green-50 px-3 py-1 rounded-full capitalize">
-          {item.status || "Confirmed"}
+          {statusLabel}
         </span>
         <span className="text-xs text-[#94A3B8]">
-          Slot: <span className="text-[#475569] font-medium">{item.time_slot?.replace(/_/g, " ")}</span>
+          {dt.slot} <span className="text-[#475569] font-medium">{item.time_slot?.replace(/_/g, " ")}</span>
         </span>
       </div>
 
@@ -84,7 +95,7 @@ function AccessCodeCard({ item }: { item: DashboardAccessCodeItem }) {
           className="flex items-center gap-2 px-4 py-2 bg-white/20 hover:bg-white/30 text-white text-sm rounded-lg transition-colors cursor-pointer"
         >
           <HiOutlineClipboardCopy className="w-4 h-4" />
-          {copied ? "Copied!" : "Copy"}
+          {copied ? dt.copied : dt.copy}
         </button>
       </div>
 

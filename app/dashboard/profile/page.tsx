@@ -11,6 +11,8 @@ import {
 } from "react-icons/hi";
 import { authService } from '@/lib/api';
 import { formatImageUrl } from '@/lib/api/config';
+import { useLanguage } from "@/lib/i18n/LanguageContext";
+import { dashboardTranslations } from "@/lib/i18n/dashboardTranslations";
 import { useDashboard } from "../DashboardContext";
 import Spinner from "@/components/shared/Spinner";
 
@@ -22,6 +24,9 @@ const LANGUAGES = [
 
 export default function ProfilePage() {
   const { dashboardData, loading, updateProfileState } = useDashboard();
+  const { language } = useLanguage();
+  const dashboardText = dashboardTranslations[language];
+  const dt = dashboardText.profile;
   const profile = dashboardData?.profile;
 
   // Profile Edit State
@@ -136,14 +141,14 @@ export default function ProfilePage() {
         }
       }
 
-      setProfileSuccessMsg("Profile information updated successfully.");
+      setProfileSuccessMsg(dt.profileUpdated);
       setEditing(false);
       setSelectedFile(null);
       setTimeout(() => setProfileSuccessMsg(null), 4000);
     } catch (err: any) {
       console.error("Failed to update profile:", err);
       setProfileErrorMsg(
-        err?.message || "Failed to update profile. Please check your inputs."
+        err?.message || dt.profileUpdateError
       );
     } finally {
       setSavingProfile(false);
@@ -173,19 +178,19 @@ export default function ProfilePage() {
     setPasswordSuccessMsg(null);
 
     if (!passwordFields.oldPassword) {
-      setPasswordErrorMsg("Please enter your current password.");
+      setPasswordErrorMsg(dt.enterCurrentPassword);
       return;
     }
     if (!passwordFields.newPassword) {
-      setPasswordErrorMsg("Please enter your new password.");
+      setPasswordErrorMsg(dt.enterNewPassword);
       return;
     }
     if (passwordFields.newPassword.length < 8) {
-      setPasswordErrorMsg("New password must contain at least 8 characters.");
+      setPasswordErrorMsg(dt.passwordTooShort);
       return;
     }
     if (passwordFields.newPassword !== passwordFields.confirmPassword) {
-      setPasswordErrorMsg("New password and confirm password do not match.");
+      setPasswordErrorMsg(dt.passwordMismatch);
       return;
     }
 
@@ -196,7 +201,7 @@ export default function ProfilePage() {
         password: passwordFields.newPassword,
       });
 
-      setPasswordSuccessMsg("Your password has been changed successfully.");
+      setPasswordSuccessMsg(dt.passwordUpdated);
       setPasswordFields({
         oldPassword: "",
         newPassword: "",
@@ -206,7 +211,7 @@ export default function ProfilePage() {
     } catch (err: any) {
       console.error("Failed to update password:", err);
       setPasswordErrorMsg(
-        err?.message || "Password update failed. Please check your current password."
+        err?.message || dt.passwordUpdateError
       );
     } finally {
       setSavingPassword(false);
@@ -214,7 +219,7 @@ export default function ProfilePage() {
   };
 
   if (loading) {
-    return <Spinner message="Loading your profile..." />;
+    return <Spinner message={dt.loadingProfile} />;
   }
 
   const selectedLangObj = LANGUAGES.find((l) => l.code === (profile?.language || "en"));
@@ -224,10 +229,10 @@ export default function ProfilePage() {
       {/* Header */}
       <div>
         <h1 className="font-displayPlayFair text-3xl font-bold text-[#1d1a17]">
-          Account & Profile
+          {dt.title}
         </h1>
         <p className="text-sm text-[#64748B] mt-1">
-          Manage your personal details, profile picture, and account security
+          {dt.updatePublicDetails}
         </p>
       </div>
 
@@ -241,9 +246,9 @@ export default function ProfilePage() {
               </div>
               <div>
                 <h2 className="font-displayPlayFair text-xl font-bold text-[#1d1a17]">
-                  Personal Information
+                  {dt.personalInfo}
                 </h2>
-                <p className="text-xs text-[#64748B]">Update your public avatar and details</p>
+                <p className="text-xs text-[#64748B]">{dt.updatePublicDetails}</p>
               </div>
             </div>
 
@@ -253,7 +258,7 @@ export default function ProfilePage() {
                 onClick={() => setEditing(true)}
                 className="px-4 py-2 rounded-xl bg-[#8B7355] hover:bg-[#725e45] text-white text-xs font-bold transition-all shadow-xs cursor-pointer"
               >
-                Edit Profile
+                {dt.editProfile}
               </button>
             )}
           </div>
@@ -286,7 +291,7 @@ export default function ProfilePage() {
                   // eslint-disable-next-line @next/next/no-img-element
                   <img
                     src={previewImage ? (previewImage.startsWith("blob:") || previewImage.startsWith("data:") ? previewImage : formatImageUrl(previewImage)) : ""}
-                    alt={draft.name || "Avatar"}
+                    alt={draft.name || dt.avatarAlt}
                     className="w-20 h-20 rounded-full object-cover border-2 border-[#E8E2DC] shadow-xs"
                   />
                 ) : (
@@ -301,7 +306,7 @@ export default function ProfilePage() {
                       type="button"
                       onClick={() => fileInputRef.current?.click()}
                       className="absolute bottom-0 right-0 w-7 h-7 bg-[#8B7355] hover:bg-[#725e45] text-white rounded-full flex items-center justify-center shadow-md transition-all cursor-pointer"
-                      title="Upload photo"
+                      title={dt.changePhoto}
                     >
                       <HiOutlineCamera className="w-4 h-4" />
                     </button>
@@ -318,7 +323,7 @@ export default function ProfilePage() {
 
               <div>
                 <h3 className="font-semibold text-base text-[#1d1a17]">
-                  {profile?.name || "Member"}
+                  {profile?.name || dashboardText.sidebar.member}
                 </h3>
                 <span className="text-xs text-[#94A3B8] block">{profile?.email}</span>
                 {editing && (
@@ -327,7 +332,7 @@ export default function ProfilePage() {
                     onClick={() => fileInputRef.current?.click()}
                     className="mt-1 text-xs font-semibold text-[#8B7355] hover:underline cursor-pointer"
                   >
-                    Change photo (JPG, PNG)
+                    {dt.changePhoto}
                   </button>
                 )}
               </div>
@@ -338,7 +343,7 @@ export default function ProfilePage() {
               {/* Full Name */}
               <div>
                 <label className="block text-xs font-bold text-[#64748B] mb-1.5 uppercase tracking-wide">
-                  Full Name
+                  {dt.fullName}
                 </label>
                 <input
                   type="text"
@@ -351,7 +356,7 @@ export default function ProfilePage() {
                       ? "border-[#8B7355] focus:outline-none focus:ring-2 focus:ring-[#8B7355]/20 bg-white"
                       : "border-[#F1EDE8] bg-[#FAFAFA] cursor-default"
                   }`}
-                  placeholder="Your Name"
+                  placeholder={dt.namePlaceholder}
                 />
               </div>
 
@@ -359,9 +364,9 @@ export default function ProfilePage() {
               <div>
                 <div className="flex items-center justify-between mb-1.5">
                   <label className="block text-xs font-bold text-[#64748B] uppercase tracking-wide">
-                    Email Address
+                    {dt.emailAddress}
                   </label>
-                  <span className="text-[10px] text-[#94A3B8] font-medium">Read-Only</span>
+                  <span className="text-[10px] text-[#94A3B8] font-medium">{dt.readOnly}</span>
                 </div>
                 <input
                   type="email"
@@ -374,7 +379,7 @@ export default function ProfilePage() {
               {/* Phone */}
               <div>
                 <label className="block text-xs font-bold text-[#64748B] mb-1.5 uppercase tracking-wide">
-                  Phone Number
+                  {dt.phoneNumber}
                 </label>
                 <input
                   type="tel"
@@ -393,7 +398,7 @@ export default function ProfilePage() {
               {/* Preferred Language */}
               <div>
                 <label className="block text-xs font-bold text-[#64748B] mb-1.5 uppercase tracking-wide">
-                  Preferred Language
+                  {dt.preferredLanguage}
                 </label>
                 {editing ? (
                   <select
@@ -420,14 +425,14 @@ export default function ProfilePage() {
               {/* Bio / Description */}
               <div className="sm:col-span-2">
                 <label className="block text-xs font-bold text-[#64748B] mb-1.5 uppercase tracking-wide">
-                  Bio / Notes
+                  {dt.bioNotes}
                 </label>
                 <textarea
                   rows={3}
                   value={draft.bio}
                   onChange={(e) => setDraft((d) => ({ ...d, bio: e.target.value }))}
                   readOnly={!editing}
-                  placeholder="A short note about yourself or your wellness routine..."
+                  placeholder={dt.bioPlaceholder}
                   className={`w-full px-4 py-3 rounded-xl text-xs text-[#1d1a17] border transition-all resize-none ${
                     editing
                       ? "border-[#8B7355] focus:outline-none focus:ring-2 focus:ring-[#8B7355]/20 bg-white"
@@ -446,7 +451,7 @@ export default function ProfilePage() {
                   disabled={savingProfile}
                   className="px-6 py-2.5 rounded-xl border border-[#CBD5E1] text-[#64748B] hover:bg-[#F8FAFC] text-xs font-bold uppercase tracking-wider transition-all cursor-pointer"
                 >
-                  Cancel
+                  {dt.cancel}
                 </button>
                 <button
                   type="submit"
@@ -456,10 +461,10 @@ export default function ProfilePage() {
                   {savingProfile ? (
                     <>
                       <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                      <span>Saving...</span>
+                      <span>{dt.saving}</span>
                     </>
                   ) : (
-                    <span>Save Changes</span>
+                    <span>{dt.saveChanges}</span>
                   )}
                 </button>
               </div>
@@ -475,9 +480,9 @@ export default function ProfilePage() {
             </div>
             <div>
               <h2 className="font-displayPlayFair text-xl font-bold text-[#1d1a17]">
-                Change Password
+                {dt.changePassword}
               </h2>
-              <p className="text-xs text-[#64748B]">Keep your account secure</p>
+              <p className="text-xs text-[#64748B]">{dt.keepAccountSecure}</p>
             </div>
           </div>
 
@@ -505,7 +510,7 @@ export default function ProfilePage() {
             {/* Current Password */}
             <div>
               <label className="block text-xs font-bold text-[#64748B] mb-1.5 uppercase tracking-wide">
-                Current Password *
+                {dt.currentPassword} *
               </label>
               <div className="relative">
                 <input
@@ -515,7 +520,7 @@ export default function ProfilePage() {
                   onChange={(e) =>
                     setPasswordFields((p) => ({ ...p, oldPassword: e.target.value }))
                   }
-                  placeholder="Enter current password"
+                  placeholder={dt.currentPasswordPlaceholder}
                   className="w-full px-4 py-2.5 pr-10 rounded-xl text-xs text-[#1d1a17] border border-[#E2E8F0] focus:outline-none focus:ring-2 focus:ring-[#8B7355]/20 focus:border-[#8B7355] bg-white transition-all"
                 />
                 <button
@@ -531,7 +536,7 @@ export default function ProfilePage() {
             {/* New Password */}
             <div>
               <label className="block text-xs font-bold text-[#64748B] mb-1.5 uppercase tracking-wide">
-                New Password *
+                {dt.newPassword} *
               </label>
               <div className="relative">
                 <input
@@ -542,7 +547,7 @@ export default function ProfilePage() {
                   onChange={(e) =>
                     setPasswordFields((p) => ({ ...p, newPassword: e.target.value }))
                   }
-                  placeholder="Minimum 8 characters"
+                  placeholder={dt.newPasswordPlaceholder}
                   className="w-full px-4 py-2.5 pr-10 rounded-xl text-xs text-[#1d1a17] border border-[#E2E8F0] focus:outline-none focus:ring-2 focus:ring-[#8B7355]/20 focus:border-[#8B7355] bg-white transition-all"
                 />
                 <button
@@ -558,7 +563,7 @@ export default function ProfilePage() {
             {/* Confirm New Password */}
             <div>
               <label className="block text-xs font-bold text-[#64748B] mb-1.5 uppercase tracking-wide">
-                Confirm New Password *
+                {dt.confirmPassword} *
               </label>
               <div className="relative">
                 <input
@@ -568,7 +573,7 @@ export default function ProfilePage() {
                   onChange={(e) =>
                     setPasswordFields((p) => ({ ...p, confirmPassword: e.target.value }))
                   }
-                  placeholder="Re-enter new password"
+                  placeholder={dt.confirmPasswordPlaceholder}
                   className="w-full px-4 py-2.5 pr-10 rounded-xl text-xs text-[#1d1a17] border border-[#E2E8F0] focus:outline-none focus:ring-2 focus:ring-[#8B7355]/20 focus:border-[#8B7355] bg-white transition-all"
                 />
                 <button
@@ -582,7 +587,7 @@ export default function ProfilePage() {
             </div>
 
             <p className="text-[11px] text-[#94A3B8] pt-1 leading-relaxed">
-              Password must be at least 8 characters long and cannot be entirely numeric.
+              {dt.passwordRule}
             </p>
 
             <button
@@ -593,10 +598,10 @@ export default function ProfilePage() {
               {savingPassword ? (
                 <>
                   <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                  <span>Updating Password...</span>
+                  <span>{dt.updatingPassword}</span>
                 </>
               ) : (
-                <span>Update Password</span>
+                <span>{dt.updatePassword}</span>
               )}
             </button>
           </form>

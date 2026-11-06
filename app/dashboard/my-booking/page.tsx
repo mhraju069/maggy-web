@@ -38,8 +38,11 @@ function formatStatus(status?: string, dt?: any): string {
   return s.charAt(0).toUpperCase() + s.slice(1);
 }
 
-function formatPaymentStatus(paymentStatus?: string): string {
+function formatPaymentStatus(paymentStatus: string | undefined, dt: { paid: string; unpaid: string }): string {
   if (!paymentStatus) return "";
+  const normalized = paymentStatus.toLowerCase().replace(/_/g, " ").trim();
+  if (normalized === "paid") return dt.paid;
+  if (normalized === "unpaid" || normalized === "not paid") return dt.unpaid;
   return paymentStatus.replace(/_/g, " ").trim();
 }
 
@@ -85,9 +88,9 @@ export default function MyBookingPage() {
       await refreshDashboard();
     } catch (err: any) {
       if (err instanceof ApiError) {
-        setCancelError(err.message || "Failed to cancel reservation.");
+        setCancelError(err.message || dt.cancelFailed);
       } else {
-        setCancelError(err?.message || "An unexpected error occurred while cancelling your reservation.");
+        setCancelError(err?.message || dt.cancelUnexpected);
       }
     } finally {
       setCancelling(false);
@@ -178,7 +181,7 @@ export default function MyBookingPage() {
                   <p className="text-[#94A3B8]">
                     Payment:{" "}
                     <span className="text-[#475569] font-medium capitalize">
-                      {formatPaymentStatus(booking.payment_status)}
+                      {formatPaymentStatus(booking.payment_status, dt)}
                     </span>
                   </p>
                 )}
@@ -191,7 +194,7 @@ export default function MyBookingPage() {
                     <HiOutlineCalendar className="w-4 h-4" />
                   </div>
                   <div>
-                    <p className="text-[10px] uppercase font-bold text-[#94A3B8] tracking-wider">Date</p>
+                    <p className="text-[10px] uppercase font-bold text-[#94A3B8] tracking-wider">{dt.dateLabel}</p>
                     <p className="text-sm font-semibold text-[#1d1a17]">
                       {formatDisplayDate(booking.date, language)}
                     </p>
@@ -203,7 +206,7 @@ export default function MyBookingPage() {
                     <HiOutlineClock className="w-4 h-4" />
                   </div>
                   <div>
-                    <p className="text-[10px] uppercase font-bold text-[#94A3B8] tracking-wider">Time</p>
+                    <p className="text-[10px] uppercase font-bold text-[#94A3B8] tracking-wider">{dt.timeLabel}</p>
                     <p className="text-sm font-semibold text-[#1d1a17]">
                       {formatTime24h(booking.time)}
                     </p>
@@ -217,7 +220,7 @@ export default function MyBookingPage() {
                   <div>
                     <p className="text-[10px] uppercase font-bold text-[#94A3B8] tracking-wider">{dt.guestsCount}</p>
                     <p className="text-sm font-semibold text-[#1d1a17]">
-                      {booking.guests} {booking.guests === 1 ? "Guest" : "Guests"}
+                      {booking.guests} {booking.guests === 1 ? dashboardTranslations[language].home.guest : dashboardTranslations[language].home.guests}
                     </p>
                   </div>
                 </div>
@@ -230,7 +233,7 @@ export default function MyBookingPage() {
                     onClick={() => handleOpenCancelModal(booking)}
                     className="text-xs font-semibold text-[#8b7355] hover:text-red-600 transition-colors cursor-pointer"
                   >
-                    Cancel reservation &rsaquo;
+                    {dt.cancelReservation} &rsaquo;
                   </button>
                 </div>
               )}
@@ -264,7 +267,7 @@ export default function MyBookingPage() {
             {/* Header */}
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-2xl font-bold text-[#1d1a17] font-displayPlayFair">
-                {cancelSuccess ? "Reservation Cancelled" : "Cancel Reservation"}
+                {cancelSuccess ? dt.reservationCancelled : dt.cancelReservation}
               </h2>
               <button
                 type="button"
@@ -282,15 +285,15 @@ export default function MyBookingPage() {
                 <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs leading-relaxed space-y-2">
                   <div className="flex items-center gap-2 font-bold text-sm text-emerald-900">
                     <BsCheckCircle className="text-emerald-600 w-4 h-4" />
-                    <span>Cancelled Successfully</span>
+                    <span>{dt.cancelledSuccessfully}</span>
                   </div>
                   <p>{cancelSuccess.message}</p>
                   {cancelSuccess.credit_restored && (
                     <div className="pt-2 border-t border-emerald-200/60 font-medium">
-                      ✓ 1 session credit has been refunded to your account.
+                      ✓ {dt.creditRefunded}
                       {cancelSuccess.remaining_sessions !== undefined && (
                         <span className="block mt-0.5">
-                          Remaining credits: <strong>{cancelSuccess.remaining_sessions}</strong>
+                          {dt.remainingCredits} <strong>{cancelSuccess.remaining_sessions}</strong>
                         </span>
                       )}
                     </div>
@@ -302,7 +305,7 @@ export default function MyBookingPage() {
                   onClick={handleCloseCancelModal}
                   className="w-full py-3.5 rounded-xl bg-[#8B7355] hover:bg-[#786247] text-white font-bold text-sm transition-all shadow-md cursor-pointer"
                 >
-                  Done
+                  {dt.done}
                 </button>
               </div>
             ) : (
@@ -310,40 +313,40 @@ export default function MyBookingPage() {
               <div className="space-y-4">
                 <div className="p-4 rounded-2xl bg-[#FAF8F5] border border-[#E8E2DC] space-y-1 text-xs">
                   <p className="text-[#64748B]">
-                    Booking Reference:{" "}
+                    {dt.bookingReference}{" "}
                     <span className="font-mono font-bold text-[#1d1a17]">
                       {cancelBooking.booking_id}
                     </span>
                   </p>
                   <p className="text-[#64748B]">
-                    Experience:{" "}
+                    {dt.experience}{" "}
                     <span className="font-semibold text-[#1d1a17]">
                       {cleanServiceName(cancelBooking.service_name)}
                     </span>
                   </p>
                   <p className="text-[#64748B]">
-                    Scheduled:{" "}
+                    {dt.scheduled}{" "}
                     <span className="font-semibold text-[#1d1a17]">
-                      {formatDisplayDate(cancelBooking.date, language)} at {formatTime24h(cancelBooking.time)}
+                      {formatDisplayDate(cancelBooking.date, language)} {dt.at} {formatTime24h(cancelBooking.time)}
                     </span>
                   </p>
                 </div>
 
                 {/* Policy Notice Box */}
                 <div className="p-3.5 rounded-xl bg-[#FCF2E9] border border-[#E8E2DC] text-[11px] text-[#8B7355] leading-relaxed">
-                  <strong>Notice:</strong> Cancellations must be made at least <strong>24 hours</strong> prior to start time to receive a session refund/credit. Cancellations within 24 hours cannot be restored.
+                  {dt.cancellationNotice}
                 </div>
 
                 {/* Reason Input */}
                 <div>
                   <label className="block text-xs font-bold text-[#0F172A] mb-1.5 uppercase tracking-wide">
-                    Reason for Cancellation <span className="text-gray-400 font-normal lowercase">(optional)</span>
+                    {dt.cancellationReason} <span className="text-gray-400 font-normal lowercase">{dt.optional}</span>
                   </label>
                   <textarea
                     rows={2}
                     value={cancelReason}
                     onChange={(e) => setCancelReason(e.target.value)}
-                    placeholder="e.g. Schedule conflict, feeling unwell..."
+                    placeholder={dt.cancellationPlaceholder}
                     disabled={cancelling}
                     className="w-full p-3 bg-white border border-[#E2E8F0] rounded-xl text-xs text-[#0F172A] focus:outline-none focus:ring-2 focus:ring-[#8B7355] resize-none"
                   />
@@ -364,7 +367,7 @@ export default function MyBookingPage() {
                     disabled={cancelling}
                     className="flex-1 py-3 rounded-xl bg-[#F1F5F9] text-[#1d1a17] font-bold text-xs hover:bg-[#E2E8F0] transition-colors cursor-pointer"
                   >
-                    Keep Reservation
+                    {dt.keepReservation}
                   </button>
                   <button
                     type="button"
@@ -379,10 +382,10 @@ export default function MyBookingPage() {
                     {cancelling ? (
                       <>
                         <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                        <span>Cancelling...</span>
+                        <span>{dt.cancelling}</span>
                       </>
                     ) : (
-                      <span>Confirm Cancellation</span>
+                      <span>{dt.confirmCancellation}</span>
                     )}
                   </button>
                 </div>

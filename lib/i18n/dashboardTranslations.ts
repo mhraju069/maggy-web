@@ -6,6 +6,11 @@ export interface DashboardTranslations {
     myBookings: string;
     accessCodes: string;
     profile: string;
+    memberPortal: string;
+    member: string;
+    userAlt: string;
+    toggleNavigation: string;
+    closeNavigation: string;
     viewWebsite: string;
     logout: string;
   };
@@ -60,6 +65,30 @@ export interface DashboardTranslations {
     completed: string;
     cancelled: string;
     pending: string;
+    dateLabel: string;
+    timeLabel: string;
+    guest: string;
+    cancelReservation: string;
+    reservationCancelled: string;
+    cancelledSuccessfully: string;
+    creditRefunded: string;
+    remainingCredits: string;
+    done: string;
+    bookingReference: string;
+    experience: string;
+    scheduled: string;
+    cancellationNotice: string;
+    cancellationReason: string;
+    optional: string;
+    cancellationPlaceholder: string;
+    keepReservation: string;
+    cancelling: string;
+    confirmCancellation: string;
+    cancelFailed: string;
+    cancelUnexpected: string;
+    at: string;
+    paid: string;
+    unpaid: string;
     timeSlot: string;
     guestsCount: string;
     totalPaid: string;
@@ -78,6 +107,13 @@ export interface DashboardTranslations {
     instruction: string;
     instructionsTitle: string;
     instructionsBody: string;
+    confirmed: string;
+    copied: string;
+    copy: string;
+    slot: string;
+    at: string;
+    private: string;
+    shared: string;
   };
   profile: {
     title: string;
@@ -96,6 +132,30 @@ export interface DashboardTranslations {
     newPassword: string;
     confirmPassword: string;
     updatePassword: string;
+    updatePublicDetails: string;
+    editProfile: string;
+    changePhoto: string;
+    avatarAlt: string;
+    readOnly: string;
+    namePlaceholder: string;
+    bioNotes: string;
+    bioPlaceholder: string;
+    cancel: string;
+    profileUpdated: string;
+    profileUpdateError: string;
+    passwordUpdated: string;
+    passwordUpdateError: string;
+    currentPasswordPlaceholder: string;
+    newPasswordPlaceholder: string;
+    confirmPasswordPlaceholder: string;
+    passwordRule: string;
+    updatingPassword: string;
+    keepAccountSecure: string;
+    loadingProfile: string;
+    enterCurrentPassword: string;
+    enterNewPassword: string;
+    passwordTooShort: string;
+    passwordMismatch: string;
   };
 }
 
@@ -199,6 +259,11 @@ export const dashboardTranslations: Record<Language, DashboardTranslations> = {
       myBookings: "My Bookings",
       accessCodes: "Access Codes",
       profile: "Profile",
+      memberPortal: "Member Portal",
+      member: "Member",
+      userAlt: "User",
+      toggleNavigation: "Toggle navigation menu",
+      closeNavigation: "Close navigation menu",
       viewWebsite: "View Website",
       logout: "Log Out",
     },
@@ -253,6 +318,30 @@ export const dashboardTranslations: Record<Language, DashboardTranslations> = {
       completed: "Completed",
       cancelled: "Cancelled",
       pending: "Pending",
+      dateLabel: "Date",
+      timeLabel: "Time",
+      guest: "Guest",
+      cancelReservation: "Cancel reservation",
+      reservationCancelled: "Reservation Cancelled",
+      cancelledSuccessfully: "Cancelled Successfully",
+      creditRefunded: "1 session credit has been refunded to your account.",
+      remainingCredits: "Remaining credits:",
+      done: "Done",
+      bookingReference: "Booking Reference:",
+      experience: "Experience:",
+      scheduled: "Scheduled:",
+      cancellationNotice: "Cancellations must be made at least 24 hours prior to start time to receive a session refund or credit. Cancellations within 24 hours cannot be restored.",
+      cancellationReason: "Reason for Cancellation",
+      optional: "(optional)",
+      cancellationPlaceholder: "e.g. Schedule conflict, feeling unwell...",
+      keepReservation: "Keep Reservation",
+      cancelling: "Cancelling...",
+      confirmCancellation: "Confirm Cancellation",
+      cancelFailed: "Failed to cancel reservation.",
+      cancelUnexpected: "An unexpected error occurred while cancelling your reservation.",
+      at: "at",
+      paid: "Paid",
+      unpaid: "Unpaid",
       timeSlot: "Time Slot",
       guestsCount: "Guests",
       totalPaid: "Total",
@@ -271,6 +360,13 @@ export const dashboardTranslations: Record<Language, DashboardTranslations> = {
       instruction: "Enter this code on the electronic keypad at the facility door followed by #.",
       instructionsTitle: "How to use your access codes",
       instructionsBody: "Codes activate 15 minutes before your scheduled start time and remain valid until the end of your session.",
+      confirmed: "Confirmed",
+      copied: "Copied!",
+      copy: "Copy",
+      slot: "Slot:",
+      at: "at",
+      private: "Private",
+      shared: "Shared",
     },
     profile: {
       title: "Profile & Account",
@@ -289,6 +385,30 @@ export const dashboardTranslations: Record<Language, DashboardTranslations> = {
       newPassword: "New Password",
       confirmPassword: "Confirm New Password",
       updatePassword: "Update Password",
+      updatePublicDetails: "Manage your personal details, profile picture, and account security",
+      editProfile: "Edit Profile",
+      changePhoto: "Change photo (JPG, PNG)",
+      avatarAlt: "Avatar",
+      readOnly: "Read-Only",
+      namePlaceholder: "Your Name",
+      bioNotes: "Bio / Notes",
+      bioPlaceholder: "A short note about yourself or your wellness routine...",
+      cancel: "Cancel",
+      profileUpdated: "Profile information updated successfully.",
+      profileUpdateError: "Failed to update profile. Please check your inputs.",
+      passwordUpdated: "Your password has been changed successfully.",
+      passwordUpdateError: "Password update failed. Please check your current password.",
+      currentPasswordPlaceholder: "Enter current password",
+      newPasswordPlaceholder: "Minimum 8 characters",
+      confirmPasswordPlaceholder: "Re-enter new password",
+      passwordRule: "Password must be at least 8 characters long and cannot be entirely numeric.",
+      updatingPassword: "Updating Password...",
+      keepAccountSecure: "Keep your account secure",
+      loadingProfile: "Loading your profile...",
+      enterCurrentPassword: "Please enter your current password.",
+      enterNewPassword: "Please enter your new password.",
+      passwordTooShort: "New password must contain at least 8 characters.",
+      passwordMismatch: "New password and confirmation do not match.",
     },
   },
   nl: {
@@ -297,6 +417,11 @@ export const dashboardTranslations: Record<Language, DashboardTranslations> = {
       myBookings: "Mijn Reserveringen",
       accessCodes: "Toegangscodes",
       profile: "Profiel",
+      memberPortal: "Ledenportaal",
+      member: "Lid",
+      userAlt: "Gebruiker",
+      toggleNavigation: "Navigatiemenu openen of sluiten",
+      closeNavigation: "Navigatiemenu sluiten",
       viewWebsite: "Bekijk Website",
       logout: "Uitloggen",
     },
@@ -351,6 +476,30 @@ export const dashboardTranslations: Record<Language, DashboardTranslations> = {
       completed: "Voltooid",
       cancelled: "Geannuleerd",
       pending: "In behandeling",
+      dateLabel: "Datum",
+      timeLabel: "Tijd",
+      guest: "Gast",
+      cancelReservation: "Reservering annuleren",
+      reservationCancelled: "Reservering geannuleerd",
+      cancelledSuccessfully: "Succesvol geannuleerd",
+      creditRefunded: "1 sessietegoed is teruggestort op je account.",
+      remainingCredits: "Resterende tegoeden:",
+      done: "Gereed",
+      bookingReference: "Boekingsreferentie:",
+      experience: "Belevenis:",
+      scheduled: "Gepland:",
+      cancellationNotice: "Annuleer minimaal 24 uur voor aanvang om een sessietegoed terug te krijgen. Annuleringen binnen 24 uur kunnen niet worden teruggedraaid.",
+      cancellationReason: "Reden voor annulering",
+      optional: "(optioneel)",
+      cancellationPlaceholder: "bijv. Planningsconflict, je niet lekker voelen...",
+      keepReservation: "Reservering behouden",
+      cancelling: "Annuleren...",
+      confirmCancellation: "Annulering bevestigen",
+      cancelFailed: "Reservering annuleren mislukt.",
+      cancelUnexpected: "Er is een onverwachte fout opgetreden bij het annuleren van je reservering.",
+      at: "om",
+      paid: "Betaald",
+      unpaid: "Niet betaald",
       timeSlot: "Tijdslot",
       guestsCount: "Gasten",
       totalPaid: "Totaal",
@@ -369,6 +518,13 @@ export const dashboardTranslations: Record<Language, DashboardTranslations> = {
       instruction: "Voer deze code in op het toetsenpaneel bij de toegangsdeur gevolgd door #.",
       instructionsTitle: "Hoe gebruik je de toegangscodes",
       instructionsBody: "Codes worden 15 minuten voor aanvang van je sessie actief en blijven geldig tot het einde van je boeking.",
+      confirmed: "Bevestigd",
+      copied: "Gekopieerd!",
+      copy: "Kopiëren",
+      slot: "Tijdslot:",
+      at: "om",
+      private: "Privé",
+      shared: "Gedeeld",
     },
     profile: {
       title: "Profiel & Account",
@@ -387,6 +543,30 @@ export const dashboardTranslations: Record<Language, DashboardTranslations> = {
       newPassword: "Nieuw Wachtwoord",
       confirmPassword: "Bevestig Nieuw Wachtwoord",
       updatePassword: "Wachtwoord Bijwerken",
+      updatePublicDetails: "Beheer je persoonlijke gegevens, profielfoto en accountbeveiliging",
+      editProfile: "Profiel bewerken",
+      changePhoto: "Foto wijzigen (JPG, PNG)",
+      avatarAlt: "Profielfoto",
+      readOnly: "Alleen-lezen",
+      namePlaceholder: "Je naam",
+      bioNotes: "Bio / Notities",
+      bioPlaceholder: "Een korte introductie of iets over je wellnessroutine...",
+      cancel: "Annuleren",
+      profileUpdated: "Profielgegevens succesvol bijgewerkt.",
+      profileUpdateError: "Profiel bijwerken mislukt. Controleer je gegevens.",
+      passwordUpdated: "Je wachtwoord is succesvol gewijzigd.",
+      passwordUpdateError: "Wachtwoord wijzigen mislukt. Controleer je huidige wachtwoord.",
+      currentPasswordPlaceholder: "Voer je huidige wachtwoord in",
+      newPasswordPlaceholder: "Minimaal 8 tekens",
+      confirmPasswordPlaceholder: "Voer het nieuwe wachtwoord opnieuw in",
+      passwordRule: "Het wachtwoord moet minimaal 8 tekens bevatten en mag niet alleen uit cijfers bestaan.",
+      updatingPassword: "Wachtwoord bijwerken...",
+      keepAccountSecure: "Houd je account veilig",
+      loadingProfile: "Profiel laden...",
+      enterCurrentPassword: "Vul je huidige wachtwoord in.",
+      enterNewPassword: "Vul je nieuwe wachtwoord in.",
+      passwordTooShort: "Het nieuwe wachtwoord moet minimaal 8 tekens bevatten.",
+      passwordMismatch: "Het nieuwe wachtwoord en de bevestiging komen niet overeen.",
     },
   },
   de: {
@@ -395,6 +575,11 @@ export const dashboardTranslations: Record<Language, DashboardTranslations> = {
       myBookings: "Meine Buchungen",
       accessCodes: "Zugangscodes",
       profile: "Profil",
+      memberPortal: "Mitgliederportal",
+      member: "Mitglied",
+      userAlt: "Benutzer",
+      toggleNavigation: "Navigationsmenü umschalten",
+      closeNavigation: "Navigationsmenü schließen",
       viewWebsite: "Website ansehen",
       logout: "Abmelden",
     },
@@ -449,6 +634,30 @@ export const dashboardTranslations: Record<Language, DashboardTranslations> = {
       completed: "Abgeschlossen",
       cancelled: "Storniert",
       pending: "Ausstehend",
+      dateLabel: "Datum",
+      timeLabel: "Uhrzeit",
+      guest: "Gast",
+      cancelReservation: "Reservierung stornieren",
+      reservationCancelled: "Reservierung storniert",
+      cancelledSuccessfully: "Erfolgreich storniert",
+      creditRefunded: "Ein Sitzungsguthaben wurde Ihrem Konto gutgeschrieben.",
+      remainingCredits: "Verbleibendes Guthaben:",
+      done: "Fertig",
+      bookingReference: "Buchungsreferenz:",
+      experience: "Erlebnis:",
+      scheduled: "Geplant:",
+      cancellationNotice: "Stornierungen müssen mindestens 24 Stunden vor Beginn erfolgen, damit ein Sitzungsguthaben erstattet werden kann. Stornierungen innerhalb von 24 Stunden können nicht rückgängig gemacht werden.",
+      cancellationReason: "Stornierungsgrund",
+      optional: "(optional)",
+      cancellationPlaceholder: "z. B. Terminkonflikt, Unwohlsein...",
+      keepReservation: "Reservierung behalten",
+      cancelling: "Wird storniert...",
+      confirmCancellation: "Stornierung bestätigen",
+      cancelFailed: "Reservierung konnte nicht storniert werden.",
+      cancelUnexpected: "Beim Stornieren Ihrer Reservierung ist ein unerwarteter Fehler aufgetreten.",
+      at: "um",
+      paid: "Bezahlt",
+      unpaid: "Unbezahlt",
       timeSlot: "Zeitfenster",
       guestsCount: "Gäste",
       totalPaid: "Gesamtbetrag",
@@ -467,6 +676,13 @@ export const dashboardTranslations: Record<Language, DashboardTranslations> = {
       instruction: "Geben Sie diesen Code auf dem Tastenfeld an der Tür ein, gefolgt von #.",
       instructionsTitle: "So verwenden Sie Ihre Zugangscodes",
       instructionsBody: "Codes werden 15 Minuten vor Beginn Ihrer gebuchten Zeit aktiv und bleiben bis zum Ende Ihrer Buchung gültig.",
+      confirmed: "Bestätigt",
+      copied: "Kopiert!",
+      copy: "Kopieren",
+      slot: "Zeitfenster:",
+      at: "um",
+      private: "Privat",
+      shared: "Gemeinschaftlich",
     },
     profile: {
       title: "Profil & Konto",
@@ -485,6 +701,30 @@ export const dashboardTranslations: Record<Language, DashboardTranslations> = {
       newPassword: "Neues Passwort",
       confirmPassword: "Neues Passwort Bestätigen",
       updatePassword: "Passwort Aktualisieren",
+      updatePublicDetails: "Verwalten Sie Ihre persönlichen Daten, Ihr Profilbild und Ihre Kontosicherheit",
+      editProfile: "Profil bearbeiten",
+      changePhoto: "Foto ändern (JPG, PNG)",
+      avatarAlt: "Profilbild",
+      readOnly: "Schreibgeschützt",
+      namePlaceholder: "Ihr Name",
+      bioNotes: "Biografie / Notizen",
+      bioPlaceholder: "Ein kurzer Hinweis zu Ihrer Person oder Ihrer Wellnessroutine...",
+      cancel: "Abbrechen",
+      profileUpdated: "Profilinformationen erfolgreich aktualisiert.",
+      profileUpdateError: "Profil konnte nicht aktualisiert werden. Bitte überprüfen Sie Ihre Eingaben.",
+      passwordUpdated: "Ihr Passwort wurde erfolgreich geändert.",
+      passwordUpdateError: "Passwort konnte nicht geändert werden. Bitte überprüfen Sie Ihr aktuelles Passwort.",
+      currentPasswordPlaceholder: "Aktuelles Passwort eingeben",
+      newPasswordPlaceholder: "Mindestens 8 Zeichen",
+      confirmPasswordPlaceholder: "Neues Passwort erneut eingeben",
+      passwordRule: "Das Passwort muss mindestens 8 Zeichen lang sein und darf nicht nur aus Zahlen bestehen.",
+      updatingPassword: "Passwort wird aktualisiert...",
+      keepAccountSecure: "Schützen Sie Ihr Konto",
+      loadingProfile: "Profil wird geladen...",
+      enterCurrentPassword: "Bitte geben Sie Ihr aktuelles Passwort ein.",
+      enterNewPassword: "Bitte geben Sie Ihr neues Passwort ein.",
+      passwordTooShort: "Das neue Passwort muss mindestens 8 Zeichen enthalten.",
+      passwordMismatch: "Neues Passwort und Bestätigung stimmen nicht überein.",
     },
   },
 };

@@ -13,11 +13,15 @@ import { Suspense, useEffect, useState } from "react";
 import { FaApple, FaGoogle } from "react-icons/fa";
 import { HiOutlineLockClosed, HiOutlineMail } from "react-icons/hi";
 import { IoEyeOutline } from "react-icons/io5";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
+import { authTranslations } from "@/lib/i18n/authTranslations";
 
 function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const redirectUrl = searchParams.get("redirect");
+  const { language } = useLanguage();
+  const tAuth = authTranslations[language]?.login || authTranslations.en.login;
 
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState("");
@@ -102,7 +106,7 @@ function LoginForm() {
     setIsInactive(false);
 
     if (!email.trim() || !password) {
-      setError("Please enter both email and password.");
+      setError(tAuth.errors.fillAll);
       return;
     }
 
@@ -115,7 +119,7 @@ function LoginForm() {
       });
 
       if (response.status === false) {
-        const logMsg = response.log || "Invalid email or password.";
+        const logMsg = response.log || tAuth.errors.loginFailed;
         setError(logMsg);
         if (logMsg.toLowerCase().includes("inactive") || logMsg.toLowerCase().includes("otp")) {
           setIsInactive(true);
@@ -131,11 +135,11 @@ function LoginForm() {
           router.push(targetRoute);
         }
       } else {
-        setError(response.log || "Login failed. Please check your credentials.");
+        setError(response.log || tAuth.errors.loginFailed);
       }
     } catch (err: unknown) {
       const msg = parseApiErrorMessage((err as { data?: unknown })?.data || err);
-      setError(msg);
+      setError(msg || tAuth.errors.loginFailed);
       if (msg.toLowerCase().includes("inactive") || msg.toLowerCase().includes("otp")) {
         setIsInactive(true);
         setTimeout(() => {
@@ -164,12 +168,11 @@ function LoginForm() {
           />
           <div className="absolute inset-0 bg-black/30" />
           <div className="absolute inset-0 flex flex-col justify-center items-center text-center p-10 text-white">
-            <h2 className="font-displayPlayFair text-4xl lg:text-5xl leading-[1.2] mb-5">
-              Welcome to the <br /> Circle of Stillness.
+            <h2 className="font-displayPlayFair text-4xl lg:text-5xl leading-[1.2] mb-5 whitespace-pre-line">
+              {tAuth.heroTitle}
             </h2>
             <p className="text-sm leading-relaxed opacity-90 max-w-sm mb-5">
-              Membership unlocks exclusive arrangements, priority reservations,
-              and personalized wellness concierge services.
+              {tAuth.heroSubtitle}
             </p>
             <div className="w-12 h-px bg-white/60" />
           </div>
@@ -180,10 +183,10 @@ function LoginForm() {
           <div className="w-full max-w-[500px]">
             <div className="mb-6">
               <h1 className="font-displayPlayFair text-[32px] font-bold text-[#1d1a17] mb-2 leading-tight">
-                Member Access
+                {tAuth.title}
               </h1>
               <p className="text-sm text-[#64748B] font-light">
-                Welcome back. Your Heaven awaits.
+                {tAuth.subtitle}
               </p>
             </div>
 
@@ -195,7 +198,7 @@ function LoginForm() {
                   className="text-[11px] font-medium text-[#1d1a17] uppercase tracking-wide"
                   style={{ fontFamily: "Cambria, serif" }}
                 >
-                  Email Address
+                  {tAuth.emailLabel}
                 </label>
                 <div className="relative">
                   <span className="absolute inset-y-0 left-3 flex items-center text-[#94A3B8] pointer-events-none">
@@ -205,7 +208,7 @@ function LoginForm() {
                     id="email"
                     type="email"
                     required
-                    placeholder="user@example.com"
+                    placeholder={tAuth.emailPlaceholder}
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     className="w-full pl-9 pr-3 py-2.5 border border-[#E2E8F0] rounded-sm text-sm text-[#1d1a17] placeholder:text-[#94A3B8] focus:outline-none focus:border-[#8b7355] transition-colors"
@@ -221,7 +224,7 @@ function LoginForm() {
                   className="text-[11px] font-medium text-[#1d1a17] uppercase tracking-wide"
                   style={{ fontFamily: "Cambria, serif" }}
                 >
-                  Password
+                  {tAuth.passwordLabel}
                 </label>
                 <div className="relative">
                   <span className="absolute inset-y-0 left-3 flex items-center text-[#94A3B8] pointer-events-none">
@@ -231,7 +234,7 @@ function LoginForm() {
                     id="password"
                     type={showPassword ? "text" : "password"}
                     required
-                    placeholder="••••••••"
+                    placeholder={tAuth.passwordPlaceholder}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     className="w-full pl-9 pr-10 py-2.5 border border-[#E2E8F0] rounded-sm text-sm text-[#1d1a17] focus:outline-none focus:border-[#8b7355] transition-colors"
@@ -250,7 +253,7 @@ function LoginForm() {
                     href={`/forgot-password${email.trim() ? `?email=${encodeURIComponent(email.trim())}` : ""}`}
                     className="text-xs text-[#8b7355] hover:text-[#6f5c43] hover:underline transition-colors"
                   >
-                    Forgot Password?
+                    {tAuth.forgotPassword}
                   </Link>
                 </div>
               </div>
@@ -264,7 +267,7 @@ function LoginForm() {
                       href={`/verify-otp?email=${encodeURIComponent(email.trim())}`}
                       className="inline-block text-xs font-semibold text-[#8b7355] hover:underline"
                     >
-                      → Verify OTP Now
+                      → {tAuth.verifyOtpLink}
                     </Link>
                   )}
                 </div>
@@ -277,7 +280,7 @@ function LoginForm() {
                 className="w-full flex items-center justify-center gap-2 py-3.5 mt-1 bg-[#CFB9A3] hover:bg-[#bfa77f] disabled:opacity-70 text-white text-xs font-bold uppercase tracking-widest rounded-sm transition-colors cursor-pointer"
                 style={{ boxShadow: "0 0 20px 0 rgba(202,117,33,0.30)" }}
               >
-                {loading ? "Logging in…" : "Log In"}
+                {loading ? tAuth.signingIn : tAuth.signInButton}
                 {!loading && (
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
                     <path
@@ -295,7 +298,7 @@ function LoginForm() {
               <div className="relative my-2 flex items-center justify-center">
                 <div className="border-t border-[#E2E8F0] w-full" />
                 <span className="bg-white px-3 text-[11px] text-[#94A3B8] uppercase tracking-wider">
-                  or continue with
+                  {tAuth.orContinueWith}
                 </span>
                 <div className="border-t border-[#E2E8F0] w-full" />
               </div>
@@ -309,30 +312,18 @@ function LoginForm() {
                   className="w-full flex items-center justify-center gap-2.5 py-2.5 px-4 border border-[#E2E8F0] hover:border-[#8b7355] hover:bg-[#FAF8F5] rounded-sm text-xs font-medium text-[#1d1a17] transition-all disabled:opacity-60 cursor-pointer shadow-xs"
                 >
                   <FaGoogle className="w-4 h-4 text-[#EA4335]" />
-                  <span>{socialLoading === "google" ? "Connecting to Google…" : "Continue with Google"}</span>
+                  <span>{socialLoading === "google" ? `${tAuth.continueWithGoogle}…` : tAuth.continueWithGoogle}</span>
                 </button>
-
-                {/* Apple Sign-In (Kept for future use when Apple Developer credentials are ready)
-                <button
-                  type="button"
-                  onClick={handleAppleLogin}
-                  disabled={loading || !!socialLoading}
-                  className="w-full flex items-center justify-center gap-2 py-2.5 px-3 border border-[#E2E8F0] hover:border-[#8b7355] hover:bg-[#FAF8F5] rounded-sm text-xs font-medium text-[#1d1a17] transition-all disabled:opacity-60 cursor-pointer"
-                >
-                  <FaApple className="w-4 h-4 text-[#000000]" />
-                  <span>{socialLoading === "apple" ? "Connecting…" : "Continue with Apple"}</span>
-                </button>
-                */}
               </div>
 
               {/* Sign up link */}
               <p className="text-center text-xs text-[#64748B] pt-3 border-t border-[#f1f5f9]">
-                Don&apos;t have an account?{" "}
+                {tAuth.noAccount}{" "}
                 <Link
                   href={`/signup${redirectUrl ? `?redirect=${encodeURIComponent(redirectUrl)}` : ""}`}
                   className="text-[#CFB9A3] hover:text-[#8b7355] font-semibold ml-0.5 transition-colors"
                 >
-                  Sign Up
+                  {tAuth.createAccount}
                 </Link>
               </p>
             </form>

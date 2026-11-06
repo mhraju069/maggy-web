@@ -309,9 +309,9 @@ export default function InformationPage() {
                 {loadingSlots ? (
                   <span className="italic text-[#94A3B8]">{infoTrans?.lunchroomCheckingNotice || "Checking hours for selected date..."}</span>
                 ) : lunchroomIsBlocked ? (
-                  <span><strong>Lunchroom:</strong> {lunchroomBlockMessage || infoTrans?.lunchroomBlockedNotice || "This date is blocked. No slots available."}</span>
+                  <span><strong>{infoTrans?.lunchroomLabel || "Lunchroom:"}</strong> {lunchroomBlockMessage || infoTrans?.lunchroomBlockedNotice || "This date is blocked. No slots available."}</span>
                 ) : lunchroomIsClosed ? (
-                  <span><strong>Lunchroom:</strong> {infoTrans?.lunchroomClosedNotice || "Closed on this date — please select another date"}</span>
+                  <span><strong>{infoTrans?.lunchroomLabel || "Lunchroom:"}</strong> {infoTrans?.lunchroomClosedNotice || "Closed on this date — please select another date"}</span>
                 ) : lunchroomOpenTime && lunchroomCloseTime ? (
                   <span>
                     <strong>{infoTrans?.lunchroomOpeningHoursLabel || "Lunchroom Opening Hours:"}</strong> {lunchroomOpenTime} – {lunchroomCloseTime}
@@ -388,7 +388,7 @@ export default function InformationPage() {
                   className="w-full p-4 border border-[#E2E8F0] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#D1B191] text-[#475569] font-medium bg-white cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {lunchroomIsBlocked ? (
-                    <option value="" disabled>Date Blocked - No Slots</option>
+                    <option value="" disabled>{infoTrans?.dateBlockedNoSlots || "Date Blocked - No Slots"}</option>
                   ) : lunchroomArrivalTimes.length === 0 ? (
                     <option value="" disabled>{infoTrans?.lunchroomNoArrivalTimes || "No arrival times available for this date"}</option>
                   ) : (
@@ -446,9 +446,9 @@ export default function InformationPage() {
                 {loadingSlots ? (
                   <span className="italic text-[#94A3B8]">{infoTrans?.lunchroomCheckingNotice || "Checking lunchroom hours for your booking date..."}</span>
                 ) : lunchroomIsBlocked ? (
-                  <span><strong>Lunchroom:</strong> {lunchroomBlockMessage || infoTrans?.lunchroomBlockedNotice || "This date is blocked. No slots available."}</span>
+                  <span><strong>{infoTrans?.lunchroomLabel || "Lunchroom:"}</strong> {lunchroomBlockMessage || infoTrans?.lunchroomBlockedNotice || "This date is blocked. No slots available."}</span>
                 ) : lunchroomIsClosed ? (
-                  <span><strong>Lunchroom:</strong> {infoTrans?.lunchroomClosedNotice || "Closed on your selected date — please change the booking date"}</span>
+                  <span><strong>{infoTrans?.lunchroomLabel || "Lunchroom:"}</strong> {infoTrans?.lunchroomClosedNotice || "Closed on your selected date — please change the booking date"}</span>
                 ) : lunchroomOpenTime && lunchroomCloseTime ? (
                   <span>
                     <strong>{infoTrans?.lunchroomOpeningHoursLabel || "Lunchroom Opening Hours:"}</strong> {lunchroomOpenTime} – {lunchroomCloseTime}

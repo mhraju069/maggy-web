@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { IoMdCheckmarkCircleOutline } from "react-icons/io";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
 
 const CheckIcon = () => (
   <IoMdCheckmarkCircleOutline size={20} color="#CFB9A3" />
@@ -41,7 +42,17 @@ export default function ArrangementCard({
   isSelected,
   onClick,
 }: ArrangementCardProps) {
-  const badge = paymentBadge[paymentType];
+  const { t } = useLanguage();
+  const cUI = (t as any)?.commonUI;
+  const paymentLabels: Record<PaymentType, string> = {
+    full: cUI?.fullPrepayment || "Full prepayment",
+    partial: cUI?.partialPayment || "Partial payment",
+    spot: cUI?.payOnTheSpot || "Pay on the spot",
+  };
+  const badge = {
+    label: paymentLabels[paymentType] || paymentBadge[paymentType].label,
+    bg: paymentBadge[paymentType].bg,
+  };
 
   return (
     <div

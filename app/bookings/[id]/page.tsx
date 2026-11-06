@@ -4,10 +4,13 @@ import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import BookingDetailsModal from "@/components/shared/BookingDetailsModal";
 import Spinner from "@/components/shared/Spinner";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
 
 export default function BookingDetailPage() {
   const params = useParams();
   const router = useRouter();
+  const { t } = useLanguage();
+  const cUI = (t as any)?.commonUI;
   const bookingId = (params?.id as string) || "";
   const [modalOpen, setModalOpen] = useState(true);
 
@@ -31,7 +34,7 @@ export default function BookingDetailPage() {
       />
       {!modalOpen && (
         <div className="text-center">
-          <Spinner message="Redirecting to dashboard..." />
+          <Spinner message={cUI?.redirectingToDashboard || "Redirecting to dashboard..."} />
         </div>
       )}
     </div>

@@ -37,3 +37,21 @@ export function formatTime24h(time?: string): string {
 
   return `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}`;
 }
+
+export function formatDisplayDate(dateStr?: string, locale: string = "en-US"): string {
+  if (!dateStr) return "N/A";
+  try {
+    const d = new Date(dateStr);
+    if (isNaN(d.getTime())) return dateStr;
+    const l = locale === "nl" ? "nl-NL" : locale === "de" ? "de-DE" : "en-US";
+    return d.toLocaleDateString(l, {
+      weekday: "short",
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+    });
+  } catch {
+    return dateStr;
+  }
+}
+

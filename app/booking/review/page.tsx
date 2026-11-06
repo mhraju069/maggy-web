@@ -30,6 +30,16 @@ export default function ReviewPage() {
   }, []);
 
   const celebration = data.celebration;
+  const occasionKeys: Record<string, string> = {
+    Birthday: "birthday",
+    Anniversary: "anniversary",
+    Graduation: "graduation",
+    "Promotion / Career Milestone": "promotion",
+    "Baby Shower": "babyShower",
+    "Engagement / Romantic Celebration": "engagement",
+    Retirement: "retirement",
+    "Other Special Event": "other",
+  };
   const isLunchroom = data.serviceType === "lunchroom" || data.serviceName.toLowerCase().includes("lunchroom");
   const isActivity = data.serviceType === "activity";
   const isPackage = data.serviceType === "package" || data.serviceType === "packages";
@@ -173,7 +183,7 @@ export default function ReviewPage() {
                         <p className="font-bold text-[#0F172A] text-sm mt-0.5">
                           {pkgSelections.lunchroomTime} Arrival
                         </p>
-                        <span className="text-[11px] text-[#64748B]">Flexible Lunchroom Entry</span>
+                        <span className="text-[11px] text-[#64748B]">{revTrans?.lunchroomDining || "Lunchroom Dining"}</span>
                       </div>
                     )}
 
@@ -183,7 +193,7 @@ export default function ReviewPage() {
                         <p className="font-bold text-[#0F172A] text-sm mt-0.5">
                           {pkgSelections.saltRoomSlot.startTime} – {pkgSelections.saltRoomSlot.endTime}
                         </p>
-                        <span className="text-[11px] text-[#64748B]">Halotherapy Session</span>
+                        <span className="text-[11px] text-[#64748B]">{revTrans?.saltRoomSession || "Salt Room Session"}</span>
                       </div>
                     )}
 
@@ -206,11 +216,14 @@ export default function ReviewPage() {
               {!isPackage && !isLunchroom && !isActivity && (
                 <div className="pt-3 border-t border-[#F1F5F9]">
                   <div>
-                    <span className="text-xs text-[#94A3B8] uppercase block mb-1">Session Duration</span>
+                    <span className="text-xs text-[#94A3B8] uppercase block mb-1">{revTrans?.duration || "Duration"}</span>
                     <p className="text-base font-bold text-[#0F172A]">
                       {data.isSaltRoom || data.serviceType === "salt_room" || data.serviceType === "saltroom"
-                        ? "1 Hour Aerosol Halotherapy"
-                        : `${data.durationHours || 3} Hours ${data.isSharedSauna ? "Shared Session Access" : "Private Access"}`}
+                        ? revTrans?.saltRoomDuration || "1 Hour Aerosol Halotherapy"
+                        : (data.isSharedSauna
+                          ? (revTrans?.sharedSaunaDuration || "{hours} Hours Shared Session Access")
+                          : (revTrans?.privateSaunaDuration || "{hours} Hours Private Access")
+                        ).replace("{hours}", String(data.durationHours || 3))}
                     </p>
                   </div>
                 </div>
@@ -221,14 +234,14 @@ export default function ReviewPage() {
                 <div className="pt-3 border-t border-[#F1F5F9] space-y-3">
                   {data.activityDetails.teacherHost && (
                     <div>
-                      <span className="text-xs text-[#94A3B8] uppercase block mb-1">Teacher / Host</span>
+                      <span className="text-xs text-[#94A3B8] uppercase block mb-1">{flow?.information?.hostGuide || "Teacher / Host"}</span>
                       <p className="text-base font-bold text-[#0F172A]">{data.activityDetails.teacherHost}</p>
                     </div>
                   )}
 
                   {data.activityDetails.additionalInfo && (
                     <div className="p-3 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0] text-xs text-[#475569]">
-                      <span className="font-bold text-[#0F172A] block mb-0.5">Additional Information:</span>
+                      <span className="font-bold text-[#0F172A] block mb-0.5">{revTrans?.additionalInformation || "Additional Information:"}</span>
                       {data.activityDetails.additionalInfo}
                     </div>
                   )}
@@ -238,7 +251,7 @@ export default function ReviewPage() {
               {/* Sauna Extras (Sauna Only) */}
               {!isLunchroom && !isActivity && data.selectedExtras && data.selectedExtras.length > 0 && (
                 <div className="pt-3 border-t border-[#F1F5F9]">
-                  <span className="text-xs text-[#94A3B8] uppercase block mb-2">Selected Add-on Extras</span>
+                  <span className="text-xs text-[#94A3B8] uppercase block mb-2">{revTrans?.selectedExtras || "Selected Extras"}</span>
                   <div className="flex flex-wrap gap-2">
                     {data.selectedExtras.map((ext) => (
                       <span key={ext.id} className="px-3 py-1 bg-[#FCF2E9] border border-[#E8E2DC] rounded-lg text-xs font-bold text-[#8B7355]">
@@ -311,7 +324,7 @@ export default function ReviewPage() {
                     <FaCakeCandles size={20} />
                   </div>
                   <div>
-                    <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#8B7355] block">Special Occasion</span>
+                    <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#8B7355] block">{revTrans?.celebrationDetails || "Special Occasion"}</span>
                     <h3 className="text-xl font-bold font-displayPlayFair text-[#0F172A]">{revTrans?.celebrationNoted || "Celebration Details 🎉"}</h3>
                   </div>
                 </div>
@@ -319,12 +332,14 @@ export default function ReviewPage() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm">
                   <div>
                     <span className="text-xs text-[#8B7355] uppercase font-bold block mb-1">{flow?.information?.whatIsBeingCelebrated || "What is being celebrated?"}</span>
-                    <p className="font-bold text-[#0F172A]">{celebration.occasion || "Special Celebration"}</p>
+                    <p className="font-bold text-[#0F172A]">
+                      {flow?.information?.occasions?.[occasionKeys[celebration.occasion] || "other"] || celebration.occasion || revTrans?.specialCelebration || "Special Celebration"}
+                    </p>
                   </div>
 
                   <div>
                     <span className="text-xs text-[#8B7355] uppercase font-bold block mb-1">{flow?.information?.whoIsItFor || "Who is it for?"}</span>
-                    <p className="font-bold text-[#0F172A]">{celebration.celebrantName || "Guest of Honor"}</p>
+                    <p className="font-bold text-[#0F172A]">{celebration.celebrantName || revTrans?.guestOfHonor || "Guest of Honor"}</p>
                   </div>
 
                   {celebration.age && (

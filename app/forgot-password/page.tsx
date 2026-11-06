@@ -8,11 +8,15 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useState } from "react";
 import { HiOutlineMail } from "react-icons/hi";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
+import { authTranslations } from "@/lib/i18n/authTranslations";
 
 function ForgotPasswordForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const initialEmail = searchParams.get("email") || "";
+  const { language } = useLanguage();
+  const tAuth = authTranslations[language]?.forgotPassword || authTranslations.en.forgotPassword;
 
   const [email, setEmail] = useState(initialEmail);
   const [loading, setLoading] = useState(false);
@@ -25,7 +29,7 @@ function ForgotPasswordForm() {
     setSuccess(null);
 
     if (!email.trim()) {
-      setError("Please enter your registered email address.");
+      setError(tAuth.errors.enterEmail);
       return;
     }
 
@@ -34,16 +38,16 @@ function ForgotPasswordForm() {
     try {
       const response = await authService.forgotPassword({ email: email.trim() });
       if (response.status !== false) {
-        setSuccess(response.log || "Password reset OTP sent to your email.");
+        setSuccess(response.log || tAuth.successMsg);
         setTimeout(() => {
           router.push(`/reset-password?email=${encodeURIComponent(email.trim())}`);
         }, 1200);
       } else {
-        setError(response.log || "Failed to send reset code. Please try again.");
+        setError(response.log || tAuth.errors.failed);
       }
     } catch (err: unknown) {
       const msg = parseApiErrorMessage((err as { data?: unknown })?.data || err);
-      setError(msg || "Failed to request password reset.");
+      setError(msg || tAuth.errors.failed);
     } finally {
       setLoading(false);
     }
@@ -66,11 +70,11 @@ function ForgotPasswordForm() {
           />
           <div className="absolute inset-0 bg-black/30" />
           <div className="absolute inset-0 flex flex-col justify-center items-center text-center p-10 text-white">
-            <h2 className="font-displayPlayFair text-4xl lg:text-5xl leading-[1.2] mb-5">
-              Reset Your <br /> Sanctuary Access.
+            <h2 className="font-displayPlayFair text-4xl lg:text-5xl leading-[1.2] mb-5 whitespace-pre-line">
+              {tAuth.heroTitle}
             </h2>
             <p className="text-sm leading-relaxed opacity-90 max-w-sm mb-5">
-              Enter your email to receive a secure 4-digit verification code to reset your password.
+              {tAuth.heroSubtitle}
             </p>
             <div className="w-12 h-px bg-white/60" />
           </div>
@@ -81,10 +85,10 @@ function ForgotPasswordForm() {
           <div className="w-full max-w-[480px]">
             <div className="mb-6">
               <h1 className="font-displayPlayFair text-[32px] font-bold text-[#1d1a17] mb-2 leading-tight">
-                Forgot Password
+                {tAuth.title}
               </h1>
               <p className="text-sm text-[#64748B] font-light">
-                We will send a 4-digit OTP code to verify your identity.
+                {tAuth.subtitle}
               </p>
             </div>
 
@@ -96,7 +100,7 @@ function ForgotPasswordForm() {
                   className="text-[11px] font-medium text-[#1d1a17] uppercase tracking-wide"
                   style={{ fontFamily: "Cambria, serif" }}
                 >
-                  Email Address
+                  {tAuth.emailLabel}
                 </label>
                 <div className="relative">
                   <span className="absolute inset-y-0 left-3 flex items-center text-[#94A3B8] pointer-events-none">
@@ -106,7 +110,7 @@ function ForgotPasswordForm() {
                     id="email"
                     type="email"
                     required
-                    placeholder="user@example.com"
+                    placeholder={tAuth.emailPlaceholder}
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     className="w-full pl-9 pr-3 py-2.5 border border-[#E2E8F0] rounded-sm text-sm text-[#1d1a17] placeholder:text-[#94A3B8] focus:outline-none focus:border-[#8b7355] transition-colors"
@@ -136,7 +140,7 @@ function ForgotPasswordForm() {
                 className="w-full flex items-center justify-center gap-2 py-3.5 mt-2 bg-[#CFB9A3] hover:bg-[#bfa77f] disabled:opacity-70 text-white text-xs font-bold uppercase tracking-widest rounded-sm transition-colors cursor-pointer"
                 style={{ boxShadow: "0 0 20px 0 rgba(202,117,33,0.30)" }}
               >
-                {loading ? "Sending OTP…" : "Send Reset Code"}
+                {loading ? tAuth.sendingOtp : tAuth.sendResetCode}
                 {!loading && (
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
                     <path
@@ -152,12 +156,12 @@ function ForgotPasswordForm() {
 
               {/* Back to login */}
               <p className="text-center text-xs text-[#64748B] pt-4 border-t border-[#f1f5f9]">
-                Remember your password?{" "}
+                {tAuth.rememberPassword}{" "}
                 <Link
                   href="/login"
                   className="text-[#CFB9A3] hover:text-[#8b7355] font-semibold ml-0.5 transition-colors"
                 >
-                  Back to Log In
+                  {tAuth.backToLogin}
                 </Link>
               </p>
             </form>

@@ -463,7 +463,7 @@ export default function SaltRoomBookingPage() {
     return (
       <div className="w-full px-6 md:px-12 max-w-6xl mx-auto py-24 text-center">
         <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-[#8B7355] border-t-transparent mb-4"></div>
-        <p className="text-[#64748B] font-cambria italic">Loading Salt Room Services...</p>
+        <p className="text-[#64748B] font-cambria italic">{(t as any)?.bookingFlow?.common?.loading || "Loading..."}</p>
       </div>
     );
   }
