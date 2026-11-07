@@ -39,7 +39,7 @@ interface PackageComboItem {
 
 export default function SaltRoomBookingPage() {
   const router = useRouter();
-  const { t } = useLanguage();
+  const { language, t } = useLanguage();
   const flow = (t as any)?.bookingFlow;
   const saltTrans = flow?.saltroom;
   const btnTrans = flow?.buttons;
@@ -500,11 +500,24 @@ export default function SaltRoomBookingPage() {
       {/* ── Title Section ── */}
       <div className="text-center mb-10 flex flex-col items-center">
         <h1 className="font-displayPlayFair text-5xl text-[#1d1a17] mb-2 uppercase tracking-tight">
-          {saltroomInfo?.title || "Salt Room"}
+          {(language === "nl"
+            ? (saltroomInfo as any)?.title_nl
+            : language === "de"
+              ? (saltroomInfo as any)?.title_de
+              : (saltroomInfo as any)?.title_en) ||
+            saltTrans?.title ||
+            saltroomInfo?.title ||
+            "Salt Room"}
         </h1>
         <DecorativeUnderline />
         <p className="font-cambria text-sm text-[#475569] mt-6 italic">
-          {saltroomInfo?.description ||
+          {(language === "nl"
+            ? (saltroomInfo as any)?.description_nl || (saltroomInfo as any)?.subtitle_nl
+            : language === "de"
+              ? (saltroomInfo as any)?.description_de || (saltroomInfo as any)?.subtitle_de
+              : (saltroomInfo as any)?.description_en || (saltroomInfo as any)?.subtitle_en) ||
+            saltTrans?.subtitle ||
+            saltroomInfo?.description ||
             saltroomInfo?.subtitle ||
             ""}
         </p>
