@@ -732,9 +732,6 @@ export default function ChooseTimePage() {
               <h4 className="font-bold text-[#0F172A] text-sm">
                 VIP Sauna ({storedData.durationHours || 3} Hours Session)
               </h4>
-              <p className="text-xs text-[#8B7355] font-medium">
-                Exclusive wellness sanctuary reserved for your group.
-              </p>
             </div>
           </div>
         </div>
@@ -1177,10 +1174,10 @@ export default function ChooseTimePage() {
               <div className="flex justify-between items-center mb-4">
                 <label className="block text-xl  font-bold text-[#0F172A] uppercase tracking-wider" style={{ fontFamily: "Inter, sans-serif" }}>
                   {isSaltRoom
-                    ? "Select Salt Room Session (1 Hour Session)"
+                    ? (ctTrans?.saltRoomTimeSlot || "Select Salt Room Session (1 Hour Session)")
                     : isSharedSauna
-                      ? "Select Shared Session Slot (1.5 Hours)"
-                      : "Time Slot"}
+                      ? (ctTrans?.sharedSaunaTimeSlot || "Select Shared Session Slot (1.5 Hours)")
+                      : (ctTrans?.saunaTimeSlot || "Time Slot")}
                 </label>
                 {isLunchroom && (
                   <span className="text-xs text-[#64748B]">
@@ -1427,7 +1424,8 @@ export default function ChooseTimePage() {
           <div>
             <div className="flex justify-between items-center mb-4">
               <label className="block text-xl  font-bold text-[#0F172A] uppercase tracking-wider" style={{ fontFamily: "Inter, sans-serif" }}>
-                Number of People </label> 
+                {ctTrans?.numberOfPeoplePlaces || "Number of People"}
+              </label> 
             </div>
 
             <select
