@@ -1040,7 +1040,6 @@ export default function AdminSubscriptionsPage() {
                     onChange={(e) => setPlanForm({ ...planForm, plan_category: e.target.value })}
                     className="w-full border border-[#E8E2DC] rounded-xl p-2.5 bg-white text-[#1d1a17] font-medium focus:outline-none focus:ring-2 focus:ring-[#CFB9A3] cursor-pointer"
                   >
-                    <option value="sauna">sauna</option>
                     <option value="saltroom">saltroom</option>
                   </select>
                 </div>
