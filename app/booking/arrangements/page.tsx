@@ -580,8 +580,8 @@ export default function SaltRoomBookingPage() {
             <FaUsers className="text-[#8B7355]" />
             <span>
               {dynamicMaxCapacity === 1
-                ? (saltTrans?.personPerSession ? saltTrans.personPerSession.replace("{count}", "1") : "1 Person / Session")
-                : (saltTrans?.peoplePerSession ? saltTrans.peoplePerSession.replace("{count}", String(dynamicMaxCapacity)) : `${dynamicMaxCapacity} People / Session`)}
+                ? (saltTrans?.personPerSession ? saltTrans.personPerSession.replace("{count}", "1") : "1 Person")
+                : (saltTrans?.peoplePerSession ? saltTrans.peoplePerSession.replace("{count}", String(dynamicMaxCapacity)) : `${dynamicMaxCapacity} People`)}
             </span>
           </div>
         </div>
