@@ -9,7 +9,7 @@ import { bookingService, CancelBookingResponse } from "@/lib/api/services/bookin
 import { ApiError } from "@/lib/api/types";
 import { useDashboard } from "../DashboardContext";
 import Spinner from "@/components/shared/Spinner";
-import { cleanServiceName } from "../page";
+import { cleanServiceName } from "@/lib/utils";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 import { dashboardTranslations } from "@/lib/i18n/dashboardTranslations";
 import { formatTime24h } from "@/lib/dateUtils";
