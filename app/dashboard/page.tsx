@@ -19,6 +19,8 @@ import Spinner from "@/components/shared/Spinner";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 import { dashboardTranslations } from "@/lib/i18n/dashboardTranslations";
 import { formatTime24h } from "@/lib/dateUtils";
+import { cleanServiceName } from "@/lib/utils";
+
 
 function formatDisplayDate(dateStr: string, locale: string = "en-US") {
   if (!dateStr) return "";
