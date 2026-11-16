@@ -68,7 +68,7 @@ const Navbar = () => {
   ];
 
   const activeLanguageLabel =
-    languageOptions.find((o) => o.value === language)?.label ?? "EN";
+    languageOptions.find((o) => o.value === language)?.label ?? "DE";
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 w-full bg-[#FCF2E9]">

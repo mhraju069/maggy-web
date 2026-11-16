@@ -43,7 +43,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="de" suppressHydrationWarning>
       <head>
         <meta name="color-scheme" content="light" />
         <link rel="icon" href="/images/logo.png" type="image/png" sizes="any" />

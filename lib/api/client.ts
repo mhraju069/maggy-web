@@ -27,8 +27,8 @@ export class ApiClient {
     // Build Headers
     const activeLang =
       typeof window !== "undefined"
-        ? localStorage.getItem("haven_language") || "en"
-        : "en";
+        ? localStorage.getItem("haven_language") || "de"
+        : "de";
 
     const headers: Record<string, string> = {
       ...DEFAULT_HEADERS,

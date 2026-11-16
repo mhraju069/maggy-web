@@ -12,13 +12,13 @@ type LanguageContextType = {
 };
 
 const LanguageContext = createContext<LanguageContextType>({
-  language: "en",
+  language: "de",
   setLanguage: () => {},
-  t: translations.en,
+  t: translations.de,
 });
 
 export const LanguageProvider = ({ children }: { children: ReactNode }) => {
-  const [language, setLanguageState] = useState<Language>("en");
+  const [language, setLanguageState] = useState<Language>("de");
 
   // Sync with user profile and localStorage on load
   useEffect(() => {
