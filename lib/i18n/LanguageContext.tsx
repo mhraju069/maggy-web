@@ -14,7 +14,7 @@ type LanguageContextType = {
 const LanguageContext = createContext<LanguageContextType>({
   language: "de",
   setLanguage: () => {},
-  t: translations.de,
+  t: translations.de as unknown as Translations,
 });
 
 export const LanguageProvider = ({ children }: { children: ReactNode }) => {
