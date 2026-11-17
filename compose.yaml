@@ -1,6 +1,7 @@
 services:
-  web:
+ frontend :
     build:
+      container_name: frontend
       context: .
       dockerfile: Dockerfile
       args:
